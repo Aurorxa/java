@@ -20,8 +20,8 @@ head:
       content: 许大仙,许大仙的博客
 
 hero:
-  name: "许大仙同学"
-  text: ""
+  name: "Java"
+  text: "大、全、细"
   tagline: "『Java 是一种跨平台、面向对象的编程语言，具有高安全性和稳定性，广泛应用于企业级开发、移动应用和网络服务。』"
   image:  # text 和 tagline 区域旁的图片
     src: /logo.svg
@@ -50,5 +50,5 @@ features:
 
 
 <confetti />
-
+<HomeUnderline />
 
