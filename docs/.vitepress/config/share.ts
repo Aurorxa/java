@@ -101,5 +101,13 @@ export const sharedConfig = defineConfig({
   },
   themeConfig: { // 主题设置
     logo: '/logo.svg',  // 左上角logo
+    editLink: {
+      pattern: 'https://github.com/Aurorxa/java/edit/master/docs/:path',
+      text: 'Edit this page on GitHub'
+    },
+    //社交链接
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/Aurorxa/java' },
+    ],
   }
 })
