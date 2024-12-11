@@ -101,6 +101,37 @@ export const sharedConfig = defineConfig({
   },
   themeConfig: { // 主题设置
     logo: '/logo.svg',  // 左上角logo
+    search: {
+      provider: 'local',
+      options: {
+        locales: {
+          root: {
+            translations: {
+              button: {
+                buttonText: 'Search',
+                buttonAriaLabel: 'Search',
+              },
+              modal: {
+                displayDetails: 'Display detailed list',
+                resetButtonTitle: 'Reset search',
+                backButtonTitle: 'Close search',
+                noResultsText: 'No results for',
+                footer: {
+                  selectText: 'to select',
+                  selectKeyAriaLabel: 'enter',
+                  navigateText: 'to navigate',
+                  navigateUpKeyAriaLabel: 'up arrow',
+                  navigateDownKeyAriaLabel: 'down arrow',
+                  closeText: 'to close',
+                  closeKeyAriaLabel: 'escape',
+                },
+              },
+            },
+          },
+
+        },
+      },
+    },
     editLink: {
       pattern: 'https://github.com/Aurorxa/java/edit/master/docs/:path',
       text: 'Edit this page on GitHub'
