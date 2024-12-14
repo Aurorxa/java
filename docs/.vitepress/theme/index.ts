@@ -9,8 +9,8 @@ import Confetti from "./components/Confetti.vue"
 import SwitchLayout from './components/SwitchLayout.vue'
 import HomeUnderline from "./components/HomeUnderline.vue"
 import "vitepress-markdown-timeline/dist/theme/index.css"
-import './style/index.css'
 import 'virtual:group-icons.css' //代码组样式
+import './style/index.css'
 
 export default {
   extends: DefaultTheme,
@@ -73,10 +73,10 @@ export default {
     )
     // giscus配置
     giscusTalk({
-      repo: 'Aurorxa/java', //仓库
-      repoId: 'R_kgDONXPoQw', //仓库ID
+      repo: 'Aurorxa/c', //仓库
+      repoId: 'R_kgDONXPdBg', //仓库ID
       category: 'Announcements', // 讨论分类
-      categoryId: 'DIC_kwDONXPoQ84ClC9a', //讨论分类ID
+      categoryId: 'DIC_kwDONXPdBs4CkzEP', //讨论分类ID
       mapping: 'pathname',
       inputPosition: 'bottom',
       lang: 'zh-CN',
