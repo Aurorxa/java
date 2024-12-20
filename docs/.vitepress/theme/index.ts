@@ -8,9 +8,12 @@ import { useData, useRoute, inBrowser } from 'vitepress'
 import Confetti from "./components/Confetti.vue"
 import SwitchLayout from './components/SwitchLayout.vue'
 import HomeUnderline from "./components/HomeUnderline.vue"
+import 'nprogress-v2/dist/index.css'
 import "vitepress-markdown-timeline/dist/theme/index.css"
-import './style/index.css'
 import 'virtual:group-icons.css' //代码组样式
+import './style/index.css'
+
+import { NProgress } from 'nprogress-v2/dist/index.js'
 
 export default {
   extends: DefaultTheme,
@@ -21,9 +24,19 @@ export default {
     app.component('ArticleMetadata', ArticleMetadata)
     app.component('confetti', Confetti)
     app.component('HomeUnderline', HomeUnderline)
+    if (inBrowser) {
+      NProgress.configure({ showSpinner: false })
+      // 手动定义 onBeforeRouteChange
+      router.onBeforeRouteChange = () => {
+        NProgress.start() // 开始进度条
+      }
+      // 在页面加载完成时停止进度条
+      router.onAfterRouteChanged = () => {
+        NProgress.done() // 停止进度条
+      }
+    }
   },
   setup() {
-    // Get frontmatter and route
     const { frontmatter } = useData()
     const route = useRoute()
     const initZoom = () => {
@@ -73,10 +86,10 @@ export default {
     )
     // giscus配置
     giscusTalk({
-      repo: 'Aurorxa/java', //仓库
-      repoId: 'R_kgDONXPoQw', //仓库ID
+      repo: 'Aurorxa/c', //仓库
+      repoId: 'R_kgDONXPdBg', //仓库ID
       category: 'Announcements', // 讨论分类
-      categoryId: 'DIC_kwDONXPoQ84ClC9a', //讨论分类ID
+      categoryId: 'DIC_kwDONXPdBs4CkzEP', //讨论分类ID
       mapping: 'pathname',
       inputPosition: 'bottom',
       lang: 'zh-CN',
