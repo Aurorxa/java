@@ -12,8 +12,11 @@ import 'nprogress-v2/dist/index.css'
 import "vitepress-markdown-timeline/dist/theme/index.css"
 import 'virtual:group-icons.css' //代码组样式
 import './style/index.css'
+<<<<<<< HEAD
 
 import { NProgress } from 'nprogress-v2/dist/index.js'
+=======
+>>>>>>> 38ea37c02e7c8375ec4f56e1332e4692bbd2de26
 
 export default {
   extends: DefaultTheme,
