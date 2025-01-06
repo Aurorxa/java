@@ -5,24 +5,38 @@ import mediumZoom from 'medium-zoom'
 import { onMounted, watch, nextTick, h } from 'vue'
 import giscusTalk from 'vitepress-plugin-comment-with-giscus'
 import { useData, useRoute, inBrowser } from 'vitepress'
+import type { EnhanceAppContext } from 'vitepress'
 import Confetti from "./components/Confetti.vue"
+import TypeIt from "./components/TypeIt.vue"
 import SwitchLayout from './components/SwitchLayout.vue'
 import HomeUnderline from "./components/HomeUnderline.vue"
+import { NProgress } from 'nprogress-v2/dist/index.js'
+import {
+  NolebaseGitChangelogPlugin
+} from '@nolebase/vitepress-plugin-git-changelog/client'
+import {
+  NolebaseInlineLinkPreviewPlugin,
+} from '@nolebase/vitepress-plugin-inline-link-preview/client'
+import '@nolebase/vitepress-plugin-inline-link-preview/client/style.css'
+import '@nolebase/vitepress-plugin-git-changelog/client/style.css'
 import 'nprogress-v2/dist/index.css'
 import "vitepress-markdown-timeline/dist/theme/index.css"
 import 'virtual:group-icons.css' //代码组样式
 import './style/index.css'
-import { NProgress } from 'nprogress-v2/dist/index.js'
+
 
 export default {
   extends: DefaultTheme,
   Layout() {
     return h(SwitchLayout)
   },
-  enhanceApp({ app, router }) {
+  enhanceApp({ app, router }: EnhanceAppContext) {
     app.component('ArticleMetadata', ArticleMetadata)
     app.component('confetti', Confetti)
     app.component('HomeUnderline', HomeUnderline)
+    app.component('TypeIt', TypeIt)
+    app.use(NolebaseGitChangelogPlugin)
+    app.use(NolebaseInlineLinkPreviewPlugin)
     if (inBrowser) {
       NProgress.configure({ showSpinner: false })
       // 手动定义 onBeforeRouteChange

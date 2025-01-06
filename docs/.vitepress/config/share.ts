@@ -1,15 +1,27 @@
 import { defineConfig } from 'vitepress'
 import timeline from "vitepress-markdown-timeline"
-import { groupIconMdPlugin, groupIconVitePlugin } from 'vitepress-plugin-group-icons'
+import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
+import { figure } from '@mdit/plugin-figure'
 import { loadEnv } from 'vite'
-import { La51Plugin } from 'vitepress-plugin-51la'
+import { pagefind } from './vite-plugin-config'
+import { pagefindPlugin } from 'vitepress-plugin-pagefind'
+import { withMermaid } from 'vitepress-plugin-mermaid'
+import {
+  GitChangelog,
+  GitChangelogMarkdownSection,
+} from '@nolebase/vitepress-plugin-git-changelog/vite'
+import {
+  InlineLinkPreviewElementTransform
+} from '@nolebase/vitepress-plugin-inline-link-preview/markdown-it'
+
 const mode = process.env.NODE_ENV || 'development'
 const { VITE_BASE_URL } = loadEnv(mode, process.cwd())
 
 console.log('Mode:', process.env.NODE_ENV)
 console.log('VITE_BASE_URL:', VITE_BASE_URL)
 
-export const sharedConfig = defineConfig({
+
+export const sharedConfig = withMermaid(defineConfig({
   rewrites: {
     'zh/:rest*': ':rest*'
   },
@@ -25,42 +37,59 @@ export const sharedConfig = defineConfig({
     // 引入 Google Fonts
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
     ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
-    ['link', { href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap', rel: 'stylesheet' }],
+    ['link', { href: 'https://fonts.googleapis.com/css?family=Roboto+Slab:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback', rel: 'stylesheet' }],
     // 网页视口
-    ['meta', { name: "viewport", content: "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,shrink-to-fit=no" }],
+    ['meta', {
+      name: "viewport",
+      content: "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,shrink-to-fit=no"
+    }],
+    // ['meta', { 'http-equiv': 'Permissions-Policy', content: 'interest-cohort=(), user-id=()' }],
     // 关键词和描述
-    ['meta', { name: "keywords", content: "许大仙" }],
+    ['meta', { name: "keywords", content: "许大仙、Java、C、C++、大数据、前端、云原生、Go、Python" }],
   ],
   appearance: true, // 主题模式，默认浅色且开启切换
   base: VITE_BASE_URL,
-  // transformHtml: (code) => {
-  //   // 匹配所有 href 链接，并检查其中是否有 target="_blank"
-  //   return code.replace(/href="([^"]*)"(.*?)>/g, (match, href, rest) => {
-  //     // 如果链接包含 target="_blank" 并且以 base 开头
-  //     if (rest.includes('target="_blank"') && href.startsWith(VITE_BASE_URL)) {
-  //       // 去掉 href 中的 base 前缀
-  //       const newHref = href.replace(VITE_BASE_URL, '/') // 保留一个 '/'
-  //       return `href="${newHref}"${rest}>`
-  //     }
-  //     // 否则返回原链接
-  //     return match
-  //   })
-  // },
   lastUpdated: true, // 上次更新
   vite: {
     build: {
       chunkSizeWarningLimit: 1600
     },
+    ssr: {
+      noExternal: [
+        '@nolebase/vitepress-plugin-enhanced-readabilities',
+        '@nolebase/ui',
+        '@nolebase/vitepress-plugin-highlight-targeted-heading',
+        '@nolebase/vitepress-plugin-inline-link-preview',
+      ],
+    },
+    optimizeDeps: {
+      exclude: [
+        '@nolebase/vitepress-plugin-enhanced-readabilities/client',
+        'vitepress',
+        '@nolebase/vitepress-plugin-inline-link-preview/client',
+      ],
+    },
     plugins: [
-      groupIconVitePlugin(), //代码组图标
-      La51Plugin({
-        id: '3Ki1BsybBJG95owJ',
-        ck: '3Ki1BsybBJG95owJ',
-        apply: 'all'
-      })
+      groupIconVitePlugin({
+        customIcon: {
+          'c': localIconLoader(import.meta.url, '../../public/iconify/c.svg'),
+        }
+      }), //代码组图标
+      pagefindPlugin(pagefind),
+      GitChangelog({
+        // 填写在此处填写您的仓库链接
+        repoURL: () => 'https://github.com/Aurorxa/java',
+      }),
+      GitChangelogMarkdownSection({
+        exclude: (id) => id.endsWith("index.md"),
+        sections: {
+          disableChangelog: true,
+          disableContributors: true,
+        },
+      }),
     ],
     server: {
-      port: 18089
+      port: 10089
     },
     css: {
       preprocessorOptions: {
@@ -103,41 +132,13 @@ export const sharedConfig = defineConfig({
       })
       md.use(timeline)
       md.use(groupIconMdPlugin) //代码组图标
+      md.use(InlineLinkPreviewElementTransform)
+      md.use(figure, { figcaption: 'alt', copyAttrs: '^class$', lazy: true })
     }
   },
   themeConfig: { // 主题设置
     logo: '/logo.svg',  // 左上角logo
-    search: {
-      provider: 'local',
-      options: {
-        locales: {
-          root: {
-            translations: {
-              button: {
-                buttonText: 'Search',
-                buttonAriaLabel: 'Search',
-              },
-              modal: {
-                displayDetails: 'Display detailed list',
-                resetButtonTitle: 'Reset search',
-                backButtonTitle: 'Close search',
-                noResultsText: 'No results for',
-                footer: {
-                  selectText: 'to select',
-                  selectKeyAriaLabel: 'enter',
-                  navigateText: 'to navigate',
-                  navigateUpKeyAriaLabel: 'up arrow',
-                  navigateDownKeyAriaLabel: 'down arrow',
-                  closeText: 'to close',
-                  closeKeyAriaLabel: 'escape',
-                },
-              },
-            },
-          },
-
-        },
-      },
-    },
+    // 编辑链接
     editLink: {
       pattern: 'https://github.com/Aurorxa/java/edit/master/docs/:path',
       text: 'Edit this page on GitHub'
@@ -147,4 +148,4 @@ export const sharedConfig = defineConfig({
       { icon: 'github', link: 'https://github.com/Aurorxa/java' },
     ],
   }
-})
+}))
