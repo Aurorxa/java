@@ -7,9 +7,17 @@
 
 
 
-# 第一章：Groovy 安装
+# 第一章：Gradle 简介
 
-## 1.1 winget 命令安装
+
+
+# 第二章：Groovy 安装
+
+## 1.1 手动安装
+
+
+
+## 1.2 winget 命令安装
 
 * 查询 Groovy 版本：
 
@@ -17,7 +25,7 @@
 winget search groovy
 ```
 
-
+![](./assets/1.gif)
 
 * 创建目录并安装到指定位置：
 
@@ -28,7 +36,7 @@ mkdir D:\develop\groovy
 winget install --id Apache.Groovy.4 --location D:\develop\groovy
 ```
 
-
+![](./assets/2.gif)
 
 * 查询是否安装成功：
 
@@ -36,11 +44,12 @@ winget install --id Apache.Groovy.4 --location D:\develop\groovy
 winget list -q groovy
 ```
 
+![](./assets/3.gif)
 
-
-* 卸载 Groovy ：
+* 卸载 Groovy（可选）：
 
 ```shell
-winget uninstall
+winget uninstall groovy
 ```
 
+![](./assets/4.gif)
