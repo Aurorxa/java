@@ -73,6 +73,7 @@ export const sharedConfig = withMermaid(defineConfig({
       groupIconVitePlugin({
         customIcon: {
           'c': localIconLoader(import.meta.url, '../../public/iconify/c.svg'),
+          'java': localIconLoader(import.meta.url, '../../public/iconify/java.svg'),
         }
       }), //代码组图标
       pagefindPlugin(pagefind),
