@@ -37,7 +37,20 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       text: '项目构建工具',
       collapsed: true,
       items: [
-
+        {
+          text: 'Maven',
+          collapsed: true,
+          items: [
+            { text: 'Maven 核心概念', link: `/04_build/maven/01_${commonDirectoryName}/` },
+          ]
+        },
+        {
+          text: 'Gradle',
+          collapsed: true,
+          items: [
+            { text: '初识 Gradle', link: `/04_build/gradle/01_${commonDirectoryName}/` },
+          ]
+        },
       ]
     },
     {
