@@ -9,7 +9,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       collapsed: true,
       items: [
         { text: '计算机软件常识科普', link: `/01_java-basic/01_${commonDirectoryName}/` },
-        { text: 'Java 入门', link: `/01_java-basic/02_${commonDirectoryName}/` },
+        { text: 'Windows 软件包管理', link: `/01_java-basic/02_${commonDirectoryName}/` },
       ]
     },
     {

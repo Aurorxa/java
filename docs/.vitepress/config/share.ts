@@ -74,6 +74,10 @@ export const sharedConfig = withMermaid(defineConfig({
         customIcon: {
           'c': localIconLoader(import.meta.url, '../../public/iconify/c.svg'),
           'java': localIconLoader(import.meta.url, '../../public/iconify/java.svg'),
+          'winget': 'vscode-icons:file-type-shell',
+          'choco': localIconLoader(import.meta.url, '../../public/iconify/choco.svg'),
+          'cmd': 'vscode-icons:file-type-shell',
+          'powershell': 'vscode-icons:file-type-powershell'
         }
       }), //代码组图标
       pagefindPlugin(pagefind),
