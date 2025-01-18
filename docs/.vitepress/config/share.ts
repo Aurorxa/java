@@ -3,7 +3,6 @@ import timeline from "vitepress-markdown-timeline"
 import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
 import { figure } from '@mdit/plugin-figure'
 import { loadEnv } from 'vite'
-import { pagefind } from './vite-plugin-config'
 import { pagefindPlugin } from 'vitepress-plugin-pagefind'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 import {
@@ -70,7 +69,7 @@ export const sharedConfig = withMermaid(defineConfig({
       ],
     },
     plugins: [
-      groupIconVitePlugin({
+      (groupIconVitePlugin({
         customIcon: {
           'c': localIconLoader(import.meta.url, '../../public/iconify/c.svg'),
           'java': localIconLoader(import.meta.url, '../../public/iconify/java.svg'),
@@ -79,8 +78,8 @@ export const sharedConfig = withMermaid(defineConfig({
           'cmd': 'vscode-icons:file-type-shell',
           'powershell': 'vscode-icons:file-type-powershell'
         }
-      }), //代码组图标
-      pagefindPlugin(pagefind),
+      }) as any),
+      //代码组图标
       GitChangelog({
         // 填写在此处填写您的仓库链接
         repoURL: () => 'https://github.com/Aurorxa/java',
@@ -152,5 +151,56 @@ export const sharedConfig = withMermaid(defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Aurorxa/java' },
     ],
+    search: {
+      provider: 'algolia',
+      options: {
+        appId: 'QFW4ZUXLUW',
+        apiKey: '9d957fcbc67da3dd10fbb496e8f5df09',
+        indexName: 'java-weiweixu',
+        locales: {
+          zh: {
+            placeholder: '搜索文档',
+            translations: {
+              button: {
+                buttonText: '搜索文档',
+                buttonAriaLabel: '搜索文档'
+              },
+              modal: {
+                searchBox: {
+                  resetButtonTitle: '清除查询条件',
+                  resetButtonAriaLabel: '清除查询条件',
+                  cancelButtonText: '取消',
+                  cancelButtonAriaLabel: '取消'
+                },
+                startScreen: {
+                  recentSearchesTitle: '搜索历史',
+                  noRecentSearchesText: '没有搜索历史',
+                  saveRecentSearchButtonTitle: '保存至搜索历史',
+                  removeRecentSearchButtonTitle: '从搜索历史中移除',
+                  favoriteSearchesTitle: '收藏',
+                  removeFavoriteSearchButtonTitle: '从收藏中移除'
+                },
+                errorScreen: {
+                  titleText: '无法获取结果',
+                  helpText: '你可能需要检查你的网络连接'
+                },
+                footer: {
+                  selectText: '选择',
+                  navigateText: '切换',
+                  closeText: '关闭',
+                  searchByText: '搜索提供者'
+                },
+                noResultsScreen: {
+                  noResultsText: '无法找到相关结果',
+                  suggestedQueryText: '你可以尝试查询',
+                  reportMissingResultsText: '你认为该查询应该有结果？',
+                  reportMissingResultsLinkText: '点击反馈'
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   }
 }))
