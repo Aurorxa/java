@@ -3,7 +3,6 @@ import timeline from "vitepress-markdown-timeline"
 import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
 import { figure } from '@mdit/plugin-figure'
 import { loadEnv } from 'vite'
-import { pagefindPlugin } from 'vitepress-plugin-pagefind'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 import {
   GitChangelog,
@@ -154,8 +153,8 @@ export const sharedConfig = withMermaid(defineConfig({
     search: {
       provider: 'algolia',
       options: {
-        appId: 'QFW4ZUXLUW',
-        apiKey: '9d957fcbc67da3dd10fbb496e8f5df09',
+        appId: '9X68L12TSR',
+        apiKey: '19ec2d361de36479ba8b610837ad263c',
         indexName: 'java-weiweixu',
         locales: {
           zh: {
