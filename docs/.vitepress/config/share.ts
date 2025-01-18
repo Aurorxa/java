@@ -155,7 +155,7 @@ export const sharedConfig = withMermaid(defineConfig({
       provider: 'algolia',
       options: {
         appId: 'QFW4ZUXLUW',
-        apiKey: '3265c82856b49ac139b0c8c842c4de1f',
+        apiKey: '9d957fcbc67da3dd10fbb496e8f5df09',
         indexName: 'java-weiweixu',
         locales: {
           zh: {
