@@ -12,6 +12,11 @@
     <template #aside-outline-before>
       <ShareButton />
     </template>
+    <template #nav-bar-content-before>
+      <div class="VPNavBarSearch search">
+        <div id="docsearch"></div>
+      </div>
+    </template>
     <template #nav-bar-content-after>
       <NolebaseEnhancedReadabilitiesMenu />
     </template>
@@ -26,7 +31,7 @@ import BackTop from "./BackTop.vue";
 import ArticleMetadata from "./ArticleMetadata.vue";
 import { useData } from "vitepress";
 import DefaultTheme from "vitepress/theme";
-import { nextTick, provide } from "vue";
+import { nextTick, provide, onMounted } from "vue";
 import { ShareButton } from "@theojs/lumen";
 
 import "@nolebase/vitepress-plugin-highlight-targeted-heading/client/style.css";
@@ -38,6 +43,18 @@ import {
 } from "@nolebase/vitepress-plugin-enhanced-readabilities/client";
 
 import "@nolebase/vitepress-plugin-enhanced-readabilities/client/style.css";
+
+import { docsearch } from "meilisearch-docsearch";
+import "meilisearch-docsearch/css";
+
+onMounted(() => {
+  docsearch({
+    container: "#docsearch",
+    host: "https://meilisearch.weiweixu.cn",
+    apiKey: "0124f56bc871ff55aed3f815f5181a0238d70ece",
+    indexUid: "java-weiweixu",
+  });
+});
 
 const { isDark } = useData();
 
