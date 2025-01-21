@@ -31,7 +31,7 @@ jobs:
           docker pull getmeili/docs-scraper:v0.12.11
           echo " 🏃‍♀️ Running docs-scraper 🏃‍♀️  "
           docker run -t --rm \
-            -e MEILISEARCH_HOST_URL=$MEILISEARCH_HOST_URL \
+            -e MEILISEARCH_HOST_URL=https://meilisearch.weiweixu.cn \
             -e MEILISEARCH_API_KEY=$API_KEY \
             -v $CONFIG_FILE_PATH:/docs-scraper/config.json \
             getmeili/docs-scraper:v0.12.11 pipenv run ./docs_scraper config.json
