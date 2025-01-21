@@ -150,6 +150,7 @@ export const sharedConfig = withMermaid(defineConfig({
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Aurorxa/java' },
     ],
+    externalLinkIcon: true,
     search: {
       provider: 'algolia',
       options: {
