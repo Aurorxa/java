@@ -23,15 +23,15 @@ jobs:
           node-version: "lts/Jod"
       - name: Run docs-scraper 🚀
         env:
-          API_KEY: ${{ secrets.MEILISEARCH_API_KEY }}
+          API_KEY: ${{ secrets.MEILISEARCH_API_KEY  }}
           CONFIG_FILE_PATH: ${{ github.workspace }}/docs/public/data/config.json
-          MEILISEARCH_HOST_URL: ${{ secrets.MEILISEARCH_HOST_URL }}
+          HOST_URL: ${{ secrets.MEILISEARCH_HOST_URL  }}
         run: |
           echo " 🏃‍♂️ Pulling docker images 🏃‍♂️  "
           docker pull getmeili/docs-scraper:latest
           echo " 🏃‍♀️ Running docs-scraper 🏃‍♀️  "
           docker run -t --rm \
-            -e MEILISEARCH_HOST_URL=https://meilisearch.weiweixu.cn \
+            -e MEILISEARCH_HOST_URL=$HOST_URL \
             -e MEILISEARCH_API_KEY=$API_KEY \
             -v $CONFIG_FILE_PATH:/docs-scraper/config.json \
-            getmeili/docs-scraper:latest pipenv run ./docs_scraper config.json
+            getmeili/docs-scraper:v0.12.8 pipenv run ./docs_scraper config.json
