@@ -21,16 +21,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "lts/Jod"
-      - name: Run docs-scraper 📝
+      - name: Run docs-scraper 🚀
         env:
           API_KEY: ${{ secrets.MEILISEARCH_API_KEY }}
           CONFIG_FILE_PATH: ${{ github.workspace }}/docs/public/data/docs-scraper-config.json
           MEILISEARCH_HOST_URL: ${{ secrets.MEILISEARCH_HOST_URL }}
         run: |
-          echo "--- CONFIG_FILE_PATH -----"
-          cat $CONFIG_FILE_PATH
-          echo "--- MEILISEARCH_HOST_URL -----"
-
+          echo " 🏃‍♂️ Pulling docker images 🏃‍♂️  "
+          docker pull getmeili/docs-scraper:v0.12.11
+          echo " 🏃‍♀️ Running docs-scraper 🏃‍♀️  "
           docker run -t --rm \
             -e MEILISEARCH_HOST_URL=$MEILISEARCH_HOST_URL \
             -e MEILISEARCH_API_KEY=$API_KEY \
