@@ -24,7 +24,7 @@ jobs:
       - name: Run docs-scraper 🚀
         env:
           API_KEY: ${{ secrets.MEILISEARCH_API_KEY }}
-          CONFIG_FILE_PATH: ${{ github.workspace }}/docs/public/data/docs-scraper-config.json
+          CONFIG_FILE_PATH: ${{ github.workspace }}/docs/public/data/config.json
           MEILISEARCH_HOST_URL: ${{ secrets.MEILISEARCH_HOST_URL }}
         run: |
           echo " 🏃‍♂️ Pulling docker images 🏃‍♂️  "
