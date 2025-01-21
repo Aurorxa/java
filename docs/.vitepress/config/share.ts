@@ -102,6 +102,9 @@ export const sharedConfig = withMermaid(defineConfig({
       }
     },
   },
+  sitemap: {
+    hostname: `https://java.weiweixu.cn${VITE_BASE_URL}`,
+  },
   markdown: { // markdown 配置
     math: true,
     lineNumbers: true, // 行号显示
@@ -116,6 +119,7 @@ export const sharedConfig = withMermaid(defineConfig({
         const defaultRender = md.render
         md.render = function (...args) {
           const [content, env] = args
+          const currentLang = env.localeIndex
           const isHomePage = env.path === '/' || env.relativePath === 'index.md'  // 判断是否是首页
 
           if (isHomePage) {
@@ -124,11 +128,20 @@ export const sharedConfig = withMermaid(defineConfig({
           // 调用原始渲染
           let defaultContent = defaultRender.apply(md, args)
           // 替换内容
-          defaultContent = defaultContent.replace(/NOTE/g, '提醒')
-            .replace(/TIP/g, '建议')
-            .replace(/IMPORTANT/g, '重要')
-            .replace(/WARNING/g, '警告')
-            .replace(/CAUTION/g, '注意')
+          if (currentLang === 'root') {
+            defaultContent = defaultContent.replace(/NOTE/g, '提醒')
+              .replace(/TIP/g, '建议')
+              .replace(/IMPORTANT/g, '重要')
+              .replace(/WARNING/g, '警告')
+              .replace(/CAUTION/g, '注意')
+          } else if (currentLang === 'ko') {
+            // 韩文替换
+            defaultContent = defaultContent.replace(/NOTE/g, '알림')
+              .replace(/TIP/g, '팁')
+              .replace(/IMPORTANT/g, '중요')
+              .replace(/WARNING/g, '경고')
+              .replace(/CAUTION/g, '주의')
+          }
           // 返回渲染的内容
           return defaultContent
         }
@@ -154,8 +167,8 @@ export const sharedConfig = withMermaid(defineConfig({
     search: {
       provider: 'algolia',
       options: {
-        appId: '9X68L12TSR',
-        apiKey: '19ec2d361de36479ba8b610837ad263c',
+        appId: 'GTN7GNWY3O',
+        apiKey: '38c2d6dd29d51917db80d26d7035ef1d',
         indexName: 'java-weiweixu',
         locales: {
           zh: {
