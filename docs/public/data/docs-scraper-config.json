@@ -1,0 +1,35 @@
+{
+  "index_uid": "java-weiweixu",
+  "start_urls": ["https://java.weiweixu.cn/"],
+  "stop_urls": [],
+  "sitemap_urls": ["https://java.weiweixu.cn/sitemap.xml"],
+  "selectors": {
+    "lvl0": {
+      "selector": ".content h1",
+      "global": true,
+      "default_value": "我的文档"
+    },
+    "lvl1": ".content h1",
+    "lvl2": ".content h2",
+    "lvl3": ".content h3",
+    "lvl4": ".content h4",
+    "lvl5": ".content h5",
+    "lvl6": ".content h6",
+    "text": ".content p, .content li"
+  },
+  "concepts": {
+    "lvl0": ".content h2",
+    "lvl1": ".content h1.title",
+    "lvl2": ".content h2.title",
+    "lvl3": ".content h3.title",
+    "lvl4": ".content h5.title",
+    "text": ".content p"
+  },
+  "contributors": {
+    "lvl0": ".content h1",
+    "lvl1": ".contributors .name",
+    "lvl2": ".contributors .title",
+    "text": ".contributors .description"
+  },
+  "selectors_exclude": [".footer"]
+}
