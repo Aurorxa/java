@@ -5,7 +5,7 @@
 * WSL2，全称为 Windows Subsystem for Linux 2，是微软提供的一种技术，允许用户在 Windows 操作系统上运行 Linux 内核。WSL2  是 WSL1 的升级版，它引入了一个真正的 Linux 内核来代替 WSL1 中使用的兼容层，从而提供更高的性能和更广泛的系统调用支持。
 * 和传统的虚拟化技术的对比，如下所示：
 
-![116](./assets/1.svg)
+![传统的虚拟化技术 VS Hyper-v 虚拟化技术](./assets/1.svg)
 
 > [!NOTE]
 >
