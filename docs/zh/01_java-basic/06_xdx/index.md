@@ -367,9 +367,9 @@ public class ConstantExe4 {
 }
 ```
 
-### 2.4.6 字符常量的运算
+### 2.4.6 字符串常量的运算
 
-* Java 中的字符常量可以使用 `+` 进行拼接。
+* Java 中的字符串常量可以使用 `+` 进行拼接。
 
 
 
@@ -379,7 +379,7 @@ public class ConstantExe4 {
 package com.github.day02;
 
 /**
- * 字符常量的拼接
+ * 字符串常量的拼接
  */
 public class ConstantExe5 {
     public static void main(String[] args) {
