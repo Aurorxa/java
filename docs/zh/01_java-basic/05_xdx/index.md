@@ -802,7 +802,6 @@ int num = 10;
 package com.github.day02;
 
 /**
- *
  * 使用变量表示一个人的信息，如：姓名、年龄、性别、身高、体重等。
  */
 public class Exe1 {
