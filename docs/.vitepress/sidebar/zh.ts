@@ -10,13 +10,14 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       items: [
         { text: '计算机软件常识科普', link: `/01_java-basic/01_${commonDirectoryName}/` },
         { text: 'Windows 软件包管理', link: `/01_java-basic/02_${commonDirectoryName}/` },
-        { text: 'Java 语言入门一', link: `/01_java-basic/03_${commonDirectoryName}/` },
-        { text: 'Java 语言入门二', link: `/01_java-basic/04_${commonDirectoryName}/` },
-        { text: 'Java 基础知识', link: `/01_java-basic/05_${commonDirectoryName}/` },
-        { text: '进制', link: `/01_java-basic/06_${commonDirectoryName}/` },
-        { text: 'Java 数据类型', link: `/01_java-basic/07_${commonDirectoryName}/` },
-        { text: 'Java 运算符', link: `/01_java-basic/08_${commonDirectoryName}/` },
-        { text: 'Java 开发工具（IDEA）', link: `/01_java-basic/09_${commonDirectoryName}/` },
+        { text: 'WSL2 的安装和配置', link: `/01_java-basic/03_${commonDirectoryName}/` },
+        { text: 'Java 语言入门一', link: `/01_java-basic/04_${commonDirectoryName}/` },
+        { text: 'Java 语言入门二', link: `/01_java-basic/05_${commonDirectoryName}/` },
+        { text: 'Java 基础知识', link: `/01_java-basic/06_${commonDirectoryName}/` },
+        { text: '进制', link: `/01_java-basic/07_${commonDirectoryName}/` },
+        { text: 'Java 数据类型', link: `/01_java-basic/08_${commonDirectoryName}/` },
+        { text: 'Java 运算符', link: `/01_java-basic/09_${commonDirectoryName}/` },
+        { text: 'Java 开发工具（IDEA）', link: `/01_java-basic/10_${commonDirectoryName}/` },
       ]
     },
     {
@@ -31,6 +32,33 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       collapsed: true,
       items: [
 
+      ]
+    },
+    {
+      text: 'Java 基础知识',
+      collapsed: true,
+      items: [
+        {
+          text: 'UML 建模语言',
+          collapsed: true,
+          items: [
+            { text: '初识 UML', link: `` },
+          ]
+        },
+        {
+          text: '数据结构和算法',
+          collapsed: true,
+          items: [
+
+          ]
+        },
+        {
+          text: '设计模式',
+          collapsed: true,
+          items: [
+
+          ]
+        },
       ]
     },
     {
@@ -68,14 +96,14 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       ]
     },
     {
-      text: '后端工程化',
+      text: '前端工程化',
       collapsed: true,
       items: [
 
       ]
     },
     {
-      text: '前端工程化',
+      text: '后端工程化',
       collapsed: true,
       items: [
 
