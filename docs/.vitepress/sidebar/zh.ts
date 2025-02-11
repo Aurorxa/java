@@ -18,6 +18,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
         { text: 'Java 数据类型', link: `/01_java-basic/08_${commonDirectoryName}/` },
         { text: 'Java 运算符', link: `/01_java-basic/09_${commonDirectoryName}/` },
         { text: 'Java 开发工具（IDEA）', link: `/01_java-basic/10_${commonDirectoryName}/` },
+        { text: 'Java 中的字符集', link: `/01_java-basic/11_${commonDirectoryName}/` },
       ]
     },
     {
