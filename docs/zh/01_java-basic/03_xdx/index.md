@@ -105,7 +105,7 @@ wsl --install Ubuntu-24.04
 
 > [!NOTE]
 >
-> 官方支持的 Linux 版本，托管在 Github 上，某些国家可能会污染 Github 的域名；此时，要么走科学上网，要么在 `Microsoft Store` 中搜索并安装。
+> 官方支持的 Linux 版本，托管在 Github 上，某些国家可能会污染 Github 的域名；此时，要么使用`科学上网`，要么在 `Microsoft Store` 中搜索并安装。
 
 ![](./assets/9.gif)
 
