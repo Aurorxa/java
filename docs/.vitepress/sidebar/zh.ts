@@ -36,7 +36,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       ]
     },
     {
-      text: 'Java 基础知识',
+      text: 'Java 基础补充',
       collapsed: true,
       items: [
         {
