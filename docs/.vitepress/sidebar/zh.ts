@@ -40,6 +40,13 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       collapsed: true,
       items: [
         {
+          text: 'JDK 新特性',
+          collapsed: true,
+          items: [
+            { text: 'JDK9', link: `` },
+          ]
+        },
+        {
           text: 'UML 建模语言',
           collapsed: true,
           items: [
