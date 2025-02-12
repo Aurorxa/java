@@ -532,15 +532,302 @@ public class FloatDemo2 {
 ## 5.1 概述
 
 - 在生活中，我们会经常说：今天天气真 `好`，我的性别是 `女`，我今年 `10` 岁等。
-- 像这类数据，在 java 语言中就可以用`字符类型`（char）来表示。`字符类型`表示`单`个字符，使用单引号（`''`）括起来，如：`'1'`、`'A'`、`'&'`。
+- 像这类数据，在 java 语言中就可以用`字符类型`（char）来表示。
+- `字符类型`表示`单`个字符，使用单引号（`''`）括起来，如：`'1'`、`'A'`、`'&'`。
+
+> [!NOTE]
+>
+> * ① Java 是支持 Unicode 编码集的，即：Java 中的字符类型也可以表示汉字，如：`'我'` 、`'你'` 等。
+> * ② Unicode 是什么，将在后文讲解，此处暂且不表！！！
+
+## 5.2 应用示例
+
+* 示例：
+
+```java
+package com.github;
+
+public class CharDemo1 {
+    public static void main(String[] args) {
+
+        char a = 'A';
+        System.out.println("a = " + a); // a = A
+
+        char b = '你';
+        System.out.println("b = " + b); // b = 你
+    }
+}
+```
+
+## 5.3 字符常量的表示形式
+
+* ① 一个字符，如：`'A'`、`'我'`。
+* ② 转义字符：将一个字符通过在前面添加 `\` 符号，让它从自己原本的含义，转变为新的含义。
+
+| 转义字符 | 描述            |
+| -------- | --------------- |
+| `\n`     | 换行            |
+| `\r`     | 回车            |
+| `\t`     | tab键           |
+| `\\`     | `\`             |
+| `\"`     | `"`             |
+| `\'`     | `'`             |
+| `\b`     | 删除键backspace |
+
+- ③ `\u` 字符的 Unicode 编码值的十六进制，如：`'\u8bb8'` 代表了许。
+- ④ 直接给 char 类型变量赋值十进制的 0~65536 之间的 Unicode 编码值。例如：`'a'` 的编码值是 97 。
 
 
 
+* 示例：
 
+```java [CharDemo.java]
+package com.github;
+
+public class CharDemo {
+    public static void main(String[] args) {
+
+        char a = 'A';
+        // a = A
+        System.out.println("a = " + a);
+
+        char b = '\u8bb8';
+        // b = 你
+        System.out.println("b = " + b);
+
+        char c = '\n';
+        System.out.println("c = " + c);
+
+        char d = 97;
+        System.out.println("d = " + d);
+    }
+}
+```
+
+```txt [结果]
+a = A
+b = 许
+c = 
+
+d = a
+```
 
 
 
 # 第六章：布尔类型（⭐）
 
 ## 6.1 概述
+
+* 布尔值用于表示 true（真）、false（假）两种状态，通常用于逻辑运算和条件判断。
+
+## 6.2 应用示例
+
+* 示例：
+
+```java
+package com.github;
+
+public class BooleanDemo {
+    public static void main(String[] args) {
+
+        boolean flag = true;
+        System.out.println("flag = " + flag); // flag = true
+        flag = false;
+        System.out.println("flag = " + flag); // flag = false
+    }
+}
+```
+
+
+
+# 第七章：数据类型转换（⭐）
+
+## 7.1 概述
+
+- 在 Java 语言编程中，经常需要对不同类型的数据进行运算，运算前需要先转换为同一类型，再运算。
+- 为了解决数据类型不一致的问题，需要对数据的类型进行转换。
+
+## 7.2 什么时候发生数据类型转换？
+
+* ① 等号左右两边数据类型不一致。
+* ② 不同数据类型的数据做运算。
+
+## 7.2 自动类型转换（隐式转换）
+
+### 7.2.1 赋值时的自动类型转换
+
+* 在赋值运算中，如果取值范围小的数据类型赋值给取值范围大的数据类型，就会发生自动类型转换（小 --> 大）。
+
+![自动类型转换](./assets/8.png)
+
+* 转换方向：
+
+![](./assets/9.jpg)
+
+> [!NOTE]
+>
+> 自动类型转换不会出现精度损失，但是可能会出现数据溢出！！！
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+public class ConvertDemo {
+
+    public static void main(String[] args) {
+
+        /*
+         * 等号右边的 100 是整数，默认是 int 类型。
+         * 等号左边是 long 类型的变量
+         *
+         * 将取值范围小的数据类型赋值给取值范围大的数据类型,发生了自动类型转换
+         */
+        long num = 100;
+
+        System.out.println("num = " + num); // num = 100
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+public class ConvertDemo2 {
+
+    public static void main(String[] args) {
+
+        /*
+         * 等号右边的 'A' 是字符，默认是 char 类型。
+         * 等号左边是 long 类型的变量
+         *
+         * 将取值范围小的数据类型赋值给取值范围大的数据类型,发生了自动类型转换
+         */
+        char c = 'A';
+        long num = c;
+
+        System.out.println("num = " + num); // num = 65
+    }
+}
+```
+
+### 7.2.2 运算时的自动类型转换
+
+* 在运算过程中，取值范围小的数据类型和取值范围大的数据类型一起做运算，运算前会发生自动类型转换（小 --> 大），然后再运算。
+
+![自动类型转换](./assets/8.png)
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+public class ConvertDemo2 {
+
+    public static void main(String[] args) {
+
+        int i = 100;
+        double d = 3.4;
+        // double = int（double） + double
+        double result = i + d;
+        System.out.println("result = " + result); // result = 103.4
+    }
+}
+```
+
+## 7.3 强制类型转换
+
+* 在赋值运算中，如果取值范围大的数据类型赋值给取值范围小的数据类型，就需要进行强制类型转换（大 --> 小）。
+
+![](./assets/10.png)
+
+* 语法：
+
+```java
+ 取值范围小的数据类型 变量名 = (取值范围小的数据类型)取值范围大的数据类型的值;
+```
+
+> [!NOTE]
+>
+> 强制类型转换可能会出现数据精度损失或数据溢出！！！
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+public class ConvertDemo2 {
+
+    public static void main(String[] args) {
+
+        // 强制类型转换，损失精度
+        int i = (int) 3.14; 
+        // i = 3
+        System.out.println("i = " + i);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+public class ConvertDemo2 {
+
+    public static void main(String[] args) {
+
+        // 强制类型转换，数据溢出
+        int i = 200;
+        byte b = (byte) i;
+        System.out.println("b = " + b); // 溢出 -56 
+    }
+}
+```
+
+## 7.4 数据类型转换的注意事项
+
+* ① 对于 byte、short ，如果等号右边是整数常量，不超出 byte 和 short 的范围，不需要我们自己强转，JVM 会在底层帮助我们自动转换（自动类型转换）。
+
+```java
+byte b = 1;
+short s = 128;
+```
+
+* ② byte、short 、char 等如果参与计算，会自动提升为 int 类型。
+
+```java
+char c1 = '0';
+char c2 = 'A';
+int num = c1 + c2;
+```
+
+
+
+# 第八章：字符串（⭐）
+
+## 8.1 概述
+
+- 但是，在生活中，也许会听到：`你是好人，只是现阶段，我想学习`、`好的啊，我们在一起`等。
+- 像这类数据，在 Java 语言中就可以用`字符串`（String）来表示。
+
+> [!CAUTION]
+>
+> Java 中的 String 不是基本数据类型，而是引用数据类型！！！
+
+- `字符串类型`表示`多`个字符的集合，使用双引号（`""`）括起来，如：`"1"`、`"我们"`。
+
+
 
