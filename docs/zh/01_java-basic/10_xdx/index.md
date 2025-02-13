@@ -27,16 +27,54 @@
 
 
 
-# 第二章：安装 IDEA
+# 第二章：安装和配置 IDEA
 
 ## 2.1 前提条件
 
 * ① 在本地操作系统中安装了 JDK ：略。
 * ② 配置 `JAVA_HOME` 环境变量和 `PATH` 环境变量：略。
 
-## 2.1 手动版
+## 2.2 安装 IDEA
+
+### 2.2.1 手动版
 
 * ① 鼠标双击，进行安装：
 
+![](./assets/2.gif)
 
+* ② 下一步安装：
+
+![](./assets/3.gif)
+
+* ③ 点击`否，我会在之后重新启动`：
+
+![](./assets/4.gif)
+
+### 2.2.2 自动版
+
+* ① 创建 IDEA 安装的目录：
+
+```cmd
+mkdir D:\develop\idea
+```
+
+![](./assets/5.gif)
+
+* ② 查询 IDEA ：
+
+```cmd
+winget search idea
+```
+
+![](./assets/6.gif)
+
+* ③ 安装 IDEA ：
+
+```cmd
+winget install --id JetBrains.IntelliJIDEA.Ultimate -l D:\develop\idea
+```
+
+![](./assets/7.gif)
+
+## 2.3 配置 IDEA
 
