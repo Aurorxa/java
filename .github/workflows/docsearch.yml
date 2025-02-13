@@ -1,0 +1,41 @@
+name: Build Deploy
+
+# 在main分支发生push事件时触发。
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "docs/**" # 只当docs文件夹中的文件发生变化时触发
+  workflow_dispatch:
+
+# 设置环境变量
+env:
+  TZ: Asia/Shanghai # 时区（设置时区可使页面中的`最近更新时间`使用时区时间）
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: build project ⚗️
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/Jod"
+      - name: Run docs-scraper 🚀
+        env:
+          APPLICATION_ID: ${{ secrets.APPLICATION_ID  }}
+          CONFIG: ${{ github.workspace }}/docs/public/data/docsearch.json
+          API_KEY: ${{ secrets.API_KEY   }}
+        run: |
+          echo " 🏃‍♂️ Pulling docker images 🏃‍♂️  "
+          docker pull algolia/docsearch-scraper
+          echo " 🏃‍♀️ Running docs-scraper 🏃‍♀️  "
+          docker run \
+            --env APPLICATION_ID=${APPLICATION_ID} \
+            --env API_KEY=${API_KEY} \
+            --env "CONFIG=${CONFIG}" \
+            algolia/docsearch-scraper
