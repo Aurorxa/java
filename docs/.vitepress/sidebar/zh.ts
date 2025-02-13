@@ -45,7 +45,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
         { text: 'Java 网络编程', link: `/03_java-senior/02_${commonDirectoryName}/` },
         { text: 'Java 类的加载和反射', link: `/03_java-senior/03_${commonDirectoryName}/` },
         { text: 'Java 枚举和注解', link: `/03_java-senior/04_${commonDirectoryName}/` },
-        { text: 'Java 单元和日志技术', link: `/03_java-senior/04_${commonDirectoryName}/` },
+        { text: 'Java 单元测试和日志技术', link: `/03_java-senior/05_${commonDirectoryName}/` },
       ]
     },
     {
