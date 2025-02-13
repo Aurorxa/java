@@ -825,9 +825,80 @@ int num = c1 + c2;
 
 > [!CAUTION]
 >
-> Java 中的 String 不是基本数据类型，而是引用数据类型！！！
+> * ① Java 中的 String 不是基本数据类型，而是引用数据类型！！！
+> * ② Java 中的 String 只是在使用方式和基本数据类型类似，但是其是引用数据类型！！！
 
 - `字符串类型`表示`多`个字符的集合，使用双引号（`""`）括起来，如：`"1"`、`"我们"`。
 
+## 8.2 应用示例
 
+* 示例：
 
+```java
+package com.github;
+
+public class StringDemo1 {
+    public static void main(String[] args) {
+
+        String str = "hello";
+
+        System.out.println("str = " + str); // str = hello
+    }
+}
+```
+
+## 8.3 字符串类型的注意事项
+
+* ① 任意数据类型的数据和 String 类型进行`+`运算的时候，结果一定是 String 类型。
+
+```java 
+package com.github;
+
+public class StringDemo2 {
+    public static void main(String[] args) {
+
+        String str = "hello";
+
+        String result = 1 + str; // [!code highlight]
+        System.out.println("result = " + result); // result = 1hello
+
+        result = str + 1; // [!code highlight]
+        System.out.println("result = " + result); // result = hello1
+    }
+}
+```
+
+* ② String 类型是不能强制类型转换为其他类型的。
+
+```java
+package com.github;
+
+public class StringDemo1 {
+    public static void main(String[] args) {
+
+        String str = "123";
+
+        // 以下代码是错误的 
+        // 不可转换的类型；无法将 'java.lang.String' 转换为 'int'
+        int num = (int)str; // [!code error]
+
+        System.out.println("num = " + num);
+    }
+}
+```
+
+```java
+package com.github;
+
+public class StringDemo1 {
+    public static void main(String[] args) {
+
+        String str = "123";
+
+        // 以下代码是正确的
+        int num = Integer.parseInt(str); // [!code highlight]
+
+        System.out.println("num = " + num);
+    }
+}
+```
