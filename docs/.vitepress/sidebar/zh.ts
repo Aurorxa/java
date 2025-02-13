@@ -79,6 +79,13 @@ export const zhSidebar: DefaultTheme.Sidebar = {
 
           ]
         },
+        {
+          text: 'Java 并发编程',
+          collapsed: true,
+          items: [
+
+          ]
+        },
       ]
     },
     {
@@ -96,23 +103,16 @@ export const zhSidebar: DefaultTheme.Sidebar = {
           text: 'Maven',
           collapsed: true,
           items: [
-            { text: 'Maven 核心概念', link: `/04_build/maven/01_${commonDirectoryName}/` },
+            { text: 'Maven 核心概念', link: `/06_project-build/maven/01_${commonDirectoryName}/` },
           ]
         },
         {
           text: 'Gradle',
           collapsed: true,
           items: [
-            { text: '初识 Gradle', link: `/04_build/gradle/01_${commonDirectoryName}/` },
+            { text: '初识 Gradle', link: `/06_project-build/gradle/01_${commonDirectoryName}/` },
           ]
         },
-      ]
-    },
-    {
-      text: 'WEB 技术规范',
-      collapsed: true,
-      items: [
-
       ]
     },
     {
@@ -140,7 +140,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       text: '微服务',
       collapsed: true,
       items: [
-
+        { text: '初识微服务', link: `/10_micro-service/01_${commonDirectoryName}/` },
       ]
     },
     {
