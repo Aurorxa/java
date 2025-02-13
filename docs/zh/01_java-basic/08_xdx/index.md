@@ -369,7 +369,7 @@ public class IntDemo4 {
 
 ### 3.4.2 使用 Math 类提供的方法来检查溢出
 
-* 在某些情况下，我们不希望将基本数据类型，如：int ，转换为 `BigInteger` 来进行处理，此时就可以使用 Java 提供的 `Math` 类中的 `addExact()`、`subtractExact()` 或 `multiplyExact()` 等静态方法，如下所示：
+* 在某些情况下，我们不希望将基本数据类型（如：int 等）转换为 `BigInteger` 来进行处理，此时就可以使用 Java 提供的 `Math` 类中的 `addExact()`、`subtractExact()` 或 `multiplyExact()` 等静态方法，如下所示：
 
 ```java [Math.java]
 public final class Math { 
@@ -440,8 +440,6 @@ public class IntDemo5 {
 > * ① Java 中的浮点类型的字面量值默认是 double 类型，如：`double num = 3.14;`，如果希望是 float 类型，可以在字面量后面添加 L 后缀，如：`float num = 3.14f;`.
 > * ② 几乎所有的编程语言对于浮点类型都采用的是 IE754 标准，该标准对于浮点类型的处理并不是很精确。
 > * ③ 在实际开发中，对于需要高精度数值运算的场景，建议使用 `BigDecimal` 类。
-
-
 
 ## 4.2 应用示例
 
