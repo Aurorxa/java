@@ -44,6 +44,18 @@ export const zhSidebar: DefaultTheme.Sidebar = {
           collapsed: true,
           items: [
             { text: 'JDK9', link: `` },
+            { text: 'JDK10', link: `` },
+            { text: 'JDK11', link: `` },
+            { text: 'JDK12', link: `` },
+            { text: 'JDK13', link: `` },
+            { text: 'JDK14', link: `` },
+            { text: 'JDK15', link: `` },
+            { text: 'JDK16', link: `` },
+            { text: 'JDK17', link: `` },
+            { text: 'JDK18', link: `` },
+            { text: 'JDK19', link: `` },
+            { text: 'JDK20', link: `` },
+            { text: 'JDK21', link: `` },
           ]
         },
         {
