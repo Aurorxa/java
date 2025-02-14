@@ -166,7 +166,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       ]
     },
     {
-      text: '项目实战',
+      text: 'K8s 生态圈',
       collapsed: true,
       items: [
 
