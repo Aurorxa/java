@@ -128,6 +128,13 @@ export const zhSidebar: DefaultTheme.Sidebar = {
             { text: '初识 Gradle', link: `/06_project-build/gradle/01_${commonDirectoryName}/` },
           ]
         },
+        {
+          text: 'IDEA',
+          collapsed: true,
+          items: [
+            { text: '初识 IDEA', link: `` },
+          ]
+        },
       ]
     },
     {
