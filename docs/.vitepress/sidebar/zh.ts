@@ -84,21 +84,21 @@ export const zhSidebar: DefaultTheme.Sidebar = {
           text: '数据结构和算法',
           collapsed: true,
           items: [
-
+            { text: '初识数据结构和算法', link: `` },
           ]
         },
         {
           text: '设计模式',
           collapsed: true,
           items: [
-
+            { text: '初识设计模式', link: `` },
           ]
         },
         {
           text: 'Java 并发编程',
           collapsed: true,
           items: [
-
+            { text: '初识并发编程', link: `` },
           ]
         },
       ]
