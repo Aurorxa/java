@@ -132,7 +132,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
           text: 'IDEA',
           collapsed: true,
           items: [
-            { text: '初识 IDEA', link: `` },
+            { text: '初识 IDEA', link: `/06_project-build/idea/01_${commonDirectoryName}/` },
           ]
         },
       ]
