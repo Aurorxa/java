@@ -32,9 +32,9 @@ export const zhSidebar: DefaultTheme.Sidebar = {
         { text: 'Java 面向对象（上）', link: `/02_java-leap/05_${commonDirectoryName}/` },
         { text: 'Java 面向对象（中）', link: `/02_java-leap/06_${commonDirectoryName}/` },
         { text: 'Java 面向对象（下）', link: `/02_java-leap/07_${commonDirectoryName}/` },
-        { text: 'Java 异常', link: `/02_java-leap/08_${commonDirectoryName}/` },
-        { text: 'Java 多线程', link: `/02_java-leap/09_${commonDirectoryName}/` },
-        { text: 'Java 常见 API', link: `/02_java-leap/10_${commonDirectoryName}/` },
+        { text: 'Java 常见 API', link: `/02_java-leap/08_${commonDirectoryName}/` },
+        { text: 'Java 异常', link: `/02_java-leap/09_${commonDirectoryName}/` },
+        { text: 'Java 多线程', link: `/02_java-leap/10_${commonDirectoryName}/` },
         { text: 'Java 集合', link: `/02_java-leap/11_${commonDirectoryName}/` },
       ]
     },

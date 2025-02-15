@@ -12,8 +12,6 @@ onMounted(() => (
     spread: 170,
     origin: { y: 0.6 },
   })
-
-  
 ));
 
 if (inBrowser) {
