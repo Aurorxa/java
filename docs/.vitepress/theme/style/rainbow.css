@@ -408,8 +408,12 @@
 
 /* 彩虹色卡 */
 :root,.dark {
+    --rainbow-prev: #009ff7;
+    --rainbow-next: #c76dd1;
     animation: rainbow 8s linear infinite;
 }
+
+
 
 :root {
     /* hero标题渐变色 */
