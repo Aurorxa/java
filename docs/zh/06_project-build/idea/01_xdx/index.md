@@ -6,7 +6,7 @@
 
 > [!NOTE]
 >
-> 官方对 `IntelliJ IDEA` 的评价是：“The IDE for Professional Development in Java and Kotlin”，即：适用于 Java 和 Kotlin 专业开发的 IDE 。
+> 官方对 `IntelliJ IDEA` 的评价是：“The IDE for Professional Development in Java and Kotlin”，即：适用于专业开发 Java 和 Kotlin 的集成开发环境（IDE）。
 
 * `IntelliJ IDEA` 被许多开发者认为是最智能的 Java IDE，拥有丰富的功能和极佳的用户体验。
 
