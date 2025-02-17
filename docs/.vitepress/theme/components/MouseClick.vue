@@ -9,7 +9,6 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import anime from "animejs";
 const canvas = ref(null);
-import { inBrowser } from "vitepress";
 onMounted(() => {
   const canvasEl = canvas.value;
   const ctx = canvasEl.getContext("2d");
@@ -170,14 +169,14 @@ onMounted(() => {
     },
   });
 
-  if (inBrowser) {
-    setCanvasSize();
+  setCanvasSize();
+  if (typeof window !== "undefined") {
     window.addEventListener("resize", setCanvasSize, false);
   }
 });
 
 onUnmounted(() => {
-  if (inBrowser) {
+  if (typeof window !== "undefined") {
     window.removeEventListener("resize", setCanvasSize);
     document.removeEventListener(tap, handleTap);
   }
