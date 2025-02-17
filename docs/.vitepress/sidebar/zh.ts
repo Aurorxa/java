@@ -118,7 +118,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
           text: 'Maven',
           collapsed: true,
           items: [
-            { text: 'Maven 核心概念', link: `/06_project-build/maven/01_${commonDirectoryName}/` },
+            { text: '初识 Maven', link: `/06_project-build/maven/01_${commonDirectoryName}/` },
           ]
         },
         {
