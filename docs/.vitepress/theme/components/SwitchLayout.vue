@@ -12,14 +12,15 @@
     <template #aside-outline-before>
       <ShareButton />
     </template>
-    <!-- <template #nav-bar-content-before>
-      <Meilisearch />
-    </template> -->
     <template #nav-bar-content-after>
       <NolebaseEnhancedReadabilitiesMenu />
     </template>
     <template #nav-screen-content-after>
       <NolebaseEnhancedReadabilitiesScreenMenu />
+    </template>
+    <template #layout-top>
+      <MouseClick />
+      <MouseFollower />
     </template>
   </DefaultTheme.Layout>
 </template>
@@ -29,8 +30,10 @@ import BackTop from "./BackTop.vue";
 import ArticleMetadata from "./ArticleMetadata.vue";
 import { useData } from "vitepress";
 import DefaultTheme from "vitepress/theme";
-import { nextTick, provide, onMounted } from "vue";
+import { nextTick, provide } from "vue";
 import { ShareButton } from "@theojs/lumen";
+import MouseClick from "./MouseClick.vue";
+import MouseFollower from "./MouseFollower.vue";
 
 import "@nolebase/vitepress-plugin-highlight-targeted-heading/client/style.css";
 import { NolebaseHighlightTargetedHeading } from "@nolebase/vitepress-plugin-highlight-targeted-heading/client";
