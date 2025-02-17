@@ -16,15 +16,15 @@ onMounted(() => {
   let pointerX = 0;
   let pointerY = 0;
   const tap =
-    "ontouchstart" in window || navigator.msMaxTouchPoints ? "touchstart" : "mousedown";
+    "ontouchstart" in globalThis || navigator.msMaxTouchPoints ? "touchstart" : "mousedown";
   const colors = ["#FF1461", "#18FF92", "#5A87FF", "#FBF38C"];
 
   // 设置画布大小以适应窗口
   function setCanvasSize() {
-    canvasEl.width = window.innerWidth * 2;
-    canvasEl.height = window.innerHeight * 2;
-    canvasEl.style.width = window.innerWidth + "px";
-    canvasEl.style.height = window.innerHeight + "px";
+    canvasEl.width = globalThis.innerWidth * 2;
+    canvasEl.height = globalThis.innerHeight * 2;
+    canvasEl.style.width = globalThis.innerWidth + "px";
+    canvasEl.style.height = globalThis.innerHeight + "px";
     canvasEl.getContext("2d").scale(2, 2);
   }
 
@@ -170,14 +170,14 @@ onMounted(() => {
   });
 
   setCanvasSize();
-  if (typeof window !== "undefined") {
-    window.addEventListener("resize", setCanvasSize, false);
+  if (typeof globalThis !== "undefined") {
+    globalThis.addEventListener("resize", setCanvasSize, false);
   }
 });
 
 onUnmounted(() => {
-  if (typeof window !== "undefined") {
-    window.removeEventListener("resize", setCanvasSize);
+  if (typeof globalThis !== "undefined") {
+    globalThis.removeEventListener("resize", setCanvasSize);
     document.removeEventListener(tap, handleTap);
   }
 });
