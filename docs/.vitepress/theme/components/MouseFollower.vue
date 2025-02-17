@@ -1,4 +1,3 @@
-// MouseEffect.vue
 <template>
   <canvas
     ref="canvas"
@@ -11,9 +10,9 @@ import { ref, onMounted, onUnmounted } from "vue";
 const canvas = ref(null);
 let ctx = null;
 let particles = [];
-let mouse = { x: globalThis?.innerWidth / 2, y: globalThis?.innerHeight / 2 };
-let targetMouse = { x: globalThis?.innerWidth / 2, y: globalThis?.innerHeight / 2 };
-let lastMouse = { x: globalThis?.innerWidth / 2, y: globalThis?.innerHeight / 2 };
+let mouse = { x: globalThis ?.innerWidth / 2, y: globalThis ?.innerHeight / 2 };
+let targetMouse = { x: globalThis ?.innerWidth / 2, y: globalThis ?.innerHeight / 2 };
+let lastMouse = { x: globalThis ?.innerWidth / 2, y: globalThis ?.innerHeight / 2 };
 let animationFrameId = null;
 
 class Particle {
@@ -154,8 +153,8 @@ function animate() {
 
 function handleResize() {
   if (!canvas.value) return;
-  canvas.value.width = globalThis.innerWidth;
-  canvas.value.height = globalThis.innerHeight;
+  canvas.value.width = globalThis .innerWidth;
+  canvas.value.height = globalThis .innerHeight;
 }
 
 function initParticles() {
@@ -168,22 +167,22 @@ function initParticles() {
 }
 
 onMounted(() => {
-  if (typeof globalThis !== "undefined") {
+  if (typeof globalThis  !== "undefined") {
     ctx = canvas.value.getContext("2d");
     handleResize();
     initParticles();
 
-    globalThis.addEventListener("resize", handleResize);
-    globalThis.addEventListener("mousemove", handleMouseMove);
+    globalThis .addEventListener("resize", handleResize);
+    globalThis .addEventListener("mousemove", handleMouseMove);
 
     animate();
   }
 });
 
 onUnmounted(() => {
-  if (typeof globalThis !== "undefined") {
-    globalThis.removeEventListener("resize", handleResize);
-    globalThis.removeEventListener("mousemove", handleMouseMove);
+  if (typeof globalThis  !== "undefined") {
+    globalThis .removeEventListener("resize", handleResize);
+    globalThis .removeEventListener("mousemove", handleMouseMove);
     if (animationFrameId) {
       cancelAnimationFrame(animationFrameId);
     }

@@ -9,6 +9,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import anime from "animejs";
 const canvas = ref(null);
+
 onMounted(() => {
   const canvasEl = canvas.value;
   const ctx = canvasEl.getContext("2d");
@@ -16,7 +17,9 @@ onMounted(() => {
   let pointerX = 0;
   let pointerY = 0;
   const tap =
-    "ontouchstart" in globalThis || navigator.msMaxTouchPoints ? "touchstart" : "mousedown";
+    "ontouchstart" in globalThis || navigator.msMaxTouchPoints
+      ? "touchstart"
+      : "mousedown";
   const colors = ["#FF1461", "#18FF92", "#5A87FF", "#FBF38C"];
 
   // 设置画布大小以适应窗口
@@ -169,16 +172,23 @@ onMounted(() => {
     },
   });
 
+  document.addEventListener(
+    tap,
+    function (e) {
+      render.play();
+      updateCoords(e);
+      animateParticules(pointerX, pointerY);
+      createRandomCircleAnimation(pointerX, pointerY); // 添加随机圆形动画
+    },
+    false
+  );
+
   setCanvasSize();
-  if (typeof globalThis !== "undefined") {
-    globalThis.addEventListener("resize", setCanvasSize, false);
-  }
+  globalThis.addEventListener("resize", setCanvasSize, false);
 });
 
 onUnmounted(() => {
-  if (typeof globalThis !== "undefined") {
-    globalThis.removeEventListener("resize", setCanvasSize);
-    document.removeEventListener(tap, handleTap);
-  }
+  globalThis.removeEventListener("resize", setCanvasSize);
+  document.removeEventListener(tap, handleTap);
 });
 </script>

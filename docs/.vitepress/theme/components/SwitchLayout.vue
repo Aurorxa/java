@@ -19,8 +19,8 @@
       <NolebaseEnhancedReadabilitiesScreenMenu />
     </template>
     <template #layout-top>
-      <MouseClick />
       <MouseFollower />
+      <MouseClick />
     </template>
     <template #home-features-after>
       <Confetti />
