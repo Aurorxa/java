@@ -151,7 +151,40 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       text: '后端工程化',
       collapsed: true,
       items: [
+        {
+          text: '系统框架',
+          collapsed: true,
+          items: [
 
+          ]
+        },
+        {
+          text: '项目管理',
+          collapsed: true,
+          items: [
+            {
+              text: '软件模型理论',
+              collapsed: true,
+              items: [
+
+              ]
+            },
+            {
+              text: '禅道&敏捷开发',
+              collapsed: true,
+              items: [
+
+              ]
+            },
+            {
+              text: 'Git',
+              collapsed: true,
+              items: [
+
+              ]
+            },
+          ]
+        },
       ]
     },
     {
