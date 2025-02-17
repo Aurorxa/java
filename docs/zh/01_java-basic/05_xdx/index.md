@@ -617,6 +617,38 @@ public class HelloWorld {
 }
 ```
 
+### 3.4.5 注意事项
+
+* ① 注释内容不会参与编译和运行，仅仅是对代码的解释说明，不要和代码无关的注释内容。
+
+> [!NOTE]
+>
+> * 正例：
+>
+> ```java {1-3}
+> /**
+> * 要找出一个不为 0 的整数值为 1 的最低有效位
+> */
+> public int findLowestSetBit(int num) {
+>     return num & -num; 
+> }
+> ```
+>
+> * 反例：
+>
+> ```java {4}
+> public void GetOnlineInfo() {
+>     HttpBrowserCapabilities bc= Request.Browser;
+>     int hbcWidth = bc.ScreenPixelsWidth;
+>     // 项目经理要求这里运行缓慢，好让客户给钱优化，并得到明显的速度提升
+>     Thread.Sleep(2000); // [!code error]
+>     HttpContext cont = System.Web.HttpContext.Current;
+>     ...
+> }
+> ```
+
+* ② 多行注释和文档注释不支持嵌套！！！
+
 ## 3.5 HelloWorld（入门程序）解析
 
 * 我们可以使用文档注释来对 HelloWorld （入门程序）进行解析。
