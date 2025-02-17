@@ -788,9 +788,58 @@ int num = 10;
 
 ![](./assets/9.svg)
 
+## 4.7 变量的使用方式
 
+* ① 输出打印。
 
-## 4.7 应用示例
+```java {7}
+package com.github;
+
+public class VariableDemo3 {
+    public static void main(String[] args) {
+
+       int num = 10;
+       System.out.println(num); // 10
+        
+    }
+}
+```
+
+* ② 参与计算。
+
+```java {8}
+package com.github;
+
+public class VariableDemo4 {
+    public static void main(String[] args) {
+
+        int a = 10;
+        int b = 20;
+        System.out.println(a + b); // 30
+        
+    }
+}
+```
+
+* ③ 修改记录的值。
+
+```java {9}
+package com.github;
+
+public class VariableDemo5 {
+    public static void main(String[] args) {
+
+        int num = 10;
+        System.out.println(num); // 10
+
+        num = 20;
+        System.out.println(num); // 20
+        
+    }
+}
+```
+
+## 4.8 应用示例
 
 * 需求：使用变量描述一个人的信息，如：姓名、年龄、性别、身高、体重等。
 
