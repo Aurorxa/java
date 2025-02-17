@@ -859,7 +859,7 @@ public class VariableTest1 {
 }
 ```
 
-* ② 变量名同一个作用域内不允许重复定义。
+* ② 变量名在同一作用域内不允许重复定义。
 
 ```java
 package com.github;
