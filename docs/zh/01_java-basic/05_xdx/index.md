@@ -654,9 +654,9 @@ public class HelloWorld {
 }
 ```
 
-## 3.6 源文件名（java 文件名）和类名的一致性问题
+## 3.6 源文件名（Java 文件名）和类名的一致性问题
 
-* ① 类名并非一定要和 java 文件名一致。但是，如果类名使用 pubilc 修饰，类名必须和 java 文件名保持一致。
+* ① 类名并非一定要和 Java 文件名（`*.java 文件`）一致。但是，如果类名使用 pubilc 修饰，类名必须和 java 文件名保持一致。
 
 ```java [HelloWorld2.java]
 /**
