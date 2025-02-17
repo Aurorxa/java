@@ -42,7 +42,7 @@
 > ```
 >
 > ```properties [.env.production]
-> # 开发环境的配置
+> # 生产环境的配置
 > VITE_API_URL=https://api.prod.com
 > ```
 >
