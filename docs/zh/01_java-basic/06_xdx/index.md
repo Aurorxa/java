@@ -880,7 +880,7 @@ public class VariableTest2 {
 
 * ③ 一条语句中可以定义多个变量（不常用）。
 
-```java
+```java {6}
 package com.github;
 
 public class VariableTest3 {
