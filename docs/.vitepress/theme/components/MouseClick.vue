@@ -9,7 +9,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import anime from "animejs";
 const canvas = ref(null);
-
+import { inBrowser } from "vitepress";
 onMounted(() => {
   const canvasEl = canvas.value;
   const ctx = canvasEl.getContext("2d");
@@ -170,23 +170,16 @@ onMounted(() => {
     },
   });
 
-  document.addEventListener(
-    tap,
-    function (e) {
-      render.play();
-      updateCoords(e);
-      animateParticules(pointerX, pointerY);
-      createRandomCircleAnimation(pointerX, pointerY); // 添加随机圆形动画
-    },
-    false
-  );
-
-  setCanvasSize();
-  window.addEventListener("resize", setCanvasSize, false);
+  if (inBrowser) {
+    setCanvasSize();
+    window.addEventListener("resize", setCanvasSize, false);
+  }
 });
 
 onUnmounted(() => {
-  window.removeEventListener("resize", setCanvasSize);
-  document.removeEventListener(tap, handleTap);
+  if (inBrowser) {
+    window.removeEventListener("resize", setCanvasSize);
+    document.removeEventListener(tap, handleTap);
+  }
 });
 </script>

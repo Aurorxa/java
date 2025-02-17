@@ -30,10 +30,10 @@ hero:
   actions:
     - theme: brand
       text: "🏠首页"
-      link: "/"        
+      link: "/"      
     - theme: alt
       text: "🎉快速开始"
-      link: "/01_java-basic/01_xdx/"            
+      link: "/01_java-basic/01_xdx/"          
 
 # 按钮下方的描述
 features:
@@ -47,4 +47,3 @@ features:
     title: "注意事项"
     details: "注意事项就这么几点：边界值、等价类、数据完整性原子性、死锁、空转、……"
 ---
-
