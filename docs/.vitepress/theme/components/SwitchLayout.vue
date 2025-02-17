@@ -22,6 +22,11 @@
       <MouseClick />
       <MouseFollower />
     </template>
+    <template #home-features-after>
+      <Confetti />
+      <TypeIt />
+      <HomeUnderline />
+    </template>
   </DefaultTheme.Layout>
 </template>
 
@@ -34,6 +39,9 @@ import { nextTick, provide } from "vue";
 import { ShareButton } from "@theojs/lumen";
 import MouseClick from "./MouseClick.vue";
 import MouseFollower from "./MouseFollower.vue";
+import Confetti from "./Confetti.vue";
+import TypeIt from "./TypeIt.vue";
+import HomeUnderline from "./HomeUnderline.vue";
 
 import "@nolebase/vitepress-plugin-highlight-targeted-heading/client/style.css";
 import { NolebaseHighlightTargetedHeading } from "@nolebase/vitepress-plugin-highlight-targeted-heading/client";

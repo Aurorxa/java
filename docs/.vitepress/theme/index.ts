@@ -33,7 +33,7 @@ export default {
   },
   enhanceApp({ app, router }: EnhanceAppContext) {
     app.component('ArticleMetadata', ArticleMetadata)
-    app.component('confetti', Confetti)
+    app.component('Confetti', Confetti)
     app.component('HomeUnderline', HomeUnderline)
     app.component('TypeIt', TypeIt)
     app.component('MouseClick', MouseClick) //鼠标跟随组件

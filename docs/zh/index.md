@@ -48,7 +48,3 @@ features:
     details: "注意事项就这么几点：边界值、等价类、数据完整性原子性、死锁、空转、……"
 ---
 
-
-<confetti />
-<HomeUnderline />
-<TypeIt />
