@@ -839,7 +839,98 @@ public class VariableDemo5 {
 }
 ```
 
-## 4.8 应用示例
+## 4.8 变量的注意事项
+
+* ① 变量中只能存在一个值。
+
+```java
+package com.github;
+
+public class VariableTest1 {
+    public static void main(String[] args) {
+
+        int num = 10;
+        System.out.println(num); // 10
+
+        num = 20;
+        System.out.println(num); // 20
+        
+    }
+}
+```
+
+* ② 变量名不允许重复定义。
+
+```java
+package com.github;
+
+public class VariableTest2 {
+    public static void main(String[] args) {
+
+        int num = 10;
+        System.out.println(num); 
+		
+        // 下面的代码是错误的
+        int num = 20; // [!code error]
+        System.out.println(num); 
+        
+    }
+}
+```
+
+* ③ 一条语句中可以定义多个变量（不常用）。
+
+```java
+package com.github;
+
+public class VariableTest3 {
+    public static void main(String[] args) {
+
+        int a = 10,b = 20;
+        System.out.println(a); // 10
+        System.out.println(b); // 20
+        
+    }
+}
+```
+
+* ④ 变量在使用之前一定要进行赋值。
+
+```java
+package com.github;
+
+public class VariableTest4 {
+    public static void main(String[] args) {
+
+        int num;
+        // 以下的代码是错误的
+        System.out.println("num = " + num); // [!code error]
+        
+    }
+}
+```
+
+* ⑤ 变量只在其作用域范围内有效。
+
+```java
+package com.github;
+
+public class VariableTest5 {
+    public static void main(String[] args) {
+
+        {
+            int num = 10;
+            System.out.println("num = " + num);
+        }
+        
+        // 以下的代码是错误的
+        System.out.println("num = " + num); // [!code error]
+        
+    }
+}
+```
+
+## 4.9 应用示例
 
 * 需求：使用变量描述一个人的信息，如：姓名、年龄、性别、身高、体重等。
 
