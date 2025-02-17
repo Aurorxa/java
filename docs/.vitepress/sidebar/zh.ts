@@ -60,17 +60,20 @@ export const zhSidebar: DefaultTheme.Sidebar = {
           items: [
             { text: 'JDK9', link: `` },
             { text: 'JDK10', link: `` },
-            { text: 'JDK11', link: `` },
+            { text: 'JDK11（LTS）', link: `` },
             { text: 'JDK12', link: `` },
             { text: 'JDK13', link: `` },
             { text: 'JDK14', link: `` },
             { text: 'JDK15', link: `` },
             { text: 'JDK16', link: `` },
-            { text: 'JDK17', link: `` },
+            { text: 'JDK17（LTS）', link: `` },
             { text: 'JDK18', link: `` },
             { text: 'JDK19', link: `` },
             { text: 'JDK20', link: `` },
-            { text: 'JDK21', link: `` },
+            { text: 'JDK21（LTS）', link: `` },
+            { text: 'JDK22', link: `` },
+            { text: 'JDK23', link: `` },
+            { text: 'JDK24', link: `` },
           ]
         },
         {
@@ -118,7 +121,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
           text: 'Maven',
           collapsed: true,
           items: [
-            { text: 'Maven 核心概念', link: `/06_project-build/maven/01_${commonDirectoryName}/` },
+            { text: '初识 Maven', link: `/06_project-build/maven/01_${commonDirectoryName}/` },
           ]
         },
         {
@@ -148,7 +151,40 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       text: '后端工程化',
       collapsed: true,
       items: [
+        {
+          text: '系统框架',
+          collapsed: true,
+          items: [
 
+          ]
+        },
+        {
+          text: '项目管理',
+          collapsed: true,
+          items: [
+            {
+              text: '软件模型理论',
+              collapsed: true,
+              items: [
+
+              ]
+            },
+            {
+              text: '禅道&敏捷开发',
+              collapsed: true,
+              items: [
+
+              ]
+            },
+            {
+              text: 'Git',
+              collapsed: true,
+              items: [
+
+              ]
+            },
+          ]
+        },
       ]
     },
     {

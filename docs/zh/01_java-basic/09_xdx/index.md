@@ -41,7 +41,7 @@
 >
 > ::: details 点我查看
 >
-> ```jsx
+> ```jsx {14}
 > import React from 'react'
 > 
 > function Greeting(props) {
@@ -55,7 +55,7 @@
 >     // JSX 是表达式，最终返回由语句决定的 JSX 结构
 >     return (
 >       <div> 
->           { element } // [!code highlight]  
+>           { element } 
 >       </div>
 >     );
 > }
