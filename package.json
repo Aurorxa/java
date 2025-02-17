@@ -34,7 +34,7 @@
     "canvas-confetti": "^1.9.3",
     "markdown-it-mathjax3": "^4.3.2",
     "vitepress": "^1.6.3",
-    "vitepress-plugin-group-icons": "^1.3.5",
+    "vitepress-plugin-group-icons": "^1.3.6",
     "vitepress-plugin-mermaid": "^2.0.17"
   },
   "dependencies": {
