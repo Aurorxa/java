@@ -1,6 +1,112 @@
-# 第一章：Java 环境的搭建（⭐）
+# 第一章：环境变量（⭐）
 
-## 1.1 C 语言 VS Java 语言
+## 1.1 概述
+
+* `环境变量`是操作系统用来配置和存储运行时环境信息的变量。
+* `环境变量`是一组键值对，能够影响操作系统和运行在操作系统之上应用程序的某些行为。
+* `环境变量`通常包含关于操作系统的配置信息，如：路径、系统设置以及程序设置等等。
+
+## 1.2 环境变量的作用
+
+* ① `路径管理`：环境变量常用于指定可执行文件的搜索路径，如：`PATH` 环境变量告诉操作系统在哪些目录中查找命令或可执行文件。
+
+> [!NOTE]
+>
+> * ① 当我们在 cmd 窗口中输入某些命令的时候，操作系统首先会在当前目录中查找该命令：
+>   * 如果找到了该命令，就立即执行。
+>   * 如果没有找到，就会去 `PATH` 环境变量对应的路径中去查找：
+>     * 如果找到了该命令，就立即执行。
+>     * 如果没有找到该命令，将会报错，提示该命令不存在。
+> * ② 其对应的流程，如下所示：
+>
+> ![](./assets/49.svg)
+
+* ② `配置文件和系统设置`：环境变量可以存储应用程序和操作系统的配置信息，应用程序可以读取这些变量来调整其行为。
+
+> [!NOTE]
+>
+> 前端项目构建工具 Vite 中，就有这方面的体现，如：
+>
+> * ① 定义环境变量，在项目根目录中创建 .env 文件来定义环境变量，如下所示：
+>
+> ::: code-group
+>
+> ```properties [.env]
+> # 默认的环境设置，所有环境都会加载
+> VITE_APP_NAME=mall
+> ```
+>
+> ```properties [.env.development]
+> # 开发环境的配置
+> VITE_API_URL=https://api.dev.com
+> ```
+>
+> ```properties [.env.production]
+> # 开发环境的配置
+> VITE_API_URL=https://api.prod.com
+> ```
+>
+> :::
+>
+> * ② 在代码中使用环境变量，如下所示：
+>
+> ```js
+> // main.js
+> console.log(import.meta.env.VITE_API_URL); 
+> console.log(import.meta.env.VITE_APP_NAME); 
+> ```
+
+* ③ ...
+
+## 1.3 在 cmd 中启动 QQ
+
+* ① 在 cmd 中切换到 QQ 的安装目录：
+
+```cmd
+cd C:\Program Files (x86)\Tencent\QQ\Bin
+```
+
+![](./assets/50.gif)
+
+* ② 启动 QQ：
+
+```cmd
+qq.exe
+```
+
+![](./assets/51.gif)
+
+## 1.4 在 cmd 中的任意目录启动 QQ
+
+* ① 在 cmd 中的任意目录不能启动 QQ（每次都需要指定的安装目录，太麻烦）：
+
+```cmd
+qq.exe
+```
+
+![](./assets/52.gif)
+
+* ② 将 QQ 的安装目录配置到 PATH 环境变量中：
+
+```cmd
+PATH=C:\Program Files (x86)\Tencent\QQ\Bin;$PATH
+```
+
+![](./assets/53.gif)
+
+* ③ 在 cmd 中的任意目录启动 QQ：
+
+```cmd
+qq.exe
+```
+
+![](./assets/54.gif)
+
+
+
+# 第二章：Java 环境的搭建（⭐）
+
+## 2.1 C 语言 VS Java 语言
 
 * C 语言的软件设计思想 VS Java 语言的软件设计思想，如下所示：
 
@@ -40,9 +146,9 @@
 > - ② Java 语言则更适合应用层开发，拥有丰富的库和工具支持，开发效率更高，并且由于自动内存管理和异常处理，编写的代码通常更加安全和健壮。
 > - ③ 两者各有优势，选择使用哪种语言应根据项目需求和开发环境来决定。
 
-## 1.2 JDK、JRE 和 JVM
+## 2.2 JDK、JRE 和 JVM
 
-###  1.2.1 JDK
+###  2.2.1 JDK
 
 * JDK（Java Development Kit，Java 开发工具包）是用于开发 Java 应用程序的。JDK 是由 JRE（Java Runtime Environment，Java 运行时环境）、编译器（javac）、解释器（java）、调试工具（jdb）以及内存分析工具（jhat）等组成。JDK 负责编译、调试和执行。JDK 和平台相关，应为每个平台都需要不同的 JDK。
 * JDK 的工作原理，如下所示：
@@ -59,7 +165,7 @@
 
 ![JDK、JRE、JVM](./assets/3.svg)
 
-### 1.2.2 JRE
+### 2.2.2 JRE
 
 * JRE（Java Runtime Environment，Java 运行时环境）可以用来运行 Java 应用程序，它包含了 JVM 和核心类库以及一些其它的文件。
 * JRE 的架构，如下所示：
@@ -77,7 +183,7 @@
 > * ③ **统一工具**：JDK 包含开发工具和运行时环境，开发者和服务器管理员通常都需要完整的 JDK，减少了安装和配置的复杂性。
 > * ④ **现代应用需求**：随着云原生、容器化等技术的兴起，JDK 完全可以满足运行时需求，不再需要分开 JDK 和 JRE。
 
-### 1.2.3 JVM 
+### 2.2.3 JVM 
 
 * JVM（Java Virtual Machine，Java 虚拟机）是 JRE 的一部分。JVM 为 Java 应用程序提供运行时环境的规范。JRE 提供运行 Java 应用程序的资源和库，JVM 是其中负责执行字节码的核心组件。JVM 负责将字节码转换为特定于机器的代码。
 * JVM 的架构，如下所示：
@@ -92,7 +198,7 @@
     * `解析（Resolution）`：它用于将符号引用解析为具体引用
   * ③ `初始化（Initialization）`：在初始化期间，static 初始值设定项和 static 字段的执行顺序遵循它们在代码中定义的顺序。这是为了确保在投入使用之前正确初始化这些类。
 
-### 1.2.4 总结
+### 2.2.4 总结
 
 * JDK、JRE 和 JVM 之间的区别，如下所示：
 
@@ -102,9 +208,9 @@
 | JRE（Java Runtime Environment） | 提供运行 Java 程序所需的环境，不包括开发工具。               | 包含 JVM 和 Java 类库。                                      | 用于运行 Java 程序。                   |
 | JVM（Java Virtual Machine）     | 执行 Java 字节码的虚拟机，负责将字节码转换为本地机器码并执行。 | 内存管理、垃圾回收、字节码执行等功能。                       | 用于 Java 程序的执行，提供跨平台支持。 |
 
-## 1.3 JDK 的安装和配置
+## 2.3 JDK 的安装和配置
 
-### 1.3.1 手动版
+### 2.3.1 手动版
 
 * ① 去 [Oracle](https://www.oracle.com/) 官网下载指定的 JDK 版本：
 
@@ -169,7 +275,7 @@ javac -version
 
 ![](./assets/22.gif)
 
-### 1.3.2 自动版
+### 2.3.2 自动版
 
 * ① 创建安装的目录：
 
@@ -259,7 +365,7 @@ javac -version
 
 ![](./assets/29.gif)
 
-## 1.4 JDK17 的目录结构说明
+## 2.4 JDK17 的目录结构说明
 
 * JDK 17 的目录结构基本上与之前的 JDK 版本类似，但随着模块化（JDK 9 引入）和一些组件的精简，目录内容可能有所调整。
 * 以下是 JDK 17 目录的常见结构及其作用：
@@ -310,9 +416,9 @@ javac -version
 
 
 
-# 第二章：Java 入门程序（⭐）
+# 第三章：Java 入门程序（⭐）
 
-## 2.1 开发 Java 程序的步骤
+## 3.1 开发 Java 程序的步骤
 
 * 开发 Java  程序的步骤，如下所示：
 
@@ -323,9 +429,9 @@ javac -version
   * ② 编译：通过 `javac` 命令对该 Java 源文件（`*.java`）进行编译，生成字节码文件（`*.class`）。
   * ③ 运行：通过 `java` 命令运行生成的字节码文件（`*.class`）。
 
-## 2.2 安装 Notepad++
+## 3.2 安装 Notepad++
 
-### 2.2.1 手动版
+### 3.2.1 手动版
 
 * ① 去 [Notepad++](https://notepad-plus-plus.org/) 官网下载安装包：
 
@@ -351,7 +457,7 @@ javac -version
 
 ![](./assets/41.png)
 
-### 2.2.2 自动版
+### 3.2.2 自动版
 
 * ① 查询 Notepad++ ：
 
@@ -377,7 +483,7 @@ winget list notepadplus
 
 ![](./assets/44.gif)
 
-## 2.3 HelloWorld（入门程序）
+## 3.3 HelloWorld（入门程序）
 
 * ① 使用 `Notepad++` 新建 `HelloWorld.java`文件，并在该文件中编写入门程序：
 
@@ -407,14 +513,14 @@ java HelloWorld
 
 ![](./assets/47.gif)
 
-## 2.4 Java 中的注释
+## 3.4 Java 中的注释
 
-### 2.4.1 概述
+### 3.4.1 概述
 
 * 在 Java 中，注释用于向代码添加说明或解释，它们不会被程序编译执行。
 * Java 提供了三种类型的注释：单行注释、多行注释和文档注释。
 
-### 2.4.2 单行注释
+### 3.4.2 单行注释
 
 * 语法：
 
@@ -437,7 +543,7 @@ public class HelloWorld {
 }
 ```
 
-### 2.4.3 多行注释
+### 3.4.3 多行注释
 
 * 语法：
 
@@ -467,7 +573,7 @@ public class HelloWorld {
 }
 ```
 
-### 2.4.5 文档注释
+### 3.4.4 文档注释
 
 * 语法：
 
@@ -511,7 +617,7 @@ public class HelloWorld {
 }
 ```
 
-## 2.5 HelloWorld（入门程序）解析
+## 3.5 HelloWorld（入门程序）解析
 
 * 我们可以使用文档注释来对 HelloWorld （入门程序）进行解析。
 
@@ -548,7 +654,7 @@ public class HelloWorld {
 }
 ```
 
-## 2.6 源文件名（java 文件名）和类名的一致性问题
+## 3.6 源文件名（java 文件名）和类名的一致性问题
 
 * ① 类名并非一定要和 java 文件名一致。但是，如果类名使用 pubilc 修饰，类名必须和 java 文件名保持一致。
 
@@ -573,18 +679,18 @@ class HelloWorld {
 * ② 一个源文件中是否可以有多个类；但是，一个源文件中有且只能有一个 pubilc 修饰的类。
 * ③ main 方法必须写在带 public 的类中。
 
-## 2.7 println 方法和 print 方法的异同点
+## 3.7 println 方法和 print 方法的异同点
 
-### 2.7.1 概述
+### 3.7.1 概述
 
 * 在 Java 中，`println()` 和 `print()` 都是 `System.out` 对象的方法，常用于输出信息到控制台。
 
-### 2.7.2 相同点
+### 3.7.2 相同点
 
 * ① 输出内容：两者都可以输出任何类型的数据（字符串、数字、对象等）。它们会将指定的内容打印到控制台。
 * ② 都是 `System.out` 的方法：这两个方法都属于 `System.out`，`System.out` 是一个 `PrintStream` 对象，提供了多种输出方法。
 
-### 2.7.3 不同点
+### 3.7.3 不同点
 
 * ① 换行行为：
 
