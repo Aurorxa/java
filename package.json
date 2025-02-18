@@ -28,7 +28,7 @@
     "@nolebase/vitepress-plugin-git-changelog": "^2.14.0",
     "@nolebase/vitepress-plugin-highlight-targeted-heading": "^2.14.0",
     "@nolebase/vitepress-plugin-inline-link-preview": "^2.14.0",
-    "@shikijs/vitepress-twoslash": "^2.4.2",
+    "@shikijs/vitepress-twoslash": "^3.0.0",
     "@types/animejs": "^3.1.12",
     "@types/dom-view-transitions": "^1.0.5",
     "@types/node": "^22.13.4",
@@ -52,7 +52,8 @@
     "vitepress-markdown-timeline": "^1.2.2",
     "vitepress-plugin-announcement": "^0.1.4",
     "vitepress-plugin-comment-with-giscus": "^1.1.15",
-    "vitepress-plugin-pagefind": "^0.4.13"
+    "vitepress-plugin-pagefind": "^0.4.13",
+    "xgplayer": "^3.0.20"
   },
   "include": [
     "**/.vitepress/**/*.ts",

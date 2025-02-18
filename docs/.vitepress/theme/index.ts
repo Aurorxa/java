@@ -25,6 +25,7 @@ import 'nprogress-v2/dist/index.css'
 import "vitepress-markdown-timeline/dist/theme/index.css"
 import 'virtual:group-icons.css' //代码组样式
 import './style/index.css'
+import xgplayer from "./components/Xgplayer.vue"
 
 export default {
   extends: DefaultTheme,
@@ -38,6 +39,7 @@ export default {
     app.component('TypeIt', TypeIt)
     app.component('MouseClick', MouseClick) //鼠标跟随组件
     app.component('MouseFollower', MouseFollower) //鼠标跟随组件
+    app.component('xgplayer', xgplayer) //鼠标跟随组件
     app.use(NolebaseGitChangelogPlugin)
     app.use(NolebaseInlineLinkPreviewPlugin)
     if (inBrowser) {
