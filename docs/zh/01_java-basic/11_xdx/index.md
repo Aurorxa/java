@@ -332,19 +332,258 @@ source /etc/default/locale
 
 # 第四章：Java 中的编码（⭐）
 
-## 4.1 JDK 17 之前
+## 4.1 概述
+
+* 如果你和别人交流 Java，当提及 Java 的编码的时候，别人一定会和你说 Java 的默认字符集是 Unicode；但是，我们也知道 Unicode 字符集的实现，即：字符编码标准，有很多种，如：UTF-8、UTF-16 以及 UTF-32 等；那么，Java 中的字符编码到底是什么？
+
+> [!NOTE]
+>
+> * ① **Unicode** 是一种字符集标准，目的是为全球所有语言的字符提供一个唯一的编码，涵盖了几乎所有的字符，包括常见的英语字符、汉字、符号等。Unicode 为每个字符分配了一个唯一的编码点。
+> * ② **UTF-8**、**UTF-16**、**UTF-32** 是 Unicode 的具体编码方式。它们都是将 Unicode 编码点转换为字节序列的不同方法：
+>   - **UTF-8**：变长编码方式，每个字符使用 1 到 4 个字节来表示，兼容 ASCII。
+>   - **UTF-16**：每个字符使用 2 或 4 个字节，通常以两字节为主。
+>   - **UTF-32**：每个字符固定使用 4 个字节。
+
+## 4.2 常见操作系统默认编码
+
+### 4.2.1 Windows
+
+* 首先说明一点，Windows 内核采用的是 UTF-16 编码，一方面是为了支持多语言（英文、中文、日文等），一方面是因为当时的计算机的性能远远不如今天，如果采取 UTF-8 编码（非定长编码），会消耗操作系统的性能；如果采取是 UTF-32 编码，将会占用更多的存储空间，考虑到种种因素，WIndows 的内核选择了 UTF-16 编码。
+
+> [!NOTE]
+>
+> 为了支持更多的字符集和国际化需求，微软在Windows NT （1993 年）系列开始决定使用 Unicode 来统一字符表示，于是 UTF-16 成为了默认的编码。
+
+* 在 Windows 7 （简体中文）操作系统（2009-10-22 正式发布）上，控制台采取的是 GBK 编码，而文件编码也采取的是 GBK ，如下所示：
+
+![Windows 7 操作系统（简体中文）默认控制台编码](./assets/31.png)
+
+![Windows 7 操作系统（简体中文）默认文件编码](./assets/32.png)
+
+* 但是，随着时间的推移，硬件的性能越来越强大，由于历史遗留问题，Windows 的内核依然是 UTF-16 编码；但是，控制台虽然采取的是 GBK 编码，而文件编码就已经改为了 UTF-8 编码，如下所示：
+
+![Windows 11 操作系统（简体中文）默认控制台编码](./assets/33.png)
+
+![Windows 11 操作系统（简体中文）默认文件编码](./assets/34.png)
+
+### 4.2.2 Linux
+
+* Linux 默认就是 `UTF-8` 编码，如下所示：
+
+![Linux 系统的默认编码](./assets/35.png)
+
+## 4.3 JDK 18 之前
+
+### 4.3.1 概述
+
+* Java 是在 1996 年的时候发布的第一个版本，Unicode 已经成为一种广泛支持的字符集，而 UTF-16 已被认为是处理 Unicode 字符的标准方式之一。
+* Java 设计者选择使用 UTF-16，是为了确保与 Unicode 标准的兼容性，且这种选择在当时广泛被其他操作系统（如 Windows NT）采用。
+
+### 4.3.2 字符串编码
+
+* Java 中的字符串在内存中的表示是 UTF-16 编码，即：Java 中的 `String` 类是基于 `UTF-16` 编码来存储字符的。
 
 
 
+* 示例：
+
+```java {42}
+/**
+ * The {@code String} class represents character strings. All
+ * string literals in Java programs, such as {@code "abc"}, are
+ * implemented as instances of this class.
+ * <p>
+ * Strings are constant; their values cannot be changed after they
+ * are created. String buffers support mutable strings.
+ * Because String objects are immutable they can be shared. For example:
+ * <blockquote><pre>
+ *     String str = "abc";
+ * </pre></blockquote><p>
+ * is equivalent to:
+ * <blockquote><pre>
+ *     char data[] = {'a', 'b', 'c'};
+ *     String str = new String(data);
+ * </pre></blockquote><p>
+ * Here are some more examples of how strings can be used:
+ * <blockquote><pre>
+ *     System.out.println("abc");
+ *     String cde = "cde";
+ *     System.out.println("abc" + cde);
+ *     String c = "abc".substring(2, 3);
+ *     String d = cde.substring(1, 2);
+ * </pre></blockquote>
+ * <p>
+ * The class {@code String} includes methods for examining
+ * individual characters of the sequence, for comparing strings, for
+ * searching strings, for extracting substrings, and for creating a
+ * copy of a string with all characters translated to uppercase or to
+ * lowercase. Case mapping is based on the Unicode Standard version
+ * specified by the {@link java.lang.Character Character} class.
+ * <p>
+ * The Java language provides special support for the string
+ * concatenation operator (&nbsp;+&nbsp;), and for conversion of
+ * other objects to strings. For additional information on string
+ * concatenation and conversion, see <i>The Java Language Specification</i>.
+ *
+ * <p> Unless otherwise noted, passing a {@code null} argument to a constructor
+ * or method in this class will cause a {@link NullPointerException} to be
+ * thrown.
+ *
+ * <p>A {@code String} represents a string in the UTF-16 format
+ * in which <em>supplementary characters</em> are represented by <em>surrogate
+ * pairs</em> (see the section <a href="Character.html#unicode">Unicode
+ * Character Representations</a> in the {@code Character} class for
+ * more information).
+ * Index values refer to {@code char} code units, so a supplementary
+ * character uses two positions in a {@code String}.
+ * <p>The {@code String} class provides methods for dealing with
+ * Unicode code points (i.e., characters), in addition to those for
+ * dealing with Unicode code units (i.e., {@code char} values).
+ *
+ * <p>Unless otherwise noted, methods for comparing Strings do not take locale
+ * into account.  The {@link java.text.Collator} class provides methods for
+ * finer-grain, locale-sensitive String comparison.
+ *
+ * @implNote The implementation of the string concatenation operator is left to
+ * the discretion of a Java compiler, as long as the compiler ultimately conforms
+ * to <i>The Java Language Specification</i>. For example, the {@code javac} compiler
+ * may implement the operator with {@code StringBuffer}, {@code StringBuilder},
+ * or {@code java.lang.invoke.StringConcatFactory} depending on the JDK version. The
+ * implementation of string conversion is typically through the method {@code toString},
+ * defined by {@code Object} and inherited by all classes in Java.
+ *
+ * @author  Lee Boynton
+ * @author  Arthur van Hoff
+ * @author  Martin Buchholz
+ * @author  Ulf Zibis
+ * @see     java.lang.Object#toString()
+ * @see     java.lang.StringBuffer
+ * @see     java.lang.StringBuilder
+ * @see     java.nio.charset.Charset
+ * @since   1.0
+ * @jls     15.18.1 String Concatenation Operator +
+ */
+
+public final class String
+    implements java.io.Serializable, Comparable<String>, CharSequence,
+               Constable, ConstantDesc {
+	...               
+}                   
+```
+
+### 4.3.3 文件编码
+
+* 默认情况下，对于文件，Java 使用的是`平台默认`的编码，即：在 `Windows` 上通常是 `GBK`，而在 `Linux` 上通常是 `UTF-8` 。
+* 当然，我们在使用 `InputStreamReader` 或 `OutputStramWriter` 等类的时候，也可以手动指定编码。
 
 
 
+* 示例：
 
-## 4.2 JDK 17 之后
+```java {5}
+/**
+ * Reads text from character files using a default buffer size. Decoding from bytes
+ * to characters uses either a specified {@linkplain java.nio.charset.Charset charset}
+ * or the platform's
+ * {@linkplain java.nio.charset.Charset#defaultCharset() default charset}.
+ *
+ * <p>
+ * The {@code FileReader} is meant for reading streams of characters. For reading
+ * streams of raw bytes, consider using a {@code FileInputStream}.
+ *
+ * @see InputStreamReader
+ * @see FileInputStream
+ *
+ * @author      Mark Reinhold
+ * @since       1.1
+ */
+public class FileReader extends InputStreamReader {
+    ...
+}
+```
 
 
 
+* 示例：
 
+```java {6,61}
+/**
+ * An InputStreamReader is a bridge from byte streams to character streams: It
+ * reads bytes and decodes them into characters using a specified {@link
+ * java.nio.charset.Charset charset}.  The charset that it uses
+ * may be specified by name or may be given explicitly, or the platform's
+ * {@link Charset#defaultCharset() default charset} may be accepted.
+ *
+ * <p> Each invocation of one of an InputStreamReader's read() methods may
+ * cause one or more bytes to be read from the underlying byte-input stream.
+ * To enable the efficient conversion of bytes to characters, more bytes may
+ * be read ahead from the underlying stream than are necessary to satisfy the
+ * current read operation.
+ *
+ * <p> For top efficiency, consider wrapping an InputStreamReader within a
+ * BufferedReader.  For example:
+ *
+ * <pre>
+ * BufferedReader in
+ *   = new BufferedReader(new InputStreamReader(anInputStream));
+ * </pre>
+ *
+ * @see BufferedReader
+ * @see InputStream
+ * @see java.nio.charset.Charset
+ *
+ * @author      Mark Reinhold
+ * @since       1.1
+ */
 
+public class InputStreamReader extends Reader {
 
+    private final StreamDecoder sd;
+
+    /**
+     * Creates an InputStreamReader that uses the
+     * {@link Charset#defaultCharset() default charset}.
+     *
+     * @param  in   An InputStream
+     *
+     * @see Charset#defaultCharset()
+     */
+    public InputStreamReader(InputStream in) {
+        super(in);
+        sd = StreamDecoder.forInputStreamReader(in, this,
+                Charset.defaultCharset()); // ## check lock object
+    }
+
+    /**
+     * Creates an InputStreamReader that uses the named charset.
+     *
+     * @param  in
+     *         An InputStream
+     *
+     * @param  charsetName
+     *         The name of a supported
+     *         {@link java.nio.charset.Charset charset}
+     *
+     * @throws     UnsupportedEncodingException
+     *             If the named charset is not supported
+     */
+    public InputStreamReader(InputStream in, String charsetName)
+        throws UnsupportedEncodingException
+    {
+        super(in);
+        if (charsetName == null)
+            throw new NullPointerException("charsetName");
+        sd = StreamDecoder.forInputStreamReader(in, this, charsetName);
+    }
+    
+    ...   
+
+}    
+```
+
+## 4.4 JDK 18 之后
+
+* 在 JDK18 之后，Java 开始使用 UTF-8 作为默认的字符集，而不再根据操作系统的默认编码来决定。这是为了确保跨平台的一致性，减少因字符编码不一致而导致的问题。
+
+* 这个变化始于 [JEP 400: UTF-8 by Default](https://openjdk.org/jeps/400)，它在 JDK 18 版本中被正式引入并生效。
 
