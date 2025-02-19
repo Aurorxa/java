@@ -161,7 +161,7 @@ if(条件表达式) {
 
 > [!NOTE]
 >
-> * ① 当条件表达式为真（true），会执行代码块 1 中的语句
+> * ① 当条件表达式为真（true），执行代码块 1 中的语句
 > * ② 当条件表达式为假（false），执行代码块 2 中的语句。
 
 * 流程图，如下所示：
@@ -723,8 +723,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
     public static void main(String[] args) {
-        // 生成一个指定范围内的随机整数 (0 到 99)
-        int randomInt = ThreadLocalRandom.current().nextInt(100); // 范围是 [0, 100)
+        // 生成一个指定范围内的随机整数 (0 到 99]
+        int randomInt = ThreadLocalRandom.current().nextInt(100); 
         System.out.println("随机整数 (0 到 99)：" + randomInt);
 
         // 生成一个随机浮点数 (0.0 到 1.0)
