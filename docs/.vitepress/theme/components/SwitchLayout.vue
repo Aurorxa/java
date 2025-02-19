@@ -53,8 +53,6 @@ import {
 
 import "@nolebase/vitepress-plugin-enhanced-readabilities/client/style.css";
 
-// import Meilisearch from "./Meilisearch.vue";
-
 const { isDark } = useData();
 
 const enableTransitions = () =>
