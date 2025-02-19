@@ -334,7 +334,7 @@ source /etc/default/locale
 
 ## 4.1 概述
 
-* 如果你和别人交流 Java，当提及 Java 的编码的时候，别人一定会和你说 Java 的默认字符集是 Unicode；但是，我们也知道 Unicode 字符集的实现，即：字符编码标准，有很多种，如：UTF-8、UTF-16 以及 UTF-32 等；那么，Java 中的字符编码到底是什么？
+* 如果你和别人交流 Java，当提及 Java 的编码的时候，别人一定会和你说 Java 的默认字符集是 Unicode；但是，我们也知道 Unicode 字符集的实现（字符编码标准），有很多种，如：UTF-8、UTF-16 以及 UTF-32 等；那么，Java 中的字符编码到底是什么？
 
 > [!NOTE]
 >
