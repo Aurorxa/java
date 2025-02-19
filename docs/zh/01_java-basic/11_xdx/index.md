@@ -377,7 +377,7 @@ source /etc/default/locale
 ### 4.3.1 概述
 
 * Java 是在 1996 年的时候发布的第一个版本，Unicode 已经成为一种广泛支持的字符集，而 UTF-16 已被认为是处理 Unicode 字符的标准方式之一。
-* Java 设计者选择使用 UTF-16，是为了确保与 Unicode 标准的兼容性，且这种选择在当时广泛被其他操作系统（如 Windows NT）采用。
+* Java 设计者选择使用 UTF-16，是为了确保与 Unicode 标准的兼容性，且这种选择在当时广泛被其他操作系统（Windows NT）采用。
 
 ### 4.3.2 字符串编码
 
