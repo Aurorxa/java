@@ -18,12 +18,10 @@
     <template #nav-screen-content-after>
       <NolebaseEnhancedReadabilitiesScreenMenu />
     </template>
-    <!-- 
-      <template #layout-top>
-        <MouseFollower />
-        <MouseClick />
-      </template> 
-    -->
+    <template #layout-top>
+      <!-- <MouseFollower /> -->
+      <MouseClick />
+    </template>
     <template #home-features-after>
       <Confetti />
       <TypeIt />
@@ -39,7 +37,7 @@ import { useData } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 import { nextTick, provide } from "vue";
 import { ShareButton } from "@theojs/lumen";
-// import MouseClick from "./MouseClick.vue";
+import MouseClick from "./MouseClick.vue";
 // import MouseFollower from "./MouseFollower.vue";
 import Confetti from "./Confetti.vue";
 import TypeIt from "./TypeIt.vue";
