@@ -138,6 +138,20 @@ export const zhSidebar: DefaultTheme.Sidebar = {
             { text: '初识 IDEA', link: `/06_project-build/idea/01_${commonDirectoryName}/` },
           ]
         },
+        {
+          text: 'Linux',
+          collapsed: true,
+          items: [
+            { text: '初识 Linux', link: `/06_project-build/linux/01_${commonDirectoryName}/` },
+          ]
+        },
+        {
+          text: 'Git',
+          collapsed: true,
+          items: [
+            { text: '初识 Git', link: `/06_project-build/git/01_${commonDirectoryName}/` },
+          ]
+        },
       ]
     },
     {
@@ -155,7 +169,27 @@ export const zhSidebar: DefaultTheme.Sidebar = {
           text: '系统框架',
           collapsed: true,
           items: [
+            {
+              text: 'SSM',
+              collapsed: true,
+              items: [
 
+              ]
+            },
+            {
+              text: 'Redis',
+              collapsed: true,
+              items: [
+
+              ]
+            },
+            {
+              text: 'SpringBoot',
+              collapsed: true,
+              items: [
+
+              ]
+            },
           ]
         },
         {
@@ -176,13 +210,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
 
               ]
             },
-            {
-              text: 'Git',
-              collapsed: true,
-              items: [
 
-              ]
-            },
           ]
         },
       ]
@@ -191,18 +219,52 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       text: '分布式核心',
       collapsed: true,
       items: [
+        {
+          text: 'JVM',
+          collapsed: true,
+          items: [
 
-      ]
-    },
-    {
-      text: '微服务',
-      collapsed: true,
-      items: [
-        { text: '初识微服务', link: `/10_micro-service/01_${commonDirectoryName}/` },
+          ]
+        },
+        {
+          text: 'JUC',
+          collapsed: true,
+          items: [
+
+          ]
+        },
+        {
+          text: 'SpringSecurity',
+          collapsed: true,
+          items: [
+
+          ]
+        },
+        {
+          text: 'SpringCloud',
+          collapsed: true,
+          items: [
+            { text: '初识微服务', link: `/10_micro-service/01_${commonDirectoryName}/` },
+          ]
+        },
+        {
+          text: 'RabbitMQ',
+          collapsed: true,
+          items: [
+
+          ]
+        },
       ]
     },
     {
       text: 'K8s 生态圈',
+      collapsed: true,
+      items: [
+
+      ]
+    },
+    {
+      text: '企业级解决方案',
       collapsed: true,
       items: [
 
