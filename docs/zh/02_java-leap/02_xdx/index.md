@@ -17,15 +17,179 @@
 
 
 
-# 第二章：顺序结构
+# 第二章：标准输入和标准输出（⭐）
 
 ## 2.1 概述
+
+* 在计算机中，所谓的`标准输入`和`标准输出`都是以计算机（CPU 和内存）为主体而言的，即：
+
+> [!NOTE]
+>
+> - ① 输入：从输入设备(键盘、鼠标、扫描仪)向计算机输入数据。
+> - ② 输出：从计算机向外部输出设备(显示器、打印机)输出数据。
+
+![计算机中的输入和输出](./assets/36.png)
+
+## 2.2 标准输出
+
+* 在 Java 中，提供了 `System.out` 对象的 `println()` 方法用于向控制台输出信息，如下所示：
+
+```java {19-30}
+public final class System {
+    /**
+     * The "standard" output stream. This stream is already
+     * open and ready to accept output data. Typically this stream
+     * corresponds to display output or another output destination
+     * specified by the host environment or user. The encoding used
+     * in the conversion from characters to bytes is equivalent to
+     * {@link Console#charset()} if the {@code Console} exists,
+     * {@link Charset#defaultCharset()} otherwise.
+     * <p>
+     * For simple stand-alone Java applications, a typical way to write
+     * a line of output data is:
+     * <blockquote><pre>
+     *     System.out.println(data)
+     * </pre></blockquote>
+     * <p>
+     * See the {@code println} methods in class {@code PrintStream}.
+     *
+     * @see     java.io.PrintStream#println()
+     * @see     java.io.PrintStream#println(boolean)
+     * @see     java.io.PrintStream#println(char)
+     * @see     java.io.PrintStream#println(char[])
+     * @see     java.io.PrintStream#println(double)
+     * @see     java.io.PrintStream#println(float)
+     * @see     java.io.PrintStream#println(int)
+     * @see     java.io.PrintStream#println(long)
+     * @see     java.io.PrintStream#println(java.lang.Object)
+     * @see     java.io.PrintStream#println(java.lang.String)
+     * @see     Console#charset()
+     * @see     Charset#defaultCharset()
+     */
+    public static final PrintStream out = null;
+ 	
+    // 其余略
+    
+    ...
+        
+}   
+```
+
+
+
+* 示例：
+
+```java
+package com.github.com.github;
+
+public class IOTest {
+
+    public static void main(String[] args) {
+        System.out.println("整数：" + 1);
+        System.out.println("浮点数：" + 3.14);
+        System.out.println("字符：" + '我');
+        System.out.println("布尔值：" + true);
+        System.out.println("字符串：" + "是什么？");
+    }
+}
+```
+
+## 2.3 标准输入
+
+* 在 Java 中，通过 `Scanner` 对象的 `nextXxx()` 方法来接收键盘录入的数据（标准输入）。
+
+* 其步骤如下：
+
+  * ① 导包：目的就是为了让 Java 知道 Scanner 类在哪里。
+
+  ```java
+  // 导包的动作必须在类定义的上边
+  import java.util.Scanner; 
+  ```
+
+  * ② 创建对象：目的就是为了使用 Scanner 类。
+
+  ```java
+  // sc 是对象名，只要符合标识符的强制规则和规范即可。
+  Scanner sc = new Scanner(System.in);
+  ```
+
+  * ③ 接收数据：
+
+  ```java
+  int num = sc.nextInt(); // 获取整数
+  ```
+
+  ```java
+  String name = sc.next(); // 获取字符串，遇到空格和换行就结束录入
+  ```
+
+  ```java
+  String name = sc.nextLine(); // 获取字符串，遇到换行就结束录入
+  ```
+
+  ```java
+  double height = sc.nextDouble(); // 获取小数
+  ```
+
+  ```java
+  ...
+  ```
+
+  * ④ 关闭资源：
+
+  ```java
+  sc.close(); // 因为 sc 是流对象，需要关闭
+  ```
+
+
+
+* 示例：
+
+```java
+// 导包
+import java.util.Scanner;
+
+public class IOTest {
+
+    public static void main(String[] args) {
+
+        // 创建 Scanner 对象
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("姓名：");
+        String name = sc.nextLine();
+        System.out.print("年龄：");
+        int age = sc.nextInt();
+        System.out.print("身高：");
+        double height = sc.nextDouble();
+        System.out.print("体重：");
+        double weight = sc.nextDouble();
+
+        System.out.println("----------------------");
+
+        System.out.println("姓名是：" + name);
+        System.out.println("年龄是：" + age);
+        System.out.println("身高是：" + height);
+        System.out.println("体重是：" + weight);
+
+        // 关闭资源
+        sc.close();
+    }
+}
+```
+
+
+
+# 第三章：顺序结构
+
+## 3.1 概述
 
 * 程序从上到下逐行地执行，表达式语句都是顺序执行的，并且上一行对某个变量的修改对下一行会产生影响。
 
 ![顺序结构](./assets/2.png)
 
-## 2.2 应用示例
+## 3.2 应用示例
 
 * 示例：
 
@@ -52,15 +216,15 @@ public class Main {
 
 
 
-# 第三章：分支结构（⭐）
+# 第四章：分支结构（⭐）
 
-## 3.1 概述
+## 4.1 概述
 
 * 根据特定条件执行不同的代码块，从而实现灵活的程序控制和更复杂的逻辑。
 
-## 3.2 单分支结构
+## 4.2 单分支结构
 
-### 3.2.1 概述
+### 4.2.1 概述
 
 * 语法：
 
@@ -79,7 +243,7 @@ if(条件表达式){
 
 ![单分支结构](./assets/3.png)
 
-### 3.2.2 应用示例
+### 4.2.2 应用示例
 
 * 需求：成年人心率的正常范围是每分钟 60~100 次。体检时，如果心率不在此范围内，则提示需要做进一步的检查。
 
@@ -112,7 +276,7 @@ public class Main {
 }
 ```
 
-### 3.2.3 应用示例
+### 4.2.3 应用示例
 
 * 需求：根据年龄判断，如果是未成年人，则提示 "未成年人请在家长陪同下访问！" 。
 
@@ -145,9 +309,9 @@ public class Main {
 }
 ```
 
-## 3.3 双分支结构
+## 4.3 双分支结构
 
-### 3.3.1 概述
+### 4.3.1 概述
 
 * 语法：
 
@@ -168,7 +332,7 @@ if(条件表达式) {
 
 ![双分支结构](./assets/4.png)
 
-### 3.3.2 应用示例
+### 4.3.2 应用示例
 
 * 需求：判断一个整数，是奇数还是偶数。
 
@@ -200,7 +364,7 @@ public class Main {
 }
 ```
 
-### 3.3.2 应用示例
+### 4.3.2 应用示例
 
 * 需求：输入年龄，如果大于18岁，则输出 "你年龄大于18，要对自己的行为负责!"；否则，输出 "你的年龄不大这次放过你了。"
 
@@ -232,7 +396,7 @@ public class Main {
 }
 ```
 
-### 3.3.3 应用示例
+### 4.3.3 应用示例
 
 * 需求：判定某个年份是否为闰年？
 
@@ -269,9 +433,9 @@ public class Main {
 }
 ```
 
-## 3.4 多重分支结构
+## 4.4 多重分支结构
 
-### 3.4.1 概述
+### 4.4.1 概述
 
 * 语法：
 
@@ -307,7 +471,7 @@ if (条件表达式1) {
 
 ![多重分支结构](./assets/5.png)
 
-### 3.4.1 应用示例
+### 4.4.1 应用示例
 
 * 需求：张三参加考试，他和父亲达成协议，如果成绩不到 60 分没有任何奖励；如果成绩 60分（含）到 80 分，奖励一个肉夹馍；如果成绩 80 分（含）到 90 分，奖励一个 ipad；如果成绩 90 分及以上，奖励一部华为 mate60 pro 。 
 
@@ -349,7 +513,7 @@ public class Main {
 }
 ```
 
-### 3.4.2 应用示例
+### 4.4.2 应用示例
 
 * 需求：判断水的温度，如果大于 95℃，则打印 "开水"；如果大于 70℃ 且小于等于 95℃，则打印 "热水"；如果大于 40℃ 且小于等于 70℃，则打印 "温水"；如果小于等于 40℃，则打印 "凉水"。
 
@@ -386,9 +550,9 @@ public class Main {
 
 ```
 
-## 3.5 多重分支结构 switch
+## 4.5 多重分支结构 switch
 
-### 3.5.1 概述
+### 4.5.1 概述
 
 * 语法：
 
@@ -422,7 +586,7 @@ switch(表达式){
 
 ![多重分支结构 switch](./assets/6.png)
 
-### 3.5.2 应用示例
+### 4.5.2 应用示例
 
 * 需求：编写一个程序，该程序可以接收一个字符，比如：a、b、c、d；其中， a 表示星期一，b 表示星期二…，根据用户的输入显示相应的信息，要求使用 switch 语句。
 
@@ -472,7 +636,7 @@ public class Main {
 }
 ```
 
-### 3.5.3 应用示例
+### 4.5.3 应用示例
 
 * 需求：编写程序，输入月份，输出该月份有多少天。说明：1 月、3 月、5 月、7月、8 月、10 月、12 月有 31 天，4 月、6 月、9 月、11 月有 30 天，2 月有 28 天或 29 天。
 
@@ -524,14 +688,14 @@ public class Main {
 }
 ```
 
-### 3.5.4 switch 和 if else if 的比较
+### 4.5.4 switch 和 if else if 的比较
 
 * ① 如果判断条件是判等，而且符合整型、枚举类型，虽然两个语句都可以使用，建议使用 swtich 语句。
 * ② 如果判断条件是区间判断，大小判断等，使用 if...else...if。
 
-## 3.6 嵌套分支
+## 4.6 嵌套分支
 
-### 3.6.1 概述
+### 4.6.1 概述
 
 * 嵌套分支是指，在一个分支结构中又嵌套了另一个分支结构，里面的分支的结构称为内层分支，外面的分支结构称为外层分支。
 
@@ -539,7 +703,7 @@ public class Main {
 >
 > 嵌套分支层数不宜过多，建议最多不要超过 3 层。
 
-### 3.6.2 应用示例
+### 4.6.2 应用示例
 
 * 需求：根据淡旺季的月份和年龄，打印票价。
 
@@ -603,9 +767,9 @@ public class Main {
 
 
 
-# 第四章：随机数
+# 第五章：随机数
 
-## 4.1 概述
+## 5.1 概述
 
 * 所谓的随机数就是没有规则，并且不能预测的一些数字，也称为真随机数。程序中也是可以产生随机数的，但是是通过一些固定规则产生的，称为伪随机数。
 * 常见的伪随机数（线性同余方程，LCG）的公式，如下所示：
@@ -633,9 +797,9 @@ $X_{n+1} = (a \cdot X_n + b) \mod m$
     * 从初始种子开始，通过公式不断生成新的随机数。
     * 每次迭代都使用前一次生成的随机数作为输入。
 
-## 4.2 Java 语言中随机数的产生
+## 5.2 Java 语言中随机数的产生
 
-### 4.2.1 通过 `Math.random()`
+### 5.2.1 通过 `Math.random()`
 
 * 通过 Math.random() 生成随机数：
 
@@ -657,7 +821,7 @@ public class Main {
 }
 ```
 
-### 4.2.2 使用 `Random` 类
+### 5.2.2 使用 `Random` 类
 
 * `Random` 类是 `java.util` 包中的一个类，它提供了更强大的随机数生成能力，支持生成不同类型的随机数，包括：整数、浮点数、布尔值等。
 
@@ -709,7 +873,7 @@ public class Main {
 }
 ```
 
-### 4.2.3 使用 `ThreadLocalRandom` 类
+### 5.2.3 使用 `ThreadLocalRandom` 类
 
 * `ThreadLocalRandom` 是在 Java 7 中引入的，它是为多线程环境设计的，避免了多线程中共享 `Random` 实例时的性能瓶颈。
 * 通常在多线程环境中使用 `ThreadLocalRandom` 比 `Random` 更高效。
@@ -734,7 +898,7 @@ public class Main {
 }
 ```
 
-### 4.2.4 使用 `SecureRandom` 类
+### 5.2.4 使用 `SecureRandom` 类
 
 * `SecureRandom` 类提供了强加密的随机数生成器，它适用于安全敏感的场景，例如：生成密码、加密密钥等。
 
@@ -762,15 +926,15 @@ public class Main {
 
 
 
-# 第五章：循环结构（⭐）
+# 第六章：循环结构（⭐）
 
-## 5.1 概述
+## 6.1 概述
 
 * 循环结构：在某些条件满足的情况下，反复执行特定代码的功能。
 
-## 5.2 for 循环
+## 6.2 for 循环
 
-### 5.2.1 概述
+### 6.2.1 概述
 
 * 语法：
 
@@ -794,9 +958,7 @@ for(初始化条件①;循环条件表达式②;迭代语句④){
 >
 > 执行过程是：① --> ② --> ③ --> ④ --> ② --> ③ --> ④ --> ... --> ② 。
 
-
-
-### 5.2.2 应用示例
+### 6.2.2 应用示例
 
 * 需求：输出 5 行 `Hello World!` 。
 
@@ -815,7 +977,7 @@ public class Main {
 }
 ```
 
-### 5.2.3 应用示例
+### 6.2.3 应用示例
 
 * 需求：求 1 ~ 100 之内所有偶数的和，以及偶数的个数。
 
@@ -844,7 +1006,7 @@ public class Main {
 }
 ```
 
-### 5.2.4 应用示例
+### 6.2.4 应用示例
 
 * 需求：输出所有的水仙花数，所谓水仙花数是指一个 3 位数，其各个位上数字立方和等于其本身，例如：`153 = 1×1×1 + 3×3×3 + 5×5×5`。
 
@@ -877,7 +1039,7 @@ public class Main {
 }
 ```
 
-### 5.2.5 应用示例
+### 6.2.5 应用示例
 
 * 需求：将 1 ~ 10 倒序输出，如：10 、9 、8 ...
 
@@ -896,7 +1058,7 @@ public class Main {
 }
 ```
 
-### 5.2.6 应用示例
+### 6.2.6 应用示例
 
 * 需求：输入两个正整数 m 和 n ，求其最大公约数和最小公倍数，例如：12 和 20 的最大公约数是 4 ，最小公倍数是 60 。
 
@@ -940,9 +1102,9 @@ public class Main {
 }
 ```
 
-## 5.3 while 循环
+## 6.3 while 循环
 
-### 5.3.1 概述
+### 6.3.1 概述
 
 * 语法：
 
@@ -969,7 +1131,7 @@ while (循环条件语句②) {
 >
 > 执行过程是：① --> ② --> ③ --> ④ --> ② --> ③ --> ④ --> ... --> ② 。
 
-### 5.3.2 应用示例
+### 6.3.2 应用示例
 
 * 需求：输出 5 行 `Hello World!` 。
 
@@ -991,7 +1153,7 @@ public class Main {
 }
 ```
 
-### 5.3.3 应用示例
+### 6.3.3 应用示例
 
 * 需求：求 1 ~ 100 之内所有偶数的和，以及偶数的个数。
 
@@ -1022,7 +1184,7 @@ public class Main {
 }
 ```
 
-### 5.3.4 应用示例
+### 6.3.4 应用示例
 
 * 需求：世界最高山峰是珠穆朗玛峰，它的高度是 8848.86 米，假如我有一张足够大的纸，它的厚度是 0.1 毫米。请问，我折叠多少次，可以折成珠穆朗玛峰的高度?
 
@@ -1055,7 +1217,7 @@ public class Main {
 }
 ```
 
-### 5.3.5 应用示例
+### 6.3.5 应用示例
 
 * 需求：给出一个整数 n ，判断该整数是否是 2 的幂次方。如果是，就输出 yes ；否则，输出 no 。
 
@@ -1099,7 +1261,7 @@ public class Main {
 }
 ```
 
-### 5.3.6 应用示例
+### 6.3.6 应用示例
 
 * 需求：整数反转，如：123 --> 321 。
 
@@ -1142,9 +1304,9 @@ public class Main {
 }
 ```
 
-## 5.4 do-while 循环
+## 6.4 do-while 循环
 
-### 5.4.1 概述
+### 6.4.1 概述
 
 * 语法：
 
@@ -1170,7 +1332,7 @@ do{
 >
 > 执行过程是：① --> ③ --> ④ --> ② --> ③ --> ④ --> ② --> ... --> ② 。
 
-### 5.4.2 应用示例
+### 6.4.2 应用示例
 
 * 需求：求 1 ~ 100 之内所有偶数的和，以及偶数的个数。
 
@@ -1195,7 +1357,7 @@ public class Main {
 }
 ```
 
-### 5.4.3 应用示例
+### 6.4.3 应用示例
 
 * 需求：实现 ATM 取款机功能。
 
@@ -1269,9 +1431,9 @@ public class ATM {
 }
 ```
 
-## 5.5 嵌套循环
+## 6.5 嵌套循环
 
-### 5.5.1 概述
+### 6.5.1 概述
 
 * 所谓的嵌套循环，是指一个循环结构 A 的循环体是另一个循环结构 B 。例如：for 循环里面还有一个for 循环，就是嵌套循环。
 * 语法：
@@ -1297,9 +1459,7 @@ for(初始化语句①; 循环条件语句②; 迭代语句⑦) {
 > * ③ 从二维图形的角度看，外层循环控制`行数`，内层循环控制`列数`。
 > * ④ 实际开发中，我们最多见到的嵌套循环是两层，一般不会出现超过三层的嵌套循环。如果将要出现，一定要停下来重新梳理业务逻辑，重新思考算法的实现，控制在三层以内；否则，可读性会很差。
 
-
-
-### 5.5.2 应用示例
+### 6.5.2 应用示例
 
 * 需求：打印 5 行 `*` ，要求每行 6 个 `*` 。
 
@@ -1320,7 +1480,7 @@ public class Main {
 }
 ```
 
-### 5.5.3 应用示例
+### 6.5.3 应用示例
 
 * 需求：打印 5 行直角三角形。
 
@@ -1341,7 +1501,7 @@ public class Main {
 }
 ```
 
-### 5.5.4 应用示例
+### 6.5.4 应用示例
 
 * 需求：打印 5 行倒直角三角形。
 
@@ -1362,7 +1522,7 @@ public class Main {
 }
 ```
 
-### 5.5.5 应用示例
+### 6.5.5 应用示例
 
 * 需求：打印 9 `×` 9 乘法表。 
 
@@ -1383,9 +1543,9 @@ public class Main {
 }
 ```
 
-## 5.6 无限循环
+## 6.6 无限循环
 
-### 5.6.1 概述
+### 6.6.1 概述
 
 * 语法：
 
@@ -1406,7 +1566,7 @@ for(;;){
 > * ① 在开发中，有的时候并不确定需要循环多少次，就需要根据循环体内部的某些条件，来控制循环的结束（break）。
 > * ② 如果上述的循环结构不能终止，就会构成死循环；所以，在实际开发中，要避免出现死循环！！！
 
-### 5.6.2 应用示例
+### 6.6.2 应用示例
 
 * 需求：从键盘读入个数不确定的整数，并判断读入的正数和负数的个数，输入为  0 时结束程序。
 
@@ -1454,9 +1614,9 @@ public class Main {
 }
 ```
 
-## 5.7 跳转控制语句
+## 6.7 跳转控制语句
 
-### 5.7.1 break
+### 6.7.1 break
 
 * break 的使用场景：break 语句用于终止某个语句块的执行，用在 switch 语句或者循环语句中。
 
@@ -1538,7 +1698,7 @@ public class Main {
 }
 ```
 
-### 5.7.2 continue
+### 6.7.2 continue
 
 * continue 的使用场景：continue 语句用于结束本次循环，继续执行下一次循环。
 
@@ -1592,7 +1752,7 @@ public class Main {
 }
 ```
 
-### 5.7.3 return 
+### 6.7.3 return 
 
 * return ：并非专门用于结束循环的，它的功能是结束一个方法。当一个方法执行到一个 return 语句的时候，这个方法将被结束。 
 
