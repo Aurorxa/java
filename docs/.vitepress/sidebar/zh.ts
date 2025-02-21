@@ -138,20 +138,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
             { text: '初识 IDEA', link: `/06_project-build/idea/01_${commonDirectoryName}/` },
           ]
         },
-        {
-          text: 'Linux',
-          collapsed: true,
-          items: [
-            { text: '初识 Linux', link: `/06_project-build/linux/01_${commonDirectoryName}/` },
-          ]
-        },
-        {
-          text: 'Git',
-          collapsed: true,
-          items: [
-            { text: '初识 Git', link: `/06_project-build/git/01_${commonDirectoryName}/` },
-          ]
-        },
+
       ]
     },
     {
@@ -169,6 +156,20 @@ export const zhSidebar: DefaultTheme.Sidebar = {
           text: '系统框架',
           collapsed: true,
           items: [
+            {
+              text: 'Linux',
+              collapsed: true,
+              items: [
+                { text: '初识 Linux', link: `` },
+              ]
+            },
+            {
+              text: 'Git',
+              collapsed: true,
+              items: [
+                { text: '初识 Git', link: `` },
+              ]
+            },
             {
               text: 'SSM',
               collapsed: true,
