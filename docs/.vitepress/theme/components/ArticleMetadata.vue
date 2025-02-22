@@ -9,60 +9,61 @@
 </template>
 
 <script lang="ts" setup>
-import dayjs from "dayjs"
-import { useData } from "vitepress"
-import { computed, ref, onMounted, watch } from "vue"
-import { countWord } from "../utils/functions"
-import { useRoute } from "vitepress"
+import dayjs from "dayjs";
+import { useData } from "vitepress";
+import { computed, ref, onMounted, watch } from "vue";
+import { countWord } from "../utils/functions";
+import { useRoute } from "vitepress";
 
-const route = useRoute() // 使用 vitepress 提供的 useRoute
+// 使用 vitepress 提供的 useRoute
+const route = useRoute();
 
-const { page } = useData()
-const date = computed(() => new Date(page.value.lastUpdated!))
+const { page } = useData();
+const date = computed(() => new Date(page.value.lastUpdated!));
 
-const wordCount = ref(0)
-const imageCount = ref(0)
+const wordCount = ref(0);
+const imageCount = ref(0);
 
 const wordTime = computed(() => {
-  return (wordCount.value / 275) * 60
+  return (wordCount.value / 275) * 60;
 });
 
 const imageTime = computed(() => {
-  const n = imageCount.value
+  const n = imageCount.value;
   if (imageCount.value <= 10) {
     // 等差数列求和
-    return n * 13 + (n * (n - 1)) / 2
+    return n * 13 + (n * (n - 1)) / 2;
   }
-  return 175 + (n - 10) * 3
+  return 175 + (n - 10) * 3;
 });
 
 // 阅读时间
 const readTime = computed(() => {
-  return Math.ceil((wordTime.value + imageTime.value) / 60)
+  return Math.ceil((wordTime.value + imageTime.value) / 60);
 });
 
 function analyze() {
-  document.querySelectorAll(".meta-des").forEach((v) => v.remove())
-  const docDomContainer = window.document.querySelector("#VPContent")
+  document.querySelectorAll(".meta-des").forEach((v) => v.remove());
+  const docDomContainer = window.document.querySelector("#VPContent");
   const imgs = docDomContainer?.querySelectorAll<HTMLImageElement>(
     ".content-container .main img"
   );
-  imageCount.value = imgs?.length || 0
+  imageCount.value = imgs?.length || 0;
   const words =
-    docDomContainer?.querySelector(".content-container .main")?.textContent || ""
-  wordCount.value = countWord(words)
+    docDomContainer?.querySelector(".content-container .main")?.textContent || "";
+  wordCount.value = countWord(words);
 }
 
 onMounted(() => {
   // 初始化时执行一次
-  analyze()
+  analyze();
 });
 
 // 监听路由变化，当路径变化时重新检查
 watch(
   () => route.path,
   () => {
-    analyze()
+    analyze();
   }
 );
 </script>
