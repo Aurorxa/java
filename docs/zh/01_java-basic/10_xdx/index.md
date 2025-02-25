@@ -467,3 +467,25 @@ winget install --id JetBrains.IntelliJIDEA.Ultimate -l D:\develop\idea
 * 示例：IDEA 创建包，并在包中写 Java 代码
 
 ![](./assets/47.gif)
+
+
+
+# 第五章：IDEA 的初步使用（⭐）
+
+## 5.1 新建类
+
+* 在指定的`包名`（package），通过`鼠标右键`，新建`类`文件：
+
+![](./assets/48.gif)
+
+## 5.2 新建 main 方法
+
+* 可以通过 `psvm` 或 `main` 快速编写 main 方法：
+
+![](./assets/49.gif)
+
+## 5.3 执行 Java 程序
+
+* 在 main 方法处的▶️，通过鼠标左键，执行 main 方法：
+
+![](./assets/50.gif)
