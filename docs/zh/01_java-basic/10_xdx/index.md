@@ -486,6 +486,6 @@ winget install --id JetBrains.IntelliJIDEA.Ultimate -l D:\develop\idea
 
 ## 5.3 执行 Java 程序
 
-* 在 main 方法处的▶️，通过鼠标左键，执行 main 方法：
+* 在 main 方法处的▶️，通过`鼠标左键`，执行 main 方法：
 
 ![](./assets/50.gif)
