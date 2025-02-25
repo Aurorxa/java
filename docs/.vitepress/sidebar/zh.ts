@@ -59,6 +59,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
           text: 'JDK 新特性',
           collapsed: true,
           items: [
+            { text: 'JDK8（LTS）', link: `` },
             { text: 'JDK9', link: `` },
             { text: 'JDK10', link: `` },
             { text: 'JDK11（LTS）', link: `` },
@@ -75,6 +76,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
             { text: 'JDK22', link: `` },
             { text: 'JDK23', link: `` },
             { text: 'JDK24', link: `` },
+            { text: 'JDK25（LTS）', link: `` },
           ]
         },
         {
