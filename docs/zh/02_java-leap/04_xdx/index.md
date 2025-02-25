@@ -6,51 +6,56 @@
 
 * 需要统计某公司 50 个员工的工资情况，例如：计算平均工资、最高工资等。如果使用之前的知识，我们需要声明 50 个变量来分别记录每位员工的工资，即：
 
-```c
-#include <stdio.h>
+```java
+package com.github.study;
 
-int main(){
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    double num1 = 0;
-    double num2 = 0;
-    double num3 = 0;
-    ...
-    printf("请输入第 1 个员工的工资：");
-    scanf("%lf",&num1);
-    printf("请输入第 2 个员工的工资：");
-    scanf("%lf",&num2);
-    printf("请输入第 3 个员工的工资：");
-    scanf("%lf",&num3);
-    ...   
-    return 0;
+import java.util.Scanner;
+
+public class ArrayDemo1 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("请输入第 1 个员工的工资：");
+        double salary1 = scanner.nextDouble();
+
+        System.out.print("请输入第 2 个员工的工资：");
+        double salary2 = scanner.nextDouble();
+
+        System.out.print("请输入第 3 个员工的工资：");
+        double salary3 = scanner.nextDouble();
+
+		...   
+            
+        scanner.close();
+    }
 }
 ```
 
 * 这样会感觉特别机械和麻烦（全是复制（Ctrl + c）和粘贴（Ctrl + v），CV 大法）；此时，我们就可以将所有的`数据`全部存储到一个`容器（数组）`中进行统一管理，并进行其它的操作，如：求最值、求平均值等，如下所示：
 
-```c
-#include <stdio.h>
+```java
+package com.github.study;
 
-int main(){
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 声明数组
-    double nums[50];
-    // 数组的长度
-    int length = sizeof(nums) / sizeof(double);
-    // 使用 for 循环向数组中添加值
-    for(int i = 0;i < length;i++){
-        printf("请输入第 &d 个员工的工资：",i);
-        scanf("%lf",&num[i]);
+import java.util.Scanner;
+
+public class ArrayDemo2 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // 定义数组
+        double[] arr = new double[50];
+
+        // 使用 for 循环向数组中添加值每个员工的工资
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print("请输入第 " + (i + 1) + " 个员工的工资：");
+            arr[i] = scanner.nextDouble();
+        }
+
+        // 其余的业务处理，如：求最值、求平均值等。
+		...
+            
+        scanner.close();
     }
-    // 其它操作，如：求最值，求平均值等
-    ...        
-    return 0;
 }
 ```
 
@@ -81,8 +86,8 @@ int main(){
 > [!CAUTION]
 >
 > * ① 数组是一种特殊的聚合变量，它可以存储多个同类型的元素，而这些元素可以通过索引或下标进行访问。
-> * ② 数组本身是一个变量，而数组中的每个元素都可以是普通的变量或指针（地址）。
-> * ③ 数组既可以存储基本数据类型的元素，如：int、float ；也可以存储复合数据类型的元素，如：结构体、数组（多维数组）。
+> * ② 数组本身是一个容器，而数组中的每个元素可以是`基本数据类型变量`或`引用数据类型变量`。
+> * ③ 数组既可以存储基本数据类型的元素，如：int、float ；也可以存储引用数据类型的元素，如：数组、枚举。
 
 ## 1.3 数组的相关概念
 
@@ -160,8 +165,8 @@ int main(){
 ### 1.4.3 数组的优点
 
 * 数组的优点就在于可以实现随机访问，而其关键就在于`数据结构的连续内存分配`以及`固定的元素大小`：
-  * `连续的内存分配`：当声明一个数组的时候，如：`int arr[10];`，在程序运行的时候，操作系统会为该数组分配 `10` 个连续存储 int 的空间。因为，我们将有一块连续的空间，每个 int 元素都紧密地排列在一起。
-  * `固定的元素大小`：数组中的每个元素都具有相同的大小，如：`int arr[10];`中的每个 `int` 元素都占用 `4` 个字节的内存空间。
+  * `连续的内存分配`：当声明一个数组的时候，如：`int[] arr = new int[10];`，在程序运行的时候，操作系统会为该数组分配 `10` 个连续存储 int 的空间。因为，我们将有一块连续的空间，每个 int 元素都紧密地排列在一起。
+  * `固定的元素大小`：数组中的每个元素都具有相同的大小，如：`int[] arr = new int[10];`中的每个 `int` 元素都占用 `4` 个字节的内存空间。
 
 > [!NOTE]
 >
@@ -205,7 +210,7 @@ address(arr[i]) = base_address(arr[0]) + index * sizeof(element);
 
 ### 1.4.5 数组元素下标为什么从 0 开始？
 
-* 虽然 C 语言并非首个采用从 0 开始的数组下标设计的语言，但由于其广泛的影响，许多后续的编程语言基本沿用了这一设计。
+* 虽然 C 语言并非首个采用从 0 开始的数组下标设计的语言，但由于其广泛的影响，许多后续的编程语言（Java 等）基本沿用了这一设计。
 * 采取这样的设计，主要原因是为了`简化偏移量的计算，从而提高数组的效率`，即：
   * 如果从 0 开始作为数组的下标，那么下标值可以直接用于计算偏移量。反之，如果从 1 开始，那么每次寻址都需要额外执行一个减法操作（即数组下标减 1）。
   
@@ -230,262 +235,272 @@ address(arr[i]) = base_address(arr[0]) + index * sizeof(element);
 
 * 语法：
 
-```c
-数据类型 数组名[元素个数|长度];
+```java
+数据类型[] 数组名; // 推荐用法
+```
+
+```java
+数据类型 数组名[]; // 类似于 C 语言的语法，在 Java 中不太推荐
 ```
 
 > [!CAUTION]
 >
-> * ① 如果 `arr` 数组声明在函数体内部，即：`int arr[5];`，将是一个局部变量数组，如果没有对该数组中的元素进行初始化，那么此时数组中的元素都是随机值，使用这样的数组会引发`未定义行为`。
-> * ② `数据类型`：表示的是数组中每一个元素的数据类型。
-> * ③ `数组名`：必须符合标识符规则和规范。
-> * ④ `元素个数或长度`：表示的是数组中最多可以容纳多少个元素。
-
-> [!NOTE]
->
-> ::: details 点我查看 C 语言中的数组，为什么这么写？
->
-> * ① 如果你学过 Java 语言，那么在 Java 中是这么定义数组的，即：`int[] arr = new int[5];`。
-> * ② 如果你学过 TypeScript 语言，那么在 TypeScript 中是这么定义数组的，即：`let arr: number[] = [1, 2, 3];`。
-> * ③ 你会发现其他编程语言中的数组的类型是这样的，如：`int[]` 或 `number[]`，而 C 语言中数组不应该也是 `int[3] arr` 这样吗？之所以出现这样的原因，是因为 C 语言的哲学是简单（简陋）、高效；换言之，能用一行代码就能解决的事，就没必要使用多行代码了，如：`int a,b,arr[3]`。
->
-> :::
+> * ① `数据类型`：表示的是数组中每个元素的数据类型。
+> * ② `数组名`：必须符合标识符规则和规范。
+> * ③ `方括号`：表示定义的是一个数组，而不是普通的变量或类等。
 
 
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.study;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 先指定元素的个数和类型，再进行初始化
+public class ArrayDemo4 {
+    public static void main(String[] args) {
 
-    // 声明数组
-    int arr[3];
+        // 声明一个 int 类型的数组
+        int[] arr;
 
-    // 给数组中的元素赋值
-    arr[0] = 10;
-    arr[1] = 20;
-    arr[2] = 30;
+        // 声明一个 double 类型的数组
+        double[] arr2;
 
-    return 0;
-}
-```
+        // 声明一个 char 类型的数组
+        char[] arr3;
 
-### 2.1.2 数组变量的三要素
+        // 声明一个 String 类型的数组
+        String[] arr4;
 
-* 假设一个数组的声明，如下所示：
-
-```c
-int arr[5]；
-```
-
-* 那么，数组变量的三要素，如下所示：
-
-> [!NOTE]
->
-> * ① 变量名：`arr` 。
-> * ② 数据类型：`int [5]`。
->   
->   ::: details 点我查看 数据类型的作用
->   
->   * ① 限定变量的取值范围：
->     * 对于`基本数据类型`，如：int 等，是通过`编码`和`内存大小`。
->     * 对于`数组`，如：int arr[5] 等，是通过`内存布局`和`内存大小`。
->   * ② 限定变量能够执行的操作：
->     * 普通数据类型的变量，可以进行`赋值操作`、`算术运算`、`关系运算`、`逻辑运算`、`位运算`、`自增自减运算`。
->     * 指针数据类型的变量，只能进行`赋值操作`、`解引用操作`、`指针运算`（指针和整数加减运算、指针的自增自减运算、指针和指针的关系运算）、`数组访问`、`多级指针`。
->     * 数组类型的变量，可以进行`声明数组操作`、`初始化数组`、`访问数组元素`、`修改数组元素`、`数组遍历`、`多维数组（二维数组）`等。
->   
->   :::
-> * ③ 值：函数体内部中数组中元素的值（局部变量数组），默认是随机值。
-
-### 2.1.3 初始化 1
-
-* 语法：
-
-```c
-数据类型 数组名[元素个数|长度] = {元素1,元素2,...} 
-```
-
-> [!NOTE]
->
-> * ① 部分初始化：如果数组初始化的元素个数`小于`数组声明的长度，那么就会从数组开始位置依次赋值，不够的就补 0 。
-> * ② 全部初始化：数组初始化的元素个数`等于`数组的长度。
-
-> [!TIP]
->
-> ::: details 点我查看 CLion 中如何显示数组索引的提示?
->
-> * ① 在 CLion 中开启`嵌入提示（形参名称-->显示数组索引的提示）`功能，即：
->
-> ![](./assets/3.png)
->
-> * ② 这样，在 CLion 中，将会显示数组初始化时每个元素对应的索引，即：
->
-> ![](./assets/4.png)
->
-> :::
-
-
-
-* 示例：部分初始化
-
-```c
-#include <stdio.h>
-
-int main() {
-
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 声明数组和部分初始化：
-    // 会将给定的值从数组的开始位置一个个的赋值，没有赋值的地方，用 0 填充
-    int arr[5] = {1, 2};
-
-    return 0;
-}
-```
-
-
-
-* 示例：全部初始化
-
-```c
-#include <stdio.h>
-
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 声明数组和全部初始化：数组初始化的元素个数等于数组的长度。
-    int arr[5] = {1, 2, 3, 4, 5};
-
-    return 0;
-}
-```
-
-### 2.1.4 初始化 2 
-
-* 语法：
-
-```c
-数据类型 数组名[] = {元素1,元素2,...} 
-```
-
-> [!NOTE]
->
-> 没有给出数组中元素的个数，将由系统根据初始化的元素，自动推断出数组中元素的个数。
-
-
-
-* 示例：
-
-```c
-#include <stdio.h>
-
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 指定元素的类型，不指定元素个数，同时进行初始化
-    int arr[] = {1, 2, 3, 4, 5};
-
-    return 0;
-}
-```
-
-### 2.1.5 初始化 3
-
-* 语法：
-
-```c
-数据类型 数组名[长度] = {元素1,元素2,...};
-```
-
-> [!NOTE]
->
-> * ① `int arr[10] = {1,2,3,4,5};`中数组 `arr` 在内存中开辟了 `10` 个连续的内存空间，但是只会给前 `5` 个内存空间赋值初始化值，即：`arr[0] ~ arr[4]` 分别是 `1`、`2`、`3`、`4`、`5`，而 `arr[5] ~ arr[9]` 就会被自动初始化为 `0` 。
-> * ② 当赋值的元素少于数组总体元素的时候，剩余的元素自动初始化为 `0`，其规则如下：
->   * 对于 `short`、`int`、`long`，就是整数 `0`。
->   * 对于 `char`，就是字符 `'\0'`。需要注意的是，`'\0'` 的十进制数就是 `0` 。
->   * 对于 `float`、`double`，就是小数 `0.0`。
-
-
-
-* 示例：
-
-```c
-#include <stdio.h>
-
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    int arr[10] = {1, 2, 3, 4, 5};
-
-    printf("arr[0] = %d \n", arr[0]); // arr[0] = 1
-    printf("arr[1] = %d \n", arr[1]); // arr[1] = 2
-    printf("arr[2] = %d \n", arr[2]); // arr[2] = 3
-    printf("arr[3] = %d \n", arr[3]); // arr[3] = 4
-    printf("arr[4] = %d \n", arr[4]); // arr[4] = 5
-    printf("arr[5] = %d \n", arr[5]); // arr[5] = 0
-    printf("arr[6] = %d \n", arr[6]); // arr[6] = 0
-    printf("arr[7] = %d \n", arr[7]); // arr[7] = 0
-    printf("arr[8] = %d \n", arr[8]); // arr[8] = 0
-    printf("arr[9] = %d \n", arr[9]); // arr[9] = 0
-
-    return 0;
-}
-```
-
-### 2.1.6 初始化 4<Badge type="danger" text="^c23" />
-
-* 语法：
-
-```c
-数据类型 数组名[长度] = {};
-```
-
-> [!NOTE]
->
-> * ① 在 C23 标准之前，数组是不支持这种`空初始化列表`的方式。
-> * ② 在 C23 标准中，数组已经支持空初始化列表，并且数组中的每个元素都会被初始化为该类型的 `0` 值，其规则如下：
->   * 对于 `short`、`int`、`long`，就是整数 `0`。
->   * 对于 `char`，就是字符 `'\0'`。需要注意的是，`'\0'` 的十进制数就是 `0` 。
->   * 对于 `float`、`double`，就是小数 `0.0`。
-
-
-
-* 示例：
-
-```c
-#include <stdio.h>
-
-int main() {
-
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-
-    int arr[3] = {};
-
-    int len = sizeof(arr) / sizeof(int);
-
-    for (int i = 0; i < len; ++i) {
-        printf("arr[%d] = %d\n", i, arr[i]);
     }
-
-    return 0;
 }
 ```
+
+### 2.1.2 数组的静态初始化
+
+#### 2.1.2.1 完整格式
+
+* 语法：
+
+```java
+数据类型[] 数组名;
+数组名 = new 数据类型[]{元素1,元素2,...};
+```
+
+```java
+数据类型[] 数组名 = new 数据类型[]{元素1,元素2,...};
+```
+
+> [!CAUTION]
+>
+> * ① `new` 就是给数组在堆内存中开辟了一片空间。
+> * ② 前后的数据类型需要保持一致，如：`int[] arr = new int[]{1,2,3}`。
+> * ③ `大括号{}` 中保存的是数组初始化的元素，并且多个元素之间使用`逗号,`隔开。
+> * ④ 数组一旦创建之后，其长度就不能发生改变。
+
+
+
+* 示例：
+
+```java
+package com.github.study;
+
+public class ArrayDemo5 {
+    public static void main(String[] args) {
+
+        /*
+        * 声明一个 int 类型的数组，并将其初始化。
+        * 其中数组中的元素是 1、2、3
+        */
+        int[] arr = new int[]{1, 2, 3};
+
+        /*
+         * 声明一个 double 类型的数组，并将其初始化。
+         * 其中数组中的元素是 1.1、1.2、1.3
+         */
+        double[] arr2 = new double[]{1.1, 2.2, 3.3};
+
+        /*
+         * 声明一个 char 类型的数组，并将其初始化。
+         * 其中数组中的元素是 a、b、c
+         */
+        char[] arr3 = new char[]{'a', 'b', 'c'};
+
+        /*
+         * 声明一个 String 类型的数组，并将其初始化。
+         * 其中数组中的元素是 hello、world
+         */
+        String[] arr4 = new String[]{"hello", "world"};
+
+    }
+}
+```
+
+#### 2.1.2.2 简化格式
+
+* 语法：
+
+```java
+数据类型[] 数组名 = {元素1,元素2,...};
+```
+
+> [!CAUTION]
+>
+> * ① 必须在一个语句中完成，不能分开两个语句写！！！
+> * ② `数组静态初始化简化格式`只是`数组静态初始化完整格式`的语法糖而已，背后的原理是一样的！！！
+
+
+
+* 示例：
+
+```java
+package com.github.study;
+
+public class ArrayDemo6 {
+    public static void main(String[] args) {
+
+        /*
+         * 声明一个 int 类型的数组，并将其初始化。
+         * 其中数组中的元素是 1、2、3
+         */
+        int[] arr = {1, 2, 3};
+
+        /*
+         * 声明一个 double 类型的数组，并将其初始化。
+         * 其中数组中的元素是 1.1、1.2、1.3
+         */
+        double[] arr2 = {1.1, 2.2, 3.3};
+
+        /*
+         * 声明一个 char 类型的数组，并将其初始化。
+         * 其中数组中的元素是 a、b、c
+         */
+        char[] arr3 = {'a', 'b', 'c'};
+
+        /*
+         * 声明一个 String 类型的数组，并将其初始化。
+         * 其中数组中的元素是 hello、world
+         */
+        String[] arr4 = {"hello", "world"};
+
+    }
+}
+```
+
+#### 2.1.2.3 应用示例
+
+* 需求：定义一个数组，要求存储 5 个学生的年龄。
+
+> [!NOTE]
+>
+> 思路分析：
+>
+> * ① 数组中的元素是什么类型？`int` 类型。
+> * ② 可以使用`数组的静态初始化语法`创建数组并初始化。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+/**
+ * 定义一个数组，要求存储 5 个学生的年龄。
+ */
+public class ArrayTest2 {
+    public static void main(String[] args) {
+        
+        // 数组静态初始化的完整格式
+        // 编译器会根据数组初始化元素的个数确定数组的长度
+        int[] ageArr = new int[]{18,19,20,21,22}; // [!code highlight]
+        
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+/**
+ * 定义一个数组，要求存储 5 个学生的年龄。
+ */
+public class ArrayTest2 {
+    public static void main(String[] args) {
+        
+        // 数组静态初始化的简化格式
+        // 编译器会根据数组初始化元素的个数确定数组的长度
+        int[] ageArr = {18,19,20,21,22}; // [!code highlight]
+    
+    }
+}
+```
+
+#### 2.1.2.4 应用示例
+
+* 需求：定义一个数组，要求存储 5 个学生的姓名。
+
+> [!NOTE]
+>
+> 思路分析：
+>
+> * ① 数组中的元素是什么类型？`String` 类型。
+> * ② 可以使用`数组的静态初始化语法`创建数组并初始化。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+/**
+ * 定义一个数组，要求存储 5 个学生的姓名。
+ */
+public class ArrayTest3 {
+    public static void main(String[] args) {
+        
+        // 数组静态初始化的完整格式
+        // 编译器会根据数组初始化元素的个数确定数组的长度
+        String[] names = new String[]{"张三","李四","王五","赵六","孙七"}; // [!code highlight]
+
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+/**
+ * 定义一个数组，要求存储 5 个学生的姓名。
+ */
+public class ArrayTest4 {
+    public static void main(String[] args) {
+
+        // 数组静态初始化的简化格式
+        // 编译器会根据数组初始化元素的个数确定数组的长度
+        String[] names = {"张三","李四","王五","赵六","孙七"}; // [!code highlight]
+
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
 
 ## 2.2 数组元素赋值
 
