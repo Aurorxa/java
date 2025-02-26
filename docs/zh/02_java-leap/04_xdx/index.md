@@ -45,7 +45,7 @@ public class ArrayDemo2 {
         // 定义数组
         double[] arr = new double[50];
 
-        // 使用 for 循环向数组中添加值每个员工的工资
+        // 使用 for 循环向数组中添加每个员工的工资
         for (int i = 0; i < arr.length; i++) {
             System.out.print("请输入第 " + (i + 1) + " 个员工的工资：");
             arr[i] = scanner.nextDouble();
@@ -492,15 +492,207 @@ public class ArrayTest4 {
 }
 ```
 
+#### 2.1.2.5 应用示例
+
+* 需求：定义一个数组，要求存储 5 个学生的身高。
+
+> [!NOTE]
+>
+> 思路分析：
+>
+> * ① 数组中的元素是什么类型？`double` 类型。
+> * ② 可以使用`数组的静态初始化语法`创建数组并初始化。
 
 
 
+* 示例：
+
+```java
+package com.github.test;
+
+/**
+ * 定义一个数组，要求存储 5 个学生的身高。
+ */
+public class ArrayTest5 {
+    public static void main(String[] args) {
+
+        // 数组静态初始化的完整格式
+        // 编译器会根据数组初始化元素的个数确定数组的长度
+        double[] names = new double[]{1.70,1.68,1.75,1.69,1.80}; // [!code highlight]
+
+    }
+}
+```
 
 
 
+* 示例：
+
+```java
+package com.github.test;
+
+/**
+ * 定义一个数组，要求存储 5 个学生的身高。
+ */
+public class ArrayTest6 {
+    public static void main(String[] args) {
+
+        // 数组静态初始化的简化格式
+        // 编译器会根据数组初始化元素的个数确定数组的长度
+        double[] names = {1.71, 1.68, 1.75, 1.69, 1.80}; // [!code highlight]
+
+    }
+}
+```
+
+### 2.1.3 数组的动态初始化
+
+* 语法：
+
+```java
+数据类型[] 数组名;
+数组名 = new 数据类型[数组的长度];
+```
+
+```java
+数据类型[] 数组名 = new 数据类型[数组的长度]; // 推荐写法
+```
+
+> [!NOTE]
+>
+> 数组的默认初始化值，如下所示：
+>
+> * 整数类型：0 。
+> * 小数类型：0.0 。
+> * 布尔类型：false 。
+> * 字符类型：'\u0000' 。
+> * 引用类型：null 。
 
 
 
+* 示例：
+
+```java
+package com.github.study;
+
+public class ArrayDemo7 {
+    public static void main(String[] args) {
+
+        /*
+         * 定义一个长度为 5 的 int 类型的数组
+         */
+        int[] arr = new int[5];
+
+        /*
+         * 定义一个长度为 10 的 double 类型的数组
+         */
+        double[] arr2 = new double[10];
+
+        /*
+         * 定义一个长度为 8 的 char 类型的数组
+         */
+        char[] arr3 = new char[8];
+
+        /*
+         * 定义一个长度为 2 的 String 类型的数组
+         */
+        String[] arr4 = new String[2];
+
+    }
+}
+```
+
+### 2.1.4 数组变量的三要素
+
+* 假设一个数组的定义，如下所示：
+
+```java
+int[] arr = new int[5];
+```
+
+* 那么，数组变量的三要素，如下所示：
+
+> [!NOTE]
+>
+> - ① 变量名：`arr` ，数组变量的标识符，用于在代码中引用数组。。
+> - ② 数据类型：`int []`，数组中元素的数据类型。
+>
+> ::: details 点我查看 数据类型的作用
+>
+> - ① 限定变量的取值范围：
+>   - 对于`基本数据类型`，如：int 等，是通过`编码`和`内存大小`。
+>   - 对于`数组`，如：int[] arr = new int[5] 等，是通过`内存布局`和`内存大小`。
+> - ② 限定变量能够执行的操作：
+>   - 普通数据类型的变量，可以进行`赋值操作`、`算术运算`、`关系运算`、`逻辑运算`、`位运算`、`自增自减运算`。
+>   - 引用数据类型的变量，可以进行`赋值操作`、`方法调用`、`关系运算`。
+>   - 数组类型的变量，可以进行`声明数组操作`、`初始化数组`、`访问数组元素`、`修改数组元素`、`数组遍历`、`多维数组（二维数组）`等。
+>
+> :::
+>
+> - ③ 值：方法体内部中数组中元素的值（局部变量数组）。
+
+### 2.1.5 数组两种初始化方式的区别
+
+#### 2.1.5.1 概述
+
+* `数组静态初始化`就是手动指定数组的元素，系统会根据元素的个数，自动推断出数组的长度，如下所示：
+
+```java
+int[] arr = new int[]{1,2,3,4,5};
+```
+
+* `数组动态初始化`就是手动指定数组的长度，由系统给出默认初始化值，如下所示：
+
+```java
+int[] arr = new int[5]; // int 类型数组的默认初始化值是 0 
+```
+
+#### 2.1.5.2 应用场景
+
+* ① 如果已经明确了元素的个数，但是不明确具体的数据，推荐使用`数组动态初始化`，如下所示：
+
+```java
+package com.github.study;
+
+import java.util.Scanner;
+
+// 使用数组来存储 50 个员工的工资
+public class ArrayDemo2 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // 定义数组
+        double[] arr = new double[50]; // [!code highlight]
+
+        // 使用 for 循环向数组中添加每个员工的工资
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print("请输入第 " + (i + 1) + " 个员工的工资：");
+            arr[i] = scanner.nextDouble();
+        }
+
+        // 其余的业务处理，如：求最值、求平均值等。
+		...
+            
+        scanner.close();
+    }
+}
+```
+
+* ② 如果已经明确了要操作的数据，推荐使用`数组静态初始化`，如下所示：
+
+```java
+package com.github.study;
+
+// 将全班的学生成绩存储到数组中，已知学生的成绩是 66,77,88,99,100
+public class ArrayDemo2 {
+    public static void main(String[] args) {
+       
+       // 定义数组
+       int[] arr = {66,77,88,99,100};  // [!code highlight]
+
+    }
+}
+```
 
 ## 2.2 数组元素赋值
 
@@ -510,34 +702,31 @@ public class ArrayTest4 {
 数组名[索引|下标] = 值;
 ```
 
+> [!NOTE]
+>
+> * ① `索引(下标)` ：每一个存储到数组的元素，都会自动的拥有一个编号，从 0 开始，这个自动编码就称为数组的索引（ index ），可以通过数组的索引访问到数组中的元素。
+> * ② `索引的取值范围是`：`[0,arr.lenght-1]`。
+
 
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.study;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 先指定元素的个数和类型，再进行初始化
+public class ArrayDemo10 {
+    public static void main(String[] args) {
 
-    // 定义数组
-    int arr[3];
+        int[] arr = new int[5];
 
-    // 给数组元素赋值
-    arr[0] = 10;
-    arr[1] = 20;
-    arr[2] = 30;
+        // 给数组中的元素赋值
+        arr[0] = 10;
+        arr[1] = 20;
+        arr[2] = 30;
+        arr[3] = 40;
+        arr[4] = 50;
 
-    // 访问数组元素
-    printf("arr[0] = %d\n", arr[0]); // arr[0] = 10
-    printf("arr[1] = %d\n", arr[1]); // arr[1] = 20
-    printf("arr[2] = %d\n", arr[2]); // arr[2] = 30
-
-    return 0;
+    }
 }
 ```
 
@@ -551,36 +740,29 @@ int main() {
 
 > [!NOTE]
 >
-> 假设数组 `arr` 有 n 个元素，如果使用的数组的下标 `< 0` 或 `> n-1` ，那么将会产生数组越界访问，即超出了数组合法空间的访问；那么，数组的索引范围是 `[0,arr.length - 1]`。
+> * ① `索引(下标)` ：每一个存储到数组的元素，都会自动的拥有一个编号，从 0 开始，这个自动编码就称为数组的索引（ index ），可以通过数组的索引访问到数组中的元素。
+> * ② `索引的取值范围是`：`[0,arr.lenght-1]`。
 
 
 
 * 示例：
 
 ```c
-#include <stdio.h>
+package com.github.study;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 先指定元素的个数和类型，再进行初始化
+public class ArrayDemo7 {
+    public static void main(String[] args) {
 
-    // 定义数组
-    int arr[3];
+        int[] arr = new int[5];
 
-    // 给数组元素赋值
-    arr[0] = 10;
-    arr[1] = 20;
-    arr[2] = 30;
+        // 直接打印输出数组中的元素，即：访问数组元素
+        System.out.println("arr[0] = " + arr[0]); // arr[0] = 0
+        System.out.println("arr[1] = " + arr[1]); // arr[1] = 0
+        System.out.println("arr[2] = " + arr[2]); // arr[2] = 0
+        System.out.println("arr[3] = " + arr[3]); // arr[3] = 0
+        System.out.println("arr[4] = " + arr[4]); // arr[4] = 0
 
-    // 访问数组元素
-    printf("arr[0] = %d\n", arr[0]); // arr[0] = 10
-    printf("arr[1] = %d\n", arr[1]); // arr[1] = 20
-    printf("arr[2] = %d\n", arr[2]); // arr[2] = 30
-
-    return 0;
+    }
 }
 ```
 
@@ -588,26 +770,29 @@ int main() {
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.study;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 定义数组和部分初始化：
-    // 会将给定的值从数组的开始位置一个个的赋值，没有赋值的地方，用 0 填充
-    int arr[5] = {1, 2};
+public class ArrayDemo9 {
+    public static void main(String[] args) {
 
-    // 访问数组元素
-    printf("arr[0] = %d\n", arr[0]); // arr[0] = 1
-    printf("arr[1] = %d\n", arr[1]); // arr[1] = 2
-    printf("arr[2] = %d\n", arr[2]); // arr[2] = 0
-    printf("arr[3] = %d\n", arr[3]); // arr[3] = 0
-    printf("arr[4] = %d\n", arr[4]); // arr[4] = 0
+        int[] arr = new int[5];
 
-    return 0;
+        // 使用变量接收数组中的元素，即：访问数组元素
+        int arr0 = arr[0];
+        int arr1 = arr[1];
+        int arr2 = arr[2];
+        int arr3 = arr[3];
+        int arr4 = arr[4];
+
+        // 打印输出变量中的值
+        System.out.println("arr[0] = " + arr0); // arr[0] = 0
+        System.out.println("arr[1] = " + arr1); // arr[1] = 0
+        System.out.println("arr[2] = " + arr2); // arr[2] = 0
+        System.out.println("arr[3] = " + arr3); // arr[3] = 0
+        System.out.println("arr[4] = " + arr4); // arr[4] = 0
+
+    }
 }
 ```
 
@@ -615,57 +800,44 @@ int main() {
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.study;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 指定元素的类型，不指定元素个数，同时进行初始化
-    int arr[] = {1, 2, 3, 4, 5};
+public class ArrayDemo10 {
+    public static void main(String[] args) {
 
-    // 访问数组元素
-    printf("arr[0] = %d\n", arr[0]); // arr[0] = 1
-    printf("arr[1] = %d\n", arr[1]); // arr[1] = 2
-    printf("arr[2] = %d\n", arr[2]); // arr[2] = 3
-    printf("arr[3] = %d\n", arr[3]); // arr[3] = 4
-    printf("arr[4] = %d\n", arr[4]); // arr[4] = 5
+        int[] arr = new int[5];
 
-    return 0;
+        // 给数组中的元素赋值
+        arr[0] = 10;
+        arr[1] = 20;
+        arr[2] = 30;
+        arr[3] = 40;
+        arr[4] = 50;
+
+        // 使用变量接收数组中的元素，即：访问数组元素
+        int arr0 = arr[0];
+        int arr1 = arr[1];
+        int arr2 = arr[2];
+        int arr3 = arr[3];
+        int arr4 = arr[4];
+        
+         // 打印输出变量中的值
+        System.out.println("arr[0] = " + arr0); // arr[0] = 10
+        System.out.println("arr[1] = " + arr1); // arr[1] = 20
+        System.out.println("arr[2] = " + arr2); // arr[2] = 30
+        System.out.println("arr[3] = " + arr3); // arr[3] = 40
+        System.out.println("arr[4] = " + arr4); // arr[4] = 50
+
+    }
 }
 ```
 
+## 2.5 数组常见问题
 
+### 2.5.1 ArrayIndexOfBoundsException
 
-* 示例：
-
-```c
-#include <stdio.h>
-
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 定义数组和全部初始化：数组初始化的元素个数等于数组的长度。
-    int arr[5] = {1, 2, 3, 4, 5};
-
-    // 访问数组元素
-    printf("arr[0] = %d\n", arr[0]); // arr[0] = 1
-    printf("arr[1] = %d\n", arr[1]); // arr[1] = 2
-    printf("arr[2] = %d\n", arr[2]); // arr[2] = 3
-    printf("arr[3] = %d\n", arr[3]); // arr[3] = 4
-    printf("arr[4] = %d\n", arr[4]); // arr[4] = 5
-
-    return 0;
-}
-```
-
-## 2.4 数组越界
-
-* 数组下标必须在指定范围内使用，超出范围视为越界。
+* 数组索引越界异常：数组下标必须在指定范围内使用，超出范围视为越界。
 
 ![数组越界](./assets/5.png)
 
@@ -679,136 +851,143 @@ int main() {
 * 示例：
 
 ```c
-#include <stdio.h>
+package com.github.study;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 定义数组和全部初始化：数组初始化的元素个数等于数组的长度。
-    int arr[] = {1, 2, 3, 4, 5};
+public class ArrayDemo11 {
+    public static void main(String[] args) {
 
-    // 访问数组元素
-    printf("arr[0] = %d\n", arr[0]); // arr[0] = 1
-    printf("arr[1] = %d\n", arr[1]); // arr[1] = 2
-    printf("arr[2] = %d\n", arr[2]); // arr[2] = 3
-    printf("arr[3] = %d\n", arr[3]); // arr[3] = 4
-    printf("arr[4] = %d\n", arr[4]); // arr[4] = 5
-    printf("arr[-1] = %d\n", arr[-1]); // 得到的是不确定的结果
-    printf("arr[5] = %d\n", arr[5]); // 得到的是不确定的结果
+        int[] arr = new int[5];
 
-    return 0;
+        // 给数组中的元素赋值
+        arr[0] = 10;
+        arr[1] = 20;
+        arr[2] = 30;
+        arr[3] = 40;
+        arr[4] = 50;
+        // 数组越界 
+        // java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5
+        arr[5] = 60; // [!code error]
+
+        System.out.println("arr[0] = " + arr[0]); // arr[0] = 10
+        System.out.println("arr[1] = " + arr[1]); // arr[1] = 20
+        System.out.println("arr[2] = " + arr[2]); // arr[2] = 30
+        System.out.println("arr[3] = " + arr[3]); // arr[3] = 40
+        System.out.println("arr[4] = " + arr[4]); // arr[4] = 50
+
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.study;
+
+public class ArrayDemo11 {
+    public static void main(String[] args) {
+
+        int[] arr = new int[5];
+
+        // 给数组中的元素赋值
+        arr[0] = 10;
+        arr[1] = 20;
+        arr[2] = 30;
+        arr[3] = 40;
+        arr[4] = 50;
+
+        System.out.println("arr[0] = " + arr[0]); // arr[0] = 10
+        System.out.println("arr[1] = " + arr[1]); // arr[1] = 20
+        System.out.println("arr[2] = " + arr[2]); // arr[2] = 30
+        System.out.println("arr[3] = " + arr[3]); // arr[3] = 40
+        System.out.println("arr[4] = " + arr[4]); // arr[4] = 50
+        // 数组越界 
+        // java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5
+        System.out.println("arr[4] = " + arr[5]); // [!code error]
+
+    }
+}
+```
+
+### 2.5.2 NullPointerException
+
+* 空指针异常：数组没有在堆上开辟内存空间，我们却试图访问堆内存空间中的值。
+
+
+
+* 示例：
+
+```java
+package com.github.study;
+
+public class ArrayTest11 {
+    public static void main(String[] args) {
+        int[] arr = null;
+        // Exception in thread "main" java.lang.NullPointerException
+        System.out.println(arr[0]); // [!code error]
+    }
 }
 ```
 
 ## 2.5 计算数组的长度
 
-* 数组长度（元素个数）是在数组定义的时候明确指定且固定的，我们不能在运行的时候直接获取数组长度；但是，我们可以通过 sizeof 运算符间接计算出数组的长度。
-* 计算步骤，如下所示：
-  * ① 使用 sizeof 运算符计算出整个数组的字节长度。
-  * ② 由于数组成员是同一数据类型；那么，每个元素的字节长度一定相等，那么`数组的长度 = 整个数组的字节长度 ÷ 单个元素的字节长度 `。
+* 在 Java 中，对于数组的长度，有一个内置属性 length ，如下所示：
 
-![计算数组的长度](./assets/6.png)
-
-> [!NOTE]
->
-> * ① 在很多编程语言中，都内置了获取数组的长度的属性或方法，如：Java 中的 arr.length 或 Rust 的 arr.len()。
-> * ② 但是，C 语言没有内置的获取数组长度的属性或方法，只能通过 `sizeof` 运算符间接来计算得到。
-> * ③ 在 C99 标准之前，C 语言中的数组是`不支持`变长数组的，即：在`编译`的时候就需要确定数组的大小（数组一旦声明或定义，数组的长度就固定了，不能改变）。
-> * ④ 在 C99 标准之后，C 语言中的数组`支持`变长数组，即：允许数组的大小在`运行`的时候确定。
+```java
+arr.length; // 数组的长度
+```
 
 
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.study;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 定义数组和全部初始化：数组初始化的元素个数等于数组的长度。
-    int arr[] = {1, 2, 3, 4, 5};
+public class ArrayDemo11 {
+    public static void main(String[] args) {
 
-    // 计算数组的长度
-    size_t length = sizeof(arr) / sizeof(arr[0]);
+        int[] arr = new int[5];
 
-    // 遍历数组
-    for (int i = 0; i < length; i++) {
-        printf("%d \n", arr[i]);
+        int len = arr.length;
+
+        System.out.println("len = " + len); // len = 5
+
     }
-
-    return 0;
 }
 ```
 
 ## 2.6 遍历数组
 
-* 遍历数组是指按顺序访问数组中的每个元素，以便读取或修改它们，编程中一般使用循环结构对数组进行遍历。
+* 遍历数组是指按顺序逐个访问数组中的每个元素，并对每个元素执行特定操作的过程。
+* 遍历数组的目的是访问数组中的每个元素，进行读取、修改或其他处理操作。
+
+> [!NOTE]
+>
+> 通常使用循环结构来遍历数组。
 
 
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java {12-14}
+package com.github.study;
 
-// 声明一个存储有 12、2、31、24、15、36、67、108、29、51 的数组，并遍历数组所有元素
+public class ArrayDemo11 {
+    public static void main(String[] args) {
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 定义数组并初始化
-    int arr[] = {12, 2, 31, 24, 15, 36, 67, 108, 29, 51};
+        int[] arr = {1, 2, 3, 4, 5};
 
-    // 计算数组的长度
-    size_t length = sizeof(arr) / sizeof(int);
+        // 数组的长度
+        int len = arr.length;
 
-    // 遍历数组
-    for (int i = 0; i < length; i++) {
-        printf("%d\n", arr[i]);
+        // 遍历数组
+        for (int i = 0; i < len; i++) {
+            System.out.println(arr[i]);
+        }
+
     }
-
-    return 0;
-}
-```
-
-
-
-* 示例：
-
-```c
-#include <stdio.h>
-
-// 声明长度为 10 的 int 类型数组，给数组元素依次赋值为 0 ~ 9 ，并遍历数组所有元素
-
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 定义数组
-    int arr[10];
-
-    // 计算数组的长度
-    size_t length = sizeof(arr) / sizeof(int);
-
-    // 给数组的每个元素赋值
-    for (int i = 0; i < length; i++) {
-        arr[i] = i;
-    }
-
-    // 遍历数组
-    for (int i = 0; i < length; i++) {
-        printf("%d\n", arr[i]);
-    }
-
-    return 0;
 }
 ```
 
@@ -861,59 +1040,6 @@ int main() {
 
     return 0;
 }
-```
-
-### 2.7.2 数组的注意事项
-
-* `C 语言规定，数组一旦声明，数组名指向的地址将不可更改`。
-* 因为在声明数组的时候，编译器会自动会数组分配内存地址，这个地址和数组名是绑定的，不可更改。
-
-> [!CAUTION]
->
-> 如果之后试图更改数组名对应的地址，编译器就会报错！！！
-
-
-
-* 示例：错误演示
-
-```c
-int num[5]; // 声明数组
-
-// 使用大括号重新赋值是不允许的，必须在数组声明的时候赋值，否则编译将会报错
-num = {1,2,3,4,5} ; // [!code error]  
-```
-
-
-
-* 示例：错误演示
-
-```c
-int num[] = {1,2,3,4,5};
-
-// 使用大括号重新赋值是不允许的，必须在数组声明的时候赋值，否则编译将会报错
-num = {2,3,4,5,6}; // [!code error] 
-```
-
-
-
-* 示例：错误演示
-
-```c
-int num[5];
-
-// 报错，需要和 Java 区别一下，在 C 中不可以
-num = NULL; // [!code error] 
-```
-
-
-
-* 示例：错误演示
-
-```c
-int a[] = {1,2,3,4,5} 
-
-// 报错，需要和 Java 区别一下，在 C 中不可以
-int b[5] = a ; // [!code error] 
 ```
 
 ## 2.8 数组应用案例
