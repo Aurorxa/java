@@ -838,9 +838,9 @@ public class ArrayDemo10 {
 
 ## 2.5 数组常见问题
 
-### 2.5.1 ArrayIndexOfBoundsException
+### 2.5.1 数组索引越界异常
 
-* 数组索引越界异常：数组下标必须在指定范围内使用，超出范围视为越界。
+* 数组索引越界异常（ArrayIndexOutOfBoundsException）：数组下标必须在指定范围内使用，超出范围视为越界。
 
 ![数组越界](./assets/5.png)
 
@@ -913,9 +913,9 @@ public class ArrayDemo11 {
 }
 ```
 
-### 2.5.2 NullPointerException
+### 2.5.2 空指针异常
 
-* 空指针异常：数组没有在堆上开辟内存空间，我们却试图访问堆内存空间中的值。
+* 空指针异常（NullPointerException）：数组没有在堆上开辟内存空间，我们却试图访问堆内存空间中的值。
 
 
 
