@@ -1004,33 +1004,31 @@ public class ArrayDemo11 {
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.test;
 
-int main() {
+/**
+ * 计算数组中所有元素的和以及平均数。
+ */
+public class ArrayTest5 {
+    public static void main(String[] args) {
 
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 定义数组并初始化
-    int arr[] = {12, 2, 31, 24, 15, 36, 67, 108, 29, 51};
+        int[] arr = {12, 2, 31, 24, 15, 36, 67, 108, 29, 51};
 
-    // 计算数组的长度
-    size_t length = sizeof(arr) / sizeof(int);
+        int sum = 0;
 
-    // 变量保存总和
-    int sum = 0;
+        for (int i = 0; i < arr.length; i++) {
+            sum += arr[i];
+        }
 
-    // 遍历数组
-    for (int i = 0; i < length; i++) {
-        sum += arr[i];
+        double avg = (double) sum / arr.length;
+
+        // 数组中所有元素的和为：375
+        System.out.println("数组中所有元素的和为：" + sum);
+        // 数组中所有元素的平均数为：37.5
+        System.out.println("数组中所有元素的平均数为：" + avg);
+
     }
-
-    double avg = (double)sum / length;
-    printf("数组的和为：%d\n", sum); // 数组的和为：375
-    printf("数组的平均值为：%.2lf\n", avg); //数组的平均值为：37.50
-
-    return 0;
 }
 ```
 
@@ -1049,39 +1047,39 @@ int main() {
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.test;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-   
-    // 定义数组并初始化
-    int arr[] = {12, 2, 31, 24, 15, -36, 67, 108, 29, 51};
+/**
+ * 计算数组的最值（最大值和最小值）
+ */
+public class ArrayTest6 {
+    public static void main(String[] args) {
 
-    // 计算数组的长度
-    size_t length = sizeof(arr) / sizeof(int);
+        int[] arr = {12, 2, 31, 24, 15, 36, 67, 108, 29, 51};
 
-    // 定义最大值
-    int max = arr[0];
-    // 定义最小值
-    int min = arr[0];
+        // 最大值
+        int max = arr[0];
 
-    // 遍历数组
-    for (int i = 0; i < length; i++) {
-        if (arr[i] >= max) {
-            max = arr[i];
+        // 最小值
+        int min = arr[0];
+
+        // 遍历获取最大值和最小值
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+
+            if (arr[i] < min) {
+                min = arr[i];
+            }
         }
-        if (arr[i] <= min) {
-            min = arr[i];
-        }
+
+        // 数组中最大值为：108
+        System.out.println("数组中最大值为：" + max);
+        // 数组中最小值为：2
+        System.out.println("数组中最小值为：" + min);
     }
-
-    printf("数组的最大值为：%d\n", max); // 数组的最大值为：108
-    printf("数组的最小值为：%d\n", min); // 数组的最小值为：-36
-
-    return 0;
 }
 ```
 
@@ -1093,54 +1091,37 @@ int main() {
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.test;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 定义数组并初始化
-    int arr[] = {12, 2, 31, 24, 2, -36, 67, 108, 29, 51};
+import java.util.Scanner;
 
-    // 计算数组的长度
-    size_t length = sizeof(arr) / sizeof(int);
+/**
+ * 统计数组中某个元素出现的次数，要求：使用无限循环，如果输入的数字是 0 ，就退出。
+ */
+public class ArrayTest7 {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
 
-    // 遍历数组
-    printf("当前数组中的元素是：");
-    for (int i = 0; i < length; i++) {
-        printf("%d ", arr[i]);
-    }
+        int[] arr = {12, 2, 31, 24, 2, -36, 67, 108, 29, 51};
 
-    printf("\n");
-
-    // 无限循环
-    while (true) {
-        // 统计的数字
-        int num;
-        // 统计数字出现的次数
-        int count = 0;
-        // 输入数字
-        printf("请输入要统计的数字：");
-        scanf("%d", &num);
-
-        // 0 作为结束条件
-        if (num == 0) {
-            break;
-        }
-
-        // 遍历数组，并计数
-        for (int i = 0; i < length; i++) {
-            if (arr[i] == num) {
-                count++;
+        while (true){
+            System.out.print("请输入一个数字：");
+            int num = sc.nextInt();
+            if (num == 0){
+                break;
             }
+            int count = 0;
+            for (int i = 0; i < arr.length; i++) {
+                if (num == arr[i]){
+                    count++;
+                }
+            }
+            System.out.println("数字 " + num + " 出现了 " + count + " 次");
         }
 
-        printf("您输入的数字 %d 在数组中出现了 %d 次\n", num, count);
+        sc.close();
     }
-
-    return 0;
 }
 ```
 
@@ -1152,31 +1133,34 @@ int main() {
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.test;
 
-#define  SIZE 10
+import java.util.Arrays;
 
-int main() {
+/**
+ * 将数组 a 中的全部元素复制到数组 b 中。
+ */
+public class ArrayTest8 {
+    public static void main(String[] args) {
 
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 定义数组并初始化
-    int a[] = {12, 2, 31, 24, 15, -36, 67, 108, 29, 51};
-    int b[SIZE];
 
-    // 复制数组
-    for (int i = 0; i < SIZE; i++) {
-        b[i] = a[i];
+        int[] a = {12, 2, 31, 24, 2, -36, 67, 108, 29, 51};
+
+        int[] b = new int[a.length];
+
+        // 数组复制
+        for (int i = 0; i < a.length; i++) {
+            b[i] = a[i];
+        }
+
+        // 打印数组
+        // a = [12, 2, 31, 24, 2, -36, 67, 108, 29, 51]
+        System.out.println("a = " + Arrays.toString(a));
+        // b = [12, 2, 31, 24, 2, -36, 67, 108, 29, 51]
+        System.out.println("b = " + Arrays.toString(b));
+
     }
-
-    // 打印数组 b 中的全部元素
-    for (int i = 0; i < SIZE; i++) {
-        printf("%d ", b[i]);
-    }
-
-    return 0;
 }
 ```
 
@@ -1198,85 +1182,32 @@ int main() {
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.test;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 原始数组
-    int arr[] = {12, 2, 31, 24, 15, -36, 67, 108, 29, 51};
+import java.util.Arrays;
 
-    // 计算数组的长度
-    size_t SIZE = sizeof(arr) / sizeof(arr[0]);
-    
-    // 打印原始数组中的全部元素
-    printf("原始数组：");
-    for (int i = 0; i < SIZE; i++) {
-        printf("%d ", arr[i]);
+/**
+ * 数组对称位置的元素互换。
+ */
+public class ArrayTest9 {
+    public static void main(String[] args) {
+
+        int[] arr = {12, 2, 31, 24, 2, -36, 67, 108, 29, 51};
+
+        // 原先的数组：[12, 2, 31, 24, 2, -36, 67, 108, 29, 51]
+        System.out.println("原先的数组："+ Arrays.toString(arr));
+
+        // 进行数组对称位置元素的互换
+        for (int i = 0; i < arr.length / 2; i++) {
+            int temp = arr[i];
+            arr[i] = arr[arr.length - 1 - i];
+            arr[arr.length - 1 - i] = temp;
+        }
+
+        // 交换之后的数组：[51, 29, 108, 67, -36, 2, 24, 31, 2, 12]
+        System.out.println("交换之后的数组："+ Arrays.toString(arr));
     }
-    printf("\n");
-
-    // 交换数组
-    for (int i = 0; i < SIZE / 2; i++) {
-        int temp          = arr[i];
-        arr[i]            = arr[SIZE - 1 - i];
-        arr[SIZE - 1 - i] = temp;
-    }
-
-    // 打印交换后的数组
-    printf("交换后数组：");
-    for (int i = 0; i < SIZE; i++) {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
-
-    return 0;
-}
-```
-
-
-
-* 示例：
-
-```c
-#include <stdio.h>
-
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 原始数组
-    int arr[] = {12, 2, 31, 24, 15, -36, 67, 108, 29, 51};
-
-    // 计算数组的长度
-    size_t SIZE = sizeof(arr) / sizeof(arr[0]);
-
-    // 打印原始数组中的全部元素
-    printf("原始数组：");
-    for (int i = 0; i < SIZE; i++) {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
-
-    // 交换数组
-    for (int i = 0, j = SIZE - 1 - i; i < SIZE / 2; i++, j--) {
-        int temp = arr[i];
-        arr[i]   = arr[j];
-        arr[j]   = temp;
-    }
-
-    // 打印交换后的数组
-    printf("交换后数组：");
-    for (int i = 0; i < SIZE; i++) {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
-
-    return 0;
 }
 ```
 
@@ -1295,44 +1226,34 @@ int main() {
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.test;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 原始数组
-    int arr[] = {12, 2, 31, -24, 15, -36, 67, 891, 29, 51};
+import java.util.Arrays;
 
-    // 计算数组的长度
-    size_t length = sizeof(arr) / sizeof(arr[0]);
+/**
+ * 将数组中的最大值移动到数组的最末尾。
+ */
+public class ArrayTest10 {
+    public static void main(String[] args) {
 
-    // 打印原始数组中的全部元素
-    printf("原始数组：");
-    for (int i = 0; i < length; i++) {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
+        int[] arr = {12, 2, 31, 24, 2, -36, 67, 108, 29, 51};
 
-    // 移动最大值到数组的最后一个位置
-    for (int i = 0; i < length - 1; i++) {
-        if (arr[i] > arr[i + 1]) {
-            int temp   = arr[i];
-            arr[i]     = arr[i + 1];
-            arr[i + 1] = temp;
+        // 原先的数组：[12, 2, 31, 24, 2, -36, 67, 108, 29, 51]
+        System.out.println("原先的数组：" + Arrays.toString(arr));
+
+        // 移动最大值到数组的最后一个位置
+        for (int i = 0; i < arr.length - 1; i++) {
+            if (arr[i] > arr[i + 1]) {
+                int temp = arr[i];
+                arr[i] = arr[i + 1];
+                arr[i + 1] = temp;
+            }
         }
-    }
 
-    // 打印移动之后的数组
-    printf("移动之后的数组：");
-    for (int i = 0; i < length; i++) {
-        printf("%d ", arr[i]);
+        // 移动之后的数组：[2, 12, 24, 2, -36, 31, 67, 29, 51, 108]
+        System.out.println("移动之后的数组："+ Arrays.toString(arr));
     }
-    printf("\n");
-
-    return 0;
 }
 ```
 
@@ -1350,45 +1271,36 @@ int main() {
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.test;
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    // 原始数组
-    int arr[] = {12, 2, 31, -24, 15, -36, 67, 891, 29, 51};
+import java.util.Arrays;
 
-    // 计算数组的长度
-    size_t length = sizeof(arr) / sizeof(arr[0]);
+/**
+ * 实现冒泡排序，即将数组的元素从小到大排列。
+ */
+public class ArrayTest11 {
+    public static void main(String[] args) {
 
-    // 打印原始数组中的全部元素
-    printf("原始数组：");
-    for (int i = 0; i < length; i++) {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
+        int[] arr = {12, 2, 31, 24, 2, -36, 67, 108, 29, 51};
 
-    for (int j = 0; j < length - 1; j++) {
-        for (int i = 0; i < length - 1 - j; i++) {
-            if (arr[i] > arr[i + 1]) {
-                int temp = arr[i];
-                arr[i] = arr[i + 1];
-                arr[i + 1] = temp;
+        // 原先的数组：[12, 2, 31, 24, 2, -36, 67, 108, 29, 51]
+        System.out.println("原先的数组：" + Arrays.toString(arr));
+
+        // 冒泡排序
+        for (int j = 0; j < arr.length - 1; j++) {
+            for (int i = 0; i < arr.length - 1 - j; i++) {
+                if (arr[i] > arr[i + 1]) {
+                    int temp = arr[i];
+                    arr[i] = arr[i + 1];
+                    arr[i + 1] = temp;
+                }
             }
         }
-    }
 
-    // 打印移动之后的数组
-    printf("移动之后的数组：");
-    for (int i = 0; i < length; i++) {
-        printf("%d ", arr[i]);
+        // 排序之后的数组：[-36, 2, 2, 12, 24, 29, 31, 51, 67, 108]
+        System.out.println("排序之后的数组："+ Arrays.toString(arr));
     }
-    printf("\n");
-
-    return 0;
 }
 ```
 
@@ -1412,47 +1324,37 @@ int main() {
 
 * 示例：
 
-```c
-#include <stdio.h>
+```java
+package com.github.test;
+
+import java.util.Arrays;
 
 /**
- * 二分查找
- *
- * @param arr 数组
- * @param len 数组长度
- * @param num 要查找的数据
- * @return 返回数据的下标，没有找到返回-1
+ * 二分查找。
  */
-int search(int arr[], int len, int num) {
-    int min = 0;
-    int max = len - 1;
-    while (min <= max) {
-        int mid = (min + max) / 2;
-        if (num < arr[mid]) { // 说明要查找的数据在左半边
-            max = mid - 1;
-        } else if (num > arr[mid]) { // 说明要查找的数据在右半边
-            min = mid + 1;
-        } else { // 说明找到了
-            return mid;
-        }
+public class ArrayTest12 {
+    public static void main(String[] args) {
+
+        int[] arr = {1, 2, 3, 4, 5, 6};
+
+        System.out.println(search(arr, 4)); // 3
     }
-    return -1;
-}
 
-int main() {
-    
-    // 禁用 stdout 缓冲区
-    setbuf(stdout, nullptr);
-    
-    int arr[] = {1, 2, 3, 4, 5, 6};
-
-    int len = sizeof(arr) / sizeof(arr[0]);
-
-    int index = search(arr, len, -1);
-
-    printf("index = %d\n", index);
-
-    return 0;
+    public static int search(int[] arr, int num) {
+        int min = 0;
+        int max = arr.length - 1;
+        while (min <= max) {
+            int mid = (min + max) / 2;
+            if (num < arr[mid]) { // 说明要查找的数据在左半边
+                max = mid - 1;
+            } else if (num > arr[mid]) { // 说明要查找的数据在右半边
+                min = mid + 1;
+            } else { // 说明找到了
+                return mid;
+            }
+        }
+        return -1;
+    }
 }
 ```
 
