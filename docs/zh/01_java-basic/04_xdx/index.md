@@ -596,7 +596,7 @@ int main() { // 定义主函数
 
 ![matlab](./assets/31.png)
 
-* ⑤ 大数据库开发，如：Hadoop、Flink、Spark 等。
+* ⑤ 大数据开发，如：Hadoop、Flink、Spark 等。
 
 ![Hadoop](./assets/32.png)
 
