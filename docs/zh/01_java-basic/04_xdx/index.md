@@ -578,6 +578,30 @@ int main() { // 定义主函数
   * ③ 数据存储、告警与报告功能。
 * 应用场景：用于构建 IoT 数据平台，支持大规模物联网设备的接入和管理。
 
+## 1.8 Java 的应用场景
+
+```mermaid
+timeline
+    title Java 语言的发展史
+    section SUN 公司
+    	1995 年 : Java 语言诞生
+    	1996 年 : Java 1.0
+    	1997 年 : Java 1.1
+    	1998 年 : Java 1.2
+    	2000 年 : Java 1.3
+    	2002 年 : Java 1.4
+    	2004 年 : Java 5.0
+    section Oracle 公司
+```
+
+
+
+
+
+
+
+
+
 
 
 # 第二章：计算机常识

@@ -3,7 +3,7 @@
 }
 
 .medium-zoom--opened .medium-zoom-image {
-  z-index: 199 !important;
+  z-index: 1999 !important;
 }
 
 .VPSocialLinks.VPNavBarSocialLinks.social-links {
