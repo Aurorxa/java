@@ -495,7 +495,7 @@ int main() { // 定义主函数
 
 * 软件开发的主要过程，包括：`需求分析`、`系统设计`、`编码（开发）`、`测试`、`部署和发布`以及 `维护和更新`，如下所示：
 
-![](./assets/48.png)
+![](./assets/27.png)
 
 * 软件开发的主要过程，其具体细节，如下所示：
   * ① `需求分析`：在这一阶段，开发团队与客户或用户紧密合作，收集和确定软件需求。这包括功能需求、性能需求、界面设计需求等，确保开发团队了解软件需要实现的目标。
@@ -580,27 +580,31 @@ int main() { // 定义主函数
 
 ## 1.8 Java 的应用场景
 
-```mermaid
-timeline
-    title Java 语言的发展史
-    section SUN 公司
-    	1995 年 : Java 语言诞生
-    	1996 年 : Java 1.0
-    	1997 年 : Java 1.1
-    	1998 年 : Java 1.2
-    	2000 年 : Java 1.3
-    	2002 年 : Java 1.4
-    	2004 年 : Java 5.0
-    section Oracle 公司
-```
+* ① 桌面应用开发，如：IDEA、CLion、Pycharm 、Eclipse 等。
+
+![JetBrains IDE](./assets/28.png)
+
+* ② 企业级应用开发，如：SpringBoot、SpringCloud 等。
+
+![Java 微服务解决方案：SpringBoot + SpringCloud](./assets/29.svg)
+
+* ③ 移动应用开发，如：andriod（虽然现在 Kotlin 逐渐成为安卓开发的主流语言，但 Java 仍然广泛用于安卓开发）、医疗设备。
+
+![WhatsApp：台湾版微信](./assets/30.png)
+
+* ④ 科学计算，如：matlab 等。
+
+![matlab](./assets/31.png)
+
+* ⑤ 大数据库开发，如：Hadoop、Flink、Spark 等。
+
+![Hadoop](./assets/32.png)
 
 
 
+* ⑥ 游戏，如：MineCraft（我的世界）等。
 
-
-
-
-
+![MineCraft（我的世界）](./assets/33.png)
 
 
 
