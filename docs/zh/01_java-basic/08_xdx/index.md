@@ -971,3 +971,94 @@ public class StringDemo1 {
     }
 }
 ```
+
+
+
+# 第九章：作业
+
+## 9.1 单选题
+
+* int 和 float 的区别是什么？
+
+- [ ] A：int 和 float 没有什么区别。
+- [ ] B：int 是变量，而 float 是方法。
+- [x] C：int 是用来存储整数变量的数据类型，而 float 是用来存储小数变量的数据类型。
+- [ ] D：int 类型的数据需要使用双引号（""）括起来。
+
+## 9.2 代码题
+
+### 9.2.1 应用示例
+
+* 需求：定义字符串类型的变量 name、字符串类型的变量 birthday、整数类型的变量 age  以及 float 类型的变量 money 。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+public class VariableTest3 {
+    public static void main(String[] args) {
+
+        // 字符串类型的变量 name
+        String name = "许大仙";
+        System.out.println("name = " + name);
+
+        // 字符串类型的变量 birthday
+        String birthday = "1999-01-01";
+        System.out.println("birthday = " + birthday);
+
+        // 整数类型的变量 age
+        int age = 18;
+        System.out.println("age = " + age);
+
+        // 小数类型的变量 money
+        float money = 3.14F;
+        System.out.println("money = " + money);
+
+    }
+}
+```
+
+### 9.2.2 应用示例
+
+* 需求：使用变量描述一个人的信息，如：姓名、年龄、性别、身高、体重等。
+
+
+
+* 示例：
+
+```java
+package com.github.day02;
+
+/**
+ * 使用变量表示一个人的信息，如：姓名、年龄、性别、身高、体重等。
+ */
+public class Exe1 {
+    public static void main(String[] args) {
+
+        // 姓名
+        String name = "张三";
+
+        // 年龄
+        int age = 18;
+
+        // 性别
+        char gender = '男';
+
+        // 身高
+        double height = 1.75;
+
+        // 体重
+        double weight = 80.0;
+
+        System.out.println("姓名：" + name); // 姓名：张三
+        System.out.println("年龄：" + age); // 年龄：18
+        System.out.println("性别：" + gender); // 性别：男
+        System.out.println("身高：" + height); // 身高：1.75
+        System.out.println("体重：" + weight); // 体重：80.0
+    }
+}
+```
+
