@@ -627,6 +627,8 @@ public class HelloWorld {
 
 > [!NOTE]
 >
+> ::: details 点我查看 正例和反例
+>
 > * 正例：
 >
 > ```java {1-3}
@@ -650,11 +652,12 @@ public class HelloWorld {
 >     ...
 > }
 > ```
+> :::
 
 * ② 多行注释和文档注释不支持嵌套！！！
 
 > [!NOTE]
->
+> ::: details 点我查看 详细信息
 > * 多行注释不支持嵌套，如下所示：
 >
 > ```java
@@ -676,6 +679,7 @@ public class HelloWorld {
 >     return num & -num; 
 > }
 > ```
+> :::
 
 ## 3.5 HelloWorld（入门程序）解析
 
