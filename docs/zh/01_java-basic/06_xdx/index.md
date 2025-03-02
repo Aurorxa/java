@@ -971,3 +971,145 @@ public class Exe1 {
 }
 ```
 
+
+
+# 第五章：作业
+
+## 5.1 单选题
+
+* ① 下面关于变量的声明，那个是错误的？
+
+- [ ] A：int x = 5;
+- [ ] B：double d = 3.14;
+- [ ] C：char c = 'C';
+- [x] D：String name = 'Hello World';
+
+> [!NOTE]
+>
+> * ① 字符常量，使用单引号（`''`）括起来，必须有且仅能包含一个字符。
+> * ② 字符串常量，使用双引号（`""`）括起来。
+
+* ② 下面的代码，那个是创建一个变量？
+
+- [x] A：int age = 18;
+- [ ] B：age = 20;
+- [ ] C：age = "许大仙";
+- [ ] D：String name;
+
+> [!NOTE]
+>
+> 变量定义的语法，如下所示：
+>
+> ```java
+> 数据类型 变量名;
+> 变量名 = 值;
+> ```
+>
+> ```java
+> 数据类型 变量名 = 值;
+> ```
+
+* ③ int 和 float 的区别是什么？
+
+- [ ] A：int 和 float 没有什么区别。
+- [ ] B：int 是变量，而 float 是方法。
+- [x] C：int 是用来存储整数变量的数据类型，而 float 是用来存储小数变量的数据类型。
+- [ ] D：int 类型的数据需要使用双引号（""）括起来。
+
+## 5.2 多选题
+
+* ① 下面的变量名，那么是正确的？
+
+- [x] A：mybirthday
+- [x] B：myname 
+- [ ] C：my name
+- [ ] D：my birthday
+- [ ] E：1987
+- [ ] D："许大仙"
+
+> [!NOTE]
+>
+> 标识符的命名规则（必须遵守，强制）：
+>
+> - ① 只能使用 `26` 个英文字母大小写，`0~9` 的数字，下划线 `_` 和美元符号 `$` 。
+> - ② 不能使用 Java 的关键字或保留字以及特殊值。
+> - ③ 数字不能开头。
+> - ④ 不能包含空格。
+> - ⑤ 严格区分大小写。
+
+* ② 关于变量的说法，那些是对的？
+
+- [ ] A：一个变量一次可以存储很多种不同的数据。
+- [x] B：变量是值的容器，定义变量可以存放值。
+- [ ] C：变量可以随时修改存储数据的类型。
+- [x] D：定义变量可以帮助我们存储信息，以便后面使用。
+
+## 5.3 代码题
+
+### 5.3.1 应用示例
+
+* 需求：请用代码描述下列银行流水变化过程。
+
+> [!NOTE]
+>
+> * ① 小明账户 bankBalance 初始值有 500.00 元。
+> * ② 存入 250 元。
+> * ③ 支出 100 元。
+> * ④ 打印剩余存款。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+public class VariableTest2 {
+    public static void main(String[] args) {
+
+        // 小明账户 bankBalance 初始值有 500.00 元。
+        double bankBalance = 500.00;
+        // 存入 250 元
+        bankBalance = bankBalance + 250;
+        // 支出 100 元。
+        bankBalance = bankBalance - 100;
+        // 打印剩余存款。
+        System.out.println("剩余存款：" + bankBalance + "元");
+
+    }
+}
+```
+
+### 5.3.2 应用示例
+
+* 需求：定义字符串类型的变量 name、字符串类型的变量 birthday、整数类型的变量 age  以及 float 类型的变量 money 。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+public class VariableTest3 {
+    public static void main(String[] args) {
+
+        // 字符串类型的变量 name
+        String name = "许大仙";
+        System.out.println("name = " + name);
+
+        // 字符串类型的变量 birthday
+        String birthday = "1999-01-01";
+        System.out.println("birthday = " + birthday);
+
+        // 整数类型的变量 age
+        int age = 18;
+        System.out.println("age = " + age);
+
+        // 小数类型的变量 money
+        float money = 3.14F;
+        System.out.println("money = " + money);
+
+    }
+}
+```

@@ -657,7 +657,8 @@ public class HelloWorld {
 * ② 多行注释和文档注释不支持嵌套！！！
 
 > [!NOTE]
-> ::: details 点我查看 详细信息
+> ::: details 点我查看 具体细节
+>
 > * 多行注释不支持嵌套，如下所示：
 >
 > ```java
