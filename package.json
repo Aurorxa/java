@@ -3,16 +3,6 @@
   "version": "1.6.3",
   "description": "",
   "main": "index.js",
-  "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "typeRoots": [
-      "node_modules/@types",
-      ".vitepress/types"
-    ]
-  },
   "scripts": {
     "docs:dev": "vitepress dev docs --mode development",
     "docs:build": "vitepress build docs --mode production",
