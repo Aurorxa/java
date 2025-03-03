@@ -272,29 +272,19 @@ public class ArithmeticDemo4 {
 * 示例：
 
 ```java
-package com.github;
+package com.github.study;
 
 /**
- *   随意给出一个整数，打印显示它的个位数，十位数，百位数的值。
- *   格式如下：
- *     数字xxx的情况如下：
- *     个位数：
- *     十位数：
- *     百位数：
- *   例如：
- *     数字153的情况如下：
- *     个位数：3
- *     十位数：5
- *     百位数：1
+ * 随意给出一个整数，打印显示它的个位数，十位数，百位数的值。
  */
 public class ArithmeticDemo5 {
     public static void main(String[] args) {
         int num = 153;
 
         // 提取百位、十位和个位
-        int bai = num / 100;
-        int shi = num % 100 / 10;
         int ge = num % 10;
+        int shi = num / 10 % 10;
+        int bai = num / 100 % 10;
 
         // 输出结果
         System.out.println("百位为：" + bai);
