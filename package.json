@@ -61,6 +61,6 @@
     "**/.vitepress/**/*.vue"
   ],
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.34.2"
+    "@rollup/rollup-linux-x64-gnu": "^4.34.9"
   }
 }
