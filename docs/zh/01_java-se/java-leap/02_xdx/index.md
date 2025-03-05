@@ -83,7 +83,6 @@ public final class System {
 package com.github.com.github;
 
 public class IOTest {
-
     public static void main(String[] args) {
         System.out.println("整数：" + 1);
         System.out.println("浮点数：" + 3.14);
@@ -151,9 +150,7 @@ public class IOTest {
 import java.util.Scanner;
 
 public class IOTest {
-
     public static void main(String[] args) {
-
         // 创建 Scanner 对象
         Scanner sc = new Scanner(System.in);
 
