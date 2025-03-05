@@ -1002,7 +1002,10 @@ public class Main {
 ### 5.2.3 使用 `ThreadLocalRandom` 类
 
 * `ThreadLocalRandom` 是在 Java 7 中引入的，它是为多线程环境设计的，避免了多线程中共享 `Random` 实例时的性能瓶颈。
-* 通常在多线程环境中使用 `ThreadLocalRandom` 比 `Random` 更高效。
+
+> [!NOTE]
+>
+> 通常在多线程环境中使用 `ThreadLocalRandom` 比 `Random` 更高效。
 
 
 
@@ -1573,8 +1576,6 @@ for(初始化语句①; 循环条件语句②; 迭代语句⑦) {
 ```
 
 * 其中，for 、while 、do-while 均可以作为外层循环或内层循环。
-  - 外层循环：循环结构 A
-  - 内层循环：循环结构 B
 
 ![嵌套循环](./assets/10.png)
 
