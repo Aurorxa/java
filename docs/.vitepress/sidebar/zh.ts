@@ -5,7 +5,7 @@ import { commonDirectoryName } from '../utils/constant'
 export const zhSidebar: DefaultTheme.Sidebar = {
   '/': [
     {
-      text: 'Java 基础',
+      text: 'Java 语言基础',
       collapsed: true,
       items: [
         {
@@ -59,7 +59,7 @@ export const zhSidebar: DefaultTheme.Sidebar = {
       ]
     },
     {
-      text: 'Java 基础补充',
+      text: 'Java 语言补充',
       collapsed: true,
       items: [
         {
