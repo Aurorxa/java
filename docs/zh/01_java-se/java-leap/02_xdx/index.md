@@ -960,7 +960,7 @@ public class Main {
         int randomInt = random.nextInt();
         System.out.println("随机整数：" + randomInt);
 
-        // 生成一个指定范围内的随机整数 (0 到 99)
+        // 生成一个指定范围内的随机整数 [0, 100)
         int randomIntInRange = random.nextInt(100); // 范围是 [0, 100)
         System.out.println("随机整数 (0 到 99)：" + randomIntInRange);
 
