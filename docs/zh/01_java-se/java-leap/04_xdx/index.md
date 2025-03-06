@@ -706,7 +706,7 @@ public class ArrayDemo2 {
 
 * 语法：
 
-```c
+```java
 数组名[索引|下标] = 值;
 ```
 
@@ -742,7 +742,7 @@ public class ArrayDemo10 {
 
 * 语法：
 
-```c
+```java
 数组名[索引|下标];
 ```
 
@@ -755,7 +755,7 @@ public class ArrayDemo10 {
 
 * 示例：
 
-```c
+```java
 package com.github.study;
 
 public class ArrayDemo7 {
@@ -841,9 +841,9 @@ public class ArrayDemo10 {
 }
 ```
 
-## 2.5 数组常见问题
+## 2.4 数组常见问题
 
-### 2.5.1 数组索引越界异常
+### 2.4.1 数组索引越界异常
 
 * 数组索引越界异常（ArrayIndexOutOfBoundsException）：数组下标必须在指定范围内使用，超出范围视为越界。
 
@@ -858,7 +858,7 @@ public class ArrayDemo10 {
 
 * 示例：
 
-```c
+```java
 package com.github.study;
 
 public class ArrayDemo11 {
@@ -918,7 +918,7 @@ public class ArrayDemo11 {
 }
 ```
 
-### 2.5.2 空指针异常
+### 2.4.2 空指针异常
 
 * 空指针异常（NullPointerException）：数组没有在堆上开辟内存空间，我们却试图访问堆内存空间中的值。
 
@@ -1366,6 +1366,8 @@ public class ArrayTest12 {
 
 
 # 第三章：JVM 内存模型（⭐）
+
+
 
 
 
