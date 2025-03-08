@@ -1444,7 +1444,7 @@ public class Main{
 
 * 其在内存中的图示，如下所示：
 
-![方法中的局部变量是作用在栈中，其生命周期和栈息息相关](./assets/31.gif)
+![方法中的局部变量是作用在栈中，其生命周期和栈保持一致](./assets/31.gif)
 
 ## 3.4 Java 中引用数据类型的内存分配
 
@@ -1477,15 +1477,17 @@ public class Main{
 
 * 如果已经明确了元素的个数，但是不明确具体的数据，推荐使用`数组动态初始化`，如下所示：
 
-```java {6,8}
+```java {7,10}
 import java.util.*;
 
 public class Main{
     public static void main(String[] args){
         
-        int[] arr; // 在栈中保存一个引用而已，其值是 null
+        // 在栈中保存一个引用而已，其值是 null
+        int[] arr; 
         
-        arr = new int[5]; // 在堆中开辟内存空间，并进行初始化，将堆内存地址赋值给 arr 变量
+        // 在堆中开辟内存空间，并进行初始化，将堆内存地址赋值给 arr 变量
+        arr = new int[5]; 
         
         // 通过 arr 对堆中数组进行赋值
         for (int i = 0; i < arr.length; i++) {
@@ -1501,7 +1503,104 @@ public class Main{
 
 ![数组动态初始化](./assets/33.gif)
 
+### 3.4.4 复杂数组的内存分配
 
+* 在实际开发中，我们会给数组中的元素赋值，以及获取数组中的元素，如下所示：
+
+```java {7,25}
+import java.util.Arrays;
+
+public class ArrayTest {
+    public static void main(String[] args){
+
+        // 定义第一个数组
+        int[] arr1 = new int[3];
+
+        System.out.println("arr1 = " + arr1);
+
+        // 获取数组中的元素
+        System.out.println("arr1[0] = " + arr1[0]);
+        System.out.println("arr1[1] = " + arr1[1]);
+        System.out.println("arr1[2] = " + arr1[2]);
+
+        // 修改数组中的元素
+        arr1[0] = 100;
+        arr1[1] = 200;
+        arr1[2] = 300;
+
+        // 打印数组中的元素
+        System.out.println(Arrays.toString(arr1));
+
+        // 定义第二个数组
+        int[] arr2 = {10, 20, 30};
+
+        System.out.println("arr2 = " + Arrays.toString(arr2));
+
+        // 修改数组中的元素
+        arr2[0] = 100;
+        arr2[1] = 200;
+        arr2[2] = 300;
+
+        // 打印数组中的元素
+        System.out.println("arr2 = " + Arrays.toString(arr2));
+
+    }
+}
+```
+
+* 其在内存中的图示，如下所示：
+
+![复杂数组的内存分配](./assets/34.gif)
+
+### 3.4.5 复杂数组的内存分配
+
+* 在实际开发中，有时我们会使用两个数组变量来引用同一个数组对象，如下所示：
+
+```java {7,25}
+import java.util.Arrays;
+
+public class ArrayTest {
+    public static void main(String[] args){
+
+        // 定义第一个数组
+        int[] arr1 = new int[3];
+
+        System.out.println("arr1 = " + arr1);
+
+        // 获取数组中的元素
+        System.out.println("arr1[0] = " + arr1[0]);
+        System.out.println("arr1[1] = " + arr1[1]);
+        System.out.println("arr1[2] = " + arr1[2]);
+
+        // 修改数组中的元素
+        arr1[0] = 100;
+        arr1[1] = 200;
+        arr1[2] = 300;
+
+        // 打印数组中的元素
+        System.out.println(Arrays.toString(arr1));
+
+        // 将 arr1 数组的地址赋值给 arr2
+        int[] arr2 = arr1;
+
+        System.out.println("arr2 = " + Arrays.toString(arr2));
+
+        // 修改数组中的元素
+        arr2[0] = 500;
+        arr2[1] = 600;
+        arr2[2] = 700;
+
+        // 打印数组中的元素
+        System.out.println("arr1 = " + Arrays.toString(arr1));
+        System.out.println("arr2 = " + Arrays.toString(arr2));
+
+    }
+}
+```
+
+* 其在内存中的图示，如下所示：
+
+![复杂数组的内存分配](./assets/35.gif)
 
 
 
