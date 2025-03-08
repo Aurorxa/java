@@ -1456,7 +1456,9 @@ public class Main{
 
 * 如果已经明确了要操作的数据，推荐使用`数组静态初始化`，如下所示：
 
-```java {4}
+```java {6}
+import java.util.*;
+
 public class Main{
     public static void main(String[] args){
         
@@ -1471,17 +1473,19 @@ public class Main{
 
 ![数组静态初始化](./assets/32.gif)
 
-### 3.4.2 数组动态初始化
+### 3.4.3 数组动态初始化
 
 * 如果已经明确了元素的个数，但是不明确具体的数据，推荐使用`数组动态初始化`，如下所示：
 
-```java {4,6}
+```java {6,8}
+import java.util.*;
+
 public class Main{
     public static void main(String[] args){
         
         int[] arr; // 在栈中保存一个引用而已，其值是 null
         
-        arr = new int[10]; // 在堆中开辟内存空间，并进行初始化，将堆内存地址赋值给 arr 变量
+        arr = new int[5]; // 在堆中开辟内存空间，并进行初始化，将堆内存地址赋值给 arr 变量
         
         // 通过 arr 对堆中数组进行赋值
         for (int i = 0; i < arr.length; i++) {
