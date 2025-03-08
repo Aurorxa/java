@@ -1608,9 +1608,7 @@ public class ArrayTest {
 
 ## 4.1 概述
 
-### 4.1.1 引入
-
-* 我们在数学、物理和计算机科学等学科中学习过`一维坐标`、`二维坐标`以及`三维坐标`。
+* 我们在`数学`、`物理`和`计算机科学`等学科中学习过`一维坐标`、`二维坐标`以及`三维坐标`。
 
 * 其中，`一维坐标`通常用于描述在线段或直线上的点的位置。
 
@@ -1684,57 +1682,422 @@ public class ArrayTest {
 
 * 总而言之，一维坐标、二维坐标和三维坐标，在不同的领域中各有其重要的应用，从基础数学到高级科学和工程技术，它们帮助我们更好地理解和描述世界的结构和行为。
 
-### 4.1.2 多维数组
-
-
-
-
-
-
-
 ## 4.2 二维数组的定义
 
+### 4.2.1 声明
+
+* 语法：
+
+```java
+数据类型[][] 数组名; // 推荐用法
+```
+
+```java
+数据类型[] 数组名[];
+```
+
+```java
+数据类型 数组名[][];
+```
 
 
 
+* 示例：
+
+```java
+package com.github.study;
+
+public class ArrayDemo7 {
+    public static void main(String[] args) {
+
+        /*
+         * 声明一个 int 类型的二维数组
+         */
+        int[][] arr;
+
+        /*
+         * 声明一个 double 类型的二维数组
+         */
+        double[][] arr2;
+
+        /*
+         * 声明一个 char 类型的二维数组
+         */
+        char[][] chs;
+
+        /*
+         * 声明一个 String 类型的二维数组
+         */
+        String[][] str;
+
+    }
+}
+```
+
+### 4.2.2 数组的静态初始化
+
+#### 4.2.2.1 完整格式
+
+* 语法：
+
+```java
+数据类型[][] 数组名;
+数组名 = new 数据类型[][]{{元素11,元素12,...},{元素21,元素22,...},...};
+```
+
+```java
+数据类型[][] 数组名 = new 数据类型[][]{{元素11,元素12,...},...};
+```
 
 
 
+* 示例：
+
+```java
+package com.github.study;
+
+public class ArrayDemo8 {
+    public static void main(String[] args) {
+
+        /*
+         * 声明一个 int 类型的二维数组，并将其初始化
+         */
+        int[][] arr = new int[][]{{11,12},{21,22}};
+
+        /*
+         * 声明一个 double 类型的二维数组，并将其初始化
+         */
+        double[][] arr2 = new double[][]{{11.1,12.2},{21.1,22.2}};
+
+        /*
+         * 声明一个 char 类型的二维数组，并将其初始化
+         */
+        char[][] chs = new char[][]{{'a','b'},{'c','d'}};
+
+        /*
+         * 声明一个 String 类型的二维数组，并将其初始化
+         */
+        String[][] str = new String[][]{{"hello","world"},{"java","python"}};
+
+    }
+}
+```
+
+#### 4.2.2.2 简化格式
+
+* 语法：
+
+```java
+数据类型[][] 数组名 = {{元素11,元素12,...},{元素21,元素22,...},...};
+```
 
 
 
+* 示例：
+
+```java
+package com.github.study;
+
+public class ArrayDemo8 {
+    public static void main(String[] args) {
+
+        /*
+         * 声明一个 int 类型的二维数组，并将其初始化
+         */
+        int[][] arr = {{11,12},{21,22}};
+
+        /*
+         * 声明一个 double 类型的二维数组，并将其初始化
+         */
+        double[][] arr2 = {{11.1,12.2},{21.1,22.2}};
+
+        /*
+         * 声明一个 char 类型的二维数组，并将其初始化
+         */
+        char[][] chs = {{'a','b'},{'c','d'}};
+
+        /*
+         * 声明一个 String 类型的二维数组，并将其初始化
+         */
+        String[][] str = {{"hello","world"},{"java","python"}};
+
+    }
+}
+```
+
+### 4.2.3 数组的动态初始化
+
+* 语法：
+
+```java
+数据类型[][] 数组名;
+数组名 = new 数据类型[一维数组的个数|行][一维数组的元素个数|列];
+```
+
+```java
+数据类型[][] 数组名 = new 数据类型[一维数组的个数|行][一维数组的元素个数|列];
+```
 
 
+
+* 示例：
+
+```java
+package com.github.study;
+
+public class ArrayDemo7 {
+    public static void main(String[] args) {
+
+        /*
+         * 定义一个 2 * 5 的 int 类型的二维数组
+         */
+        int[][] arr = new int[2][5];
+
+        /*
+         * 定义一个 3 * 4 的 double 类型的二维数组
+         */
+        double[][] arr2 = new double[3][4];
+
+        /*
+         * 定义一个 1 * 5 的 char 类型的二维数组
+         */
+        char[][] chs = new char[1][5];
+
+        /*
+         * 定义一个 2 * 1 的 String 类型的二维数组
+         */
+        String[][] str = new String[2][1];
+
+    }
+}
+```
 
 ## 4.3 二维数组的理解
 
+### 4.3.1 概述
 
+* 二维数组，就是一维数组的一维数组，即：一维数组的元素也是一维数组。
+* 假设二维数组的定义是这样的，如下所示：
 
+```java
+int[][] arr = new int[3][4]
+```
 
+* 其在内存中的图示，如下所示：
 
+![二维数组的内存结构](./assets/36.svg)
 
+* 假设二维数组的定义是这样的，如下所示：
 
+```java
+int[][] arr = new int[3][];
 
+arr[0] = new int[2];
+arr[1] = new int[3];
+arr[2] = new int[4];
+```
+
+* 其在内存中的图示，如下所示：
+
+![二维数组的内存结构](./assets/37.svg)
+
+### 4.3.2 二维数组的内存分析
+
+#### 4.3.2.1 二维数组的静态初始化
+
+* 和`一维数组`类似，如果已经明确了要操作的数据，推荐使用`数组静态初始化`，如下所示：
+
+```java
+import java.util.*;
+
+public class Main{
+    public static void main(String[] args){
+        
+        int[][] arr = new int[][] {{11,12,13},{21,22,23},{31,32,33}};
+        
+        System.out.println(Arrays.deepToString(arr));
+    }
+}
+```
+
+* 其在内存中的图示，如下所示：
+
+![](./assets/38.gif)
+
+#### 4.3.2.2 二维数组的动态初始化
+
+* 和`一维数组`类似，如果已经明确了元素的个数，但是不明确具体的数据，推荐使用`数组动态初始化`，如下所示：
+
+```java
+import java.util.Arrays;
+
+public class ArrayTest {
+    public static void main(String[] args){
+
+        // 定义第一个数组
+        int[][] arr = new int[3][2];
+
+        System.out.println("arr = " + arr);
+
+        // 获取数组中的元素
+        System.out.println("arr[0][0] = " + arr[0][0]);
+        System.out.println("arr[0][1] = " + arr[0][1]);
+        System.out.println("arr[1][0] = " + arr[1][0]);
+        System.out.println("arr[1][1] = " + arr[1][1]);
+        System.out.println("arr[2][0] = " + arr[2][0]);
+        System.out.println("arr[2][1] = " + arr[2][1]);
+
+        // 修改数组中的元素
+        arr[0][0] = -10;
+        arr[0][1] = 20;
+        arr[1][0] = -30;
+        arr[1][1] = 40;
+        arr[2][0] = -50;
+        arr[2][1] = 60;
+
+        // 打印数组中的元素
+        System.out.println(Arrays.deepToString(arr));
+    }
+}
+```
+
+* 其在内存中的图示，如下所示：
+
+![](./assets/39.gif)
+
+#### 4.3.2.3 二维数组的动态初始化
+
+* 和`一维数组`类似，如果已经明确了元素的个数，但是不明确具体的数据，推荐使用`数组动态初始化`，如下所示：
+
+```java
+import java.util.Arrays;
+
+public class ArrayTest {
+    public static void main(String[] args){
+
+        // 定义第一个数组
+        int[][] arr = new int[3][];
+
+        System.out.println("arr = " + arr);
+
+        arr[0] = new int[2];
+        arr[1] = new int[3];
+        arr[2] = new int[4];
+        
+        // 获取数组中的元素
+        System.out.println("arr[0][0] = " + arr[0][0]);
+        System.out.println("arr[0][1] = " + arr[0][1]);
+        System.out.println("arr[1][0] = " + arr[1][0]);
+        System.out.println("arr[1][1] = " + arr[1][1]);
+        System.out.println("arr[1][2] = " + arr[1][2]);
+        System.out.println("arr[2][0] = " + arr[2][0]);
+        System.out.println("arr[2][1] = " + arr[2][1]);
+        System.out.println("arr[2][2] = " + arr[2][2]);
+        System.out.println("arr[2][3] = " + arr[2][3]);
+
+        // 修改数组中的元素
+        arr[0][0] = -10;
+        arr[0][1] = 20;
+        arr[1][0] = -30;
+        arr[1][1] = 40;
+        arr[1][2] = -50;
+        arr[2][0] = 60;
+        arr[2][1] = -70;
+        arr[2][2] = 80;
+        arr[2][3] = -90;
+
+        // 打印数组中的元素
+        System.out.println(Arrays.deepToString(arr));
+    }
+}
+```
+
+* 其在内存中的图示，如下所示：
+
+![](./assets/40.gif)
 
 ## 4.4 二维数组的遍历
 
+* 遍历数组是指按顺序逐个访问数组中的每个元素，并对每个元素执行特定操作的过程。
+* `遍历数组`的目的是`访问数组中的每个元素`，以便进行`读取`、`修改`或`其他`操作，并不仅仅是打印数组中的元素。
+
+> [!NOTE]
+>
+> 在实际开发中，通常会使用`循环结构（for、while、do...while）`来遍历数组。
 
 
 
+* 示例：
+
+```java
+public class ArrayDemo7 {
+    public static void main(String[] args) {
+
+        // 定义二维数组
+        int[][] arr = new int[3][2];
+
+        // 给数组中的元素赋值
+        int count = 1;
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[i].length; j++) {
+                arr[i][j] = count++;
+            }
+        }
+
+        // 遍历数组中的元素
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[i].length; j++) {
+                System.out.print(arr[i][j] + "\t");
+            }
+            System.out.println();
+        }
+
+    }
+}
+```
+
+## 4.5 二维数组的应用案例
+
+* 需求：计算出每个季度的总营业额和全年的总营业额。
+
+> [!NOTE]
+>
+> 某个商城每个季度的营业额（单位是万），如下所示：
+>
+> | 季度     | 营业额     |
+> | -------- | ---------- |
+> | 第一季度 | 22，66，44 |
+> | 第二季度 | 77，33，88 |
+> | 第三季度 | 25，45，65 |
+> | 第四季度 | 11，66，99 |
 
 
 
+* 示例：
 
+```java
+public class ArrayTest13 {
+    public static void main(String[] args) {
 
-## 4.5 二维数组的内存分析
+        // 某个商城每个季度的营业额
+        int[][] arr = {{22, 66, 44}, {77, 33, 88}, {25, 45, 65}, {11, 66, 99}};
 
+        // 遍历二维数组，计算每个季度的总营业额以及全年的总营业额
+        int total = 0;
+        for (int i = 0; i < arr.length; i++) {
+            int sum = 0;
+            for (int j = 0; j < arr[i].length; j++) {
+                sum += arr[i][j];
+                total += arr[i][j];
+            }
+            System.out.println("第 " + (i + 1) + " 季度的总营业额是：" + sum);
+        }
 
+        System.out.println("全年总营业额是：" + total);
 
-## 4.6 二维数组的应用案例
-
-
-
-
+    }
+}
+```
 
 
 
