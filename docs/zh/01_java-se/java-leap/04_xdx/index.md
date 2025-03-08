@@ -649,7 +649,7 @@ int[] arr = new int[5];
 int[] arr = new int[]{1,2,3,4,5};
 ```
 
-* `数组动态初始化`就是在定义数组的时候，没有直接给出数组中具体的元素，而是只指定了数组的长度，如下所示：
+* `数组动态初始化`就是在定义数组的时候，没有直接给出数组中具体的元素，而是只指定了数组的长度（由系统给出默认初始化值），如下所示：
 
 ```java
 int[] arr = new int[5]; // int 类型数组的默认初始化值是 0 
@@ -1369,7 +1369,7 @@ public class ArrayTest12 {
 
 ## 3.1 Java 内存分配
 
-* 在计算机中，每一个正在运行的应用（程序，软件）都是需要占用一块内存区域的，Java 应用（Java 应用跑在 JVM 之上）也不例外，如下所示：
+* 在计算机中，每一个正在运行的应用（程序，软件）都是需要占用一块内存区域，Java 应用（Java 应用跑在 JVM 之上）也不例外，如下所示：
 
 ![每个正在运行的应用都需要占用一块内存区域](./assets/24.svg)
 
@@ -1427,9 +1427,9 @@ public class ArrayTest12 {
 
 ## 3.3 Java 中基本数据类型的内存分配
 
-* 我们在实际开发中，会经常使用基本数据类型，如下所示：
+* 在实际开发中，我们会经常在方法中使用基本数据类型的变量，即：局部变量，如下所示：
 
-```java {4}
+```java {4-6}
 public class Main{
     public static void main(String[] args){
         
@@ -1442,13 +1442,60 @@ public class Main{
 }
 ```
 
-* 其图示，如下所示：
+* 其在内存中的图示，如下所示：
 
+![方法中的局部变量是作用在栈中，其生命周期和栈息息相关](./assets/31.gif)
 
+## 3.4 Java 中引用数据类型的内存分配
 
+### 3.4.1 概述
 
+* 目前而言，只需要记住，一旦在代码中看到 new 关键字，就意味着 Java 会在`堆`中开辟空间来存储对象或数组。
 
+### 3.4.2 数组静态初始化
 
+* 如果已经明确了要操作的数据，推荐使用`数组静态初始化`，如下所示：
+
+```java {4}
+public class Main{
+    public static void main(String[] args){
+        
+        int[] arr = new int[] {1,2,3,4,5,6};
+        
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
+* 其在内存中的图示，如下所示：
+
+![数组静态初始化](./assets/32.gif)
+
+### 3.4.2 数组动态初始化
+
+* 如果已经明确了元素的个数，但是不明确具体的数据，推荐使用`数组动态初始化`，如下所示：
+
+```java {4,6}
+public class Main{
+    public static void main(String[] args){
+        
+        int[] arr; // 在栈中保存一个引用而已，其值是 null
+        
+        arr = new int[10]; // 在堆中开辟内存空间，并进行初始化，将堆内存地址赋值给 arr 变量
+        
+        // 通过 arr 对堆中数组进行赋值
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = i;
+        }
+        
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
+* 其在内存中的图示，如下所示：
+
+![数组动态初始化](./assets/33.gif)
 
 
 
