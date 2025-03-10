@@ -714,7 +714,7 @@ public class MethodTest7 {
      */
     public static int max(int[] arr) {
         int max = arr[0];
-        for (int i = 1; i < arr.length; i++) {
+        for (int i = 0; i < arr.length; i++) {
             if (arr[i] > max) {
                 max = arr[i];
             }
@@ -729,14 +729,94 @@ public class MethodTest7 {
         System.out.println("max(arr) = " + max(arr));
     }
 }
-
 ```
 
-## 4.3 
+## 4.3 判断是否存在
+
+* 需求：定义一个方法判断数组中的某个元素是否存在，如果存在就返回该元素的索引，如果不存在就返回 -1 。
 
 
 
+* 示例：
 
+```java
+package com.github.test;
+
+public class MethodTest8 {
+
+    /**
+     * 定义一个方法判断数组中的某个元素是否存在?
+     * 如果存在就返回该元素的索引，如果不存在就返回 -1 。
+     *
+     * @param arr 数组
+     */
+    public static int contains(int[] arr, int num) {
+        int result = -1;
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == num) {
+                return i;
+            }
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+
+        int[] arr = {11, 22, 33, 44, 55};
+
+        System.out.println("contains(arr,11) = " + contains(arr, 11));
+        System.out.println("contains(arr,100) = " + contains(arr, 100));
+    }
+}
+```
+
+## 4.4 复制数组
+
+* 需求：定义一个方法 copyOfRange(int[] arr,int from,int to) 。
+
+> [!NOTE]
+>
+> * ① 将数组 arr 中的元素从索引 from （包含 from）开始，到索引 to 结束（不包含 to）的元素复制到新数组中。
+> * ② 将新数组返回。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Arrays;
+
+public class MethodTest9 {
+
+    /**
+     * 将数组 arr 中的元素从索引 from （包含 from）开始，
+     * 到索引 to 结束（不包含 to）的元素复制到新数组中。
+     * 将新数组返回。
+     *
+     * @param arr 数组
+     */
+    public static int[] copyOfRange(int[] arr, int from, int to) {
+        int[] newArr = new int[to - from];
+        int index = 0;
+        for (int i = from; i < to; i++) {
+            newArr[index++] = arr[i];
+        }
+        return newArr;
+    }
+
+    public static void main(String[] args) {
+
+        int[] arr = {1, 2, 3, 4, 5, 6, 7, 8};
+
+        int[] newArr = copyOfRange(arr, 2, 5);
+
+        System.out.println("newArr = " + Arrays.toString(newArr));
+
+    }
+}
+```
 
 
 
