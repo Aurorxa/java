@@ -400,23 +400,255 @@ public class MethodDemo3 {
 }
 ```
 
+### 2.4.2 应用示例
+
+* 需求：定义方法，比较两个长方形的面积。
 
 
 
+* 示例：
 
+```java
+package com.github.test;
 
+public class MethodTest5 {
 
+    /**
+     * 计算矩形的面积
+     *
+     * @param length 长
+     * @param width  宽
+     * @return 面积
+     */
+    public static double getArea(double length, double width) {
+        return length * width;
+    }
 
+    /**
+     * 比较两个矩形的面积
+     *
+     * @param area1 面积1
+     * @param area2 面积2
+     * @return true：面积1大，false：面积2大
+     */
+    public static boolean compareArea(double area1, double area2) {
+        return area1 > area2;
+    }
 
+    public static void main(String[] args) {
 
+        double area1 = getArea(3, 4);
+        double area2 = getArea(5, 6);
+        boolean result = compareArea(area1, area2);
+        System.out.println(result ? "长方形1的面积大" : "长发形2的面积大");
 
+    }
+}
+```
 
+## 2.5 方法的注意事项
+
+* ① 方法不调用不执行。
+
+```java
+public class Main{
+    public static void main(String[] args){
+        // 只定义不调用，方法是不会执行的。
+    }
+    
+    public static void play(){
+        System.out.println("玩游戏~");
+    }
+}
+```
+
+* ② 方法和方法之间是平级关系，不能互相嵌套定义。
+
+```java
+public class Main{
+    public static void main(String[] args){
+        // 下面的代码是错误的，在 Java 中方法是不能嵌套定义的
+        public static void play(){ // [!code error]
+            System.out.println("玩游戏~"); // [!code error]
+        } // [!code error]
+    }
+}
+```
+
+* ③ 方法的编写顺序和执行顺序是没有关系的。
+
+```java
+public class Main{
+    public static void main(String[] args){
+        play2();
+        play1();
+    }
+    
+    public static void play1(){
+        System.out.println("玩游戏~");
+    }
+    public static void play2(){
+        System.out.println("玩游戏~");
+    }
+}
+```
+
+* ④ 方法的返回值类型如果是 void ，则表示该方法没有返回值，此时就可以省略 return 语句。如果一定要写 return 语句，return 关键字后面是不能加具体的数据。
+
+```java
+public class Main{
+    public static void main(String[] args){
+        // 只定义不调用，方法是不会执行的。
+        play(2);
+    }
+    
+    public static void play(int num){
+        if(num == 2){
+            return;
+        }
+        System.out.println("玩游戏~");
+    }
+}
+```
+
+* ⑤ return 语句的后面是不能编写其他的代码的，因为永远执行不到，属于无效的代码。
+
+```java
+public class Main{
+    public static void main(String[] args){
+        // 只定义不调用，方法是不会执行的。
+        play(2);
+    }
+    
+    public static void play(int num){
+        if(num == 2){
+            return;
+            // 下面的代码是错误的
+            System.out.println("玩游戏~"); // [!code error]
+        }
+        System.out.println("玩游戏~");
+    }
+}
+```
 
 
 
 # 第三章：方法重载（⭐）
 
+## 3.1 概述
 
+* 在同一个类中，定义了多个`同名的方法`，这些同名的方法具有相同的功能。
+* 每个方法具有`不同`的`参数类型`或`参数个数`，这些同名的方法，就构成了重载关系。
+
+> [!NOTE]
+>
+> 方法重载：在同一个类中，方法名相同，参数不同（个数不同、类型不同、顺序不同）的方法，和返回值无关！！！
+
+* 方法重载的好处：使用方法重载，可以为编程带来方便，让方法的调用者，在调用方法的时候，不需要为了相似的功能去查阅文档，查找各种不同的方法名，降低学习成本，提高开发效率，如：`System.out.println()` 方法就是典型的方法重载。
+
+```java
+public void print(boolean b){}
+```
+
+```java
+public void print(char c){}
+```
+
+```java
+...
+```
+
+```java
+public void println(Object x){}
+```
+
+## 3.2 应用示例
+
+* 需求：要求获取两个数（整数或小数）的和。
+
+
+
+* 示例：
+
+```java
+package com.github.study;
+
+public class MethodDemo4 {
+    /**
+     * 计算两个变量的和
+     *
+     * @param num1 变量
+     * @param num2 变量
+     * @return 变量的和
+     */
+    public static int getSum(int num1, int num2) {
+        return num1 + num2;
+    }
+
+    /**
+     * 计算两个变量的和
+     *
+     * @param num1 变量
+     * @param num2 变量
+     * @return 变量的和
+     */
+    public static double getSum(double num1, double num2) {
+        return num1 + num2;
+    }
+
+    public static void main(String[] args) {
+        // 调用方法
+        int sum = getSum(10, 20);
+        System.out.println("sum = " + sum);
+
+        // 调用方法
+        double sum2 = getSum(20.1, 30.2);
+        System.out.println("sum2 = " + sum2);
+    }
+
+}
+```
+
+## 3.3 应用示例
+
+* 需求：使用方法重载的思想，设计比较两个整数是否相同的方法，需要覆盖 byte、short、int 和 long 类型。
+
+
+
+* 示例：
+
+```java
+package com.github.study;
+
+public class MethodDemo5 {
+    public static boolean compare(byte num1, byte num2) {
+        return num1 == num2;
+    }
+
+    public static boolean compare(short num1, short num2) {
+        return num1 == num2;
+    }
+
+    public static boolean compare(int num1, int num2) {
+        return num1 == num2;
+    }
+
+    public static boolean compare(long num1, long num2) {
+        return num1 == num2;
+    }
+
+    public static void main(String[] args) {
+        // 调用方法
+        boolean compare = compare(1, 1);
+        System.out.println("compare = " + compare);
+
+        // 调用方法
+        compare = compare(1L, 1L);
+        System.out.println("compare = " + compare);
+    }
+
+}
+```
 
 
 
