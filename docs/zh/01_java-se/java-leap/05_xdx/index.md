@@ -621,6 +621,7 @@ public class MethodDemo4 {
 package com.github.study;
 
 public class MethodDemo5 {
+    
     public static boolean compare(byte num1, byte num2) {
         return num1 == num2;
     }
@@ -652,5 +653,94 @@ public class MethodDemo5 {
 
 
 
-# 第四章：综合练习（⭐）
+# 第四章：综合练习
+
+## 4.1 数组遍历
+
+* 需求：设计一个方法用于数组遍历，要求将遍历的结果显示在一行，如：[11,22,33,44,55] 。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+public class MethodTest6 {
+
+    /**
+     * 设计一个方法用于数组遍历，要求将遍历的结果显示在一行，如：[11,22,33,44,55] 。
+     *
+     * @param arr 数组
+     */
+    public static void printArray(int[] arr) {
+        System.out.print("[");
+        for (int i = 0; i < arr.length; i++) {
+            if (i == arr.length - 1) {
+                System.out.print(arr[i]);
+                break;
+            }
+            System.out.print(arr[i] + ",");
+        }
+        System.out.println("]");
+    }
+
+    public static void main(String[] args) {
+
+        int[] arr = {11, 22, 33, 44, 55};
+
+        printArray(arr);
+    }
+}
+```
+
+## 4.2 数组最大值
+
+* 需求：设计一个方法求数组的最大值，并将最大值返回。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+public class MethodTest7 {
+
+    /**
+     * 设计一个方法求数组的最大值，并将最大值返回。
+     *
+     * @param arr 数组
+     */
+    public static int max(int[] arr) {
+        int max = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        return max;
+    }
+
+    public static void main(String[] args) {
+
+        int[] arr = {11, 22, 33, 44, 55};
+
+        System.out.println("max(arr) = " + max(arr));
+    }
+}
+
+```
+
+## 4.3 
+
+
+
+
+
+
+
+# 第五章：方法的内存分析（⭐）
+
+
 
