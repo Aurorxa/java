@@ -4,9 +4,9 @@
 
 ## 1.1 为什么需要方法？
 
-* 我们小时候，可能玩过类似`《街霸》`或`《拳皇》`这样的游戏，如下所示：
+* 我们小时候，可能玩过类似`《街头霸王》`或`《拳皇》`这样的游戏，如下所示：
 
-![街霸游戏或拳皇游戏](./assets/1.png)
+![街头霸王](./assets/1.png)
 
 * 在这些游戏中，假设角色的`出拳`、`出脚`、`跳跃`等动作都需要编写 50 - 80 行的代码。
 
@@ -696,7 +696,7 @@ public class MethodTest6 {
 
 ## 4.2 数组最大值
 
-* 需求：设计一个方法求数组的最大值，并将最大值返回。
+* 需求：设计一个方法，用于求数组的最大值，并将最大值返回。
 
 
 
@@ -731,9 +731,9 @@ public class MethodTest7 {
 }
 ```
 
-## 4.3 判断是否存在
+## 4.3 判断数组中元素是否存在
 
-* 需求：定义一个方法判断数组中的某个元素是否存在，如果存在就返回该元素的索引，如果不存在就返回 -1 。
+* 需求：设计一个方法，用于判断数组中的某个元素是否存在，如果存在就返回该元素的索引，如果不存在就返回 -1 。
 
 
 
@@ -750,7 +750,7 @@ public class MethodTest8 {
      *
      * @param arr 数组
      */
-    public static int contains(int[] arr, int num) {
+    public static int indexOf(int[] arr, int num) {
         int result = -1;
         for (int i = 0; i < arr.length; i++) {
             if (arr[i] == num) {
@@ -764,15 +764,15 @@ public class MethodTest8 {
 
         int[] arr = {11, 22, 33, 44, 55};
 
-        System.out.println("contains(arr,11) = " + contains(arr, 11));
-        System.out.println("contains(arr,100) = " + contains(arr, 100));
+        System.out.println("indexOf(arr,11) = " + indexOf(arr, 11));
+        System.out.println("indexOf(arr,100) = " + indexOf(arr, 100));
     }
 }
 ```
 
 ## 4.4 复制数组
 
-* 需求：定义一个方法 copyOfRange(int[] arr,int from,int to) 。
+* 需求：定义一个方法 `copyOfRange(int[] arr,int from,int to)` 。
 
 > [!NOTE]
 >
@@ -799,6 +799,7 @@ public class MethodTest9 {
      */
     public static int[] copyOfRange(int[] arr, int from, int to) {
         int[] newArr = new int[to - from];
+        // 定义伪索引
         int index = 0;
         for (int i = from; i < to; i++) {
             newArr[index++] = arr[i];
@@ -822,5 +823,313 @@ public class MethodTest9 {
 
 # 第五章：方法的内存分析（⭐）
 
+## 5.1 方法调用的基本内存原理
 
+* 假设正在执行的代码，如下所示：
 
+```java
+public class MethodDemo {
+    public static void main(String[] args){
+        int num = 100;
+        System.out.println("num = " + num);
+    }
+}
+```
+
+* 由于代码中没有 new 关键字，就意味着不会在堆中开辟内存空间。而方法（main 方法也是方法）被调用之后就会进栈执行，方法（main 方法也是方法）执行完毕之后就会弹栈（出栈），如下所示：
+
+> [!NOTE]
+>
+> * ① 程序开始运行的时候，会执行 main 方法，此时 main 方法就会进栈，当执行 `int num = 100;`的时候，就会在栈中开辟一个名为 num 的内存空间，并给其赋值为 100，然后让输出语句打印 num 内存空间的值。
+> * ② 当 main 方法执行完毕之后，会弹栈，此时栈中 num 内存空间也随之消失。
+> * ③ 不要觉得`进栈`和`弹栈`很神奇，底层实现很简单，就是通过两个 SP 寄存器移动来实现的！！！
+
+![方法的入栈和弹栈](./assets/5.gif)
+
+* 上面的代码非常简单，现在我们将代码复杂一点，如下所示：
+
+```java
+public class MethodDemo {
+    public static void main(String[] args){
+        eat();
+    }
+    public static void eat(){
+        study();
+        System.out.println("吃饭(*^▽^*)");
+        sleep();
+    }
+    public static void sleep(){
+        System.out.println("睡觉o(*￣︶￣*)o");
+    }
+    public static void study(){
+        System.out.println("学习^_^");
+    }
+}
+```
+
+* 由于代码中没有 new 关键字，就意味着不会在堆中开辟内存空间。而方法（main 方法也是方法）被调用之后就会进栈执行，方法（main 方法也是方法）执行完毕之后就会弹栈（出栈），如下所示：
+
+> [!NOTE]
+>
+> 每个方法都会有进栈和弹栈的操作，即：方法开始执行的时候进栈，方法执行完毕的时候弹栈。
+
+![方法的入栈和弹栈](./assets/6.gif)
+
+## 5.2 基本数据类型 VS 引用数据类型
+
+### 5.2.1 概述
+
+* 在 Java 中，基本数据类型是 4 类 8 种，如下所示：
+
+![基本数据类型](./assets/7.jpg)
+
+* 除了上述的基本数据类型，其余的都是引用数据类型，如：类、数组、接口、枚举和注解等。
+
+### 5.2.2 基本数据类型的内存分析
+
+* 假设正在运行的代码，如下所示：
+
+```java
+public class MethodDemo{
+    public static void main(String[] args){
+        int num = 10;
+        double d = 3.14;
+        char c = 'A';
+        boolean b = false;
+        
+        System.out.println(num);
+        System.out.println(d);
+        System.out.println(c);
+        System.out.println(b);
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+> [!IMPORTANT]
+>
+> `基本数据类型`的变量中存储的是`真实的数据`！！！
+
+![基本数据类型的内存示意图](./assets/8.gif)
+
+### 5.2.3 引用数据类型的内存分析
+
+* 假设正在运行的代码，如下所示：
+
+```java
+import java.util.*;
+public class MethodDemo{
+    public static void main(String[] args){
+        int[] arr = null;
+        
+        arr = new int[]{1,2,3,4,5,6,7,8,9,10};
+        
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+> [!IMPORTANT]
+>
+> `引用数据类型`的变量中存储的是`引用（堆中对象的地址值）`！！！
+
+![引用数据类型的内存示意图](./assets/9.gif)
+
+### 5.2.4 从内存角度解释基本数据类型和引用数据类型
+
+#### 5.2.4.1 基本数据类型
+
+* 基本数据类型的变量：其`数据值`是`存储`在`自己的内存空间`的，如下所示：
+
+```java
+public class MethodDemo{
+    public static void main(String[] args){
+        int num = 10;
+        double d = 3.14;
+        char c = 'A';
+        boolean b = false;
+        
+        System.out.println(num);
+        System.out.println(d);
+        System.out.println(c);
+        System.out.println(b);
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+![基本数据类型的变量](./assets/10.gif)
+
+* 基本数据类型的特点是：赋值给其他变量，赋值的也是真实的值，如果修改其他变量的值，是不会影响自身变量中保存的值，如下所示：
+
+```java
+public class MethodDemo{
+    public static void main(String[] args){
+        int num = 10;
+        int num2 = num;
+        System.out.println(num2);
+        
+        num2 = 20; // [!code highlight]
+        
+        System.out.println(num);
+        System.out.println(num2);
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+![基本数据类型的特点](./assets/11.gif)
+
+#### 5.2.4.2 引用数据类型
+
+* 引用数据类型的变量：其`数据值`是`存储`在`堆空间`中的，`自己空间`中`存储`的是`引用`（堆中对象的地址值），如下所示：
+
+```java
+import java.util.*;
+
+public class MethodDemo{
+    public static void main(String[] args){
+        int[] arr = null;
+        
+        arr = new int[]{1,2,3,4,5,6,7,8,9,10};
+        
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+![引用数据类型的变量](./assets/12.gif)
+
+* 引用数据类型的特点是：赋值给其他变量，赋值的是引用（堆中对象的地址值），如果修改其他变量对应堆中对象的数据，是会影响自身变量对应堆中对象的数据，如下所示：
+
+```java
+import java.util.*;
+
+public class MethodDemo{
+    public static void main(String[] args){
+        int[] arr = null;
+        
+        arr = new int[]{1,2,3,4,5,6,7,8,9,10};
+        
+        System.out.println(Arrays.toString(arr));
+        
+        int[] arr2 = arr; // [!code highlight]
+        
+        for(int i = 0;i<arr2.length;i++){
+            arr2[i] *= 10;
+        }
+        System.out.println(Arrays.toString(arr));
+        System.out.println(Arrays.toString(arr2));
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+![引用数据类型的特点](./assets/13.gif)
+
+## 5.3 方法传递基本数据类型的内存原理
+
+* 假设代码中的方法传递的是基本类型的参数，如下所示：
+
+```java
+public class MethodDemo6 {
+
+    public static void change(int num) {
+        num = 200;
+    }
+
+    public static void main(String[] args) {
+
+        int num = 10;
+        System.out.println("调用 change 之前，num = " + num);
+
+        change(num); // [!code highlight]
+
+        System.out.println("调用 change 之后，num = " + num);
+
+    }
+
+}
+```
+
+* 其内存图示，如下所示：
+
+> [!IMPORTANT]
+>
+> * ① 方法传递基本类型数据的时候，传递的是真实的数据，形参的改变，不会影响到实际参数的值。
+> * ② Java 中的方法传递参数的方式是`值传递`，如果参数是基本数据类型，传递的是真实的值；如果参数是引用数据类型，传递的是引用（堆中对象的地址）。
+
+![方法传递基本数据类型的参数](./assets/14.gif)
+
+* 如果想让方法修改真实的数据，就需要修改代码，让方法将处理之后的数据返回，并重新赋值给变量，如下所示：
+
+```java
+public class MethodDemo6 {
+
+    public static int change(int num) { // [!code highlight]
+        num = 200;
+        return num; // [!code highlight]
+    }
+
+    public static void main(String[] args) {
+
+        int num = 10;
+        System.out.println("调用 change 之前，num = " + num);
+
+        num = change(num); // [!code highlight]
+
+        System.out.println("调用 change 之后，num = " + num);
+
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+![方法传递基本数据类型的参数](./assets/15.gif)
+
+## 5.4 方法传递引用数据类型的内存原理
+
+* 假设代码中的方法传递的是引用类型的参数，如下所示：
+
+```java
+import java.util.*;
+
+public class MethodDemo6 {
+
+    public static void change(int[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] *= 10;
+        }
+    }
+
+    public static void main(String[] args) {
+
+        int[] arr = {1, 2, 3, 4, 5, 6, 7, 8};
+        System.out.println("调用 change 之前，arr = " + Arrays.toString(arr));
+
+        change(arr); // [!code highlight]
+
+        System.out.println("调用 change 之后，arr = " + Arrays.toString(arr));
+
+    }
+
+}
+```
+
+* 其内存图示，如下所示：
+
+> [!IMPORTANT]
+>
+> * ① 方法传递引用类型数据的时候，传递的是引用（堆中对象的地址），形参的改变，会影响到实际参数的值。
+> * ② Java 中的方法传递参数的方式是`值传递`，如果参数是基本数据类型，传递的是真实的值；如果参数是引用数据类型，传递的是引用（堆中对象的地址）。
+
+![方法传递引用数据类型的参数](./assets/16.gif)
