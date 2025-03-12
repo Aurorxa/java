@@ -1570,19 +1570,187 @@ public class PasswordDemo {
 
 ## 6.7 数字解密
 
-* 需求：
+* 需求：将上述的数字加密之后再进行解密。
+
+> [!NOTE]
+>
+> 思路：
+>
+> ![数字解密](./assets/18.svg)
 
 
 
+* 示例：
 
+```java
+package com.github;
+
+import java.util.Arrays;
+
+public class PasswordDemo2 {
+    public static void main(String[] args) {
+        int num = 8346;
+        int result = decrypt(num);
+        System.out.println("result = " + result);
+    }
+
+    /**
+     * 数字解密
+     *
+     * @param num 加密数字
+     * @return 解密数字
+     */
+    public static int decrypt(int num) {
+        int[] arr = split(num);
+        // 对数组中的元素进行反转
+        reverse(arr);
+        // %10 的逆操作
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] >= 0 && arr[i] <= 4) {
+                arr[i] += 10;
+            }
+        }
+        // +5 的逆操作
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] -= 5;
+        }
+        // 将数组拼接返回
+        return append(arr);
+    }
+
+    /**
+     * 将数组拼接成数字
+     *
+     * @param arr 数组
+     * @return 数字
+     */
+    public static int append(int[] arr) {
+        int num = 0;
+        for (int i = 0; i < arr.length; i++) {
+            num = num * 10 + arr[i];
+        }
+        return num;
+    }
+
+    /**
+     * 反转数组
+     *
+     * @param arr 数组
+     */
+    public static void reverse(int[] arr) {
+        for (int i = 0; i < arr.length / 2; i++) {
+            int temp = arr[i];
+            arr[i] = arr[arr.length - 1 - i];
+            arr[arr.length - 1 - i] = temp;
+        }
+    }
+
+    /**
+     * 将数字拆分成数组
+     *
+     * @param num 数字
+     * @return 数组
+     */
+    public static int[] split(int num) {
+        int[] arr = new int[count(num)];
+        // 将数字拆分放到数组中
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = num % 10;
+            num = num / 10;
+        }
+        // 反转数组
+        reverse(arr);
+        // 返回数组
+        return arr;
+    }
+
+    /**
+     * 获取数字的位数
+     *
+     * @param num 数字
+     * @return 位数
+     */
+    public static int count(int num) {
+        int count = 0;
+        while (num != 0) {
+            num = num / 10;
+            count++;
+        }
+        return count;
+    }
+
+}
+
+```
 
 ## 6.8 抢红包
 
-* 需求：
+* 需求：一个大 V 直播抽奖，奖品是现金红包，分别有 `{2,588,888,1000,10000}` 五个奖金。请使用代码模拟抽奖，
+  打印出每个奖项，奖项的出现顺序要随机且不重复。
+
+> [!NOTE]
+>
+> 打印的效果，如下所示：
+>
+> ![](./assets/19.png)
+>
+> 思路：
+>
+> * ① 创建一个新的数组，用来保存抽中的奖金，刚开始数组是空的。
+> * ② 根据随机索引从原先的数组中获取元素，去新数组中判断元素是否存在。
+> * ③ 如果元素不存在，则保存元素到新数组中。
+> * ④ 最后，打印新数组中的元素就可以了。 
 
 
 
+* 示例：
 
+```java
+package com.github;
+
+import java.util.Random;
+
+public class GuessDemo {
+    public static void main(String[] args) {
+        Random random = new Random();
+
+        // 奖金红包数组
+        int[] arr = {2, 588, 888, 1000, 10000};
+
+        // 抽中的奖金红包数组
+        int[] guess = new int[arr.length];
+
+        int index = 0;
+        do {
+            int i = random.nextInt(arr.length);
+            if (!contains(guess, arr[i])) {
+                guess[index++] = arr[i];
+            }
+        } while (index != arr.length);
+
+        for (int i = 0; i < guess.length; i++) {
+            System.out.println(guess[i] + " 元的奖金被抽出");
+        }
+    }
+
+    /**
+     * 判断数组中是否包含某个元素
+     *
+     * @param arr 数组
+     * @param num 元素
+     * @return true/false
+     */
+    public static boolean contains(int[] arr, int num) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == num) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+}
+```
 
 ## 6.9 模拟双色球
 
