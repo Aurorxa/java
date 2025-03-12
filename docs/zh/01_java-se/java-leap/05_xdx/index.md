@@ -1322,7 +1322,7 @@ public class VerifyCodeDemo {
             int index = random.nextInt(LETTERS.length());
             sb.append(LETTERS.charAt(index));
         }
-        sb.append(random.nextInt(9));
+        sb.append(random.nextInt(10));
         return sb.toString();
     }
 
@@ -1331,27 +1331,242 @@ public class VerifyCodeDemo {
 
 ## 6.4 数组元素的复制
 
-* 需求：
+* 需求：将一个数组的元素复制到另一个新的数组中。
 
 
 
+* 示例：
 
+```java
+package com.github;
+
+import java.util.Arrays;
+
+public class ArrayDemo {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5};
+        int[] newArr = copy(arr);
+        System.out.println(arr == newArr);
+        System.out.println("arr = " + Arrays.toString(arr));
+        System.out.println("newArr = " + Arrays.toString(newArr));
+    }
+
+    /**
+     * 将一个数组复制到另一个数组中
+     *
+     * @param arr 旧数组
+     * @return 新数组
+     */
+    public static int[] copy(int[] arr) {
+        int[] newArr = new int[arr.length];
+        System.arraycopy(arr, 0, newArr, 0, arr.length);
+        return newArr;
+    }
+}
+```
 
 ## 6.5 评委打分
 
-* 需求：
+* 需求：在唱歌比赛中，有 6 名评委给选手打分，分数范围是 [0－100] 之间的整数。
+
+> [!NOTE]
+>
+> 选手的最后得分为：去掉最高分、最低分后的 4 个评委的平均分，请完成上述过程并计算出选手的得分。
 
 
 
+* 示例：
 
+```java
+package com.github;
+
+import java.security.SecureRandom;
+import java.util.Arrays;
+
+public class SongDemo {
+
+    private static final SecureRandom random = new SecureRandom();
+
+    public static void main(String[] args) {
+        int[] arr = generateScores();
+        System.out.println("评委打分数组 = " + Arrays.toString(arr));
+
+        arr = calculateFinalScores(arr);
+        System.out.println("去掉最高分和最低分的打分数组 = " + Arrays.toString(arr));
+
+        double score = calculateFinalScore(arr);
+        System.out.println("最后得分 = " + score);
+    }
+
+    /**
+     * 生成评委打分
+     *
+     * @return 分数 [0, 100]
+     */
+    public static int generateScore() {
+        return random.nextInt(101);
+    }
+
+    /**
+     * 生成评委打分数组
+     *
+     * @return 数组
+     */
+    public static int[] generateScores() {
+        int[] scores = new int[6];
+        for (int i = 0; i < scores.length; i++) {
+            scores[i] = generateScore();
+        }
+        return scores;
+    }
+
+    /**
+     * 去掉最高分和最低分的打分数组
+     *
+     * @param scores 打分数组
+     * @return 过滤后的打分数组
+     */
+    public static int[] calculateFinalScores(int[] scores) {
+        if (scores.length < 6) {
+            throw new IllegalArgumentException("评分数组长度必须至少为6");
+        }
+        Arrays.sort(scores);
+        int[] finalScores = new int[4];
+        System.arraycopy(scores, 1, finalScores, 0, finalScores.length);
+        return finalScores;
+    }
+
+
+    /**
+     * 获取最后得分
+     *
+     * @param scores 评委打分数组
+     * @return 最后得分
+     */
+    public static double calculateFinalScore(int[] scores) {
+        return Arrays
+                .stream(scores)
+                .average()
+                .orElse(Double.NaN);
+    }
+
+}
+```
 
 ## 6.6 数字加密
 
-* 需求：
+* 需求：某系统的数字密码（大于 0），如：1983，采用加密的方式进行传输。
+
+> [!NOTE]
+>
+> 加密规则：先得到每位数，然后每位数都 +5 ，再对 10 取余，最后将所有数字反转，得到一串新数。
+>
+> |      | 1    | 9    | 8    | 3    |
+> | ---- | ---- | ---- | ---- | ---- |
+> | +5   | 6    | 14   | 13   | 8    |
+> | %10  | 6    | 4    | 3    | 8    |
+> | 反转 | 8    | 3    | 4    | 6    |
+> 
+> 思路：将 1983 进行拆分，放到数组中进行操作。
 
 
 
+* 示例：
 
+```java
+package com.github;
+
+public class PasswordDemo {
+    
+    public static void main(String[] args) {
+        int num = 1983;
+        int encrypt = encrypt(num);
+        System.out.println("encrypt = " + encrypt);
+    }
+
+    /**
+     * 加密
+     *
+     * @param num 数字
+     * @return 加密后的数字
+     */
+    public static int encrypt(int num) {
+        int[] arr = split(num);
+        // 每位数都 +5 ，再对 10 取余
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] += 5;
+            arr[i] %= 10;
+        }
+        // 反转数组
+        reverse(arr);
+        // 将数组拼接成数字
+        return append(arr);
+    }
+
+    /**
+     * 将数组拼接成数字
+     *
+     * @param arr 数组
+     * @return 数字
+     */
+    public static int append(int[] arr) {
+        int num = 0;
+        for (int i = 0; i < arr.length; i++) {
+            num = num * 10 + arr[i];
+        }
+        return num;
+    }
+
+
+    /**
+     * 反转数组
+     *
+     * @param arr 数组
+     */
+    public static void reverse(int[] arr) {
+        for (int i = 0; i < arr.length / 2; i++) {
+            int temp = arr[i];
+            arr[i] = arr[arr.length - 1 - i];
+            arr[arr.length - 1 - i] = temp;
+        }
+    }
+
+    /**
+     * 将数字拆分成数组
+     *
+     * @param num 数字
+     * @return 数组
+     */
+    public static int[] split(int num) {
+        int[] arr = new int[count(num)];
+        // 将数字拆分放到数组中
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = num % 10;
+            num = num / 10;
+        }
+        // 反转数组
+        reverse(arr);
+        // 返回数组
+        return arr;
+    }
+
+    /**
+     * 获取数字的位数
+     *
+     * @param num 数字
+     * @return 位数
+     */
+    public static int count(int num) {
+        int count = 0;
+        while (num != 0) {
+            num = num / 10;
+            count++;
+        }
+        return count;
+    }
+
+}
+```
 
 ## 6.7 数字解密
 
