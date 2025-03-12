@@ -1752,9 +1752,5 @@ public class GuessDemo {
 }
 ```
 
-## 6.9 模拟双色球
-
-* 需求：
-
 
 
