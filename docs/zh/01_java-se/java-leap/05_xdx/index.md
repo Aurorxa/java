@@ -95,8 +95,8 @@ public class Main {
 ## 2.1 概述
 
 * `方法`分为`方法定义`和`方法调用`。
-* 其中， 将一些代码打包在一起的过程就称为`方法定义`。
-* 其中，方法定义后并不能直接运行的，需要手动调用才能执行，该过程称为`方法调用`（不调用，不执行）。
+* 将一些代码打包在一起的过程就称为`方法定义`。
+* 方法定义后并不能直接运行的，需要手动调用才能执行，该过程称为`方法调用`。
 
 ## 2.2 最简单的方法定义和调用
 
@@ -1138,33 +1138,200 @@ public class MethodDemo6 {
 
 # 第六章：综合练习
 
-## 6.1 飞机票
+## 6.1 卖飞机票
+
+* 需求：机票的价格按照淡季旺季、头等舱和经济舱收费，请输入机票原价、月份和头等舱或经济舱，输出机票的价格。
+
+> [!NOTE]
+>
+> 机票价格计算规则：
+>
+> * ① 旺季（5 月 - 10 月）头等舱 9 折，经济舱 8.5 折。
+> * ② 淡季（11 月 - 来年 4 月）头等舱 7 折，经济舱 6.5 折
 
 
 
+* 示例：
+
+```java
+package com.github;
+
+import java.util.Scanner;
+
+public class TicketDemo {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("请输入机票原价：");
+        double price = input.nextDouble();
+
+        System.out.print("请输入月份：");
+        int month = input.nextInt();
+
+        System.out.print("请输入头等舱（0）/经济舱（1）：");
+        int seatType = input.nextInt();
+
+        double discount = getDiscount(price, month, seatType);
+        System.out.println("打折之后的机票价格 = " + discount);
+
+        input.close();
+    }
+
+    /**
+     * 计算机票的价格
+     *
+     * @param price    原价
+     * @param month    月份
+     * @param seatType 座位类型
+     * @return 打折后的机票价格
+     */
+    public static double getDiscount(double price, int month, int seatType) {
+        if (month < 0 || month > 12) {
+            throw new IllegalArgumentException("月份输入有误！");
+        }
+        if (seatType != 0 && seatType != 1) {
+            throw new IllegalArgumentException("座位类型输入有误！");
+        }
+        double discount;
+        if (month >= 5 && month <= 10) {
+            discount = (seatType == 0) ? 0.9 : 0.85;
+        } else {
+            discount = (seatType == 0) ? 0.7 : 0.65;
+        }
+        return price * discount;
+    }
+
+}
+```
+
+## 6.2 找素数
+
+* 需求：判断 101 - 200 之间有多少个质数，并输出所有的质数。
+
+> [!NOTE]
+>
+> 在大于 1 的自然数中，除了 1 和它自身外，不能被其他自然数整除的数叫做质数。
 
 
 
+* 示例：
 
-## 6.2 打印素数
+```java
+package com.github;
+
+import java.util.Scanner;
+
+public class PrimeNumDemo {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("请输入范围的最小值：");
+        int min = input.nextInt();
+
+        System.out.print("请输入范围的最大值：");
+        int max = input.nextInt();
+
+        int count = 0;
+
+        for (int i = min; i <= max; i++) {
+            if (isPrime(i)) {
+                System.out.println(i);
+                count++;
+            }
+        }
+
+        System.out.println("[" + min + "," + max + "] " +
+                "范围内共有 " + count + " 个质数");
+
+        input.close();
+    }
+
+    /**
+     * 判断一个数是否为质数
+     *
+     * @param num 大于 1 的自然数
+     * @return true 表示是质数，false 表示不是质数
+     */
+    public static boolean isPrime(int num) {
+        if (num <= 1) {
+            return false;
+        }
+        boolean flag = true;
+        for (int i = 2; i <= num - 1; i++) {
+            if (num % i == 0) {
+                flag = false;
+                break;
+            }
+        }
+        return flag;
+    }
+
+}
+```
+
+## 6.3 开发验证码
+
+* 需求：定义一个方法实现随机产生一个 5 位的验证码。
+
+> [!NOTE]
+>
+> * 验证码图示，如下所示：
+>
+> ![验证码](./assets/17.png)
+>
+> * 验证码格式：
+>
+>   * ① 长度为 5。
+>
+>   * ② 前四位是大写字母或小写字母。
+>
+>   * ③ 最后一位是数字。
 
 
 
+* 示例：
 
+```java
+package com.github;
 
+import java.security.SecureRandom;
 
+public class VerifyCodeDemo {
 
-## 6.3 验证码
+    private static final SecureRandom random = new SecureRandom();
 
+    private static final String LETTERS = "abcdefghijklmnopqrstuvwxyz"
+            + "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+    public static void main(String[] args) {
+        String code = generateCode();
+        System.out.println("code = " + code);
+    }
 
+    /**
+     * 生成验证码，验证码格式：
+     * ① 长度为 5。
+     * ② 前四位是大写字母或小写字母。
+     * ③ 最后一位是数字。
+     *
+     * @return 验证码
+     */
+    private static String generateCode() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 4; i++) {
+            int index = random.nextInt(LETTERS.length());
+            sb.append(LETTERS.charAt(index));
+        }
+        sb.append(random.nextInt(9));
+        return sb.toString();
+    }
 
+}
+```
 
+## 6.4 数组元素的复制
 
-
-## 6.4 复制数组
-
-
+* 需求：
 
 
 
@@ -1172,11 +1339,15 @@ public class MethodDemo6 {
 
 ## 6.5 评委打分
 
+* 需求：
+
 
 
 
 
 ## 6.6 数字加密
+
+* 需求：
 
 
 
@@ -1184,9 +1355,23 @@ public class MethodDemo6 {
 
 ## 6.7 数字解密
 
+* 需求：
 
 
 
 
-## 6.8 抽奖
+
+## 6.8 抢红包
+
+* 需求：
+
+
+
+
+
+## 6.9 模拟双色球
+
+* 需求：
+
+
 
