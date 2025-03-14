@@ -225,8 +225,8 @@ public class 类名 {
 
 > [!NOTE]
 >
-> * ① `成员变量`，在很多技术资料中，也称为`属性`，通常是名字，如：手机型号、手机颜色、手机价格等。
-> * ② `成员方法`，在很多技术资料中，也称为`行为`，通常是动词，如：打电话、接电话、发送短信、购物等。
+> * ① `成员变量`，也称为`属性`，通常是名字，如：手机型号、手机颜色、手机价格等。
+> * ② `成员方法`，也称为`行为`，通常是动词，如：打电话、接电话、发送短信、购物等。
 
 
 
@@ -267,8 +267,12 @@ public class Phone {
 * 语法：
 
 ```java
-类名 对象名 = new 类名(); // 每调用一个 new 关键字，就创建一个新的对象
+类名 对象名 = new 类名(); 
 ```
+
+> [!NOTE]
+>
+> 每调用一次 new 关键字，就创建一个新的对象！！！
 
 
 
@@ -290,11 +294,11 @@ public class PhoneTest {
 
 ### 2.1.5 对象的使用语法
 
-* 给属性赋值或访问属性：
+* 访问属性（给属性赋值）：
 
 ```java
 对象名.成员变量 = xxx; // 给属性赋值
-成员变量类型 变量名 = 对象名.成员变量; // 访问属性
+数据类型 变量名 = 对象名.成员变量; // 访问属性
 ```
 
 * 访问行为：
@@ -343,9 +347,326 @@ public class PhoneTest {
 
 ## 2.2 类的注意事项
 
+* ① 用来描述一类事物的类，专业描述是 `JavaBean 类`。
+
+> [!NOTE]
+>
+> * ① 在 JavaBean 类中，是不写 main 方法的。
+> * ② JavaBean 类还有其它特点，后面讲解。
+> * ③ JavaBean 在实际开发中非常常见，尤其是在 Web 应用、Spring 框架和数据库交互中被广泛使用。
+
+```java
+/**
+ * 创建一个手机类
+ */
+public class Phone {
+    /* 成员变量，即：属性 */
+
+    // 品牌
+    String brand;
+    // 价格
+    double price;
+
+    /* 成员方法，即：行为 */
+
+    /**
+     * 打电话
+     */
+    public void call() {
+        System.out.println("打电话");
+    }
+
+    /**
+     * 玩游戏
+     */
+    public void play() {
+        System.out.println("玩游戏");
+    }
+}
+```
+
+* ② 之前，我们编写的含有 main 方法的类，叫做`测试类`。并且，我们可以在测试类中创建 JavaBean 类的对象并进行赋值和调用。
+
+> [!CAUTION]
+>
+> 在实际开发中，一个项目（单体项目）或模块（微服务项目中的模块），只能有一个含有 main 方法的类，以便 JVM 找到程序的入口。
+>
+> ::: details 点我查看
+>
+> ```java
+> package com.example.demo;
+> 
+> import org.springframework.boot.SpringApplication;
+> import org.springframework.boot.autoconfigure.SpringBootApplication;
+> import org.springframework.web.bind.annotation.GetMapping;
+> import org.springframework.web.bind.annotation.RequestParam;
+> import org.springframework.web.bind.annotation.RestController;
+> 
+> @SpringBootApplication
+> @RestController  
+> public class DemoApplication {
+> 
+>     public static void main(String[] args) {
+>         SpringApplication.run(DemoApplication.class, args);
+>     }
+> 
+>     
+>     @GetMapping("/hello")
+>     public String sayHello(
+>         @RequestParam(value = "name", defaultValue = "World") String name) {
+>         return "Hello, " + name + "!";
+>     }
+> }
+> ```
+>
+> :::
+
+```java
+public class PhoneTest {
+    public static void main(String[] args) {
+
+        // 创建对象
+        Phone p = new Phone();
+
+        // 创建对象
+        Phone p2 = new Phone();
+        
+    }
+}
+```
+
+* ③ 类名首字母建议大写，见名知意，即：遵循大驼峰命名规范。
+
+```java
+public class Phone {}
+```
+
+* ④ 一个 Java 文件可以定义多个 class 类，但是有且仅有一个是 public 修饰的，且 public 修饰的类必须和源文件名相同。
+
+> [!TIP]
+>
+> 在实际开发中，一个 Java 文件中只定义一个 class 类，并且使用 public 修饰。
+
+* ⑤ 类中成员变量的完整定义格式是：`访问修饰符 数据类型 变量名 = 初始化值;`，通常是不需要指定初始化值的，由系统给出默认初始化值。
+
+> [!NOTE]
+>
+> * ① 访问修饰符，后面讲解。
+> * ② 对象成员变量的默认初始化值，如下所示：
+>
+> | 数据类型 | 默认初始化值 |
+> | :------- | :----------- |
+> | 整数类型 | 0            |
+> | 小数类型 | 0.0          |
+> | 布尔类型 | false        |
+> | 字符类型 | '\u0000'     |
+> | 引用类型 | null         |
+
+## 2.3 应用示例
+
+* 需求：编写女朋友类，创建女朋友类的对象，给女朋友的属性赋值并调用女朋友类中的方法。
 
 
 
+* 示例：
+
+::: code-group
+
+```java [GirlFriend.java]
+/**
+ * 女朋友类
+ */
+public class GirlFriend {
+    // 属性
+    String name;
+    int age;
+    String gender;
+    double height;
+    double weight;
+
+    public void eat() {
+        System.out.println("吃东西");
+    }
+
+    public void sleep() {
+        System.out.println("睡觉");
+    }
+
+    public void play() {
+        System.out.println("打游戏");
+    }
+
+    public void study() {
+        System.out.println("学习");
+    }
+}
+```
+
+```java [GirlFriendTest.java]
+/**
+ * 测试类
+ */
+public class GirlFriendTest {
+    public static void main(String[] args) {
+        GirlFriend gf = new GirlFriend();
+
+        // 给对象属性赋值
+        gf.name = "小花";
+        gf.age = 18;
+        gf.gender = "女";
+        gf.height = 1.75;
+        gf.weight = 50.0;
+
+        // 访问对象属性
+        System.out.println("姓名：" + gf.name);
+        System.out.println("年龄：" + gf.age);
+        System.out.println("性别：" + gf.gender);
+        System.out.println("身高：" + gf.height);
+        System.out.println("体重：" + gf.weight);
+
+        System.out.println("-------------------");
+
+        // 调用对象方法
+        gf.eat();
+        gf.sleep();
+        gf.play();
+        gf.study();
+    }
+}
+```
+
+:::
+
+## 2.4 实际开发中类的设计
+
+* 在实际开发中，先分析需求中有几类事物，如下所示：
+
+![分析需求中有几类事物](./assets/9.png)
+
+* 根据事物，创建对应的类，如下所示：
+
+::: code-group
+
+```java [Student.java]
+/**
+ * 学生类
+ */
+public class Student {
+    
+}
+```
+
+```java [ClassRoom.java]
+/**
+ * 班级类
+ */
+public class ClassRoom {
+    
+}
+```
+
+```java [Teach.java]
+/**
+ * 教学类
+ */
+public class Teach {
+    
+}
+```
+
+```java [Exam.java ]
+/**
+ * 考试类
+ */
+public class Exam {
+    
+}
+```
+
+```java [Grade.java]
+/**
+ * 成绩类
+ */
+public class Grade {
+    
+}
+```
+
+:::
+
+* 以学生类为例，通过`名词提炼法`，抽取出`类`的`属性`，如下所示：
+
+![名词提炼法，抽取出类的属性](./assets/10.png)
+
+* 在对应的类中，编写相应的属性，如下所示：
+
+```java [Student.java]
+import java.time.LocalDateTime;
+/**
+ * 学生类
+ */
+public class Student {
+    // 姓名
+    String name;
+    // 性别
+    char gender;
+    // 年龄
+    int age;
+    // 入学时间
+    LocalDateTime enrollmentTime;
+    // 当前班级
+    String classRoom;
+    // 当前状态
+    String state;
+    // 监护人姓名
+    String guardianName;
+
+}
+```
+
+* 以学生类为例，通过`动词提炼法`（查看页面中的按钮），抽取出`类`的`方法`，如下所示：
+
+![动词提炼法，抽取出类中的方法](./assets/11.png)
+
+* 在对应的类中，编写相应的方法，如下所示：
+
+```java [Student.java]
+import java.time.LocalDateTime;
+/**
+ * 学生类
+ */
+public class Student {
+    // 姓名
+    String name;
+    // 性别
+    char gender;
+    // 年龄
+    int age;
+    // 入学时间
+    LocalDateTime enrollmentTime;
+    // 当前班级
+    String classRoom;
+    // 当前状态
+    String state;
+    // 监护人姓名
+    String guardianName;
+
+    /**
+     * 根据姓名查询学生
+     *
+     * @param name 姓名
+     * @return 学生信息
+     */
+    public Student search(String name) {
+        if (this.name.equals(name)) {
+            return this;
+        } else {
+            return null;
+        }
+    }
+
+}
+```
 
 
 
