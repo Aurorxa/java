@@ -93,10 +93,12 @@ public class Main {
 
 * 在程序中，也不例外，如果我们要实现某些功能，我们可以指挥一个个的对象，让它们去帮我们实现各个功能，即：面向对象编程。
 
-```java
+::: code-group
+
+```java [ScannerTest.java]
 import java.util.*;
 
-public class Main {
+public class ScannerTest {
     public static void main(String[] args){
         // input 就是对象，通过它我们可以在控制台中输入数据，以便执行之后的逻辑
         Scanner input = new Scanner(System.in);
@@ -114,12 +116,10 @@ public class Main {
 }
 ```
 
-```java
-package com.github;
-
+```java [RandomTest.java]
 import java.util.Random;
 
-public class Main {
+public class RandomTest {
     public static void main(String[] args) {
         // 通过 Random 对象获取随机数
         Random random = new Random();
@@ -131,6 +131,8 @@ public class Main {
     }
 }
 ```
+
+:::
 
 ## 1.3 面向对象编程需要学习什么？
 
@@ -670,19 +672,185 @@ public class Student {
 
 
 
-# 第三章：对象的内存分析
+# 第三章：封装
+
+## 3.1 概述
+
+* 假设在一个需求中有多个事物，有的行为我们并不能确定到底归属于那个类，比如：人画圆。
+
+![人画圆](./assets/12.png)
+
+* 我们是将`画圆`这个行为，写到`人`这个类中，还是写到`圆`这个类中？
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+    
+    public void draw(){}
+}
+```
+
+```java [Circle.java]
+public class Circle {
+    
+    public void draw(){}
+}
+```
+
+:::
+
+* 此时，就需要使用到我们将要学习的知识 --- 面向对象的三大特征之一（封装）。
+
+## 3.2 概念
+
+* 面向对象的三大特征是：`封装`、继承和多态，如下所示：
+
+```mermaid
+classDiagram
+    class OOP {
+        +封装
+        +继承
+        +多态
+    }
+
+    class 封装 {
+        +封装数据
+        +提供访问控制
+        +隐藏实现细节
+    }
+
+    class 继承 {
+        +子类继承父类
+        +代码复用
+        +父类提供通用行为
+    }
+
+    class 多态 {
+        +方法重载 (Overloading)
+        +方法重写 (Overriding)
+        +同一接口多种实现
+    }
+
+    OOP --> 封装
+    OOP --> 继承
+    OOP --> 多态
+
+```
+
+* `封装`就是告诉我们，在拿到需求之后，`如何正确的设计对象的属性和方法`。
+* 假设现在有一个需求，如下所示：
+
+> [!NOTE]
+>
+> * 需求：定义一个类用来描述人。
+> * 其中，人的属性有姓名、年龄。
+> * 其中，人的行为有吃饭、睡觉。
+
+* 上面的需求非常简单，无非就是要求我们，定义一个 Person 类，并在类中编写属性和行为。
+
+```java [Person.java]
+public class Person{
+    String name;
+    int age;
+    
+    public void eat() {
+        System.out.println("吃东西");
+    }
+
+    public void sleep() {
+        System.out.println("睡觉");
+    }
+}
+```
+
+* 在实际开发中，往往需求不会这么简单，如：人画圆。
+
+> [!NOTE]
+>
+> 需求：人画圆，需要针对这个需求进行面向对象设计。
+
+* 由于上述的需求，涉及到两个事物，所以我们理所当然地应该定义两个类，如下所示：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+    
+}
+```
+
+```java [Circle.java]
+public class Circle {
+    
+}
+```
+
+:::
+
+* 由于画圆是属于行为，我们就需要定义一个方法来表示画圆这个行为，如下所示：
+
+```java
+public void draw(){
+    System.out.println("画圆");
+}
+```
+
+* 很多人可能这么认为，既然是人画圆，当然就应该写在人这个类中了，如下所示：
+
+```java [Person.java]
+public class Person {
+    public void draw(){ // [!code error]
+    	System.out.println("画圆"); // [!code error]
+	} // [!code error]
+}
+```
+
+* 其实，不然，画圆这个行为就应该写到圆这个类中，如下所示：
+
+```java [Circle.java]
+public class Circle {
+    public void draw(){ // [!code highlight]
+    	System.out.println("画圆"); // [!code highlight]
+	} // [!code highlight]
+}
+```
+
+> [!IMPORTANT]
+>
+> 封装中的一个原则：对象代表什么，就应该封装对应的数据，并提供数据对应的行为。
+
+* 既然，我们使用一个类来代表一个圆，那么就会设计一些属性来封装圆的一些信息，如：半径。那么画圆这个行为就需要根据半径来画，如下所示：
+
+```java [Circle.java]
+public class Circle {
+    
+    // 半径
+    double radius;
+    
+    public void draw(){ // [!code highlight]
+    	System.out.println("根据半径"+radius+"画一个圆"); // [!code highlight]
+	} // [!code highlight]
+}
+```
 
 
 
 
 
-# 第四章：成员变量和局部变量
+# 第四章：对象的内存分析
 
 
 
 
 
-# 第五章：封装
+# 第五章：成员变量和局部变量
+
+
+
+
+
+
 
 
 
