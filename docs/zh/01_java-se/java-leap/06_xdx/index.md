@@ -687,14 +687,18 @@ public class Student {
 ```java [Person.java]
 public class Person {
     
-    public void draw(){}
+    public void draw(){
+        System.out.println("画圆");
+    }
 }
 ```
 
 ```java [Circle.java]
 public class Circle {
     
-    public void draw(){}
+    public void draw(){
+        System.out.println("画圆");
+    }
 }
 ```
 
@@ -703,6 +707,8 @@ public class Circle {
 * 此时，就需要使用到我们将要学习的知识 --- 面向对象的三大特征之一（封装）。
 
 ## 3.2 概念
+
+### 3.2.1 概述
 
 * 面向对象的三大特征是：`封装`、继承和多态，如下所示：
 
@@ -738,12 +744,14 @@ classDiagram
 
 ```
 
-* `封装`就是告诉我们，在拿到需求之后，`如何正确的设计对象的属性和方法`。
-* 假设现在有一个需求，如下所示：
+* `封装`就是告诉我们，在拿到需求之后，`如何正确地设计对象的属性和方法`。
+
+### 3.2.2 举例
+
+* 假设现在有一个需求：定义一个类用来描述人。
 
 > [!NOTE]
 >
-> * 需求：定义一个类用来描述人。
 > * 其中，人的属性有姓名、年龄。
 > * 其中，人的行为有吃饭、睡觉。
 
@@ -764,11 +772,9 @@ public class Person{
 }
 ```
 
-* 在实际开发中，往往需求不会这么简单，如：人画圆。
+* 在实际开发中，需求往往不会这么简单，经常会涉及到多个对象，如：人画圆（需要针对这个需求进行面向对象设计）。
 
-> [!NOTE]
->
-> 需求：人画圆，需要针对这个需求进行面向对象设计。
+![人画圆](./assets/12.png)
 
 * 由于上述的需求，涉及到两个事物，所以我们理所当然地应该定义两个类，如下所示：
 
@@ -788,7 +794,7 @@ public class Circle {
 
 :::
 
-* 由于画圆是属于行为，我们就需要定义一个方法来表示画圆这个行为，如下所示：
+* 由于`画圆`是属于行为，我们就需要定义一个`方法`来表示画圆这个行为，如下所示：
 
 ```java
 public void draw(){
@@ -796,7 +802,7 @@ public void draw(){
 }
 ```
 
-* 很多人可能这么认为，既然是人画圆，当然就应该写在人这个类中了，如下所示：
+* 很多人可能会这么认为，既然是`人画圆`，当然`画圆`这个`行为`就应该写在`人`这个类中了，如下所示：
 
 ```java [Person.java]
 public class Person {
@@ -806,7 +812,7 @@ public class Person {
 }
 ```
 
-* 其实，不然，画圆这个行为就应该写到圆这个类中，如下所示：
+* 其实，这种想法是错误的，`画圆`这个行为应该写到`圆`这个类中，如下所示：
 
 ```java [Circle.java]
 public class Circle {
@@ -818,9 +824,9 @@ public class Circle {
 
 > [!IMPORTANT]
 >
-> 封装中的一个原则：对象代表什么，就应该封装对应的数据，并提供数据对应的行为。
+> 封装的一个重要原则：对象代表什么，就应该封装对应的数据，并提供数据对应的行为。
 
-* 既然，我们使用一个类来代表一个圆，那么就会设计一些属性来封装圆的一些信息，如：半径。此时，画圆这个行为就需要根据半径来画，如下所示：
+* 既然，我们使用一个`类`来代表`圆`，那么就会设计一些`属性`来封装`圆`的`一些信息`，如：`半径`。并且，`画圆`这个行为是需要根据`半径`来画的，如下所示：
 
 ```java [Circle.java]
 public class Circle {
@@ -834,9 +840,171 @@ public class Circle {
 }
 ```
 
+> [!IMPORTANT]
+>
+> * ① 和面向过程的编程思想不同，面向对象编程最为核心的就是：指挥对象做某件事情。
+> * ② 人画圆，在面向对象中，其实就是`人`指挥`圆`去`画圆`，即：`圆`提供`画圆`的`功能`，让人去调用，以实现画圆这件事情；换言之，如果圆没有提供画圆的功能，人是不能是实现画圆这个需求的。
+
+### 3.2.3 举例
+
+* 假设现在有一个需求：人关门，如下所示：
+
+![人关门](./assets/13.png)
+
+* 由于上述的需求，涉及到两个事物，所以我们理所当然地应该定义两个类，如下所示：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+    
+}
+```
+
+```java [Door.java]
+public class Door {
+    
+}
+```
+
+:::
+
+* 由于`关门`是属于行为，我们就需要定义一个`方法`来表示关门这个行为，如下所示：
+
+```java
+public void close(){
+    System.out.println("关门");
+}
+```
+
+* 很多人可能会这么认为，既然是`人关门`，当然`关门`这个`行为`就应该写在`人`这个类中了，如下所示：
+
+```java [Person.java]
+public class Person {
+    public void close(){ // [!code error]
+    	System.out.println("关门"); // [!code error]
+	} // [!code error]
+}
+```
+
+* 其实，这种想法是错误的，`关门`这个行为应该写到`门`这个类中，如下所示：
+
+```java [Circle.java]
+public class Door {
+    public void close(){ // [!code highlight]
+    	System.out.println("关门"); // [!code highlight]
+	} // [!code highlight]
+}
+```
+
+> [!IMPORTANT]
+>
+> 封装的一个重要原则：对象代表什么，就应该封装对应的数据，并提供数据对应的行为。
+
+* 既然，我们使用一个`类`来代表`门`，那么就会设计一些`属性`来封装`门`的`一些信息`，如：`门的状态`。并且，`关门`这个行为是需要根据`门的状态`来画的，如下所示：
+
+> [!NOTE]
+>
+> * ① 在这个需求中，人只是给门一个作用力（调用门提供的关门方法），然后门就自己关上了。
+>
+> * ② 从另外的角度看，如果门坏了，即使人给的作用力再大，也无济于事，因为门因为不能提供关门的功能而导致门不会关上。
+
+```java {5-9}
+public class Door {
+    // 门的状态数据
+    boolean flag = true;
+    
+    public void close(){ 
+        if(flag){
+            System.out.println("关门"); 
+        }
+	} 
+}
+```
+
+## 3.3 封装的好处
+
+* ① **保护数据**，防止外部直接修改对象的状态
+* ② **提高代码的可维护性**，避免外部直接依赖内部实现
+* ③ **增强代码的复用性**，通过公共接口提供统一的访问方式。
+
+## 3.4 如何实现封装？
+
+* ① 使用 `private` 关键字限制字段的访问。
+
+> [!NOTE]
+>
+> * private 是一个权限访问修饰符。
+> * private 可以修饰成员（成员变量或成员方法）。
+> * 被 private 修饰的成员只能在本类中才能访问。
+
+* ② 提供 `public` 方法（Getter 和 Setter）控制访问权限。
+
+> [!NOTE]
+>
+> * Setter 方法，即：setXxx(xxx) 用于供外部修改。
+> * Getter 方法，即：getXxx() 用于供外部访问。
 
 
-## 3.3 如何实现封装？
+
+* 示例：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+    // 私有变量，外部无法直接访问
+    private String name;
+    private int age;
+
+    // 公共的 getter 方法
+    public String getName() {
+        return name;
+    }
+
+    // 公共的 setter 方法
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        if (age > 0) { // 简单的数据验证
+            this.age = age;
+        } else {
+            System.out.println("年龄不能为负数！");
+        }
+    }
+}
+```
+
+```java [PersonRightTest.java]
+public class PersonRightTest {
+    public static void main(String[] args){
+        Person p = new Person();
+        p.setAge(18); // [!code highlight]
+        System.out.println(p.getAge()); // 18
+    }
+}
+```
+
+```java [PersonErrorTest.java]
+public class PersonErrorTest {
+    public static void main(String[] args){
+        Person p = new Person();
+        // 会在控制台输出"年龄不能为负数！"
+        p.setAge(-18); // [!code highlight]
+        System.out.println(p.getAge()); // 0
+    }
+}
+```
+
+:::
+
+
 
 
 
