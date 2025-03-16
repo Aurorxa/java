@@ -934,8 +934,7 @@ public class Door {
 
 > [!NOTE]
 >
-> * private 是一个权限访问修饰符。
-> * private 可以修饰成员（成员变量或成员方法）。
+> * private 是一个权限访问修饰符，private 可以修饰成员（成员变量或成员方法）。
 > * 被 private 修饰的成员只能在本类中才能访问。
 
 * ② 提供 `public` 方法（Getter 和 Setter）控制访问权限。
@@ -971,9 +970,9 @@ public class Person {
         return age;
     }
 
-    public void setAge(int age) {
-        if (age > 0) { // 简单的数据验证
-            this.age = age;
+    public void setAge(int a) {
+        if (a > 0) { // 简单的数据验证
+            age = a;
         } else {
             System.out.println("年龄不能为负数！");
         }
