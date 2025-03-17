@@ -579,6 +579,8 @@ public class CharDemo1 {
 
 * 示例：
 
+::: code-group
+
 ```java [CharDemo.java]
 package com.github;
 
@@ -602,7 +604,7 @@ public class CharDemo {
 }
 ```
 
-```txt [结果]
+```txt [输出结果]
 a = A
 b = 许
 c = 
@@ -610,7 +612,7 @@ c =
 d = a
 ```
 
-
+:::
 
 # 第六章：布尔类型（⭐）
 
@@ -947,8 +949,7 @@ public class StringDemo1 {
 
         String str = "123";
 
-        // 以下代码是错误的 
-        // 不可转换的类型；无法将 'java.lang.String' 转换为 'int'
+        // ❌ 错误：不可转换的类型；无法将 'java.lang.String' 转换为 'int'
         int num = (int)str; // [!code error]
 
         System.out.println("num = " + num);
@@ -964,7 +965,7 @@ public class StringDemo1 {
 
         String str = "123";
 
-        // 以下代码是正确的
+        // ✅ 以下代码是正确的
         int num = Integer.parseInt(str); // [!code highlight]
 
         System.out.println("num = " + num);

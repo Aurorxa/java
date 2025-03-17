@@ -780,6 +780,8 @@ class HelloWorld {
 
 * 示例：
 
+::: code-group
+
 ```java [HelloWorld.java]
 public class HelloWorld {
 	public static void main(String[] args){
@@ -796,7 +798,7 @@ Hello, World! This is on a new line.
 This is the second line.
 ```
 
-
+:::
 
 # 第四章：作业
 

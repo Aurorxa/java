@@ -706,7 +706,7 @@ public class Circle {
 
 * 此时，就需要使用到我们将要学习的知识 --- 面向对象的三大特征之一（封装）。
 
-## 3.2 概念
+## 3.2 封装的概念
 
 ### 3.2.1 概述
 
@@ -962,8 +962,8 @@ public class Person {
     }
 
     // 公共的 setter 方法
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String n) {
+        name = n;
     }
 
     public int getAge() {
@@ -1005,11 +1005,308 @@ public class PersonErrorTest {
 
 ## 3.5 就近原则和 this 关键字
 
+### 3.5.1 概述
 
+* 之前，我们的代码是这样的，如下所示：
 
+::: code-group
 
+```java [Person.java]{12,20}
+public class Person {
+    // 私有变量，外部无法直接访问
+    private String name;
+    private int age;
 
+    // 公共的 getter 方法
+    public String getName() {
+        return name;
+    }
 
+    // 公共的 setter 方法
+    public void setName(String n) {
+        name = n;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int a) {
+        if (a > 0) { // 简单的数据验证
+            age = a;
+        } else {
+            System.out.println("年龄不能为负数！");
+        }
+    }
+}
+```
+
+```java [PersonTest.java]
+public class PersonTest {
+    public static void main(String[] args){
+        Person p = new Person();
+        p.setName("如花");
+        System.out.println(p.getName());
+        p.setAge(18); 
+        System.out.println(p.getAge()); 
+    }
+}
+```
+
+:::
+
+* 我们会发现 `setName()` 和 `setAge()` 中的参数是 `n` 和 `a`，这不符合我们的命名规范（标识符需要见名知意）。于是，我们就将代码修改一下，如下所示：
+
+::: code-group
+
+```java [Person.java]{12,20}
+public class Person {
+    // 私有变量，外部无法直接访问
+    private String name;
+    private int age;
+
+    // 公共的 getter 方法
+    public String getName() {
+        return name;
+    }
+
+    // 公共的 setter 方法
+    public void setName(String name) {
+        name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        if (age > 0) { // 简单的数据验证
+            age = age;
+        } else {
+            System.out.println("年龄不能为负数！");
+        }
+    }
+}
+```
+
+```java [PersonTest.java]
+public class PersonTest {
+    public static void main(String[] args){
+        Person p = new Person();
+        p.setName("如花");
+        System.out.println(p.getName());
+        p.setAge(18); 
+        System.out.println(p.getAge()); 
+    }
+}
+```
+
+:::
+
+* 当我们在测试类中运行的时候，会发现结果并非我们预期的那样，如下所示：
+
+```txt [输出结果]
+null
+0
+```
+
+### 3.5.2 成员变量和局部变量
+
+#### 3.5.2.1 概述
+
+* 在 Java 中，`成员变量`和 `局部变量`是两种不同的变量类型，它们的作用域、存储位置和生命周期都不同。
+
+#### 3.5.2.2 定义位置
+
+* `成员变量（实例变量）`：定义在类内部，但是在方法外部，属于类的对象。
+
+```java {4}
+public class Person {
+    
+    // 成员变量
+    private int age;
+    
+    public void method(){
+        int age = 10; 
+        System.out.println(age);  // 10
+    }
+}
+```
+
+* `局部变量`：定义在方法、构造方法或代码块内部，仅在其作用范围内可用。
+
+```java {9，10}
+public class Person {
+    
+    // 成员变量
+    private int age;
+    
+    /**
+    * @param num 局部变量
+    */
+    public void method(int num){
+        int age = 10; // 局部变量
+        System.out.println(age);  // 10
+    }
+}
+```
+
+#### 3.5.2.3 作用域
+
+* `成员变量`的作用范围是整个类，可以被类中的所有方法使用。
+
+```java 
+public class ScopeExample {
+    int memberVar = 100; // 成员变量
+
+    public void testMethod() {
+        int localVar = 50; // 局部变量
+        System.out.println(localVar); // 可以访问局部变量
+    }
+
+    public void anotherMethod() {
+        // ❌ 错误：无法访问 testMethod() 中的局部变量
+        System.out.println(localVar); // [!code error]
+        // ✅ 可以访问成员变量
+        System.out.println(memberVar); // [!code highlight]
+    }
+}
+```
+
+* `局部变量`只在定义它的方法或代码块中有效，一旦方法执行完毕，该变量就被销毁。
+
+```java
+public class ScopeExample {
+    int memberVar = 100; // 成员变量
+
+    public void testMethod() {
+        int localVar = 50; // 局部变量
+        System.out.println(localVar); // 可以访问局部变量
+    }
+
+    public void anotherMethod() {
+        // ❌ 错误：无法访问 testMethod() 中的局部变量
+        System.out.println(localVar); // [!code error]
+        // ✅ 可以访问成员变量
+        System.out.println(memberVar); // [!code highlight]
+    }
+}
+```
+
+#### 3.5.2.4 存储位置
+
+* `成员变量`是存储在堆中的，因为其属于对象。
+* `局部变量`是存储在栈中的，方法执行完毕后就会被销毁。
+
+#### 3.5.2.5 默认值
+
+* 成员变量是会被赋默认值。
+
+```java
+public class DefaultValueExample {
+    // 默认值为 0
+    int memberVar;  // [!code highlight]
+
+    public void method() {
+        int localVar; 
+        // ❌ 编译错误：局部变量未初始化
+        System.out.println(localVar); // [!code error]
+    }
+}
+```
+
+* `局部变量`不会被自动初始化，使用前必须显示赋值，否则会编译失败。
+
+```java
+public class DefaultValueExample {
+    // 默认值为 0
+    int memberVar;  // [!code highlight]
+
+    public void method() {
+        int localVar; 
+        // ❌ 编译错误：局部变量未初始化
+        System.out.println(localVar); // [!code error]
+    }
+}
+```
+
+#### 3.5.2.6 修饰符的使用
+
+* `成员变量`可以使用 `private`、`public`、`protected`、`static`、`final` 等修饰符。
+
+```java
+public class ModifierExample {
+    // ✅ 成员变量可以使用访问修饰符
+    private int memberVar = 10;  // [!code highlight]
+
+    public void method() {
+        // ❌ 局部变量不能使用访问修饰符
+        private int localVar = 5; // [!code error]
+        // ✅ 但可以用 final 修饰
+        final int localVar = 5; // [!code highlight]
+    }
+}
+```
+
+* `局部变量`**不能** 使用访问修饰符（`private`、`public` 等），但可以使用 `final`。
+
+```java
+public class ModifierExample {
+    // ✅ 成员变量可以使用访问修饰符
+    private int memberVar = 10;  // [!code highlight]
+
+    public void method() {
+        // ❌ 局部变量不能使用访问修饰符
+        private int localVar = 5; // [!code error]
+        // ✅ 但可以用 final 修饰
+        final int localVar = 5; // [!code highlight]
+    }
+}
+```
+
+#### 3.5.2.7 生命周期
+
+* `成员变量`随着对象的创建而存在，随着对象被垃圾回收而销毁。
+
+```java
+public class LifecycleExample {
+    // 成员变量，生命周期与对象相同
+    int memberVar = 10;  // [!code highlight]
+
+    public void method() {
+        // 局部变量，方法执行完就销毁
+        int localVar = 20; 
+    }
+
+    public static void main(String[] args) {
+        // 创建对象
+        LifecycleExample obj = new LifecycleExample(); 
+        // 调用方法，局部变量 localVar 仅在这里生效
+        obj.method(); 
+    } 
+}
+```
+
+* `局部变量`在方法执行时创建，方法执行完毕后销毁。
+
+```java
+public class LifecycleExample {
+    // 成员变量，生命周期与对象相同
+    int memberVar = 10; 
+
+    public void method() {
+        // 局部变量，方法执行完就销毁
+        int localVar = 20;  // [!code highlight]
+    }
+
+    public static void main(String[] args) {
+        // 创建对象
+        LifecycleExample obj = new LifecycleExample(); 
+        // 调用方法，局部变量 localVar 仅在这里生效
+        obj.method(); 
+    } 
+}
+```
 
 ## 3.6 IDEA 技巧
 
@@ -1026,8 +1323,6 @@ public class PersonErrorTest {
 
 
 
-
-# 第五章：成员变量和局部变量
 
 
 

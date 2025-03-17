@@ -57,7 +57,7 @@
 
 
 
-* 示例：合法的标识符
+* 示例：合法标识符（✅）
 
 ```txt
 age, student_1, _tempValue, $result
@@ -65,7 +65,7 @@ age, student_1, _tempValue, $result
 
 
 
-* 示例：不合法的标识符
+* 示例：不合法标识符（❌）
 
 ```txt
 1student, @value, #total
@@ -647,7 +647,7 @@ public class VariableDemo{
         {
             boolean flag = true;
         }
-        // 此处代码有问题，将会编译失败
+        // ❌ 错误：此处代码有问题，将会编译失败
         System.out.println(flag); // [!code error]
     }
 }
@@ -869,7 +869,7 @@ public class VariableTest2 {
         int num = 10;
         System.out.println(num); 
 		
-        // 下面的代码是错误的
+        // ❌ 错误：下面的代码是错误的
         int num = 20; // [!code error]
         System.out.println(num); 
         
@@ -902,7 +902,7 @@ public class VariableTest4 {
     public static void main(String[] args) {
 
         int num;
-        // 以下的代码是错误的
+        // ❌ 错误：以下的代码是错误的
         System.out.println("num = " + num); // [!code error]
         
     }
@@ -922,7 +922,7 @@ public class VariableTest5 {
             System.out.println("num = " + num);
         }
         
-        // 以下的代码是错误的
+        // ❌ 错误：以下的代码是错误的
         System.out.println("num = " + num); // [!code error]
         
     }
