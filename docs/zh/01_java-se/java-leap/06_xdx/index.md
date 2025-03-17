@@ -672,7 +672,7 @@ public class Student {
 
 
 
-# 第三章：封装
+# 第三章：封装（⭐）
 
 ## 3.1 概述
 
@@ -1112,11 +1112,527 @@ null
 
 ### 3.5.2 成员变量和局部变量
 
-#### 3.5.2.1 概述
+* `成员变量（实例变量）`：定义在类内部，但是在方法外部，属于类的对象。
+
+```java {4}
+public class Person {
+    
+    // 成员变量
+    private int age;
+    
+    public void method(){
+        int age = 10; 
+        System.out.println(age);  // 10
+    }
+}
+```
+
+* `局部变量`：定义在方法、构造方法或代码块内部，仅在其作用范围内可用。
+
+```java {9，10}
+public class Person {
+    
+    // 成员变量
+    private int age;
+    
+    /**
+    * @param num 局部变量
+    */
+    public void method(int num){
+        int age = 10; // 局部变量
+        System.out.println(age);  // 10
+    }
+}
+```
+
+
+### 3.5.3 就近原则
+
+* 所谓的`就近原则`就是`谁离我近，我就用谁`。
+
+
+
+* 示例：
+
+```java {7,10}
+public class Person {
+    
+    // 成员变量
+    private int age;
+    
+    public void method(){
+        int age = 10; 
+        // 对于输出语句而言，局部变量 age 比成员变量 age 近。
+        // 根据就近原则，将使用局部变量，所以结果是 10
+        System.out.println(age);  // 10
+    }
+}
+```
+
+
+
+* 示例：
+
+```java {9,12}
+public class Person {
+    
+    // 成员变量
+    private int age;
+    
+    /**
+    * @param age 局部变量
+    */
+    public void method(int age){
+        // 对于输出语句而言，局部变量 age 比成员变量 age 近。
+        // 根据就近原则，将使用局部变量，所以结果是 10
+        System.out.println(age);  // 10
+    }
+}
+```
+
+
+
+* 示例：
+
+```java {4,10}
+public class Person {
+    
+    // 成员变量
+    private int age;
+    
+    public void method(){
+        // int age = 10; 
+        // 对于输出语句而言，此时没有局部变量 age
+        // 根据就近原则，将使用成员变量，所以结果是 0
+        System.out.println(age);  // 0
+    }
+}
+```
+
+### 3.5.4 this 关键字
+
+* 当`方法`的`参数`或者`局部变量`和`类`的`成员变量`同名的时候，可以使用 `this` 来区分它们。
+
+> [!NOTE]
+>
+> `this` 引用的是当前对象的成员变量。
+
+
+
+* 示例：
+
+```java {4,12}
+public class Person {
+    
+    // 成员变量
+    private int age;
+    
+    public void method(){
+        int age = 10; 
+        // 对于输出语句而言，局部变量 age 比成员变量 age 近。
+        // 根据就近原则，将使用局部变量，所以结果本来应该是 10 。
+        // 但是，使用了 this 关键字，而 this 引用的是当前对象的成员变量。
+        // 而 int 类型的成员变量默认是 0 ，所以输出结果是 0 。
+        System.out.println(this.age);  // 0
+    }
+}
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Person.java] {2,4,10,18}
+public class Person {
+    private String name;
+    private int age;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+```java [PersonTest.java]
+public class PersonTest {
+    public static void main(String[] args) {
+        Person p = new Person();
+        p.setName("如花");
+        System.out.println(p.getName()); // 如花
+        p.setAge(18);
+        System.out.println(p.getAge()); // 18
+    }
+}
+```
+
+:::
+
+## 3.6 IDEA 技巧
+
+* 对于 `setXxx()` 或 `getXxx()` 方法，在 IDEA 中，可以通过`Alt + Insert`快捷键一键生成。
+
+
+
+* 示例：
+
+```java
+public class Person {
+    private String name;
+    private int age;
+}
+```
+
+![](./assets/14.gif)
+
+## 3.7 坑
+
+* 在`《阿里巴巴 Java 编码规范》`中，`禁止`类中的任何布尔类型的变量，前面加 is 前缀。
+
+> [!CAUTION]
+>
+> * ① POJO 类中的任何布尔类型的变量，都不要加 is 前缀，否则部分框架解析会引起序列化错误。
+> * ② 定义为布尔类型 boolean isDeleted 的字段，它的 getter 方法也是 isDeleted()，部分框架在反向解析时，“误以为”对应的字段名称是 deleted，导致字段获取不到，得到意料之外的结果或抛出异常。
+
+
+
+* 示例：
+
+```java
+public class Person {
+    private String name;
+    private int age;
+    // ❌ 错误：任何布尔类型的变量，都不要加 is 前缀，部分框架解析会引起序列化错误
+    private boolean isDeleted;
+}
+```
+
+![](./assets/15.gif)
+
+
+
+# 第四章：构造方法（⭐）
+
+## 4.1 概述
+
+* 构造方法（构造器、构造函数）的作用：在创建对象的时候，给成员变量进行初始化（赋值）。
+* 在之前，我们创建对象是这样的，如下所示：
+
+```java
+public class PersonTest {
+    public static void main(String[] args) {
+        // new Person() 调用的是空参的构造方法
+        Person p = new Person();
+    }
+}
+```
+
+## 4.2 构造方法的语法
+
+* 语法：
+
+```java
+public class 类名 {
+    
+    访问修饰符 类名(数据类型 参数1,数据类型 参数2,...){
+        // 方法体
+    }
+    
+    // 其余略
+}
+```
+
+> [!CAUTION]
+>
+> * 特点：
+>   * ① 构造方法的方法名和类名相同，大小写也需保持一致。
+>   * ② 没有返回值类型，甚至连 void 也没有。
+>   * ③ 没有具体的返回值，即：不能由 return 携带结果数据。
+> * 执行时机：
+>   * ① 创建对象的时候由虚拟机调用，不能手动调用构造方法。
+>   * ② 每创建一次对象，就会调用一次构造方法。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Person.java]{15,23-26}
+public class Person {
+    /**
+     * 姓名
+     */
+    private String name;
+
+    /**
+     * 年龄
+     */
+    private int age;
+
+    /**
+     * 空参构造方法
+     */
+    public Person() {}
+
+    /**
+     * 全参（全部参数）构造方法
+     *
+     * @param name 姓名
+     * @param age  年龄
+     */
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+```java [PersonTest.java] {4,9}
+public class PersonTest {
+    public static void main(String[] args) {
+        // new Person() 中的 Person() 调用无参构造方法
+        Person p = new Person();
+        System.out.println(p.getName()); // null
+        System.out.println(p.getAge()); // 0
+
+        // new Person("张三", 20) 中的 Person("张三", 20) 调用全参构造方法
+        Person p2 = new Person("张三", 20);
+        System.out.println(p2.getName()); // 张三
+        System.out.println(p2.getAge()); // 20
+    }
+}
+```
+
+:::
+
+## 4.3 构造方法的注意事项
+
+* ① 如果类中没有提供构造方法（无参构造方法或有参构造方法），那么 JVM 会帮助我们创建一个无参的构造方法。
+
+::: code-group
+
+```java [Person.java] {12-13}
+public class Person {
+    /**
+     * 姓名
+     */
+    private String name;
+
+    /**
+     * 年龄
+     */
+    private int age;
+
+	// 没有提供无参构造方法，JVM 会帮我们创建无参构造方法
+    // public Person() {}
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+```java [PersonTest.java] {5}
+public class PersonTest {
+    public static void main(String[] args) {
+        // new Person() 中的 Person() 调用无参构造方法
+        // Person 没有提供无参构造方法，JVM 会帮我们创建无参构造方法
+        Person p = new Person();
+    }
+}
+```
+
+:::
+
+* ② 如果类中有提供构造方法（无参构造方法或有参构造方法），那么 JVM 不会帮助我们创建一个无参的构造方法。
+
+::: code-group
+
+```java [Person.java] {18-21}
+public class Person {
+    /**
+     * 姓名
+     */
+    private String name;
+
+    /**
+     * 年龄
+     */
+    private int age;
+
+    /**
+     * 全参（全部参数）构造方法
+     *
+     * @param name 姓名
+     * @param age  年龄
+     */
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+```java [PersonErrorTest.java] 
+public class PersonErrorTest {
+    public static void main(String[] args) {
+        // ❌ 错误：由于我们已经提供了构造方法，JVM 不会帮助我们创建一个无参的构造方法
+        // new Person() 中的 Person() 调用无参构造方法
+        Person p = new Person(); // [!code error]
+        System.out.println(p.getName()); // null
+        System.out.println(p.getAge()); // 0
+    }
+}
+```
+
+```java [PersonRightTest.java] {4}
+public class PersonRightTest {
+    public static void main(String[] args) {
+        // new Person("张三", 20) 中的 Person("张三", 20) 调用全参构造方法
+        Person p2 = new Person("张三", 20);
+        System.out.println(p2.getName()); // 张三
+        System.out.println(p2.getAge()); // 20
+    }
+}
+```
+
+:::
+
+* ③ 如果类中有提供构造方法（无参构造方法或有参构造方法），但是还需要调用无参构造方法，就需要在类中手动实现无参构造方法。
+
+::: code-group
+
+```java [Person.java] {15,23-26}
+public class Person {
+    /**
+     * 姓名
+     */
+    private String name;
+
+    /**
+     * 年龄
+     */
+    private int age;
+
+    /**
+     * 空参构造方法
+     */
+    public Person() {}
+
+    /**
+     * 全参（全部参数）构造方法
+     *
+     * @param name 姓名
+     * @param age  年龄
+     */
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+```java [PersonTest.java] {4,9}
+public class PersonTest {
+    public static void main(String[] args) {
+        // new Person() 中的 Person() 调用无参构造方法
+        Person p = new Person();
+        System.out.println(p.getName()); // null
+        System.out.println(p.getAge()); // 0
+
+        // new Person("张三", 20) 中的 Person("张三", 20) 调用全参构造方法
+        Person p2 = new Person("张三", 20);
+        System.out.println(p2.getName()); // 张三
+        System.out.println(p2.getAge()); // 20
+    }
+}
+```
+
+:::
+
+
+
+# 第五章：成员变量和局部变量（⭐）
+
+## 5.1 概述
 
 * 在 Java 中，`成员变量`和 `局部变量`是两种不同的变量类型，它们的作用域、存储位置和生命周期都不同。
 
-#### 3.5.2.2 定义位置
+## 5.2 定义位置
 
 * `成员变量（实例变量）`：定义在类内部，但是在方法外部，属于类的对象。
 
@@ -1151,7 +1667,7 @@ public class Person {
 }
 ```
 
-#### 3.5.2.3 作用域
+## 5.3 作用域
 
 * `成员变量`的作用范围是整个类，可以被类中的所有方法使用。
 
@@ -1193,12 +1709,12 @@ public class ScopeExample {
 }
 ```
 
-#### 3.5.2.4 存储位置
+## 5.4 存储位置
 
 * `成员变量`是存储在堆中的，因为其属于对象。
 * `局部变量`是存储在栈中的，方法执行完毕后就会被销毁。
 
-#### 3.5.2.5 默认值
+## 5.5 默认值
 
 * 成员变量是会被赋默认值。
 
@@ -1230,25 +1746,9 @@ public class DefaultValueExample {
 }
 ```
 
-#### 3.5.2.6 修饰符的使用
+## 5.6 修饰符的使用
 
-* `成员变量`可以使用 `private`、`public`、`protected`、`static`、`final` 等修饰符。
-
-```java
-public class ModifierExample {
-    // ✅ 成员变量可以使用访问修饰符
-    private int memberVar = 10;  // [!code highlight]
-
-    public void method() {
-        // ❌ 局部变量不能使用访问修饰符
-        private int localVar = 5; // [!code error]
-        // ✅ 但可以用 final 修饰
-        final int localVar = 5; // [!code highlight]
-    }
-}
-```
-
-* `局部变量`**不能** 使用访问修饰符（`private`、`public` 等），但可以使用 `final`。
+* `成员变量`**可以**使用 `private`、`public`、`protected`、`static`、`final` 等修饰符。
 
 ```java
 public class ModifierExample {
@@ -1264,7 +1764,23 @@ public class ModifierExample {
 }
 ```
 
-#### 3.5.2.7 生命周期
+* `局部变量`**不能**使用访问修饰符（`private`、`public` 等），但可以使用 `final`。
+
+```java
+public class ModifierExample {
+    // ✅ 成员变量可以使用访问修饰符
+    private int memberVar = 10;  // [!code highlight]
+
+    public void method() {
+        // ❌ 局部变量不能使用访问修饰符
+        private int localVar = 5; // [!code error]
+        // ✅ 但可以用 final 修饰
+        final int localVar = 5; // [!code highlight]
+    }
+}
+```
+
+## 5.7 生命周期
 
 * `成员变量`随着对象的创建而存在，随着对象被垃圾回收而销毁。
 
@@ -1308,28 +1824,6 @@ public class LifecycleExample {
 }
 ```
 
-## 3.6 IDEA 技巧
 
 
-
-
-
-
-
-
-
-# 第四章：对象的内存分析
-
-
-
-
-
-
-
-
-
-
-
-
-
-# 第六章：构造方法
+# 第六章：this 关键字（⭐）
