@@ -1281,7 +1281,7 @@ public class PersonTest {
 
 :::
 
-## 3.6 IDEA 技巧
+## 3.6 IDEA 使用技巧
 
 * 对于 `setXxx()` 或 `getXxx()` 方法，在 IDEA 中，可以通过`Alt + Insert`快捷键一键生成。
 
@@ -1296,7 +1296,7 @@ public class Person {
 }
 ```
 
-![](./assets/14.gif)
+![IDEA 使用技巧](./assets/14.gif)
 
 ## 3.7 坑
 
@@ -1437,6 +1437,8 @@ public class PersonTest {
 
 ## 4.3 构造方法的注意事项
 
+### 4.3.1 构造方法的定义
+
 * ① 如果类中没有提供构造方法（无参构造方法或有参构造方法），那么 JVM 会帮助我们创建一个无参的构造方法。
 
 ::: code-group
@@ -1543,11 +1545,11 @@ public class PersonErrorTest {
 }
 ```
 
-```java [PersonRightTest.java] {4}
+```java [PersonRightTest.java]
 public class PersonRightTest {
     public static void main(String[] args) {
         // new Person("张三", 20) 中的 Person("张三", 20) 调用全参构造方法
-        Person p2 = new Person("张三", 20);
+        Person p2 = new Person("张三", 20); // [!code highlight]
         System.out.println(p2.getName()); // 张三
         System.out.println(p2.getAge()); // 20
     }
@@ -1624,15 +1626,317 @@ public class PersonTest {
 
 :::
 
+### 4.3.2 构造方法的重载
+
+* 普通方法的重载：在同一个类中，方法名相同，参数不同（个数不同、类型不同、顺序不同）的方法，和返回值无关。
+* 构造方法的重载：在同一个类中，参数不同（个数不同、类型不同、顺序不同）的构造方法，因为构造方法和类名相同，并且构造方法没有返回值。
 
 
-# 第五章：成员变量和局部变量（⭐）
+
+* 示例：
+
+```java 
+public class Person {
+    
+    private String name;
+    private int age;
+
+    public Person() {}
+
+    public Person(String name) { // [!code highlight]
+        this.name = name;
+    }
+
+    public Person(int age) { // [!code highlight]
+        this.age = age;
+    }
+
+    public Person(String name, int age) { // [!code highlight]
+        this.name = name;
+        this.age = age;
+    }
+
+    public Person(int age, String name) { // [!code highlight]
+        this.age = age;
+        this.name = name;
+    }
+}
+```
+
+### 4.3.3 推荐的使用方式
+
+* ① 在实际开发中，我们往往既会提供无参构造方法，也会提供有参构造方法。
+* ② 很多框架会要求我们提供无参构造方法，以便其内部进行反射实例化，至于反射是什么，后面讲解。
+
+
+
+* 示例：
+
+```java {15,23}
+public class Person {
+    /**
+     * 姓名
+     */
+    private String name;
+
+    /**
+     * 年龄
+     */
+    private int age;
+
+    /**
+     * 空参构造方法
+     */
+    public Person() {}
+
+    /**
+     * 全参（全部参数）构造方法
+     *
+     * @param name 姓名
+     * @param age  年龄
+     */
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+## 4.4 IDEA 使用技巧
+
+* 对于构造方法，在 IDEA 中，可以通过`Alt + Insert`快捷键一键生成。
+
+
+
+* 示例：
+
+```java
+public class Person {
+    private String name;
+    private int age;
+}
+```
+
+![IDEA 使用技巧](./assets/16.gif)
+
+
+
+# 第五章：标准的 JavaBean
 
 ## 5.1 概述
 
+* JavaBean 是一种符合特定编写规范的 Java 类，通常用于封装数据、实现对象属性的访问和修改。
+* JavaBean 广泛应用于 Java 的应用开发，特别是在数据库交互、表单处理、以及 MVC 架构（Spring 框架等）。
+
+## 5.2 JavaBean 的要求
+
+* ① 类名需要见名知意。
+* ② 成员变量需要使用 private 关键字修饰，即：属性私有化。
+* ③ JavaBean 中的属性必须通过公共的 getter 方法和 setter 方法进行访问或修改：
+  * setter 方法：用来设置属性值，命名格式是 `setPropertyName()`。
+  * getter 方法：用来读取属性值，命名格式是 `getPropertyName()`。
+
+> [!CAUTION]
+>
+> 如果属性是布尔类型，禁止使用 `isXxx` 的形式。
+
+* ④ 需要提供至少 2 个构造方法：
+  * 无参构造方法。
+  * 全参构造方法。
+* ⑤ ~~实现序列化接口（非强制），即：JavaBean 通常实现 `Serializable` 接口，这样可以将 JavaBean 对象序列化为字节流，便于网络传输或存储到文件~~。
+
+> [!CAUTION]
+>
+> * ① 已经有 JEP 提议，将序列化删除，因为其不安全以及性能较差等原因。
+> * ② 现在跨语言数据交换的方案，并不是 Java 内置的序列化方式，而是 JSON 等其它格式。
+
+
+
+* 示例：
+
+```java
+public class Person {
+    
+    private String name;
+    private int age;
+
+    public Person() {}
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+## 5.3 IDEA 使用技巧
+
+* 对于构造方法，在 IDEA 中，可以通过`Alt + Insert`快捷键一键生成。
+
+
+
+* 示例：
+
+```java
+public class Person {
+    
+    private String name;
+    private int age;
+
+}   
+```
+
+![IDEA 使用技巧](./assets/17.gif)
+
+## 5.4 应用示例
+
+* 需求：定义一个`注册功能`的标准 JavaBean。
+
+![注册功能的标准 JavaBean](./assets/18.png)
+
+
+
+* 示例：
+
+```java
+public class User {
+
+    // 用户名
+    private String username;
+
+    // 密码
+    private String password;
+
+    // 确认密码
+    private String confirmPassword;
+
+    // 邮箱
+    private String email;
+
+    // 性别
+    private char gender;
+
+    // 年龄
+    private int age;
+
+    // 空参构造方法
+    public User() {}
+
+    // 全参构造方法
+    public User(String username, String password, 
+                String confirmPassword, String email, 
+                char gender, int age) {
+        this.username = username;
+        this.password = password;
+        this.confirmPassword = confirmPassword;
+        this.email = email;
+        this.gender = gender;
+        if (age < 19 || age > 25) {
+            System.out.println("年龄必须在19到25之间！");
+        } else {
+            this.age = age;
+        }
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public char getGender() {
+        return gender;
+    }
+
+    public void setGender(char gender) {
+        this.gender = gender;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        if (age < 19 || age > 25) {
+            System.out.println("年龄必须在19到25之间！");
+        } else {
+            this.age = age;
+        }
+    }
+}
+```
+
+
+
+
+
+# 第六章：成员变量和局部变量（⭐）
+
+## 6.1 概述
+
 * 在 Java 中，`成员变量`和 `局部变量`是两种不同的变量类型，它们的作用域、存储位置和生命周期都不同。
 
-## 5.2 定义位置
+## 6.2 成员变量 VS 局部变量
+
+### 6.2.1 定义位置
 
 * `成员变量（实例变量）`：定义在类内部，但是在方法外部，属于类的对象。
 
@@ -1667,7 +1971,7 @@ public class Person {
 }
 ```
 
-## 5.3 作用域
+### 6.2.2 作用域
 
 * `成员变量`的作用范围是整个类，可以被类中的所有方法使用。
 
@@ -1709,12 +2013,12 @@ public class ScopeExample {
 }
 ```
 
-## 5.4 存储位置
+### 6.2.3 存储位置
 
 * `成员变量`是存储在堆中的，因为其属于对象。
 * `局部变量`是存储在栈中的，方法执行完毕后就会被销毁。
 
-## 5.5 默认值
+### 6.2.4 默认值
 
 * 成员变量是会被赋默认值。
 
@@ -1746,7 +2050,7 @@ public class DefaultValueExample {
 }
 ```
 
-## 5.6 修饰符的使用
+### 6.2.5 修饰符的使用
 
 * `成员变量`**可以**使用 `private`、`public`、`protected`、`static`、`final` 等修饰符。
 
@@ -1780,7 +2084,7 @@ public class ModifierExample {
 }
 ```
 
-## 5.7 生命周期
+### 6.2.6 生命周期
 
 * `成员变量`随着对象的创建而存在，随着对象被垃圾回收而销毁。
 
@@ -1826,4 +2130,4 @@ public class LifecycleExample {
 
 
 
-# 第六章：this 关键字（⭐）
+# 第七章：this 关键字（⭐）
