@@ -467,7 +467,7 @@ public class Main{
 ```java
 public class Main{
     public static void main(String[] args){
-        // 下面的代码是错误的，在 Java 中方法是不能嵌套定义的
+        // ❌ 错误：在 Java 中方法是不能嵌套定义的
         public static void play(){ // [!code error]
             System.out.println("玩游戏~"); // [!code error]
         } // [!code error]
@@ -523,7 +523,7 @@ public class Main{
     public static void play(int num){
         if(num == 2){
             return;
-            // 下面的代码是错误的
+            // ❌ 错误：return 语句的后面是不能编写其他的代码的
             System.out.println("玩游戏~"); // [!code error]
         }
         System.out.println("玩游戏~");

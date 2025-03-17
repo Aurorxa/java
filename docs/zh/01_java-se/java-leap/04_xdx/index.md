@@ -872,7 +872,7 @@ public class ArrayDemo11 {
         arr[2] = 30;
         arr[3] = 40;
         arr[4] = 50;
-        // 数组越界 
+        // ❌ 错误：数组越界 
         // java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5
         arr[5] = 60; // [!code error]
 
@@ -910,7 +910,7 @@ public class ArrayDemo11 {
         System.out.println("arr[2] = " + arr[2]); // arr[2] = 30
         System.out.println("arr[3] = " + arr[3]); // arr[3] = 40
         System.out.println("arr[4] = " + arr[4]); // arr[4] = 50
-        // 数组越界 
+        // ❌ 错误：数组越界 
         // java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5
         System.out.println("arr[4] = " + arr[5]); // [!code error]
 
@@ -932,7 +932,7 @@ package com.github.study;
 public class ArrayTest11 {
     public static void main(String[] args) {
         int[] arr = null;
-        // Exception in thread "main" java.lang.NullPointerException
+        // ❌ 错误：Exception in thread "main" java.lang.NullPointerException
         System.out.println(arr[0]); // [!code error]
     }
 }
