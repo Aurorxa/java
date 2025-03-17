@@ -1863,11 +1863,7 @@ public class User {
         this.confirmPassword = confirmPassword;
         this.email = email;
         this.gender = gender;
-        if (age < 19 || age > 25) {
-            System.out.println("年龄必须在19到25之间！");
-        } else {
-            this.age = age;
-        }
+        this.age = age;
     }
 
     public String getUsername() {
@@ -1915,11 +1911,7 @@ public class User {
     }
 
     public void setAge(int age) {
-        if (age < 19 || age > 25) {
-            System.out.println("年龄必须在19到25之间！");
-        } else {
-            this.age = age;
-        }
+        this.age = age;
     }
 }
 ```
