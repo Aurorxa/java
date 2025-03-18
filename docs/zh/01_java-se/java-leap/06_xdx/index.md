@@ -2071,6 +2071,10 @@ public class PersonTest {
 
 ![一个对象的内存图](./assets/27.gif)
 
+* 其在内存中的完整动态图，如下所示：
+
+
+
 ## 6.4 两个对象的内存图
 
 * 当在测试类中执行如下代码的时候，如下所示：
@@ -2172,8 +2176,6 @@ public class PersonTest {
 
 
 
-
-## 6.8 成员变量 VS 局部变量
 
 
 
@@ -2378,5 +2380,4 @@ public class LifecycleExample {
     } 
 }
 ```
-
 

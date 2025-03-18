@@ -10,12 +10,14 @@
     "resolveJsonModule": true,
     "typeRoots": [
       "node_modules/@types",
-      ".vitepress/types"
+      ".vitepress/types",
+      "./global.d.ts"
     ]
   },
   "include": [
     "**/.vitepress/**/*.ts",
     "**/.vitepress/**/*.mts",
-    "**/.vitepress/**/*.vue"
+    "**/.vitepress/**/*.vue",
+    "src/**/*.ts", "src/**/*.d.ts", "global.d.ts"
   ]
 }
