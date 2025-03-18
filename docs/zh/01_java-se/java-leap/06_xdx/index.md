@@ -2071,10 +2071,6 @@ public class PersonTest {
 
 ![一个对象的内存图](./assets/27.gif)
 
-* 其在内存中的完整动态图，如下所示：
-
-
-
 ## 6.4 两个对象的内存图
 
 * 当在测试类中执行如下代码的时候，如下所示：
@@ -2163,21 +2159,330 @@ public class PersonTest {
 
 ## 6.5 两个变量指向同一个对象的内存图
 
+* 当在测试类中执行如下代码的时候，如下所示：
 
+```java
+Person p = new Person(); // 调用无参构造方法
+```
+
+```java
+Person p2 = new Person("张三", 20); // 调用全参构造方法
+```
+
+* 会在内存中执行以下的步骤，如下所示：
+
+> [!NOTE]
+>
+> * ① 将 class 文件（字节码文件）加载到方法区中。
+>
+> * ② 在栈中声明局部变量。
+>
+> * ③ 在堆中开辟一个内存空间（对象）。
+>
+> * ④ 对堆中对象的属性进行默认初始化。
+>
+> * ⑤ 对堆中对象的属性进行显示初始化。
+>
+> * ⑥ 对堆中对象的属性进行构造方法初始化。
+>
+> * ⑦ 将堆中对象的地址值赋值给左边的局部变量。
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+    String name = "呵呵哒"; // 显示初始化
+
+    int age = 18; // 显示初始化
+
+    public Person() {}
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public void study(){
+        System.out.println("好好学习"); 
+    }
+}
+```
+
+```java [PersonTest.java]
+public class PersonTest {
+  public static void main(String[] args) {
+        Person p = new Person();
+        p.name = "张三";
+        p.age = 20;
+        System.out.println(p.name);
+        System.out.println(p.age);
+        p.study();
+      
+        System.out.println("--------------");
+        Person p2 = p;
+        p2.name = "李四";
+        p2.age = 32;
+        System.out.println(p2.name);
+        System.out.println(p2.age);
+        p2.study();      
+  }
+}
+```
+
+:::
+
+* 其在内存中的动态图，如下所示：
+
+![两个变量指向同一个对象的内存图](./assets/29.gif)
 
 ## 6.6 this 的内存原理
 
+### 6.6.1 this 的作用
 
+* this 的作用是用来区分`局部变量`和`成员变量`，如下所示：
 
+```java
+public class Person {
+    private int age; // 成员变量
+    
+    public void method(){
+        int age; // 局部变量
+        System.out.println(age); // 打印局部变量
+        System.out.println(this.age); // 打印成员变量
+    }
+}
+```
 
+### 6.6.2 this 的本质
+
+* this 的本质是：所在方法调用者的地址，如下所示：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+    /**
+     * 姓名
+     */
+    private String name;
+
+    /**
+     * 年龄
+     */
+    private int age;
+
+    /**
+     * 空参构造方法
+     */
+    public Person() {}
+
+    /**
+     * 全参构造方法
+     *
+     * @param name 姓名
+     * @param age  年龄
+     */
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+```java [PersonTest.java]
+public class PersonTest {
+    public static void main(String[] args) {
+        Person p = new Person();
+        p.setName("张三");
+        p.setAge(20);
+        System.out.println(p.getName() + ", " + p.getAge());
+    }
+}
+```
+
+:::
+
+* 其在内存中的动态图，如下所示：
+
+![this 的本质 ](./assets/30.gif)
 
 ## 6.7 基本数据类型 VS 引用数据类型
 
+### 6.7.1 概述
 
+* 在 Java 中，基本数据类型是 4 类 8 种，如下所示：
 
+![基本数据类型](./assets/7.jpg)
 
+* 除了上述的基本数据类型，其余的都是引用数据类型，如：类、数组、接口、枚举和注解等。
 
+### 6.7.2 基本数据类型的内存分析
 
+* 假设正在运行的代码，如下所示：
+
+```java
+public class MethodDemo{
+    public static void main(String[] args){
+        int num = 10;
+        double d = 3.14;
+        char c = 'A';
+        boolean b = false;
+        
+        System.out.println(num);
+        System.out.println(d);
+        System.out.println(c);
+        System.out.println(b);
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+> [!IMPORTANT]
+>
+> `基本数据类型`的变量中存储的是`真实的数据`！！！
+
+![基本数据类型的内存示意图](./assets/8.gif)
+
+### 6.7.3 引用数据类型的内存分析
+
+* 假设正在运行的代码，如下所示：
+
+```java
+import java.util.*;
+public class MethodDemo{
+    public static void main(String[] args){
+        int[] arr = null;
+        
+        arr = new int[]{1,2,3,4,5,6,7,8,9,10};
+        
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+> [!IMPORTANT]
+>
+> `引用数据类型`的变量中存储的是`引用（堆中对象的地址值）`！！！
+
+![引用数据类型的内存示意图](./assets/9.gif)
+
+### 6.7.4 从内存角度解释基本数据类型和引用数据类型
+
+#### 6.7.4.1 基本数据类型
+
+* 基本数据类型的变量：其`数据值`是`存储`在`自己的内存空间`的，如下所示：
+
+```java
+public class MethodDemo{
+    public static void main(String[] args){
+        int num = 10;
+        double d = 3.14;
+        char c = 'A';
+        boolean b = false;
+        
+        System.out.println(num);
+        System.out.println(d);
+        System.out.println(c);
+        System.out.println(b);
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+![基本数据类型的变量](./assets/10.gif)
+
+* 基本数据类型的特点是：赋值给其他变量，赋值的也是真实的值，如果修改其他变量的值，是不会影响自身变量中保存的值，如下所示：
+
+```java
+public class MethodDemo{
+    public static void main(String[] args){
+        int num = 10;
+        int num2 = num;
+        System.out.println(num2);
+        
+        num2 = 20; // [!code highlight]
+        
+        System.out.println(num);
+        System.out.println(num2);
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+![基本数据类型的特点](./assets/11.gif)
+
+#### 6.7.4.2 引用数据类型
+
+* 引用数据类型的变量：其`数据值`是`存储`在`堆空间`中的，`自己空间`中`存储`的是`引用`（堆中对象的地址值），如下所示：
+
+```java
+import java.util.*;
+
+public class MethodDemo{
+    public static void main(String[] args){
+        int[] arr = null;
+        
+        arr = new int[]{1,2,3,4,5,6,7,8,9,10};
+        
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+![引用数据类型的变量](./assets/12.gif)
+
+* 引用数据类型的特点是：赋值给其他变量，赋值的是引用（堆中对象的地址值），如果修改其他变量对应堆中对象的数据，是会影响自身变量对应堆中对象的数据，如下所示：
+
+```java
+import java.util.*;
+
+public class MethodDemo{
+    public static void main(String[] args){
+        int[] arr = null;
+        
+        arr = new int[]{1,2,3,4,5,6,7,8,9,10};
+        
+        System.out.println(Arrays.toString(arr));
+        
+        int[] arr2 = arr; // [!code highlight]
+        
+        for(int i = 0;i<arr2.length;i++){
+            arr2[i] *= 10;
+        }
+        System.out.println(Arrays.toString(arr));
+        System.out.println(Arrays.toString(arr2));
+    }
+}
+```
+
+* 其内存图示，如下所示：
+
+![引用数据类型的特点](./assets/13.gif)
 
 
 
