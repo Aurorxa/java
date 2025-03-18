@@ -1916,6 +1916,45 @@ public class User {
 }
 ```
 
+## 5.5 Lombok 介绍
+
+* 可能你会觉得标准的 JavaBean ，非常繁琐，都是样板代码；即使，在 IDEA 的帮助下，也感觉代码很长且都是机械重复的工作。
+* 其实，在实际开发中，我们可以通过 Lombok 来简化 Java 代码的编写。其解决了开发者在编写 Java 代码时常见的重复性工作问题，让代码更加简洁和易读。
+
+
+
+* 示例：
+
+```java
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+
+    // 用户名
+    private String username;
+
+    // 密码
+    private String password;
+
+    // 确认密码
+    private String confirmPassword;
+
+    // 邮箱
+    private String email;
+
+    // 性别
+    private char gender;
+
+    // 年龄
+    private int age;
+}
+```
+
 
 
 # 第六章：对象内存分析（⭐）
