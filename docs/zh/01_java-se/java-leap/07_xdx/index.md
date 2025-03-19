@@ -600,7 +600,108 @@ Product{id=3, name='华为耳机', price=199.0, count=100}
 
 :::
 
+## 2.2 对象数组 2
 
+* 需求：定义数组存储 3 辆汽车信息。
+
+> [!NOTE]
+>
+> * ① 汽车的属性是：品牌、价格和颜色。
+> * ② 创建 3 个汽车对象，数据通过键盘录入而来，并将数据存储到数组中。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Car.java]
+public class Car {
+
+    private String brand;
+
+    private double price;
+
+    private String color;
+
+    public Car(String brand, double price, String color) {
+        this.brand = brand;
+        this.price = price;
+        this.color = color;
+    }
+
+    public Car() {}
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public String toString() {
+        return "Car {" + "brand='" + brand + '\'' + ", price=" + price + ", color='" + color + '\'' + '}';
+    }
+}
+
+```
+
+```java [CarTest.java]
+import java.util.Scanner;
+
+public class CarTest {
+    public static void main(String[] args) {
+        // 创建键盘录入对象
+        Scanner input = new Scanner(System.in);
+        // 创建 3 辆车的数组
+        Car[] car = new Car[3];
+        // 键盘录入
+        for (int i = 0; i < car.length; i++) {
+            System.out.print("请输入第 " + (i + 1) + " 辆车的品牌：");
+            String brand = input.next();
+            System.out.print("请输入第 " + (i + 1) + " 辆车的价格：");
+            double price = input.nextDouble();
+            System.out.print("请输入第 " + (i + 1) + " 辆车的颜色：");
+            String color = input.next();
+            // 将 Car 对象放入数组中
+            car[i] = new Car(brand, price, color);
+        }
+        // 打印数组
+        for (int i = 0; i < car.length; i++) {
+            System.out.println(car[i]);
+        }
+        // 关闭输入流
+        input.close();
+    }
+}
+
+```
+
+```txt [cmd 控制台]
+Car {brand='宝马', price=2.5, color='红色'}
+Car {brand='黑马', price=3.5, color='黑色'}
+Car {brand='皇马', price=9.9, color='白色'}
+```
+
+:::
 
 
 
