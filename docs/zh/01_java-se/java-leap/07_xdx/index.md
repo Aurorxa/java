@@ -499,7 +499,106 @@ public class GameTest {
 
 # 第二章：对象数组练习
 
-## 2.1 概述
+## 2.1 对象数组 1
+
+* 需求：定义数组存储 3 个商品对象。
+
+> [!NOTE]
+>
+> * ① 商品的属性：商品 id、商品名称、商品价格、商品库存。
+> * ② 创建三个商品对象，并将商品对象存入到数组中。
+> * ③ 遍历对象数组。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Product.java]
+public class Product {
+    private int id;
+    private String name;
+    private double price;
+    private int count;
+
+    public Product() {}
+
+    public Product(int id, String name, double price, int count) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.count = count;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" + "id=" + id + ", name='" + name + '\'' + ", price=" + price + ", count=" + count + '}';
+    }
+}
+```
+
+```java [ProductTest.java]
+public class ProductTest {
+    public static void main(String[] args) {
+        // 创建对象数组
+        Product[] arr = new Product[3];
+        // 创建商品对象
+        Product p1 = new Product(1, "华为手机", 5999, 100);
+        Product p2 = new Product(2, "华为平板", 3999, 100);
+        Product p3 = new Product(3, "华为耳机", 199, 100);
+        // 将商品对象放入数组中
+        arr[0] = p1;
+        arr[1] = p2;
+        arr[2] = p3;
+        // 遍历对象数组
+        for (int i = 0; i < arr.length; i++) {
+            Product p = arr[i];
+            System.out.println(p);
+        }
+    }
+}
+```
+
+```txt [cmd 控制台]
+Product{id=1, name='华为手机', price=5999.0, count=100}
+Product{id=2, name='华为平板', price=3999.0, count=100}
+Product{id=3, name='华为耳机', price=199.0, count=100}
+```
+
+:::
 
 
 
