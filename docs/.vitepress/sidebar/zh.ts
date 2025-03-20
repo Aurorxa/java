@@ -1,4 +1,4 @@
-import { DefaultTheme } from 'vitepress'
+import type { DefaultTheme } from 'vitepress'
 import { commonDirectoryName } from '../utils/constant'
 
 // 中文侧边栏
