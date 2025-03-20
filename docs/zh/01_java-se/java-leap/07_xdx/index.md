@@ -10,11 +10,11 @@
 ```mermaid
 classDiagram
     class 乔峰 {
-        - string 姓名 = "乔峰"
+        - String 姓名 = "乔峰"
         - int 血量 = 100
     }
     class 鸠摩智 {
-        - string 姓名 = "鸠摩智"
+        - String 姓名 = "鸠摩智"
         - int 血量 = 100
     }
 ```
@@ -28,7 +28,7 @@ classDiagram
 鸠摩智举起拳头打了鸠摩智一下，造成了 XX 点伤害，乔峰还剩下 XXX 点血。
 
 ...
-乔峰 K.O. 鸠摩智
+乔峰 K.O 鸠摩智
 ```
 
 * 如果你不了解回合制游戏，那么请看下面的`大话西游`，其就是典型的回合制游戏，如下所示：
@@ -208,27 +208,29 @@ public class GameTest {
 ```mermaid
 classDiagram
     class 乔峰 {
-        - string 姓名 = "乔峰"
+        - String 姓名 = "乔峰"
         - int 血量 = 100
-        - gender = "男" # 可能是男，可能是女
-        - faces = "风流俊雅" # 容颜
+        - char 性别 = "男" # 可能是男，可能是女
+        - String 容颜 = "风流俊雅" 
     }
     class 鸠摩智 {
-        - string 姓名 = "鸠摩智"
+        - String 姓名 = "鸠摩智"
         - int 血量 = 100
-        - gender = "男" # 可能是男，可能是女
-        - faces = "相貌英俊" # 容颜
+        - char 性别 = "男" # 可能是男，可能是女
+        - String 容颜 = "相貌英俊" 
     }
 ```
 
 * 其中，男女的容颜，如下所示：
 
 ```java
-String[] boyfaces = {"风流俊雅","气宇轩昂","相貌英俊","五官端正","相貌平平","一塌糊涂","面目狰狞"}
+String[] boyfaces 
+   = {"风流俊雅","气宇轩昂","相貌英俊","五官端正","相貌平平","一塌糊涂","面目狰狞"};
 ```
 
 ```java
-String[] girlfaces = {"美奂绝伦","沉鱼落雁","婷婷玉立","身材娇好","相貌平平","相貌简陋","惨不忍睹"};
+String[] girlfaces 
+   = {"美奂绝伦","沉鱼落雁","婷婷玉立","身材娇好","相貌平平","相貌简陋","惨不忍睹"};
 ```
 
 * 当游戏开始启动的时候，需要模拟回合制格斗游戏，如下所示：
@@ -237,7 +239,7 @@ String[] girlfaces = {"美奂绝伦","沉鱼落雁","婷婷玉立","身材娇好
 乔峰使出了一招【背心钉】，转到对方的身后，一掌向鸠摩智背心的灵台穴拍去。结果给鸠摩智造成一处伤。
 鸠摩智使出了一招【游空探爪】，飞起身形自半空中变掌为抓锁向乔峰。结果乔峰退了半步，毫发无损。
 ...
-乔峰 K.O. 鸠摩智
+乔峰 K.O 鸠摩智
 ```
 
 * 其中，他们之间的武功招式（每次格斗的时候，从数组中随机选择一个武功），如下所示：
@@ -501,12 +503,12 @@ public class GameTest {
 
 ## 2.1 对象数组 1
 
-* 需求：定义数组存储 3 个商品对象。
+* 需求：定义数组，并存储 3 个商品对象。
 
 > [!NOTE]
 >
-> * ① 商品的属性：商品 id、商品名称、商品价格、商品库存。
-> * ② 创建三个商品对象，并将商品对象存入到数组中。
+> * ① 商品的属性：id、名称、价格、库存。
+> * ② 创建 3 个商品对象，并将商品对象存入到数组中。
 > * ③ 遍历对象数组。
 
 
@@ -517,9 +519,17 @@ public class GameTest {
 
 ```java [Product.java]
 public class Product {
+    
+    // id
     private int id;
+    
+    // 名称
     private String name;
+    
+    // 价格
     private double price;
+    
+    // 库存
     private int count;
 
     public Product() {}
@@ -565,7 +575,10 @@ public class Product {
 
     @Override
     public String toString() {
-        return "Product{" + "id=" + id + ", name='" + name + '\'' + ", price=" + price + ", count=" + count + '}';
+        return "Product{" + "id=" + id 
+            + ", name='" + name + '\'' 
+            + ", price=" + price 
+            + ", count=" + count + '}';
     }
 }
 ```
@@ -602,12 +615,13 @@ Product{id=3, name='华为耳机', price=199.0, count=100}
 
 ## 2.2 对象数组 2
 
-* 需求：定义数组存储 3 辆汽车信息。
+* 需求：定义数组，并存储 3 辆汽车对象。
 
 > [!NOTE]
 >
-> * ① 汽车的属性是：品牌、价格和颜色。
-> * ② 创建 3 个汽车对象，数据通过键盘录入而来，并将数据存储到数组中。
+> * ① 汽车的属性：品牌、价格、颜色。
+> * ② 创建 3 个汽车对象，数据通过键盘录入，并将汽车对象存储到数组中。
+> * ③ 遍历对象数组。
 
 
 
@@ -617,11 +631,14 @@ Product{id=3, name='华为耳机', price=199.0, count=100}
 
 ```java [Car.java]
 public class Car {
-
+    
+    // 品牌
     private String brand;
 
+    // 价格
     private double price;
 
+    // 颜色
     private String color;
 
     public Car(String brand, double price, String color) {
@@ -658,10 +675,11 @@ public class Car {
 
     @Override
     public String toString() {
-        return "Car {" + "brand='" + brand + '\'' + ", price=" + price + ", color='" + color + '\'' + '}';
+        return "Car {" + "brand='" + brand+ '\'' 
+            + ", price=" + price 
+            + ", color='" + color + '\'' + '}';
     }
 }
-
 ```
 
 ```java [CarTest.java]
@@ -673,7 +691,7 @@ public class CarTest {
         Scanner input = new Scanner(System.in);
         // 创建 3 辆车的数组
         Car[] car = new Car[3];
-        // 键盘录入
+        // 键盘录入，创建汽车对象，并将汽车对象存储到数组中
         for (int i = 0; i < car.length; i++) {
             System.out.print("请输入第 " + (i + 1) + " 辆车的品牌：");
             String brand = input.next();
@@ -692,18 +710,206 @@ public class CarTest {
         input.close();
     }
 }
-
 ```
 
 ```txt [cmd 控制台]
-Car {brand='宝马', price=2.5, color='红色'}
-Car {brand='黑马', price=3.5, color='黑色'}
+Car {brand='宝马', price=100000.25, color='红色'}
+Car {brand='奔驰', price=350000.25, color='黑色'}
 Car {brand='皇马', price=9.9, color='白色'}
 ```
 
 :::
 
+## 2.3 对象数组 3
 
+* 需求：定义数组，存储 4 个女朋友对象。
+
+> [!NOTE]
+>
+> * ① 女朋友的属性：姓名、年龄、性别、爱好。
+> * ② 计算出四女朋友的平均年龄。
+> * ③ 统计年龄比平均值低的女朋友有几个？并把她们的所有信息打印出来。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [GirlFriend.java]
+public class GirlFriend {
+
+    // 姓名
+    private String name;
+
+    // 年龄
+    private int age;
+
+    // 性别
+    private char gender;
+
+    // 爱好
+    private String hobby;
+
+    public GirlFriend() {}
+
+    public GirlFriend(String name, int age, char gender, String hobby) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.hobby = hobby;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public char getGender() {
+        return gender;
+    }
+
+    public void setGender(char gender) {
+        this.gender = gender;
+    }
+
+    public String getHobby() {
+        return hobby;
+    }
+
+    public void setHobby(String hobby) {
+        this.hobby = hobby;
+    }
+
+    @Override
+    public String toString() {
+        return "GirlFriend{" + "name='"
+                + name + '\'' + ", age="
+                + age + ", gender="
+                + gender + ", hobby='"
+                + hobby + '\'' + '}';
+    }
+}
+```
+
+```java [GirlFriendTest.java]
+public class GirlFriendTest {
+    public static void main(String[] args) {
+        // 定义数组对象
+        GirlFriend[] gf = new GirlFriend[4];
+        // 创建 4 个女朋友对象
+        GirlFriend g1 = new GirlFriend("小红", 18, '女', "唱歌");
+        GirlFriend g2 = new GirlFriend("小花", 19, '女', "打游戏");
+        GirlFriend g3 = new GirlFriend("小绿", 20, '女', "看电影");
+        GirlFriend g4 = new GirlFriend("小黄", 21, '女', "看电影");
+        // 将 4 个女朋友对象放入数组中
+        gf[0] = g1;
+        gf[1] = g2;
+        gf[2] = g3;
+        gf[3] = g4;
+        // 计算出女朋友的平均年龄
+        double avgAge = avgAge(gf);
+        System.out.println("平均年龄：" + avgAge);
+        // 统计年龄比平均值低的女朋友有几个
+        int count = lessAvgAgeCount(gf, avgAge);
+        System.out.println("年龄比平均值低的女朋友有：" + count + " 个");
+        // 打印年龄比平均值低的女朋友
+        GirlFriend[] result = lessAvgAge(gf, avgAge, count);
+        for (int i = 0; i < result.length; i++) {
+            System.out.println(result[i]);
+        }
+    }
+
+    /**
+     * 计算平均年龄
+     * @param gf 女朋友对象数组
+     * @return 平均年龄
+     */
+    public static double avgAge(GirlFriend[] gf) {
+        double sum = 0;
+        for (int i = 0; i < gf.length; i++) {
+            sum += gf[i].getAge();
+        }
+        return sum / gf.length;
+    }
+
+    /**
+     * 计算年龄比平均值低的女朋友的数量
+     * @param gf 女朋友对象数组
+     * @param avgAge 平均值
+     * @return 数量
+     */
+    public static int lessAvgAgeCount(GirlFriend[] gf, double avgAge) {
+        int count = 0;
+        for (int i = 0; i < gf.length; i++) {
+            if (gf[i].getAge() < avgAge) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 返回年龄比平均值低的女朋友
+     * @param gf 女朋友对象数组
+     * @param avgAge 平均值
+     * @param count 数量
+     * @return 女朋友对象数组
+     */
+    public static GirlFriend[] lessAvgAge(GirlFriend[] gf, double avgAge, int count) {
+
+        GirlFriend[] result = new GirlFriend[count];
+
+        for (int i = 0, j = 0; i < gf.length; i++) {
+            if (gf[i].getAge() < avgAge) {
+                result[j++] = gf[i];
+            }
+        }
+
+        return result;
+    }
+}
+```
+
+```txt [cmd 控制台]
+平均年龄：19.5
+年龄比平均值低的女朋友有：2 个
+GirlFriend{name='小红', age=18, gender=女, hobby='唱歌'}
+GirlFriend{name='小花', age=19, gender=女, hobby='打游戏'}
+```
+
+:::
+
+## 2.4 对象数组 4
+
+* 需求：定义数组，存储 3 个学生对象。
+
+> [!NOTE]
+>
+> * ① 学生的属性：学号，姓名，年龄。
+> * ② 添加的时候需要进行学号的唯一性判断。。
+> * ③ 添加完毕之后，遍历所有学生信息。
+> * ④ 通过 id 删除学生信息：如果存在，则删除；如果不存在，则提示删除失败。
+> * ⑤ 删除完毕之后，遍历所有学生信息。
+> * ⑥ id 为 2 的学生，年龄 +1 岁。
+
+
+
+* 示例：
+
+```java
+```
 
 
 
