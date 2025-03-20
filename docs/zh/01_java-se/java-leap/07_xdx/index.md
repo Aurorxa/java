@@ -1037,7 +1037,7 @@ public class StudentTest {
         for (int i = 0; i < arr.length; i++) {
             System.out.println(arr[i]);
         }
-        System.out.println("===================");
+        System.out.println("======================================");
     }
 
     /**
@@ -1112,23 +1112,23 @@ public class StudentTest {
 Student{id=1, name='林青霞', age=30}
 Student{id=2, name='张曼玉', age=35}
 Student{id=3, name='王祖蓝', age=40}
-===================
+======================================
 Student{id=1, name='林青霞', age=30}
 Student{id=2, name='张曼玉', age=35}
 Student{id=3, name='王祖蓝', age=40}
 Student{id=4, name='刘意', age=28}
-===================
+======================================
 id不存在，删除失败
 Student{id=1, name='林青霞', age=30}
 Student{id=2, name='张曼玉', age=35}
 Student{id=3, name='王祖蓝', age=40}
 Student{id=4, name='刘意', age=28}
-===================
+======================================
 Student{id=1, name='林青霞', age=30}
 Student{id=2, name='张曼玉', age=35}
 Student{id=3, name='王祖蓝', age=41}
 Student{id=4, name='刘意', age=28}
-===================
+======================================
 ```
 
 :::
