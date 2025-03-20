@@ -893,27 +893,243 @@ GirlFriend{name='小花', age=19, gender=女, hobby='打游戏'}
 
 ## 2.4 对象数组 4
 
-* 需求：定义数组，存储 3 个学生对象。
+* 需求：定义数组，存储 3 个学生对象作为初识数据，学生对象的学号、姓名各不相同。
 
 > [!NOTE]
 >
 > * ① 学生的属性：学号，姓名，年龄。
-> * ② 添加的时候需要进行学号的唯一性判断。。
+> * ② 再次添加一个学生的对象，并在添加的时候进行学号的唯一性判断。
 > * ③ 添加完毕之后，遍历所有学生信息。
 > * ④ 通过 id 删除学生信息：如果存在，则删除；如果不存在，则提示删除失败。
 > * ⑤ 删除完毕之后，遍历所有学生信息。
-> * ⑥ id 为 2 的学生，年龄 +1 岁。
+> * ⑥ 查询 id 为 2 的学生，如果存在，就将其年龄 +1 岁。
 
 
 
 * 示例：
 
-```java
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    private int id;
+
+    private String name;
+
+    private int age;
+
+    public Student() {}
+
+    public Student(int id, String name, int age) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" + "id=" + id + 
+            ", name='" + name + '\'' + ", age=" + age + '}';
+    }
+}
 ```
 
+```java [StudentTest.java]
+public class StudentTest {
+    public static void main(String[] args) {
+        // 创建一个对象数组
+        Student[] arr = new Student[3];
 
+        // 创建三个学生对象
+        Student s1 = new Student(1, "林青霞", 30);
+        Student s2 = new Student(2, "张曼玉", 35);
+        Student s3 = new Student(3, "王祖蓝", 40);
 
+        // 把学生对象作为元素赋值给数组
+        arr[0] = s1;
+        arr[1] = s2;
+        arr[2] = s3;
 
+        // 遍历数组
+        printArray(arr);
 
-# 第三章：购物车
+        // 添加元素
+        Student s4 = new Student(4, "刘意", 28);
+        arr = add(arr, s4);
+
+        // 遍历数组
+        printArray(arr);
+
+        // 通过 id 删除学生信息，如果存在，则删除；否则，则提示删除失败
+        delete(arr, 10);
+
+        // 遍历数组
+        printArray(arr);
+
+        // 修改信息
+        edit(arr, 3);
+
+        // 遍历数组
+        printArray(arr);
+    }
+
+    /**
+     * 判断数组中是否包含指定的元素
+     * @param arr 数组
+     * @param id 指定的元素
+     * @return true 包含，false 不包含
+     */
+    public static boolean contains(Student[] arr, int id) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] != null && arr[i].getId() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 添加元素到数组中
+     * @param arr 数组
+     * @param s 要添加的元素
+     * @return 返回添加后的数组
+     */
+    public static Student[] add(Student[] arr, Student s) {
+        if (contains(arr, s.getId())) {
+            System.out.println("当前id重复，请修改id后在添加");
+        } else {
+            // 添加数组元素
+            arr = append(arr, s);
+        }
+        return arr;
+    }
+
+    /**
+     * 打印数组中的元素
+     * @param arr 数组
+     */
+    public static void printArray(Student[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            System.out.println(arr[i]);
+        }
+        System.out.println("===================");
+    }
+
+    /**
+     * 判断数组中元素的个数
+     * @param arr 数组
+     * @return 数组中元素的个数
+     */
+    public static int count(Student[] arr) {
+        int count = 0;
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] != null) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static Student[] append(Student[] arr, Student s) {
+        int count = count(arr);
+        if (count == arr.length) {
+            // 数组已经存满，需要进行扩容
+            Student[] newArr = new Student[arr.length + 1];
+            // 把原数组中的元素复制到新数组中
+            System.arraycopy(arr, 0, newArr, 0, arr.length);
+            // 把新元素赋值到新数组中
+            newArr[arr.length] = s;
+            // 把新数组赋值给原数组
+            arr = newArr;
+        } else {
+            // 数组没有存满，直接添加即可
+            arr[count] = s;
+        }
+
+        return arr;
+    }
+
+    /**
+     * 根据 id 删除信息
+     * @param arr 数组
+     * @param id id
+     */
+    public static void delete(Student[] arr, int id) {
+        if (!contains(arr, id)) {
+            System.out.println("id不存在，删除失败");
+        }
+        for (int i = 0; i < arr.length; i++) {
+            if (null != arr[i] && arr[i].getId() == id) {
+                arr[i] = null;
+            }
+        }
+    }
+
+    /**
+     * 修改用户信息
+     * @param arr 数组
+     * @param id id
+     */
+    public static void edit(Student[] arr, int id) {
+        if (!contains(arr, id)) {
+            System.out.println("id不存在，修改失败");
+        }
+        for (int i = 0; i < arr.length; i++) {
+            if (null != arr[i] && arr[i].getId() == id) {
+                arr[i].setAge(arr[i].getAge() + 1);
+            }
+        }
+    }
+}
+```
+
+```txt [cmd 控制台]
+Student{id=1, name='林青霞', age=30}
+Student{id=2, name='张曼玉', age=35}
+Student{id=3, name='王祖蓝', age=40}
+===================
+Student{id=1, name='林青霞', age=30}
+Student{id=2, name='张曼玉', age=35}
+Student{id=3, name='王祖蓝', age=40}
+Student{id=4, name='刘意', age=28}
+===================
+id不存在，删除失败
+Student{id=1, name='林青霞', age=30}
+Student{id=2, name='张曼玉', age=35}
+Student{id=3, name='王祖蓝', age=40}
+Student{id=4, name='刘意', age=28}
+===================
+Student{id=1, name='林青霞', age=30}
+Student{id=2, name='张曼玉', age=35}
+Student{id=3, name='王祖蓝', age=41}
+Student{id=4, name='刘意', age=28}
+===================
+```
+
+:::
 
