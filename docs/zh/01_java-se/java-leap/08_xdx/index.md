@@ -79,9 +79,145 @@
 
 
 
-# 第二章：String 介绍
+# 第二章：String 介绍（⭐）
 
 ## 2.1 概述
 
+* 在 Java 中，字符串字面量是使用 `""` 包裹的，如下所示：
+
+```java
+String str = "abc";
+```
+
+```java
+String str = "你好啊";
+```
+
+* 在 Java 中，字符串和任意类型的数据（常量或变量）进行拼接，结果是一个新的字符串，如下所示：
+
+```java
+String str = "abc";
+String str2 = "abc" + 1;
+```
+
+```java
+String str = "abc";
+String str2 = 'c' + "abc";
+```
+
+## 2.2 字符串的应用场景
+
+* ① `用户的输入和输出处理`：用户在界面、命令行或网页中输入的数据通常是字符串，需要进行读取、处理和显示。
+
+![用户的输入和输出处理](./assets/4.png)
+
+* ② `文本数据处理`：对文章、日志、配置文件等文本进行读取、解析、提取关键字、格式化等操作。
+
+![文本数据处理](./assets/5.jpeg)
+
+## 2.3 字符串需要学习的内容
+
+* ① 掌握字符串的一些常见操作：String、StringBuilder、StringBuffer、StringJoiner、Pattern、Matcher。
+* ② 掌握分析问题、解决问题的能力，以解决实际开发中的常见问题。
+* ③ 学习字符串相关的底层原理，以便处理开发中的一些复杂问题。
+
+## 2.4 package 关键字和 import 关键字
+
+### 2.4.1 package 关键字
+
+* `package` 用于将类、接口等 Java 文件组织成不同的命名空间，从而避免命名冲突。
+* 语法：
+
+```java
+package 顶级包名.子包名;
+```
+
+> [!NOTE]
+>
+> * ① `package` 帮助代码更有条理，尤其是在大型项目中。每个 Java 类文件可以声明一个包。
+> * ② `package` 对应于文件系统的目录，package 语句中，用 `.` 来指明包（目录）的层次。
+> * ③ `package` 语句作为 Java 源文件的第一条语句，指明该文件中定义的类所在的包。
+> * ④ 如果没有显式声明 `package`，默认的包是 `default`，但这不推荐在实际开发中使用。
+> * ⑤ 包通常用小写单词标识，通常使用所在公司域名的倒置，比如：`com.github.xxx` 。
+
+> [!NOTE]
+>
+> ::: details 点我查看 大型项目中的 `package`
+>
+> ![大型项目中的包](./assets/6.png)
+>
+> :::
 
 
+
+* 示例：
+
+```java {1}
+package com.github.model;
+
+public class Student {
+    
+    String name;
+    int age;
+    char gender;
+
+    public void study() {
+        System.out.println("学习使我快乐");
+    }
+}
+```
+
+### 2.4.2 import 关键字
+
+* `import` 用于引入其他包中的类或接口，这样就可以在当前类中使用它们而不需要写全类的完整路径。
+* 语法：
+
+```java
+import 顶级包名.子包名.类;
+```
+
+> [!NOTE]
+>
+> * ① `import` 语句使得代码更加简洁，避免每次使用类时都要写完整的类路径。
+> * ② `import` 语句通常放在类文件的最上方，在 `package` 声明之后，类声明之前。
+> * ③ `import java.util.Scanner` ：只引入一个类，使用其类名即可。
+> * ④ `import java.util.*`：使用 `*` 来引入包中的所有类，但这种做法不推荐，因为它会引入所有类，可能影响性能，也不清楚具体引入了哪些类。
+> * ⑤ 在实际开发中，无需担心，我们都是通过 `IDEA` ，让其帮助我们自动导入包。
+
+
+
+* 示例：
+
+```java {1}
+import java.util.Scanner;
+
+public class IOTest {
+    public static void main(String[] args) {
+        // 创建 Scanner 对象
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("姓名：");
+        String name = sc.nextLine();
+        System.out.print("年龄：");
+        int age = sc.nextInt();
+        System.out.print("身高：");
+        double height = sc.nextDouble();
+        System.out.print("体重：");
+        double weight = sc.nextDouble();
+
+        System.out.println("----------------------");
+
+        System.out.println("姓名是：" + name);
+        System.out.println("年龄是：" + age);
+        System.out.println("身高是：" + height);
+        System.out.println("体重是：" + weight);
+
+        // 关闭资源
+        sc.close();
+    }
+}
+```
+
+
+
+# 第三章：String（⭐）
