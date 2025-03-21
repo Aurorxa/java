@@ -221,3 +221,139 @@ public class IOTest {
 
 
 # 第三章：String（⭐）
+
+## 3.1 概述
+
+* ① 在 Java 中，字符串是使用 String 类来表示的。并且，所有的字符串字面量都是 String 类的实例。
+
+```java
+String str = "abc";
+```
+
+```java
+String str = "你好啊";
+```
+
+* ② 在 Java 中，String 是通过 final 关键字修饰的，表明其不能被继承。
+
+```java
+public final class String
+    implements java.io.Serializable, Comparable<String>, CharSequence,
+               Constable, ConstantDesc {
+    ...               
+}
+```
+
+* ③ 在 Java 中，一旦 String 创建之后，就不可以改变，如果对其进行了拼接操作，就会产生新的 String 对象。
+
+```java
+String str = "abc";
+String str2 = str + 1 ; // 新的 String 实例
+```
+
+* ④ 在 JDK9 之后，String 对象的字符串内容是存储在一个 byte 数组中。
+
+```java
+public final class String
+    implements java.io.Serializable, Comparable<String>, CharSequence,
+               Constable, ConstantDesc {
+
+    @Stable
+    private final byte[] value;
+    
+    ...               
+ }                  
+```
+
+## 3.2 String 的特点
+
+* ① String 是使用 final 修饰的，意味着我们不能继承 String。
+
+::: code-group
+
+```java [正例]
+public class Demo {
+    public static void main(String[] args){
+        // 以下代码是正确的
+        String str = "abc"; // [!code highlight]
+    }
+}
+```
+
+```java [反例]
+ // 以下代码是错误的
+public class String2 extends String { // [!code error]
+    
+}
+```
+
+:::
+
+* ② String 的内容是不会发生改变的，它的对象在创建之后就不能改变，即：如果进行字符串拼接操作，就会产生一个新的字符串对象。
+
+```java
+String str = "abc";
+String str2 = str + 1 ; // 新的 String 实例
+```
+
+## 3.3 创建 String 对象的两种方式
+
+* ① `直接赋值`：类似于普通基本数据类型变量的写法（语法糖），如：`String str = "xxx"` 。
+* ② `new 构造方法`：
+
+| String 类的构造方法              | 描述                             |
+| -------------------------------- | -------------------------------- |
+| public String() {}               | 创建空白字符串，不包含任何内容   |
+| public String(String original){} | 根据传入的字符串，创建字符串对象 |
+| public String(char value[]) {}   | 根据字符数组，创建字符串对象     |
+| public String(byte[] bytes){}    | 根据字节数组，创建字符串对象     |
+
+> [!NOTE]
+>
+> * ① 在实际开发中，使用最多的是`直接赋值`的写法。
+> * ② 但是，有的时候，我们也需要将`字符数组`或`字节数组`，转换为字符串对象；此时，就需要使用`new 构造方法`的形式。
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo1 {
+    public static void main(String[] args) {
+        // 直接赋值
+        String s1 = "hello";
+        System.out.println("s1 = " + s1);     
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo1 {
+    public static void main(String[] args) {        
+        // new 构造方法
+        String s2 = new String();
+        System.out.println("s2 = " + s2);
+        
+        String s3 = new String("world");
+        System.out.println("s3 = " + s3);
+        
+        byte[] bytes = {97,98,99,100};
+        String s4 = new String(bytes);
+        System.out.println("s4 = " + s4);
+        
+        char[] chs = {'a','b','c'};
+        String s5 = new String(chs);
+        System.out.println("s5= " + s5);        
+    }
+}
+```
+
+## 3.4 创建 String 对象背后的原理
