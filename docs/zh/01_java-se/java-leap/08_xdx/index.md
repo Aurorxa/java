@@ -121,9 +121,11 @@ String str2 = 'c' + "abc";
 * ② 掌握分析问题、解决问题的能力，以解决实际开发中的常见问题。
 * ③ 学习字符串相关的底层原理，以便处理开发中的一些复杂问题。
 
-## 2.4 package 关键字和 import 关键字
 
-### 2.4.1 package 关键字
+
+# 第三章：package 和 import （⭐）
+
+## 3.1 package 关键字
 
 * `package` 用于将类、接口等 Java 文件组织成不同的命名空间，从而避免命名冲突。
 * 语法：
@@ -167,7 +169,7 @@ public class Student {
 }
 ```
 
-### 2.4.2 import 关键字
+## 3.2 import 关键字
 
 * `import` 用于引入其他包中的类或接口，这样就可以在当前类中使用它们而不需要写全类的完整路径。
 * 语法：
@@ -220,9 +222,9 @@ public class IOTest {
 
 
 
-# 第三章：String（⭐）
+# 第四章：String（⭐）
 
-## 3.1 概述
+## 4.1 概述
 
 * ① 在 Java 中，字符串是使用 String 类来表示的。并且，所有的字符串字面量都是 String 类的实例。
 
@@ -265,7 +267,7 @@ public final class String
  }                  
 ```
 
-## 3.2 String 的特点
+## 4.2 String 的特点
 
 * ① String 是使用 final 修饰的，意味着我们不能继承 String。
 
@@ -296,7 +298,7 @@ String str = "abc";
 String str2 = str + 1 ; // 新的 String 实例
 ```
 
-## 3.3 创建 String 对象的两种方式
+## 4.3 创建 String 对象的两种方式
 
 * ① `直接赋值`：类似于普通基本数据类型变量的写法（语法糖），如：`String str = "xxx"` 。
 * ② `new 构造方法`：
@@ -356,4 +358,4 @@ public class StringDemo1 {
 }
 ```
 
-## 3.4 创建 String 对象背后的原理
+## 4.4 创建 String 对象背后的原理
