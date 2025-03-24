@@ -640,7 +640,7 @@ public class StringDemo2 {
 }
 ```
 
-### 4.5.3 字符串内容大小比较（区分大小写）
+### 4.5.5 字符串内容大小比较（区分大小写）
 
 * 在 Java 中，字符串内容大小的比较需要使用 compareTo() 方法，并且 compareTo() 方法是按照字符的 Unicode 编码值进行比较大小，严格区分大小写。
 
@@ -686,7 +686,7 @@ public class StringDemo3 {
 }
 ```
 
-### 4.5.4 字符串内容大小比较（不区分大小写）
+### 4.5.6 字符串内容大小比较（不区分大小写）
 
 * 在 Java 中，字符串内容大小的比较（忽略大小写）需要使用 compareToIgnoreCase() 方法，并且 compareTo() 方法是按照字符的 Unicode 编码值进行比较大小。
 
