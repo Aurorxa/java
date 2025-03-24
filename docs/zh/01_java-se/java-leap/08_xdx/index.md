@@ -395,7 +395,7 @@ public class StringDemo1 {
 
 ![JDK 8 之后的字符串常量池](./assets/9.svg)
 
-### 4.4.2 直接赋值的内存分配
+### 4.4.2 直接赋值方法的内存分配
 
 * 假设要运行的代码，如下所示：
 
@@ -419,6 +419,10 @@ public class StringDemo {
 
 ![直接赋值](./assets/10.gif)
 
+* 其完成的内存动态图，如下所示：
+
+![直接赋值](./assets/11.gif)
+
 ### 4.4.3 new 构造方法的内存分配
 
 * 假设要运行的代码，如下所示：
@@ -435,7 +439,202 @@ public class StringDemo {
 
 * 其在内存中的动态图，如下所示：
 
+![new 构造方法](./assets/12.gif)
+
+* 其完整的内存动态图，如下所示：
+
+![new 构造方法](./assets/13.gif)
+
+## 4.5 字符串内容比较
+
+### 4.5.1 概述
+
+* 之前，我们可以通过 `==` 来判断字符串是否相等，如下所示：
+
+```java
+public class StringDemo {
+    public static void main(String[] args) {  
+        String s1 = "abc";
+        String s2 = "abc";
+        System.out.println(s1 == s2); // true
+  }
+}
+```
+
+* 其在内存中的动态图，如下所示：
+
+> [!NOTE]
+>
+> * ① 如果是基本数据类型，`==` 比较的是数据值。
+> * ② 如果是引用数据类型，`==` 比较的是对象的地址（只有两个字符串变量都指向字符串的常量对象时，才会返回 true ）。 
+
+![](./assets/14.gif)
+
+* 之前，我们可以通过 `==` 来判断字符串是否相等，如下所示：
+
+```java
+public class StringDemo {
+    public static void main(String[] args) {  
+        String s1 = "abc";
+        String s2 = "bcd";
+        System.out.println(s1 == s2); // false
+  }
+}
+```
+
+* 其在内存中的动态图，如下所示：
+
+> [!NOTE]
+>
+> * ① 如果是基本数据类型，`==` 比较的是数据值。
+> * ② 如果是引用数据类型，`==` 比较的是对象的地址（只有两个字符串变量都指向字符串的常量对象时，才会返回 true ）。 
+
+![](./assets/15.gif)
+
+* 但是，如果 String 创建的方式不一样，我们通过 `==` 来判断字符串是否相等，得到的结果可能并非我们所预期的（因为我们想要的是如果字符串内容相等，就认为是一样的），如下所示：
+
+```java
+public class StringDemo {
+    public static void main(String[] args) {  
+        String s1 = "abc";
+        String s2 = new String("abc");
+        System.out.println(s1 == s2); // false
+  }
+}
+```
+
+* 其在内存中的动态图，如下所示：
+
+> [!NOTE]
+>
+> * ① 如果是基本数据类型，`==` 比较的是数据值。
+> * ② 如果是引用数据类型，`==` 比较的是对象的地址（只有两个字符串变量都指向字符串的常量对象时，才会返回 true ）。 
+
+![](./assets/16.gif)
+
+### 4.5.2 字符串内容相等比较（区分大小写）
+
+* 在 Java 中，字符串内容相等的比较需要使用 equals() 方法，并且 equals() 方法区分大小写。
+
+```java
+public boolean equals(Object anObject) { // [!code focus]
+    if (this == anObject) {
+        return true;
+    }
+    return (anObject instanceof String aString)
+            && (!COMPACT_STRINGS || this.coder == aString.coder)
+            && StringLatin1.equals(value, aString.value);
+}
+```
 
 
 
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo {
+    public static void main(String[] args) {
+        String s1 = "abc";
+        String s2 = new String("abc");
+        System.out.println(s1.equals(s2)); // true
+    }
+}
+```
+
+### 4.5.3 字符串内容相等比较（忽略大小写）
+
+* 在 Java 中，字符串内容相等的比较（忽略大小写）需要使用 equalsIgnoreCase() 方法。
+
+```java
+public boolean equalsIgnoreCase(String anotherString) { // [!code focus]
+    return (this == anotherString) ? true
+            : (anotherString != null)
+            && (anotherString.length() == length())
+            && regionMatches(true, 0, anotherString, 0, length());
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo {
+    public static void main(String[] args) {
+        String s1 = "abc";
+        String s2 = new String("Abc");
+        System.out.println(s1.equalsIgnoreCase(s2)); // true
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+import java.util.Scanner;
+
+public class StringDemo {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入一个字符串："); // abc
+        String str = input.next(); // new 出来的
+        System.out.println("您输入的字符串是：" + str);
+        String str2 = "abc";
+        System.out.println(str == str2); // false
+    }
+}
+```
+
+### 4.5.4 应用示例（用户登录）
+
+* 需求：已知正确的用户名和密码，请使用程序模拟用户登录。
+
+> [!NOTE]
+>
+> 总共给 3 次试错机会，并且登录成功之后，需要给出相应的提示。
+
+
+
+* 示例：
+
+```java
+import java.util.Scanner;
+
+public class StringDemo2 {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        // 正确的用户名和密码
+        String rightUsername = "admin";
+        String rightPassword = "123456";
+        // 用户登录逻辑
+        int count = 3;
+        int originCount = count;
+        do {
+            System.out.print("请输入用户名：");
+            String username = input.next();
+            System.out.print("请输入密码：");
+            String password = input.next();
+            if (username.equals(rightUsername) 
+                && password.equals(rightPassword)) {
+                System.out.println("登录成功");
+                break;
+            }
+            count--;
+            if (count > 0) {
+                System.out.println("登录失败，请重新输入，还剩下" + (count) + "次机会！");
+            } else {
+                System.out.println("登录失败，您已经输错" + originCount + "次了");
+            }
+        } while (count > 0);
+    }
+}
+```
 
