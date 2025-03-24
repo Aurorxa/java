@@ -93,7 +93,7 @@ String str = "abc";
 String str = "你好啊";
 ```
 
-* 在 Java 中，字符串和任意类型的数据（常量或变量）进行拼接，结果是一个新的字符串，如下所示：
+* 在 Java 中，字符串和任意数据类型的数据（常量或变量）进行相加，其实是拼接操作，结果是一个新的字符串，如下所示：
 
 ```java
 String str = "abc";
@@ -227,34 +227,29 @@ public class IOTest {
 
 ## 4.1 概述
 
-* ① 在 Java 中，字符串是使用 String 类来表示的。并且，所有的字符串字面量都是 String 类的实例。
+* 在 Java 中，String 类是定义在 java.lang 包下的，如下所示：
 
-```java
-String str = "abc";
-```
+```java {1}
+package java.lang; 
 
-```java
-String str = "你好啊";
-```
-
-* ② 在 Java 中，String 是通过 final 关键字修饰的，表明其不能被继承。
-
-```java
-public final class String
+package java.lang;public final class String
     implements java.io.Serializable, Comparable<String>, CharSequence,
                Constable, ConstantDesc {
     ...               
 }
 ```
 
-* ③ 在 Java 中，一旦 String 创建之后，就不可以改变，如果对其进行了拼接操作，就会产生新的 String 对象。
+* 在 Java 中，所有的`字符串字面量`都是 String 类的`对象`，如下所示：
 
 ```java
 String str = "abc";
-String str2 = str + 1 ; // 新的 String 实例
 ```
 
-* ④ 在 JDK9 之后，String 对象的字符串内容是存储在一个 byte 数组中。
+```java
+String str2 = "1";
+```
+
+* 在 JDK9 之后，String 对象内部的字符串内容是存储在一个 byte 数组中。
 
 ```java
 public final class String
@@ -292,7 +287,11 @@ public class String2 extends String { // [!code error]
 
 :::
 
-* ② String 的内容是不会发生改变的，它的对象在创建之后就不能改变，即：如果进行字符串拼接操作，就会产生一个新的字符串对象。
+* ② String 的内容是不会发生改变的，它的值在创建之后就不能发生改变。
+
+> [!NOTE]
+>
+> 如果进行字符串拼接操作，就会产生一个新的字符串对象
 
 ```java
 String str = "abc";
@@ -318,14 +317,14 @@ String str2 = str + 1 ; // 新的 String 实例
 
 
 
-* 示例：
+* 示例：直接赋值
 
 ```java
 package com.github.demo;
-
+ 
 public class StringDemo1 {
     public static void main(String[] args) {
-        // 直接赋值
+       
         String s1 = "hello";
         System.out.println("s1 = " + s1);     
     }
@@ -334,24 +333,29 @@ public class StringDemo1 {
 
 
 
-* 示例：
+* 示例：new 构造方法
 
 ```java
 package com.github.demo;
 
+// new 构造方法
 public class StringDemo1 {
     public static void main(String[] args) {        
-        // new 构造方法
+        
+        // 空参构造，创建一个空白的字符串对象
         String s2 = new String();
         System.out.println("s2 = " + s2);
         
+        // 传递一个字符串，根据传递的字符串内容创建一个新的字符串对象
         String s3 = new String("world");
         System.out.println("s3 = " + s3);
         
+        // 传递一个字节数组，根据字节数组的内容创建一个新的字符串对象
         byte[] bytes = {97,98,99,100};
         String s4 = new String(bytes);
         System.out.println("s4 = " + s4);
         
+        // 传递一个字符数组，根据字符数组的内容创建一个新的字符串对象
         char[] chs = {'a','b','c'};
         String s5 = new String(chs);
         System.out.println("s5= " + s5);        
@@ -360,3 +364,78 @@ public class StringDemo1 {
 ```
 
 ## 4.4 创建 String 对象背后的原理
+
+### 4.4.1 Java 中的内存分配
+
+* 为了更好的管理内存，JVM 将内存分为了`本地方法栈`、`寄存器`、`栈`、`方法区`和`堆`，如下所示：
+
+> [!NOTE]
+>
+> - ① ~~**本地方法栈**：用于执行本地方法（Native Methods），是 Java 外部代码执行的栈空间。~~
+> - ② ~~**寄存器**：硬件存储器，用于存储运算临时数据，提高计算效率。~~
+> - ③ `栈`：用于存储方法的局部变量、操作数、栈帧等，和方法的调用生命周期密切相关，即：方法运行的时候进栈，方法执行完毕之后出栈。
+> - ④ `方法区`：存储类的元数据、常量池等信息，类和方法的静态数据存储区域。
+> - ⑤ `堆`：存储对象和数组，是 JVM 管理的最大内存区域，涉及对象的创建和垃圾回收。
+
+![JVM 内存区域](./assets/7.svg)
+
+* 为了更方便的管理字符串，Java 设计了 StringTable（字符串常量池），只有直接赋值的方式创建的字符串才会创建到该常量池中，并且在 JDK7 之后该字符串常量池是在方法区中的，如下所示：
+
+> [!NOTE]
+>
+> 如果使用 `new 构造方法`创建的字符串还是在堆中。
+
+![JDK 7 之前的字符串常量池](./assets/8.svg)
+
+* 但是，这种设计并不是很好，在 JDK 8 的时候，取消了方法区，新增了元空间，并将原先方法区中的很多功能进行拆分，有的功能放到了堆中，有的功能放到了元空间中，同时字符串常量池也从方法区移动到了堆中，如下所示：
+
+> [!NOTE]
+>
+> JDK 7 中设计不好的原因是：方法区（永久代）使用的是虚拟机的内存，当加载过多的类，非常容易导致内存溢出，如：`OutOfMemoryError: PermGen space` 。
+
+![JDK 8 之后的字符串常量池](./assets/9.svg)
+
+### 4.4.2 直接赋值的内存分配
+
+* 假设要运行的代码，如下所示：
+
+```java
+public class StringDemo {
+  public static void main(String[] args) {  
+    String s1 = "abc";
+    String s2 = "abc";	
+  }
+}
+```
+
+* 其在内存中的动态图，如下所示：
+
+> [!NOTE]
+>
+> 使用`直接赋值`的方式创建字符串，系统会检查该`字符串`在`字符串常量池`中是否存在？
+>
+> * ① 存在：直接复用之前在`字符串常量池`中创建的字符串。
+> * ② 不存在：在`字符串常量池`中创建新的字符串。
+
+![直接赋值](./assets/10.gif)
+
+### 4.4.3 new 构造方法的内存分配
+
+* 假设要运行的代码，如下所示：
+
+```java
+public class StringDemo {
+  public static void main(String[] args) {  
+     char[] chs = {'a','b','c'};
+     String s1 = new String(chs);
+     String s2 = new String(chs);
+  }
+}
+```
+
+* 其在内存中的动态图，如下所示：
+
+
+
+
+
