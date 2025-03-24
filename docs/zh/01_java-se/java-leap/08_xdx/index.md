@@ -291,7 +291,7 @@ public class String2 extends String { // [!code error]
 
 > [!NOTE]
 >
-> 如果进行字符串拼接操作，就会产生一个新的字符串对象
+> 如果进行字符串拼接操作，就会产生一个新的字符串对象！！！
 
 ```java
 String str = "abc";
@@ -629,9 +629,11 @@ public class StringDemo2 {
             }
             count--;
             if (count > 0) {
-                System.out.println("登录失败，请重新输入，还剩下" + (count) + "次机会！");
+                System.out.println("登录失败，请重新输入，还剩下" 
+                                   + (count) + "次机会！");
             } else {
-                System.out.println("登录失败，您已经输错" + originCount + "次了");
+                System.out.println("登录失败，您已经输错" 
+                                   + originCount + "次了");
             }
         } while (count > 0);
     }
@@ -639,4 +641,100 @@ public class StringDemo2 {
 ```
 
 ### 4.5.3 字符串内容大小比较（区分大小写）
+
+* 在 Java 中，字符串内容大小的比较需要使用 compareTo() 方法，并且 compareTo() 方法是按照字符的 Unicode 编码值进行比较大小，严格区分大小写。
+
+```java
+public int compareTo(String anotherString) { // [!code focus]
+    byte v1[] = value;
+    byte v2[] = anotherString.value;
+    byte coder = coder();
+    if (coder == anotherString.coder()) {
+        return coder == LATIN1 ? StringLatin1.compareTo(v1, v2)
+                               : StringUTF16.compareTo(v1, v2);
+    }
+    return coder == LATIN1 ? StringLatin1.compareToUTF16(v1, v2)
+                           : StringUTF16.compareToLatin1(v1, v2);
+ } // [!code focus]
+```
+
+> [!NOTE]
+>
+> * ① 字典顺序，也称为词典顺序或字母顺序，是指字符串按照字符在 Unicode 编码中的顺序进行比较。比较过程从两个字符串的第一个字符开始，逐个比较对应位置的字符。
+>
+> * ② str1.compareTo(str2) 有 3 种结果：
+>
+>   * 0：str1 在字典顺序中等于 str2。
+>
+>   * 0 ：str1 在字典顺序中大于 str2。
+>
+>   * <0 ：str1 在字典顺序中小于 str2。
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo3 {
+    public static void main(String[] args) {
+        String str1 = "abc";
+        String str2 = "bcd";
+        System.out.println(str1.compareTo(str2)); // -1
+    }
+}
+```
+
+### 4.5.4 字符串内容大小比较（不区分大小写）
+
+* 在 Java 中，字符串内容大小的比较（忽略大小写）需要使用 compareToIgnoreCase() 方法，并且 compareTo() 方法是按照字符的 Unicode 编码值进行比较大小。
+
+```java
+public int compareToIgnoreCase(String str) {  // [!code focus]
+    return CASE_INSENSITIVE_ORDER.compare(this, str);
+} // [!code focus]
+
+public static final Comparator<String> CASE_INSENSITIVE_ORDER
+                                         = new CaseInsensitiveComparator();
+
+    private static class CaseInsensitiveComparator
+            implements Comparator<String>, java.io.Serializable {
+        // use serialVersionUID from JDK 1.2.2 for interoperability
+        @java.io.Serial
+        private static final long serialVersionUID = 8575799808933029326L;
+
+        public int compare(String s1, String s2) {
+            byte v1[] = s1.value;
+            byte v2[] = s2.value;
+            byte coder = s1.coder();
+            if (coder == s2.coder()) {
+                return coder == LATIN1 ? StringLatin1.compareToCI(v1, v2)
+                                       : StringUTF16.compareToCI(v1, v2);
+            }
+            return coder == LATIN1 ? StringLatin1.compareToCI_UTF16(v1, v2)
+                                   : StringUTF16.compareToCI_Latin1(v1, v2);
+        }
+
+        /** Replaces the de-serialized object. */
+        @java.io.Serial
+        private Object readResolve() { return CASE_INSENSITIVE_ORDER; }
+ }
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo3 {
+    public static void main(String[] args) {
+        String str1 = "abc";
+        String str2 = "bcd";
+        System.out.println(str1.compareToIgnoreCase(str2)); // -1
+    }
+}
+```
 
