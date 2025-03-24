@@ -15,14 +15,14 @@ public class ArrayDemo1 {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("请输入第 1 个员工的工资：");
-        double salary1 = scanner.nextDouble();
+        System.out.print("请输入第 1 个员工的工资："); // [!code focus]
+        double salary1 = scanner.nextDouble(); // [!code focus]
 
-        System.out.print("请输入第 2 个员工的工资：");
-        double salary2 = scanner.nextDouble();
+        System.out.print("请输入第 2 个员工的工资："); // [!code focus]
+        double salary2 = scanner.nextDouble(); // [!code focus]
 
-        System.out.print("请输入第 3 个员工的工资：");
-        double salary3 = scanner.nextDouble();
+        System.out.print("请输入第 3 个员工的工资："); // [!code focus]
+        double salary3 = scanner.nextDouble(); // [!code focus]
 
 		...   
             
@@ -33,7 +33,7 @@ public class ArrayDemo1 {
 
 * 这样会感觉特别机械和麻烦（全是复制（Ctrl + c）和粘贴（Ctrl + v），CV 大法）；此时，我们就可以将所有的`数据`全部存储到一个`容器（数组）`中进行统一管理，并进行其它的操作，如：求最值、求平均值等，如下所示：
 
-```java
+```java {13-16}
 package com.github.study;
 
 import java.util.Scanner;
@@ -46,9 +46,9 @@ public class ArrayDemo2 {
         double[] arr = new double[50];
 
         // 使用 for 循环向数组中添加每个员工的工资
-        for (int i = 0; i < arr.length; i++) {
-            System.out.print("请输入第 " + (i + 1) + " 个员工的工资：");
-            arr[i] = scanner.nextDouble();
+        for (int i = 0; i < arr.length; i++) {  
+            System.out.print("请输入第 " + (i + 1) + " 个员工的工资："); 
+            arr[i] = scanner.nextDouble(); 
         }
 
         // 其余的业务处理，如：求最值、求平均值等。

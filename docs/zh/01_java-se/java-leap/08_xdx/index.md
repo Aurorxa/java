@@ -229,10 +229,10 @@ public class IOTest {
 
 * 在 Java 中，String 类是定义在 java.lang 包下的，如下所示：
 
-```java {1}
-package java.lang; 
+```java 
+package java.lang;  // [!code focus]
 
-package java.lang;public final class String
+public final class String
     implements java.io.Serializable, Comparable<String>, CharSequence,
                Constable, ConstantDesc {
     ...               
@@ -257,7 +257,7 @@ public final class String
                Constable, ConstantDesc {
 
     @Stable
-    private final byte[] value;
+    private final byte[] value; // [!code focus]
     
     ...               
  }                  
@@ -524,7 +524,7 @@ public boolean equals(Object anObject) { // [!code focus]
     return (anObject instanceof String aString)
             && (!COMPACT_STRINGS || this.coder == aString.coder)
             && StringLatin1.equals(value, aString.value);
-}
+} // [!code focus]
 ```
 
 
@@ -553,7 +553,7 @@ public boolean equalsIgnoreCase(String anotherString) { // [!code focus]
             : (anotherString != null)
             && (anotherString.length() == length())
             && regionMatches(true, 0, anotherString, 0, length());
-}
+} // [!code focus]
 ```
 
 
@@ -637,4 +637,6 @@ public class StringDemo2 {
     }
 }
 ```
+
+### 4.5.3 字符串内容大小比较（区分大小写）
 
