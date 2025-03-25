@@ -593,54 +593,7 @@ public class StringDemo {
 }
 ```
 
-### 4.5.4 应用示例（用户登录）
-
-* 需求：已知正确的用户名和密码，请使用程序模拟用户登录。
-
-> [!NOTE]
->
-> 总共给 3 次试错机会，并且登录成功之后，需要给出相应的提示。
-
-
-
-* 示例：
-
-```java
-import java.util.Scanner;
-
-public class StringDemo2 {
-    public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
-        // 正确的用户名和密码
-        String rightUsername = "admin";
-        String rightPassword = "123456";
-        // 用户登录逻辑
-        int count = 3;
-        int originCount = count;
-        do {
-            System.out.print("请输入用户名：");
-            String username = input.next();
-            System.out.print("请输入密码：");
-            String password = input.next();
-            if (username.equals(rightUsername) 
-                && password.equals(rightPassword)) {
-                System.out.println("登录成功");
-                break;
-            }
-            count--;
-            if (count > 0) {
-                System.out.println("登录失败，请重新输入，还剩下" 
-                                   + (count) + "次机会！");
-            } else {
-                System.out.println("登录失败，您已经输错" 
-                                   + originCount + "次了");
-            }
-        } while (count > 0);
-    }
-}
-```
-
-### 4.5.5 字符串内容大小比较（区分大小写）
+### 4.5.4 字符串内容大小比较（区分大小写）
 
 * 在 Java 中，字符串内容大小的比较需要使用 compareTo() 方法，并且 compareTo() 方法是按照字符的 Unicode 编码值进行比较大小，严格区分大小写。
 
@@ -686,9 +639,9 @@ public class StringDemo3 {
 }
 ```
 
-### 4.5.6 字符串内容大小比较（不区分大小写）
+### 4.5.5 字符串内容大小比较（不区分大小写）
 
-* 在 Java 中，字符串内容大小的比较（忽略大小写）需要使用 compareToIgnoreCase() 方法，并且 compareTo() 方法是按照字符的 Unicode 编码值进行比较大小。
+* 在 Java 中，字符串内容大小的比较（忽略大小写）需要使用 compareToIgnoreCase() 方法，并且 compareToIgnoreCase() 方法是按照字符的 Unicode 编码值进行比较大小。
 
 ```java
 public int compareToIgnoreCase(String str) {  // [!code focus]
@@ -737,4 +690,184 @@ public class StringDemo3 {
     }
 }
 ```
+
+## 4.10 应用示例
+
+### 4.10.1 用户登录
+
+* 需求：已知正确的用户名和密码，请使用程序模拟用户登录。
+
+> [!NOTE]
+>
+> 总共给 3 次试错机会，并且登录成功之后，需要给出相应的提示。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Scanner;
+
+public class StringDemo2 {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        // 正确的用户名和密码
+        String rightUsername = "admin";
+        String rightPassword = "123456";
+        // 用户登录逻辑
+        int count = 3;
+        int originCount = count;
+        do {
+            System.out.print("请输入用户名：");
+            String username = input.next();
+            System.out.print("请输入密码：");
+            String password = input.next();
+            if (username.equals(rightUsername) 
+                && password.equals(rightPassword)) {
+                System.out.println("登录成功");
+                break;
+            }
+            count--;
+            if (count > 0) {
+                System.out.println("登录失败，请重新输入，还剩下" 
+                                   + (count) + "次机会！");
+            } else {
+                System.out.println("登录失败，您已经输错" 
+                                   + originCount + "次了");
+            }
+        } while (count > 0);
+    }
+}
+```
+
+### 4.10.2 遍历字符串
+
+* 需求：键盘录入一个字符串，实现在控制台遍历字符串并输出每个字符。
+
+> [!NOTE]
+>
+> * 根据索引返回字符：
+>
+> ```java
+> public char charAt(int index) {}
+> ```
+>
+> * 返回字符串的长度：
+>
+> ```java
+> public int length() {}
+> ```
+
+
+
+* 示例：
+
+```java
+package com.github.test2;
+
+import java.util.Scanner;
+
+public class StringTest2 {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("请输入一个字符串：");
+        String str = sc.next();
+        // 遍历字符串，获取每个字符
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            System.out.println(c);
+        }
+        sc.close();
+    }
+}
+```
+
+### 4.10.3 统计字符个数
+
+* 需求：键盘录入一个字符串，统计该字符串中大写字母字符、小写字母字符以及数字字符出现的次数（不考虑其他字符）。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Scanner;
+
+public class StringTest3 {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("请输入一个字符串：");
+        String str = sc.next();
+        // 遍历字符串，进行字符个数统计
+        int majusculeCount = 0;
+        int minusculeCount = 0;
+        int digitCount = 0;
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (c >= 'A' && c <= 'Z') {
+                majusculeCount++;
+            } else if (c >= 'a' && c <= 'z') {
+                minusculeCount++;
+            } else if (c >= '0' && c <= '9') {
+                digitCount++;
+            }
+        }
+        System.out.println("大写字母个数：" + majusculeCount);
+        System.out.println("小写字母个数：" + minusculeCount);
+        System.out.println("数字个数：" + digitCount);
+        sc.close();
+    }
+}
+```
+
+### 4.10.4 字符串拼接
+
+* 需求：定义一个方法，将 int 数组中的数据按照指定的格式拼接成一个字符串返回。
+
+> [!NOTE]
+>
+> * ① 假设数组是 `int[] arr = {1,2,3};`，调用该方法后的输出结果是 ：`[1,2,3]`。
+> * ② 其实，Java 中的 `Arrays.toString(arr)` 底层就是这种逻辑。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+public class StringTest4 {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5};
+        String s = printArray(arr);
+        System.out.println("s = " + s);
+    }
+
+    /**
+     * 打印数组
+     * @param arr 数组
+     * @return 数组字符串
+     */
+    public static String printArray(int[] arr) {
+        String str = "[";
+        for (int i = 0; i < arr.length; i++) {
+            if (i == arr.length - 1) {
+                str += arr[i];
+                break;
+            }
+            str += arr[i] + ",";
+        }
+        str += "]";
+        return str;
+    }
+}
+```
+
+### 4.10.5 字符串反转
+
+
 

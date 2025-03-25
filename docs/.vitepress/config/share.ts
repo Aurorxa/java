@@ -80,7 +80,7 @@ export const sharedConfig = withMermaid(defineConfig({
           'cmd': 'vscode-icons:file-type-shell',
           'powershell': 'vscode-icons:file-type-powershell'
         }
-      }) as any),
+      }) as import('vite').Plugin),
       //代码组图标
       GitChangelog({
         // 填写在此处填写您的仓库链接
@@ -95,7 +95,7 @@ export const sharedConfig = withMermaid(defineConfig({
       }),
     ],
     server: {
-      port: 11099
+      port: 12099
     },
     css: {
       preprocessorOptions: {
@@ -120,7 +120,7 @@ export const sharedConfig = withMermaid(defineConfig({
       // 创建 markdown-it 插件
       md.use((md) => {
         const defaultRender = md.render
-        md.render = function (...args) {
+        md.render = (...args) => {
           const [content, env] = args
           const currentLang = env.localeIndex
           const isHomePage = env.path === '/' || env.relativePath === 'index.md'  // 判断是否是首页
