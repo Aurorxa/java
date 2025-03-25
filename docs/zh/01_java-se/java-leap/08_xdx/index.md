@@ -853,6 +853,12 @@ public class StringTest4 {
      * @return 数组字符串
      */
     public static String printArray(int[] arr) {
+        if (arr == null) {
+            return "null";
+        }
+        if (arr.length == 0) {
+            return "[]";
+        }
         String str = "[";
         for (int i = 0; i < arr.length; i++) {
             if (i == arr.length - 1) {
@@ -869,5 +875,175 @@ public class StringTest4 {
 
 ### 4.10.5 字符串反转
 
+* 需求：定义一个方法，将字符串进行反转。
 
+> [!NOTE]
+>
+> * ① 字符串转换为字符数组：
+>
+> ```java
+> public char[] toCharArray()
+> ```
+>
+> * ② 将字符数组中的元素进行反转，再转换为字符串。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+public class StringTest5 {
+    public static void main(String[] args) {
+        String str = "abc";
+        String reverse = reverse(str);
+        System.out.println("reverse = " + reverse);
+    }
+
+    /**
+     * 反转字符串
+     * @param str 字符串
+     * @return 字符串
+     */
+    public static String reverse(String str) {
+        char[] chs = str.toCharArray();
+        for (int i = 0, j = chs.length; i < j; i++, j--) {
+            char temp = chs[i];
+            chs[i] = chs[j - 1];
+            chs[j - 1] = temp;
+        }
+        return String.valueOf(chs);
+    }
+}
+```
+
+### 4.10.6 金额转换
+
+* 需求：将发票上的数字（2135）转换为大写（`零`佰`零`拾`零`万`贰`仟`壹`佰`叁`拾`伍`元）。
+
+![金额转换](./assets/17.png)
+
+> [!NOTE]
+>
+> * ① String 有一个 format 的方法，如下所示：
+>
+> ```java
+> public static String format(String format, Object... args);
+> ```
+>
+> * ② 将数字（2135）拆分为数组（`int[] arr = {2,1,3,5}`）和 `String[] MONEY_UNIT = {"佰", "拾", "万", "仟", "佰", "拾", "元"}`的长度进行比较：如果不够，前面补零；如果超了，直接报错。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Arrays;
+
+public class StringTest6 {
+    public static String[] MONEY_UNIT = {"佰", "拾", "万", "仟", "佰", "拾", "元"};
+    public static String[] RMB_UNIT = {"零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"};
+
+    public static void main(String[] args) {
+        int num = 2135;
+        String digits = convert(num);
+        System.out.println(digits);
+    }
+
+    /**
+     * 金额转换
+     * @param num 数字
+     * @return 字符串
+     */
+    public static String convert(int num) {
+        String format = getFormat();
+        System.out.println("format = " + format);
+        String[] rmb = convertRMB(num, MONEY_UNIT.length);
+        System.out.println("rmb = " + Arrays.toString(rmb));
+        return String.format(format, Arrays.stream(rmb).toArray());
+    }
+
+    /**
+     * 获取 format 的字符串
+     * @return 字符串
+     */
+    public static String getFormat() {
+        String format = "";
+        for (int i = 0; i < MONEY_UNIT.length; i++) {
+            format += "%s" + MONEY_UNIT[i];
+        }
+        return format;
+    }
+
+    /**
+     * 判断数字的位数
+     * @param num 数字
+     * @return 位数
+     */
+    public static int count(int num) {
+        int count = 0;
+        while (num != 0) {
+            num = num / 10;
+            count++;
+        }
+        return count;
+    }
+
+    /**
+     * 将数字转换为 RMB
+     * @param num 数字
+     * @param maxLength 最大位数
+     * @return RMB
+     */
+    public static String[] convertRMB(int num, int maxLength) {
+        int[] digits = getDigits(num, maxLength);
+        String[] money = new String[digits.length];
+        for (int i = 0; i < digits.length; i++) {
+            money[i] = RMB_UNIT[digits[i]];
+        }
+        return money;
+    }
+
+    /**
+     * 将数字转换为数组
+     * @param num 数字
+     * @return 数组
+     */
+    public static int[] getDigits(int num, int maxLength) {
+        int[] digits = new int[count(num)];
+        for (int i = 0; i < digits.length; i++) {
+            digits[i] = num % 10;
+            num = num / 10;
+        }
+        // 将数组反转
+        reverse(digits);
+        // 判断位数
+        if (digits.length > maxLength) {
+            throw new RuntimeException("数字位数超过最大位数");
+        }
+        // 前面补零
+        if (digits.length < maxLength) {
+            int[] newDigits = new int[maxLength];
+            System.arraycopy(digits, 0, newDigits, maxLength - digits.length, digits.length);
+            return newDigits;
+        }
+        return digits;
+    }
+
+    /**
+     * 数组反转
+     * @param chs 数组
+     */
+    public static void reverse(int[] chs) {
+        for (int i = 0, j = chs.length; i < j; i++, j--) {
+            int temp = chs[i];
+            chs[i] = chs[j - 1];
+            chs[j - 1] = temp;
+        }
+    }
+}
+```
 
