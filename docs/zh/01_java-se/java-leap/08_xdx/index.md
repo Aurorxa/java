@@ -882,7 +882,7 @@ public class StringTest4 {
 > * ① 字符串转换为字符数组：
 >
 > ```java
-> public char[] toCharArray()
+> public char[] toCharArray() {}
 > ```
 >
 > * ② 将字符数组中的元素进行反转，再转换为字符串。
@@ -929,7 +929,7 @@ public class StringTest5 {
 > * ① String 有一个 format 的方法，如下所示：
 >
 > ```java
-> public static String format(String format, Object... args);
+> public static String format(String format, Object... args){}
 > ```
 >
 > * ② 将数字（2135）拆分为数组（`int[] arr = {2,1,3,5}`）和 `String[] MONEY_UNIT = {"佰", "拾", "万", "仟", "佰", "拾", "元"}`的长度进行比较：如果不够，前面补零；如果超了，直接报错。
@@ -1046,4 +1046,78 @@ public class StringTest6 {
     }
 }
 ```
+
+### 4.10.7 手机号屏蔽
+
+* 需求：将手机号中间的 4 个号码进行屏蔽，如：`13115899468` --> `131****9468`。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+public class StringTest7 {
+
+    public static void main(String[] args) {
+        String phone = "13115899468";
+        String convert = convert(phone);
+        System.out.println("convert = " + convert);
+    }
+
+    /**
+     * 手机号屏蔽
+     * @param phone 手机号码
+     * @return 屏蔽后的手机号码
+     */
+    public static String convert(String phone) {
+        return phone.replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+    }
+}
+```
+
+### 4.10.8 敏感词替换
+
+* 需求：将一些敏感词替换为 `*`，如：`这里有一些敏感词，比如：傻瓜和笨蛋。` --> `这里有一些敏感词，比如：**和**。`。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+public class StringTest8 {
+
+    public static void main(String[] args) {
+        String text = "这里有一些敏感词，比如：傻瓜和笨蛋。";
+        String[] sensitiveWords = {"傻瓜", "笨蛋"};
+        String replacement = "*";
+        String result = replaceSensitiveWords(text, sensitiveWords, replacement);
+        System.out.println("result = " + result);
+    }
+
+    /**
+     * 敏感词替换
+     * @param text 文本
+     * @param sensitiveWords 敏感词
+     * @param replacement 替换字符
+     * @return 替换之后的文本
+     */
+    public static String replaceSensitiveWords(String text, 
+                                               String[] sensitiveWords, 
+                                               String replacement) {
+        for (int i = 0; i < sensitiveWords.length; i++) {
+            String word = sensitiveWords[i];
+            if (text.contains(word)) {
+                text = text.replaceAll(word, replacement.repeat(word.length()));
+            }
+        }
+        return text;
+    }
+}
+```
+
+
 
