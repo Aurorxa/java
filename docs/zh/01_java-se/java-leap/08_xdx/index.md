@@ -1301,7 +1301,7 @@ public class StringBuilderDemo1 {
 
 ### 5.3.1 字符串
 
-* 将 `StringBuilder` 内部维护的数据以`字符串`的形式返回：
+* `StringBuilder`支持将内部维护的数据以`字符串`的形式返回：
 
 ```java
 public String toString(){}
@@ -1336,7 +1336,7 @@ public class StringBuilderDemo1 {
 
 ### 5.3.2 拼接
 
-* StringBuilder 支持拼接各种数据类型的数据。
+* StringBuilder 支持拼接各种数据类型的数据，并且支持链接调用。
 
 ```java
 public StringBuilder append(Object obj) {}
@@ -1680,4 +1680,8 @@ public class StringBuilderDemo8 {
     }
 }
 ```
+
+
+
+# 第六章：StringJoiner（⭐）
 
