@@ -691,6 +691,132 @@ public class StringDemo3 {
 }
 ```
 
+## 4.6 静态方法
+
+* String 提供了静态方法，可以将任意数据类型转换为 String 类型。
+
+::: code-group
+
+```java [Object --> String]
+public static String valueOf(Object obj) { // [!code focus]
+   return (obj == null) ? "null" : obj.toString();
+} // [!code focus]
+```
+
+```java [char[] --> String]
+public static String valueOf(char data[]) { // [!code focus]
+    return new String(data);
+} // [!code focus]
+public static String valueOf(char data[], int offset, int count) { // [!code focus]
+    return new String(data, offset, count);
+} // [!code focus]
+```
+
+```java [基本数据类型 --> String]
+public static String valueOf(boolean b) { // [!code focus]
+    return b ? "true" : "false";
+} // [!code focus]
+public static String valueOf(char c) { // [!code focus]
+    if (COMPACT_STRINGS && StringLatin1.canEncode(c)) {
+        return new String(StringLatin1.toBytes(c), LATIN1);
+    }
+    return new String(StringUTF16.toBytes(c), UTF16);
+} // [!code focus]
+public static String valueOf(long l) { // [!code focus]
+    return Long.toString(l);
+} // [!code focus]
+public static String valueOf(long l) { // [!code focus]
+    return Long.toString(l);
+} // [!code focus]
+public static String valueOf(float f) { // [!code focus]
+    return Float.toString(f);
+} // [!code focus]
+public static String valueOf(double d) { // [!code focus]
+    return Double.toString(d);
+} // [!code focus]
+```
+
+:::
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+import java.util.Map;
+
+public class StringDemo5 {
+    public static void main(String[] args) {
+        Map<String,Object> map = Map.of("name","张三","age",18,"sex","男");
+        String str = String.valueOf(map);
+        // str = {sex=男, age=18, name=张三}
+        System.out.println("str = " + str);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo6 {
+    public static void main(String[] args) {
+        char[] chs = {'a', 'b', 'c', 'd', 'e', 'f'};
+        String str = String.valueOf(chs);
+        // str = abcdef
+        System.out.println("str = " + str);
+        str = String.valueOf(chs, 2, 3);
+        // str = cde
+        System.out.println("str = " + str);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo7 {
+    public static void main(String[] args) {
+        String str = String.valueOf(true);
+        // String.valueOf(true) = true
+        System.out.println("String.valueOf(true) = " + str);
+        str = String.valueOf(1);
+        // String.valueOf(1) = 1
+        System.out.println("String.valueOf(1) = " + str);
+        str = String.valueOf('a');
+        // String.valueOf('a') = a
+        System.out.println("String.valueOf('a') = " + str);
+    }
+}
+```
+
+## 4.7 字符串拼接问题（了解）
+
+4.7.1 
+
+
+
+## 4.8 空字符串比较
+
+
+
+
+
+## 4.9 字符串的常用方法
+
+
+
+
+
 ## 4.10 应用示例
 
 ### 4.10.1 用户登录
@@ -1120,4 +1246,438 @@ public class StringTest8 {
 ```
 
 
+
+# 第五章：StringBuilder（⭐）
+
+## 5.1 概述
+
+* 因为 String 对象是不可变的对象，虽然可以共享常量对象，但是对于频繁字符串的修改和拼接操作，效率极低。
+* 因此，Java 在 java.lang 包中提供了可变字符序列 StringBuilder 和 StringBuffer ，其目的就是为了提高字符串的操作效率。
+
+> [!NOTE]
+>
+> * ① StringBuilder 是线程不安全的。
+> * ② StringBuffer 是线程安全的。
+
+![StringBuilder 和 StringBuffer](./assets/18.png)
+
+## 5.2 StringBuilder 的构造方法
+
+* StringBuilder 提供了 3 个常用的构造方法来创建 StringBuilder 对象，如下所示：
+
+| 构造方法                                 | 描述                                         |
+| ---------------------------------------- | -------------------------------------------- |
+| public StringBuilder(){}                 | 创建一个空白的可变字符串对象，不包含任何内容 |
+| public StringBuilder(String str){}       | 根据字符串的内容，创建可变字符串对象         |
+| public StringBuilder(CharSequence seq){} | 根据字符序列对象，创建可变字符串对象         |
+
+> [!NOTE]
+>
+> * ① StrringBuilder 和 StringBuffer 是 CharSequence  的子类。
+> * ② 可以通过 `public StringBuilder(CharSequence seq){}`实现将 StringBuffer  转换为 StrringBuilder 。
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+public class StringBuilderDemo1 {
+    public static void main(String[] args) {
+        // 创建一个空白的可变字符串对象
+        StringBuilder str = new StringBuilder();
+
+        // 根据字符数组创建一个可变字符串对象
+        StringBuilder str2 = new StringBuilder("abc");
+        
+        // 根据字符序列创建一个可变字符串对象
+        StringBuilder str3 = new StringBuilder(new StringBuffer("abc"));
+    }
+}
+```
+
+## 5.3 StringBuilder 的常用方法
+
+### 5.3.1 字符串
+
+* 将 `StringBuilder` 内部维护的数据以`字符串`的形式返回：
+
+```java
+public String toString(){}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+public class StringBuilderDemo1 {
+    public static void main(String[] args) {
+        // 创建一个空白的可变字符串对象
+        StringBuilder sb1 = new StringBuilder();
+        String str = sb1.toString();
+        System.out.println("str = " + str);
+
+        // 根据字符数组创建一个可变字符串对象
+        StringBuilder sb2 = new StringBuilder("abc");
+        str = sb2.toString();
+        System.out.println("str = " + str);
+
+        // 根据字符序列创建一个可变字符串对象
+        StringBuilder sb3 = new StringBuilder(new StringBuffer("abc"));
+        str = sb3.toString();
+        System.out.println("str = " + str);
+    }
+}
+```
+
+### 5.3.2 拼接
+
+* StringBuilder 支持拼接各种数据类型的数据。
+
+```java
+public StringBuilder append(Object obj) {}
+```
+
+```java
+public StringBuilder append(String str) {}
+```
+
+```java
+public StringBuilder append(StringBuffer sb) {}
+```
+
+```java
+public StringBuilder append(CharSequence s) {}
+```
+
+```java
+public StringBuilder append(CharSequence s, int start, int end) {}
+```
+
+```java
+public StringBuilder append(char[] str) {}
+```
+
+```java
+public StringBuilder append(char[] str, int offset, int len) {}
+```
+
+```java
+public StringBuilder append(boolean b) {}
+```
+
+```java
+public StringBuilder append(char c) {}
+```
+
+```java
+public StringBuilder append(int i) {}
+```
+
+```java
+public StringBuilder append(long lng) {}
+```
+
+```java 
+public StringBuilder append(float f) {}
+```
+
+```java 
+public StringBuilder append(double d) {}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+import java.util.HashMap;
+
+public class StringBuilderDemo2 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(1);
+        sb.append('a');
+        sb.append(1.1f);
+        sb.append(3.14);
+        sb.append(new HashMap<>());
+        String str = sb.toString();
+        System.out.println(str);
+    }
+}
+```
+
+### 5.3.3 插入（了解）
+
+* StringBuilder 支持在 index 位置插入数据。
+
+```java
+public StringBuilder insert(int index, char[] str, int offset,int len) {}
+```
+
+```java
+public StringBuilder insert(int offset, Object obj) {}
+```
+
+```java
+public StringBuilder insert(int offset, String str) {}
+```
+
+```java
+public StringBuilder insert(int offset, char[] str) {}
+```
+
+```java
+public StringBuilder insert(int dstOffset, CharSequence s) {}
+```
+
+```java
+public StringBuilder insert(int dstOffset, CharSequence s,
+                            int start, int end) {}
+```
+
+```java
+public StringBuilder insert(int offset, boolean b) {}
+```
+
+```java
+public StringBuilder insert(int offset, char c) {}
+```
+
+```java
+public StringBuilder insert(int offset, int i) {}
+```
+
+```java
+public StringBuilder insert(int offset, long l) {}
+```
+
+```java
+public StringBuilder insert(int offset, float f) {}
+```
+
+```java
+public StringBuilder insert(int offset, double d) {{}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+import java.util.HashMap;
+
+public class StringBuilderDemo2 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(1);
+        sb.append('a');
+        sb.append(1.1f);
+        sb.append(3.14);
+        sb.append(new HashMap<>());
+        // 在 index 位置插入数据
+        sb.insert(2, "呵呵哒");
+        String str = sb.toString();
+        System.out.println(str);
+    }
+}
+```
+
+### 5.3.4 删除（了解）
+
+* StringBuilder 支持删除`指定范围`以及`指定索引位置上`的数据。
+
+```java
+public StringBuilder delete(int start, int end) {}
+```
+
+```java
+public StringBuilder deleteCharAt(int index) { }
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+public class StringBuilderDemo2 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder("Hello World");
+        // 删除指定范围的数据
+        sb.delete(1, 3);
+        String str = sb.toString(); // Hlo World
+        System.out.println(str);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+public class StringBuilderDemo3 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder("Hello World");
+        // 删除指定索引位置上的数据
+        sb.deleteCharAt(1);
+        String str = sb.toString(); // Hllo World
+        System.out.println(str);
+    }
+}
+```
+
+### 5.3.5 反转
+
+* StringBuilder 支持反转内部维护的数据。
+
+```java
+public StringBuilder reverse() {}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+public class StringBuilderDemo4 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder("Hello World");
+        sb.reverse();
+        String str = sb.toString(); // dlroW olleH
+        System.out.println(str);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+import java.util.Scanner;
+
+/**
+ * 判断一个数是否是回文数，即：121 = 121
+ */
+public class StringBuilderDemo5 {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入数字：");
+        String str = input.next();
+        String reverse = new StringBuilder(str).reverse().toString();
+        if (str.equals(reverse)) {
+            System.out.println(str + "是回文数");
+        } else {
+            System.out.println(str + "不是回文数");
+        }
+    }
+}
+```
+
+### 5.3.6 替换（了解）
+
+* StringBuilder 支持替换指定范围内的字符序列。
+
+```java
+public StringBuilder replace(int start, int end, String str) {}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+public class StringBuilderDemo6 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder("Hello World");
+        String str = "123";
+        sb.replace(1, 1 + str.length(), str);
+        System.out.println(sb); // H123o World
+    }
+}
+```
+
+### 5.3.7 查找（了解）
+
+* StringBuilder 支持查找`指定字符串`在`字符序列`中的位置。
+
+```java
+public int indexOf(String str) {}
+```
+
+```java
+public int indexOf(String str, int fromIndex) {}
+```
+
+```java
+public int lastIndexOf(String str) {}
+```
+
+```java
+public int lastIndexOf(String str, int fromIndex) {}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+public class StringBuilderDemo7 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder("Hello World");
+        String str = "o";
+        int index = sb.indexOf(str);
+        System.out.println(index); // 4
+    }
+}
+```
+
+### 5.3.8 截取子串（了解）
+
+* StringBuilder 支持截取指定范围内的字符串。
+
+```java
+public String substring(int start) {}
+```
+
+```java
+public String substring(int start, int end) {}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+public class StringBuilderDemo8 {
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder("Hello World");
+        String str = sb.substring(1, 5); // ello
+        System.out.println(str); 
+    }
+}
+```
 
