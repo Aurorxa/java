@@ -1558,33 +1558,6 @@ public class StringBuilderDemo4 {
 }
 ```
 
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-import java.util.Scanner;
-
-/**
- * 判断一个数是否是回文数，即：121 = 121
- */
-public class StringBuilderDemo5 {
-    public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
-        System.out.print("请输入数字：");
-        String str = input.next();
-        String reverse = new StringBuilder(str).reverse().toString();
-        if (str.equals(reverse)) {
-            System.out.println(str + "是回文数");
-        } else {
-            System.out.println(str + "不是回文数");
-        }
-    }
-}
-```
-
 ### 5.3.6 替换（了解）
 
 * StringBuilder 支持替换指定范围内的字符序列。
@@ -1675,13 +1648,249 @@ public class StringBuilderDemo8 {
 }
 ```
 
+## 5.4 应用示例
+
+### 5.4.1 对称字符串
+
+* 需求：键盘接受一个字符串，程序判断出该字符串是否是对称字符串。
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+import java.util.Scanner;
+
+/**
+ * 判断一个数是否是对称字符串，即：121 = 121
+ */
+public class StringBuilderDemo5 {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入数字：");
+        String str = input.next();
+        String reverse = new StringBuilder(str).reverse().toString();
+        if (str.equals(reverse)) {
+            System.out.println(str + "是对称字符串");
+        } else {
+            System.out.println(str + "不是对称字符串");
+        }
+    }
+}
+```
+
+### 5.4.2 拼接字符串
+
+* 需求：定义一个方法，把 int 数组中的数据按照指定的格式拼接成一个字符串返回。
+
+> [!NOTE]
+>
+> 假设数组是 `int[] arr = {1,2,3};`，方法执行后的输出结果是 `[1, 2, 3]`。
+
+
+
+* 示例：
+
+```java
+package com.github.demo2;
+
+public class StringBuilderDemo7 {
+    public static void main(String[] args) {
+        //1.定义数组
+        int[] arr = {1,2,3};
+
+        //2.调用方法把数组变成字符串
+        String str = arrToString(arr);
+
+        System.out.println(str);
+
+    }
+
+    public static String arrToString(int[] arr){
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+
+        for (int i = 0; i < arr.length; i++) {
+            if(i == arr.length - 1){
+                sb.append(arr[i]);
+            }else{
+                sb.append(arr[i]).append(", ");
+            }
+        }
+        sb.append("]");
+
+        return sb.toString();
+    }
+}
+```
+
 
 
 # 第六章：StringJoiner（⭐）
 
+## 6.1 概述
+
+* `StringJoiner` 是 Java 8 引入的一个类，用于简化字符串的连接操作。
+* 它特别适合在需要将多个字符串合并成一个字符串的场景中，尤其是当字符串之间需要有特定的分隔符时。
+* 它提供了更灵活的方式来拼接字符串，并且可以自动处理分隔符的添加。
+
+## 6.2 构造方法
+
+* StringJoiner 提供了 2 个常用的构造方法来创建 StringJoiner 对象，如下所示：
+
+| 构造方法                                                     | 描述                   |
+| ------------------------------------------------------------ | ---------------------- |
+| public StringJoiner(CharSequence delimiter) {}               | 指定分隔符             |
+| public StringJoiner(CharSequence delimiter,  CharSequence prefix, CharSequence suffix)  {} | 指定分隔符、前缀和后缀 |
 
 
 
+* 示例：
+
+```java
+package com.github.demo3;
+
+import java.util.StringJoiner;
+
+public class StringJoinerDemo1 {
+    public static void main(String[] args) {
+        StringJoiner sf = new StringJoiner("");
+        
+        StringJoiner sf2 = new StringJoiner(",", "[", "]");
+    }
+}
+```
+
+## 6.3 StringJoiner 常用方法
+
+### 6.3.1 字符串
+
+* `StringJoiner`支持将内部维护的数据以`字符串`的形式返回：
+
+```java
+public String toString() {}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo3;
+
+import java.util.StringJoiner;
+
+public class StringJoinerDemo1 {
+    public static void main(String[] args) {
+        StringJoiner sf = new StringJoiner(",", "[", "]");
+        String str = sf.toString();
+        System.out.println("str = " + str); // str = []
+    }
+}
+```
+
+### 6.3.2 添加元素
+
+* `StringJoiner` 支持添加元素，并支持链式调用：
+
+```java
+public StringJoiner add(CharSequence newElement) {}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo3;
+
+import java.util.StringJoiner;
+
+public class StringJoinerDemo1 {
+    public static void main(String[] args) {
+        StringJoiner sf = new StringJoiner(",", "[", "]");
+        // 添加元素
+        sf.add("a");
+        sf.add("b");
+        sf.add("c").add("hello world");
+        String str = sf.toString();
+        System.out.println("str = " + str); // str = [a,b,c,hello world]
+    }
+}
+```
+
+### 6.3.3 合并
+
+* StringJoiner 支持合并 StringJoiner 对象：
+
+```java
+public StringJoiner merge(StringJoiner other) {}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo3;
+
+import java.util.StringJoiner;
+
+public class StringJoinerDemo1 {
+    public static void main(String[] args) {
+        StringJoiner sf = new StringJoiner(",", "[", "]");
+        sf.add("1").add("2").add("3");
+        StringJoiner sf2 = new StringJoiner(",", "[", "]");
+        sf2.add("a").add("b").add("c");
+
+        // 合并
+        sf.merge(sf2);
+
+        String str = sf.toString();
+        System.out.println("str = " + str); // str = [1,2,3,a,b,c]
+    }
+}
+
+```
+
+## 6.4 应用示例
+
+### 6.4.1 拼接字符串
+
+* 需求：定义一个方法，把 int 数组中的数据按照指定的格式拼接成一个字符串返回。
+
+> [!NOTE]
+>
+> 假设数组是 `int[] arr = {1,2,3};`， 方法执行后的输出结果是 `[1, 2, 3]`。
+
+
+
+* 示例：
+
+```java
+package com.github.demo3;
+
+import java.util.StringJoiner;
+
+public class StringJoinerDemo1 {
+    public static void main(String[] args) {
+        int [] arr = {1, 2, 3};
+        String str = arrToString(arr);
+        System.out.println("str = " + str);
+    }
+
+
+    public static String arrToString(int[] arr){
+        StringJoiner joiner = new StringJoiner(",", "[", "]");
+        for (int i = 0; i < arr.length; i++) {
+            joiner.add(String.valueOf(arr[i]));
+        }
+        return joiner.toString();
+    }
+}
+```
 
 
 
