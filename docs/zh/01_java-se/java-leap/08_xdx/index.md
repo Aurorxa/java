@@ -801,15 +801,916 @@ public class StringDemo7 {
 
 ## 4.7 空字符串比较
 
+### 4.7.1 概述
+
+* 在 Java 中，空字符串就是 `""`，即：长度为 0 的字符串。
+
+### 4.7.2 判断空字符串
+
+#### 4.7.2.1 字符串长度
+
+* 如果字符串的长度为 0 ，那么它就是空字符串。
+
+```java
+public int length(){}
+```
+
+> [!NOTE]
+>
+> JDK 1.6 在 String 类中提供了 `isEmpty` 方法，用来判断字符串是否是空字符串，如下所示：
+>
+> ```java
+> public boolean isEmpty() {
+>     return value.length == 0;
+> }
+> ```
 
 
 
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "";
+        System.out.println(str.length() == 0); // true
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "";
+        System.out.println(str.isEmpty()); // true
+    }
+}
+```
+
+#### 4.7.2.2 isEmpty() VS isBlank()
+
+* isEmpty() 用于检查字符串是否为空，即：字符串的长度是否为 0 。
+
+```java
+public boolean isEmpty() {
+    return value.length == 0;
+}
+```
+
+* isBlank() 用于检查字符串是否为空，或者只包含空白字符，如：空格、制表符、换行符：
+
+```java
+public boolean isBlank() {
+    return indexOfNonWhitespace() == length();
+}
+private int indexOfNonWhitespace() {
+    return isLatin1() ? StringLatin1.indexOfNonWhitespace(value)
+                      : StringUTF16.indexOfNonWhitespace(value);
+}
+```
+
+> [!NOTE]
+>
+> 在实际开发中，我们使用 `isBlank()` 方法居多！！！
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "";
+        System.out.println(str.isEmpty());  // 输出 true
+
+        str = "hello";
+        System.out.println(str.isEmpty());  // 输出 false
+
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "   ";  // 包含空格
+        System.out.println(str.isBlank());  // 输出 true
+
+        str = "";
+        System.out.println(str.isBlank());  // 输出 true
+
+        str = "hello";
+        System.out.println(str.isBlank());  // 输出 false
+
+    }
+}
+```
+
+#### 4.7.2.3 实际开发技巧
+
+* 实际开发中，并不能保证 String 一定不为 null ，如果为 null ，并调用了 String 的方法，将会产生 NullPointerException 。
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = null;
+        boolean b = isBlank(str);
+        System.out.println("b = " + b);
+    }
+
+    /**
+     * 判断字符串是否为空或包含空白字符
+     * @param str 字符串
+     * @return true：为空或包含空白字符，false：不为空或不包含空白字符
+     */
+    public static boolean isBlank(String str) {
+        return str == null || str.isBlank();
+    }
+}
+```
 
 ## 4.8 字符串的常用方法
 
+### 4.8.1 系列 1
+
+#### 4.8.1.1 判断字符串内容是否为空
+
+* 判断字符串是否为空，即：字符串的长度是否为 0 。
+
+```java
+public boolean isEmpty() { // [!code focus]
+    return value.length == 0;
+} // [!code focus]
+```
+
+* 判断检查字符串是否为空，或者只包含空白字符，如：空格、制表符、换行符：
+
+```java
+public boolean isBlank() { // [!code focus]
+    return indexOfNonWhitespace() == length();
+} // [!code focus]
+private int indexOfNonWhitespace() {
+    return isLatin1() ? StringLatin1.indexOfNonWhitespace(value)
+                      : StringUTF16.indexOfNonWhitespace(value);
+}
+```
+
+> [!NOTE]
+>
+> 在实际开发中，我们使用 `isBlank()` 方法居多！！！
 
 
 
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "";
+        System.out.println(str.isEmpty());  // 输出 true
+
+        str = "hello";
+        System.out.println(str.isEmpty());  // 输出 false
+
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "   ";  // 包含空格
+        System.out.println(str.isBlank());  // 输出 true
+
+        str = "";
+        System.out.println(str.isBlank());  // 输出 true
+
+        str = "hello";
+        System.out.println(str.isBlank());  // 输出 false
+
+    }
+}
+```
+
+#### 4.8.1.2 拼接字符串
+
+* 拼接其它字符串，相当于 `+` ：
+
+```java
+public String concat(String str) { // [!code focus]
+    if (str.isEmpty()) {
+        return this;
+    }
+    return StringConcatHelper.simpleConcat(this, str);
+} // [!code focus]
+```
+
+> [!NOTE]
+>
+> * ① 功能上不如 `+` 强大，`+` 可以拼接各种数据类型的数据，而 `concat` 只能拼接字符串。
+> * ② 在实际开发中，使用 `StringBuilder` 居多！！！
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "Hello ";
+        String result = str.concat("World");
+        System.out.println("result = " + result); // result = Hello World
+    }
+}
+```
+
+#### 4.8.1.3 比较字符串内容
+
+* 比较字符串内容（区分大小写）：
+
+```java
+public boolean equals(Object anObject) { // [!code focus]
+    if (this == anObject) {
+        return true;
+    }
+    return (anObject instanceof String aString)
+            && (!COMPACT_STRINGS || this.coder == aString.coder)
+            && StringLatin1.equals(value, aString.value);
+} // [!code focus]
+```
+
+> [!NOTE]
+>
+> 如果`str1.equals(str2)`中的`str1`是`null`，会产生`NullPointerException`，可以使用 `Objects.equals(str1,str2)` 来代替！！！
+
+* 比较字符串内容（不区分大小写）：
+
+```java
+public boolean equalsIgnoreCase(String anotherString) { // [!code focus]
+    return (this == anotherString) ? true
+            : (anotherString != null)
+            && (anotherString.length() == length())
+            && regionMatches(true, 0, anotherString, 0, length());
+} // [!code focus]
+```
+
+* 比较字符串内容（区分大小写）：
+
+```java
+public final class Objects { // [!code focus]
+    public static boolean equals(Object a, Object b) { // [!code focus]
+        return (a == b) || (a != null && a.equals(b));
+    } // [!code focus]
+} // [!code focus]
+```
+
+> [!NOTE]
+>
+> 如果`str1.equals(str2)`中的`str1`是`null`，会产生`NullPointerException`，可以使用 `Objects.equals(str1,str2)` 来代替！！！
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "hello";
+        String str2 = "Hello";
+
+        System.out.println(str.equals(str2)); // false
+        System.out.println(str.equalsIgnoreCase(str2)); // true
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+import java.util.Objects;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = null;
+        String str2 = "hello";
+        String str3 = "hello";
+
+        System.out.println(Objects.equals(str, str2)); // false
+        System.out.println(Objects.equals(str2, str3)); // true
+    }
+}
+```
+
+#### 4.8.1.4 比较字符串大小
+
+* 比较字符串大小（区分大小写），按照 Unicode 编码值比较大小：
+
+```java
+public int compareTo(String anotherString) { // [!code focus]
+    byte v1[] = value;
+    byte v2[] = anotherString.value;
+    byte coder = coder();
+    if (coder == anotherString.coder()) {
+        return coder == LATIN1 ? StringLatin1.compareTo(v1, v2)
+                               : StringUTF16.compareTo(v1, v2);
+    }
+    return coder == LATIN1 ? StringLatin1.compareToUTF16(v1, v2)
+                           : StringUTF16.compareToLatin1(v1, v2);
+ } // [!code focus]
+```
+
+* 比较字符串大小（不区分大小写），按照 Unicode 编码值比较大小：
+
+```java
+public int compareToIgnoreCase(String str) { // [!code focus]
+    return CASE_INSENSITIVE_ORDER.compare(this, str);
+} // [!code focus]
+
+public static final Comparator<String> CASE_INSENSITIVE_ORDER
+                                     = new CaseInsensitiveComparator();
+
+/**
+ * CaseInsensitiveComparator for Strings.
+ */
+private static class CaseInsensitiveComparator
+        implements Comparator<String>, java.io.Serializable {
+    // use serialVersionUID from JDK 1.2.2 for interoperability
+    @java.io.Serial
+    private static final long serialVersionUID = 8575799808933029326L;
+
+    public int compare(String s1, String s2) {
+        byte v1[] = s1.value;
+        byte v2[] = s2.value;
+        byte coder = s1.coder();
+        if (coder == s2.coder()) {
+            return coder == LATIN1 ? StringLatin1.compareToCI(v1, v2)
+                                   : StringUTF16.compareToCI(v1, v2);
+        }
+        return coder == LATIN1 ? StringLatin1.compareToCI_UTF16(v1, v2)
+                               : StringUTF16.compareToCI_Latin1(v1, v2);
+    }
+
+    /** Replaces the de-serialized object. */
+    @java.io.Serial
+    private Object readResolve() { return CASE_INSENSITIVE_ORDER; }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str1 = "hello";
+        String str2 = "Hello";
+
+        System.out.println(str1.compareTo(str2)); // 32
+        System.out.println(str1.compareToIgnoreCase(str2)); // 0
+    }
+}
+```
+
+#### 4.8.1.5 转换大小写
+
+* 将字符串中的字母转换为大写字母：
+
+```java
+public String toUpperCase() { // [!code focus] 
+    return toUpperCase(Locale.getDefault());
+} // [!code focus]
+```
+
+* 将字符串中的字母转换小写字母：
+
+```java
+public String toLowerCase() { // [!code focus] 
+    return toLowerCase(Locale.getDefault());
+} // [!code focus] 
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "Hello";
+        System.out.println(str.toUpperCase()); // HELLO
+        System.out.println(str.toLowerCase()); // hello
+    }
+}
+```
+
+#### 4.8.1.6 去掉前后空白
+
+* 将字符串的前后空白去掉：
+
+```java
+public String trim() { // [!code focus]
+    String ret = isLatin1() ? StringLatin1.trim(value)
+                            : StringUTF16.trim(value);
+    return ret == null ? this : ret;
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = " Hello1 111 ";
+        System.out.println(str.trim()); // Hello1 111
+    }
+}
+```
+
+### 4.8.2 系列 2 ：查找
+
+* 字符串中是否包含子串（推荐）：
+
+```java
+public boolean contains(CharSequence s) { // [!code focus]
+    return indexOf(s.toString()) >= 0;
+} // [!code focus]
+```
+
+* 从前往后查找字符串中的子串，如果有，返回第一次出现的下标；否则，返回 -1 ：
+
+```java
+public int indexOf(String str) { // [!code focus]
+    byte coder = coder();
+    if (coder == str.coder()) {
+        return isLatin1() ? StringLatin1.indexOf(value, str.value)
+                          : StringUTF16.indexOf(value, str.value);
+    }
+    if (coder == LATIN1) {  // str.coder == UTF16
+        return -1;
+    }
+    return StringUTF16.indexOfLatin1(value, str.value);
+} // [!code focus]
+```
+
+* 从后往前查找字符串中的子串，如果有，返回第一次出现的下标；否则，返回 -1 ：
+
+```java
+public int lastIndexOf(String str) { // [!code focus]
+    return lastIndexOf(str, length());
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "Hello world Hello World";
+        String str2 = "world";
+        System.out.println(str.contains(str2)); // true
+
+        int index = str.indexOf(str2);
+        System.out.println(index); // 6
+
+        int index2 = str.lastIndexOf(str2);
+        System.out.println(index2); // 6
+    }
+}
+```
+
+### 4.8.3 系列 3 ：字符串截取
+
+* 返回一个新的字符串，它是此字符串的从 `beginIndex` 开始截取到最后的一个子字符串：
+
+```java
+public String substring(int beginIndex) { // [!code focus]
+    return substring(beginIndex, length());
+} // [!code focus]
+```
+
+* 返回一个新字符串，它是此字符串从 `beginIndex` 开始截取到 `endIndex` (不包含)的一个子字符串：
+
+```java
+public String substring(int beginIndex, int endIndex) { // [!code focus]
+    int length = length();
+    checkBoundsBeginEnd(beginIndex, endIndex, length);
+    if (beginIndex == 0 && endIndex == length) {
+        return this;
+    }
+    int subLen = endIndex - beginIndex;
+    return isLatin1() ? StringLatin1.newString(value, beginIndex, subLen)
+                      : StringUTF16.newString(value, beginIndex, subLen);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "Java is a good computer language";
+
+        System.out.println(str.substring(5)); // is a good computer language
+        System.out.println(str.substring(5, 11)); // is a g
+    }
+}
+```
+
+### 4.8.4 系列 4 ：字符相关
+
+* 返回 index 位置的字符：
+
+```java
+public char charAt(int index) { // [!code focus]
+    if (isLatin1()) {
+        return StringLatin1.charAt(value, index);
+    } else {
+        return StringUTF16.charAt(value, index);
+    }
+} // [!code focus]
+```
+
+* 将字符串转换为一个新的字符数组返回：
+
+```java
+public char[] toCharArray() { // [!code focus]
+    return isLatin1() ? StringLatin1.toChars(value)
+                      : StringUTF16.toChars(value);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+import java.util.Arrays;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        // 将首字母变为大写
+        String str = "hello World";
+        str = Character.toUpperCase(str.charAt(0)) + str.substring(1);
+        System.out.println("str = " + str); // Hello World
+
+        // 将字符串中的字符按照大小顺序排列
+        String str2 = "helloworldjava";
+        char[] chars = str2.toCharArray();
+        Arrays.sort(chars);
+        // [a, a, d, e, h, j, l, l, l, o, o, r, v, w]
+        System.out.println("chars = " + Arrays.toString(chars)); 
+    }
+}
+```
+
+### 4.8.5 系列 5 ：编码和解码
+
+* 编码，将字符串转换为字节数组：
+
+```java
+public byte[] getBytes(Charset charset) { // [!code focus]
+    if (charset == null) throw new NullPointerException();
+    return encode(charset, coder(), value);
+ } // [!code focus]
+```
+
+```java
+public byte[] getBytes() { // [!code focus]
+    return encode(Charset.defaultCharset(), coder(), value);
+} // [!code focus]
+```
+
+* 解码，将字节数组转换为字符串：
+
+```java
+public String(byte bytes[], Charset charset) { // [!code focus]
+    this(bytes, 0, bytes.length, charset);
+} // [!code focus]
+```
+
+```java
+public String(byte[] bytes) { // [!code focus]
+    this(bytes, 0, bytes.length);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+import java.nio.charset.StandardCharsets;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "我爱中国";
+        // 编码
+        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+        // 解码
+        String result = new String(bytes, StandardCharsets.UTF_8);
+        // 我爱中国
+        System.out.println(result); 
+    }
+}
+```
+
+### 4.8.6 系列 6 ：开头和结尾
+
+* 是否以指定字符串开头：
+
+```java
+public boolean startsWith(String prefix) { // [!code focus]
+    return startsWith(prefix, 0);
+} // [!code focus]
+```
+
+* 是否以指定字符串结尾：
+
+```java
+public boolean endsWith(String suffix) { // [!code focus]
+    return startsWith(suffix, length() - suffix.length());
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "我爱中国，我喜欢Java语言，但是我的英语不咋的";
+        System.out.println(str.startsWith("我")); // true
+        System.out.println(str.startsWith("我爱")); // true
+        System.out.println(str.startsWith("我爱中国")); // true
+
+        System.out.println(str.endsWith("不咋的")); // true
+        System.out.println(str.endsWith("咋的")); // true
+        System.out.println(str.endsWith("的")); // true
+    }
+}
+```
+
+### 4.8.7 系列 7 ：正则表达式
+
+#### 4.8.7.1 概述
+
+* 正则表达式：用来专门处理字符串的技术。 
+
+| 字符类      | 描述                                    |
+| ----------- | --------------------------------------- |
+| `[abc]`     | 只能是 a 或 b 或 c                      |
+| `[^abc]`    | 除了 a 、b 、c 以外的任意一个字符       |
+| `[a-zA-Z]`  | 必须是 a - z ，A - Z 中的任意一个字符   |
+| `[^a-zA-Z]` | 除了 a - z ，A - Z 中的任意任意一个字符 |
+
+| 数字类   | 描述                             |
+| -------- | -------------------------------- |
+| `[0-9]`  | 只能是 0 和 9 之间的任意一个数字 |
+| `\d`     | 等同于 `[0-9]`                   |
+| `[^0-9]` | 除了 0 和 9 之间的任意一个数字   |
+| `\D`     | 等同于 `[^0-9]`                  |
+
+| 预定义字符类 | 描述                   |
+| ------------ | ---------------------- |
+| `.`          | 匹配所有字符           |
+| `\d`         | 等同于 `[0-9]`         |
+| `\D`         | 等同于 `[^0-9]`        |
+| `\w`         | 等同于 `[a-zA-Z_0-9]`  |
+| `\W`         | 等同于 `[^a-zA-Z_0-9]` |
+
+| 边界匹配器 | 描述     |
+| ---------- | -------- |
+| `^`        | 行的开头 |
+| `$`        | 行的结尾 |
+
+| 数量类   | 描述                                            |
+| -------- | ----------------------------------------------- |
+| `X?`     | X 字符最多只能出现一次（ 0 次或 1 次）          |
+| `X*`     | X 字符可以出现 0 次、1 次或多次                 |
+| `X+`     | X 字符可以出现 1 次或多次                       |
+| `X{n}`   | X 字符只能出现 n 次                             |
+| `X{n*,}` | X 字符至少出现 n 次（在数学中表示 `[n,+∞)` ）   |
+| `X{n,m}` | X 字符只能出现 n 到 m 次（在数学中表示 [n,m] ） |
+
+* 常用正则表达式：
+
+| 常用正则表达式                                               | 描述                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `^[a-zA-Z]\w{5,15}$`                                         | 验证用户名和密码，并要求第一个字符为字母，一共 6-16 位字母数字下划线组成 |
+| `^(\d{3,4}-)\d{7,8}$`                                        | 验证电话号码                                                 |
+| `^\(13[0-9]\|14[5\|7]\|15[0-9]\|15[1-3]\|15[5-9]\|18[0-9]\|18[1-3]\|18[5-9]\)\d\{8\}$ ` | 验证手机号码                                                 |
+| `^\w+([-+.]\w+)*@\w+([-.]\w+)*.\w+([-.]\w+)*$`               | 验证电子邮箱                                                 |
+| `(\^\d\{15}\$)\|(\^\d\{18}\$)\|(\^\d\{17\}(\d\|X\|x)\$)`     | 验证身份证号码                                               |
+| `^[A-Za-z0-9]+$`                                             | 只能输入由数字和 26 个英文字母组成的字符串                   |
+| `^[0-9]+(\.\[0-9\]+){0,1}$`                                  | 整数或小数                                                   |
+| `[\u4e00-\u9fa5]`                                            | 中文字符                                                     |
+| `^(\[1-9\][0-9]*)+(.[0-9]{1,2})?$`                           | 金额校验（非零开头的最多带 2 位小数的数字）                  |
+
+#### 4.7.8.2 字符串是否匹配
+
+* 字符串是否匹配指定的正则表达式：
+
+```java
+public boolean matches(String regex) { // [!code focus]
+    return Pattern.matches(regex, this);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String iphone = "13800138000";
+        boolean matches = iphone.matches("^1[3-9]\\d{9}$");
+        System.out.println("matches = " + matches);
+    }
+}
+```
+
+#### 4.7.8.3 替换
+
+* 替换（不支持正则）：
+
+```java
+public String replace(CharSequence target, CharSequence replacement) { // [!code focus]
+    String trgtStr = target.toString();
+    String replStr = replacement.toString();
+    int thisLen = length();
+    int trgtLen = trgtStr.length();
+    int replLen = replStr.length();
+
+    if (trgtLen > 0) {
+        if (trgtLen == 1 && replLen == 1) {
+            return replace(trgtStr.charAt(0), replStr.charAt(0));
+        }
+
+        boolean thisIsLatin1 = this.isLatin1();
+        boolean trgtIsLatin1 = trgtStr.isLatin1();
+        boolean replIsLatin1 = replStr.isLatin1();
+        String ret = (thisIsLatin1 && trgtIsLatin1 && replIsLatin1)
+                ? StringLatin1.replace(value, thisLen,
+                                       trgtStr.value, trgtLen,
+                                       replStr.value, replLen)
+                : StringUTF16.replace(value, thisLen, thisIsLatin1,
+                                      trgtStr.value, trgtLen, trgtIsLatin1,
+                                      replStr.value, replLen, replIsLatin1);
+        if (ret != null) {
+            return ret;
+        }
+        return this;
+
+    } else { // trgtLen == 0
+        int resultLen;
+        try {
+            resultLen = Math.addExact(thisLen, Math.multiplyExact(
+                    Math.addExact(thisLen, 1), replLen));
+        } catch (ArithmeticException ignored) {
+            throw new OutOfMemoryError("Required length exceeds implementation limit");
+        }
+
+        StringBuilder sb = new StringBuilder(resultLen);
+        sb.append(replStr);
+        for (int i = 0; i < thisLen; ++i) {
+            sb.append(charAt(i)).append(replStr);
+        }
+        return sb.toString();
+    }
+} // [!code focus]
+```
+
+* 替换匹配到的第一个（支持正则）：
+
+```java
+public String replaceFirst(String regex, String replacement) { // [!code focus]
+    return Pattern.compile(regex).matcher(this).replaceFirst(replacement);
+} // [!code focus]
+```
+
+* 替换所有匹配部分（支持正则）：
+
+```java
+public String replaceAll(String regex, String replacement) { // [!code focus]
+    return Pattern.compile(regex).matcher(this).replaceAll(replacement);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "hello22world.java;234";
+        // 将其中的非字母替换掉
+        String s = str.replaceAll("[^a-zA-Z]", "");
+        System.out.println("s = " + s);
+    }
+}
+```
+
+#### 4.7.8.4 拆分
+
+* 按照正则将字符串进行拆分：
+
+```java
+public String[] split(String regex) { // [!code focus]
+    return split(regex, 0);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo;
+
+import java.util.Arrays;
+
+public class StringDemo8 {
+    public static void main(String[] args) {
+        String str = "张三.23|李四.24|王五.25";
+        // 按照|拆分
+        String regex = "\\|";
+        String[] split = str.split(regex);
+        for (String s : split) {
+            // 按照.进行拆分
+            String[] str2 = s.split("\\.");
+            System.out.println(Arrays.toString(str2));
+        }
+    }
+}
+```
 
 ## 4.9 应用示例
 
@@ -1235,910 +2136,6 @@ public class StringTest8 {
             }
         }
         return text;
-    }
-}
-```
-
-
-
-# 第五章：StringBuilder（⭐）
-
-## 5.1 概述
-
-* 因为 String 对象是不可变的对象，虽然可以共享常量对象，但是对于频繁字符串的修改和拼接操作，效率极低。
-* 因此，Java 在 java.lang 包中提供了可变字符序列 StringBuilder 和 StringBuffer ，其目的就是为了提高字符串的操作效率。
-
-> [!NOTE]
->
-> * ① StringBuilder 是线程不安全的。
-> * ② StringBuffer 是线程安全的。
-
-![StringBuilder 和 StringBuffer](./assets/18.png)
-
-## 5.2 StringBuilder 的构造方法
-
-* StringBuilder 提供了 3 个常用的构造方法来创建 StringBuilder 对象，如下所示：
-
-| 构造方法                                 | 描述                                         |
-| ---------------------------------------- | -------------------------------------------- |
-| public StringBuilder(){}                 | 创建一个空白的可变字符串对象，不包含任何内容 |
-| public StringBuilder(String str){}       | 根据字符串的内容，创建可变字符串对象         |
-| public StringBuilder(CharSequence seq){} | 根据字符序列对象，创建可变字符串对象         |
-
-> [!NOTE]
->
-> * ① StrringBuilder 和 StringBuffer 是 CharSequence  的子类。
-> * ② 可以通过 `public StringBuilder(CharSequence seq){}`实现将 StringBuffer  转换为 StrringBuilder 。
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-public class StringBuilderDemo1 {
-    public static void main(String[] args) {
-        // 创建一个空白的可变字符串对象
-        StringBuilder str = new StringBuilder();
-
-        // 根据字符数组创建一个可变字符串对象
-        StringBuilder str2 = new StringBuilder("abc");
-        
-        // 根据字符序列创建一个可变字符串对象
-        StringBuilder str3 = new StringBuilder(new StringBuffer("abc"));
-    }
-}
-```
-
-## 5.3 StringBuilder 的常用方法
-
-### 5.3.1 字符串
-
-* `StringBuilder`支持将内部维护的数据以`字符串`的形式返回：
-
-```java
-public String toString(){}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-public class StringBuilderDemo1 {
-    public static void main(String[] args) {
-        // 创建一个空白的可变字符串对象
-        StringBuilder sb1 = new StringBuilder();
-        String str = sb1.toString();
-        System.out.println("str = " + str);
-
-        // 根据字符数组创建一个可变字符串对象
-        StringBuilder sb2 = new StringBuilder("abc");
-        str = sb2.toString();
-        System.out.println("str = " + str);
-
-        // 根据字符序列创建一个可变字符串对象
-        StringBuilder sb3 = new StringBuilder(new StringBuffer("abc"));
-        str = sb3.toString();
-        System.out.println("str = " + str);
-    }
-}
-```
-
-### 5.3.2 拼接
-
-* StringBuilder 支持拼接各种数据类型的数据，并且支持链接调用。
-
-```java
-public StringBuilder append(Object obj) {}
-```
-
-```java
-public StringBuilder append(String str) {}
-```
-
-```java
-public StringBuilder append(StringBuffer sb) {}
-```
-
-```java
-public StringBuilder append(CharSequence s) {}
-```
-
-```java
-public StringBuilder append(CharSequence s, int start, int end) {}
-```
-
-```java
-public StringBuilder append(char[] str) {}
-```
-
-```java
-public StringBuilder append(char[] str, int offset, int len) {}
-```
-
-```java
-public StringBuilder append(boolean b) {}
-```
-
-```java
-public StringBuilder append(char c) {}
-```
-
-```java
-public StringBuilder append(int i) {}
-```
-
-```java
-public StringBuilder append(long lng) {}
-```
-
-```java 
-public StringBuilder append(float f) {}
-```
-
-```java 
-public StringBuilder append(double d) {}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-import java.util.HashMap;
-
-public class StringBuilderDemo2 {
-    public static void main(String[] args) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(1);
-        sb.append('a');
-        sb.append(1.1f);
-        sb.append(3.14);
-        sb.append(new HashMap<>());
-        String str = sb.toString();
-        System.out.println(str);
-    }
-}
-```
-
-### 5.3.3 插入（了解）
-
-* StringBuilder 支持在 index 位置插入数据。
-
-```java
-public StringBuilder insert(int index, char[] str, int offset,int len) {}
-```
-
-```java
-public StringBuilder insert(int offset, Object obj) {}
-```
-
-```java
-public StringBuilder insert(int offset, String str) {}
-```
-
-```java
-public StringBuilder insert(int offset, char[] str) {}
-```
-
-```java
-public StringBuilder insert(int dstOffset, CharSequence s) {}
-```
-
-```java
-public StringBuilder insert(int dstOffset, CharSequence s,
-                            int start, int end) {}
-```
-
-```java
-public StringBuilder insert(int offset, boolean b) {}
-```
-
-```java
-public StringBuilder insert(int offset, char c) {}
-```
-
-```java
-public StringBuilder insert(int offset, int i) {}
-```
-
-```java
-public StringBuilder insert(int offset, long l) {}
-```
-
-```java
-public StringBuilder insert(int offset, float f) {}
-```
-
-```java
-public StringBuilder insert(int offset, double d) {{}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-import java.util.HashMap;
-
-public class StringBuilderDemo2 {
-    public static void main(String[] args) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(1);
-        sb.append('a');
-        sb.append(1.1f);
-        sb.append(3.14);
-        sb.append(new HashMap<>());
-        // 在 index 位置插入数据
-        sb.insert(2, "呵呵哒");
-        String str = sb.toString();
-        System.out.println(str);
-    }
-}
-```
-
-### 5.3.4 删除（了解）
-
-* StringBuilder 支持删除`指定范围`以及`指定索引位置上`的数据。
-
-```java
-public StringBuilder delete(int start, int end) {}
-```
-
-```java
-public StringBuilder deleteCharAt(int index) { }
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-public class StringBuilderDemo2 {
-    public static void main(String[] args) {
-        StringBuilder sb = new StringBuilder("Hello World");
-        // 删除指定范围的数据
-        sb.delete(1, 3);
-        String str = sb.toString(); // Hlo World
-        System.out.println(str);
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-public class StringBuilderDemo3 {
-    public static void main(String[] args) {
-        StringBuilder sb = new StringBuilder("Hello World");
-        // 删除指定索引位置上的数据
-        sb.deleteCharAt(1);
-        String str = sb.toString(); // Hllo World
-        System.out.println(str);
-    }
-}
-```
-
-### 5.3.5 反转
-
-* StringBuilder 支持反转内部维护的数据。
-
-```java
-public StringBuilder reverse() {}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-public class StringBuilderDemo4 {
-    public static void main(String[] args) {
-        StringBuilder sb = new StringBuilder("Hello World");
-        sb.reverse();
-        String str = sb.toString(); // dlroW olleH
-        System.out.println(str);
-    }
-}
-```
-
-### 5.3.6 替换（了解）
-
-* StringBuilder 支持替换指定范围内的字符序列。
-
-```java
-public StringBuilder replace(int start, int end, String str) {}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-public class StringBuilderDemo6 {
-    public static void main(String[] args) {
-        StringBuilder sb = new StringBuilder("Hello World");
-        String str = "123";
-        sb.replace(1, 1 + str.length(), str);
-        System.out.println(sb); // H123o World
-    }
-}
-```
-
-### 5.3.7 查找（了解）
-
-* StringBuilder 支持查找`指定字符串`在`字符序列`中的位置。
-
-```java
-public int indexOf(String str) {}
-```
-
-```java
-public int indexOf(String str, int fromIndex) {}
-```
-
-```java
-public int lastIndexOf(String str) {}
-```
-
-```java
-public int lastIndexOf(String str, int fromIndex) {}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-public class StringBuilderDemo7 {
-    public static void main(String[] args) {
-        StringBuilder sb = new StringBuilder("Hello World");
-        String str = "o";
-        int index = sb.indexOf(str);
-        System.out.println(index); // 4
-    }
-}
-```
-
-### 5.3.8 截取子串（了解）
-
-* StringBuilder 支持截取指定范围内的字符串。
-
-```java
-public String substring(int start) {}
-```
-
-```java
-public String substring(int start, int end) {}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-public class StringBuilderDemo8 {
-    public static void main(String[] args) {
-        StringBuilder sb = new StringBuilder("Hello World");
-        String str = sb.substring(1, 5); // ello
-        System.out.println(str); 
-    }
-}
-```
-
-## 5.4 应用示例
-
-### 5.4.1 对称字符串
-
-* 需求：键盘接受一个字符串，程序判断出该字符串是否是对称字符串。
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-import java.util.Scanner;
-
-/**
- * 判断一个数是否是对称字符串，即：121 = 121
- */
-public class StringBuilderDemo5 {
-    public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
-        System.out.print("请输入数字：");
-        String str = input.next();
-        String reverse = new StringBuilder(str).reverse().toString();
-        if (str.equals(reverse)) {
-            System.out.println(str + "是对称字符串");
-        } else {
-            System.out.println(str + "不是对称字符串");
-        }
-    }
-}
-```
-
-### 5.4.2 拼接字符串
-
-* 需求：定义一个方法，把 int 数组中的数据按照指定的格式拼接成一个字符串返回。
-
-> [!NOTE]
->
-> 假设数组是 `int[] arr = {1,2,3};`，方法执行后的输出结果是 `[1, 2, 3]`。
-
-
-
-* 示例：
-
-```java
-package com.github.demo2;
-
-public class StringBuilderDemo7 {
-    public static void main(String[] args) {
-        //1.定义数组
-        int[] arr = {1,2,3};
-
-        //2.调用方法把数组变成字符串
-        String str = arrToString(arr);
-
-        System.out.println(str);
-
-    }
-
-    public static String arrToString(int[] arr){
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-
-        for (int i = 0; i < arr.length; i++) {
-            if(i == arr.length - 1){
-                sb.append(arr[i]);
-            }else{
-                sb.append(arr[i]).append(", ");
-            }
-        }
-        sb.append("]");
-
-        return sb.toString();
-    }
-}
-```
-
-
-
-# 第六章：StringJoiner（⭐）
-
-## 6.1 概述
-
-* `StringJoiner` 是 Java 8 引入的一个类，用于简化字符串的连接操作。
-* 它特别适合在需要将多个字符串合并成一个字符串的场景中，尤其是当字符串之间需要有特定的分隔符时。
-* 它提供了更灵活的方式来拼接字符串，并且可以自动处理分隔符的添加。
-
-## 6.2 构造方法
-
-* StringJoiner 提供了 2 个常用的构造方法来创建 StringJoiner 对象，如下所示：
-
-| 构造方法                                                     | 描述                   |
-| ------------------------------------------------------------ | ---------------------- |
-| public StringJoiner(CharSequence delimiter) {}               | 指定分隔符             |
-| public StringJoiner(CharSequence delimiter,  CharSequence prefix, CharSequence suffix)  {} | 指定分隔符、前缀和后缀 |
-
-
-
-* 示例：
-
-```java
-package com.github.demo3;
-
-import java.util.StringJoiner;
-
-public class StringJoinerDemo1 {
-    public static void main(String[] args) {
-        StringJoiner sf = new StringJoiner("");
-        
-        StringJoiner sf2 = new StringJoiner(",", "[", "]");
-    }
-}
-```
-
-## 6.3 StringJoiner 常用方法
-
-### 6.3.1 字符串
-
-* `StringJoiner`支持将内部维护的数据以`字符串`的形式返回：
-
-```java
-public String toString() {}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo3;
-
-import java.util.StringJoiner;
-
-public class StringJoinerDemo1 {
-    public static void main(String[] args) {
-        StringJoiner sf = new StringJoiner(",", "[", "]");
-        String str = sf.toString();
-        System.out.println("str = " + str); // str = []
-    }
-}
-```
-
-### 6.3.2 添加元素
-
-* `StringJoiner` 支持添加元素，并支持链式调用：
-
-```java
-public StringJoiner add(CharSequence newElement) {}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo3;
-
-import java.util.StringJoiner;
-
-public class StringJoinerDemo1 {
-    public static void main(String[] args) {
-        StringJoiner sf = new StringJoiner(",", "[", "]");
-        // 添加元素
-        sf.add("a");
-        sf.add("b");
-        sf.add("c").add("hello world");
-        String str = sf.toString();
-        System.out.println("str = " + str); // str = [a,b,c,hello world]
-    }
-}
-```
-
-### 6.3.3 合并
-
-* StringJoiner 支持合并 StringJoiner 对象：
-
-```java
-public StringJoiner merge(StringJoiner other) {}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.demo3;
-
-import java.util.StringJoiner;
-
-public class StringJoinerDemo1 {
-    public static void main(String[] args) {
-        StringJoiner sf = new StringJoiner(",", "[", "]");
-        sf.add("1").add("2").add("3");
-        StringJoiner sf2 = new StringJoiner(",", "[", "]");
-        sf2.add("a").add("b").add("c");
-
-        // 合并
-        sf.merge(sf2);
-
-        String str = sf.toString();
-        System.out.println("str = " + str); // str = [1,2,3,a,b,c]
-    }
-}
-
-```
-
-## 6.4 应用示例
-
-### 6.4.1 拼接字符串
-
-* 需求：定义一个方法，把 int 数组中的数据按照指定的格式拼接成一个字符串返回。
-
-> [!NOTE]
->
-> 假设数组是 `int[] arr = {1,2,3};`， 方法执行后的输出结果是 `[1, 2, 3]`。
-
-
-
-* 示例：
-
-```java
-package com.github.demo3;
-
-import java.util.StringJoiner;
-
-public class StringJoinerDemo1 {
-    public static void main(String[] args) {
-        int [] arr = {1, 2, 3};
-        String str = arrToString(arr);
-        System.out.println("str = " + str);
-    }
-
-
-    public static String arrToString(int[] arr){
-        StringJoiner joiner = new StringJoiner(",", "[", "]");
-        for (int i = 0; i < arr.length; i++) {
-            joiner.add(String.valueOf(arr[i]));
-        }
-        return joiner.toString();
-    }
-}
-```
-
-
-
-# 第七章：String 的相关底层原理
-
-
-
-
-
-# 第八章：综合练习（⭐）
-
-## 8.1 罗马数字
-
-* 需求：键盘录入一个字符串（长度小于等于 9，只能是数字），并将内容变为罗马数字。
-
-> [!NOTE]
->
-> * ① 阿拉伯数字和罗马数字的对比关系，如下所示：
->
-> | 阿拉伯数字 | 罗马数字 |
-> | ---------- | -------- |
-> | 1          | I        |
-> | 2          | II       |
-> | 3          | III      |
-> | 4          | IV       |
-> | 5          | V        |
-> | 6          | VI       |
-> | 7          | VII      |
-> | 8          | VIII     |
-> | 9          | IX       |
->
-> * ② 罗马数字中没有`0`，如果键盘录入的数字包含`0`，可以变为`"0"`。 
-
-
-
-* 示例：
-
-```java
-package com.github.test2;
-
-import java.util.Scanner;
-
-public class RomanNumeralTest {
-    public static final String[] ROMAN_NUMERAL_ARRAY = 
-                 {"0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
-
-    public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
-        String str;
-        do {
-            System.out.print("请输入字符串（长度小于等于 9 ，并且只能是数字）：");
-            str = input.next();
-        } while (str.length() > 9 || !str.matches("[0-9]+"));
-
-        String roman = toRoman(str);
-        System.out.println("roman = " + roman);
-
-        input.close();
-    }
-
-    /**
-     * 将包含 0-9 的字符串转换为罗马数字
-     * @param str 包含 0-9 的字符串
-     * @return 罗马数字字符串
-     */
-    public static String toRoman(String str) {
-        StringJoiner sj = new StringJoiner(" ");
-        for (int i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
-            int index = Integer.parseInt(String.valueOf(ch));
-            String roman = ROMAN_NUMERAL_ARRAY[index];
-            sj.add(roman);
-        }
-        return sj.toString();
-    }
-}
-```
-
-## 8.2 调整字符串
-
-* 需求：给定两个字符串 A 和 B ，A 的旋转操作就是将 A 最左边的字符移动到最右边，如：A = "abcde"，移动一次之后的结果就是 "bcdea"，如果在若干次调整操作之后，A 能变为 B ，那么就返回 true；否则，返回 false。
-
-
-
-* 示例：
-
-```java
-package com.github.test2;
-
-public class StringDemoTest {
-    public static void main(String[] args) {
-        String strA = "abcde";
-        String strB = "cdeab";
-
-        boolean rotate = isRotateEquals(strA, strB);
-        System.out.println("rotate = " + rotate);
-    }
-
-    /**
-     * 每调用一次，就将最左侧的字符移动到字符串的最后面
-     * @param str 循转前的字符串
-     * @return 旋转后的字符串
-     */
-    public static String rotate(String str) {
-        return str.substring(1) + str.charAt(0);
-    }
-
-    /**
-     * 判断旋转之后是否相等
-     * @param strA 字符串 A
-     * @param strB 字符串 B
-     * @return true/false
-     */
-    public static boolean isRotateEquals(String strA, String strB) {
-        for (int i = 0; i < strA.length(); i++) {
-            strA = rotate(strA);
-            if (strA.equals(strB)) {
-                return true;
-            }
-        }
-        return false;
-    }
-}
-```
-
-## 8.3 打乱字符串
-
-* 需求：键盘输入任意字符串，打乱里面的内容。
-
-
-
-* 示例：
-
-```java
-package com.github.test2;
-
-import java.security.SecureRandom;
-import java.util.Random;
-import java.util.Scanner;
-
-public class StringDemoTest2 {
-    public static final Random RANDOM = new SecureRandom();
-
-    public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
-        System.out.print("请输入字符串：");
-        String str = input.next();
-        System.out.println("之前字符串 = " + str);
-        str = randomString(str);
-        System.out.println("随机字符串 = " + str);
-        input.close();
-    }
-
-    /**
-     * 随机字符串
-     * @param str 字符串
-     * @return 随机字符串
-     */
-    public static String randomString(String str) {
-        char[] chs = str.toCharArray();
-        for (int i = 0; i < chs.length; i++) {
-            // 获取随机索引
-            int index = RANDOM.nextInt(chs.length);
-            // 将 chs[i] 和 chs[index] 交换
-            char temp = chs[i];
-            chs[i] = chs[index];
-            chs[index] = temp;
-        }
-        return String.valueOf(chs);
-    }
-}
-```
-
-## 8.4 验证码
-
-* 需求：定义一个方法实现随机产生一个 5 位的验证码。
-
-> [!NOTE]
->
-> 验证码格式：
->
-> - ① 长度为 5。
-> - ② 四位字母和一位数字，数字可以在任意位置。
-
-
-
-* 示例：
-
-```java
-package com.github.test2;
-
-import java.security.SecureRandom;
-import java.util.Random;
-
-public class RandomCodeTest {
-    private static final Random RANDOM = new SecureRandom();
-    private static final String LETTERS = "abcdefghijklmnopqrstuvwxyz" 
-        + "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    public static void main(String[] args) {
-        String code = generate5Code();
-        System.out.println("code = " + code);
-    }
-
-    /**
-     * 生成验证码
-     * @param length 长度，不能超过 53
-     * @return 验证码
-     */
-    public static String generateCode(int length) {
-        if (length < 5 || length > 52) {
-            throw new RuntimeException("验证码长度错误，范围是 [5,52] ");
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < length - 1; i++) {
-            // 获取随机索引
-            int index = RANDOM.nextInt(LETTERS.length());
-            // 存放到字符数组中
-            sb.append(LETTERS.charAt(index));
-        }
-        sb.append(RANDOM.nextInt(10));
-        return randomString(sb.toString());
-    }
-
-    /**
-     * 生成验证码
-     * @return 5 位验证码
-     */
-    public static String generate5Code() {
-        return generateCode(5);
-    }
-
-    /**
-     * 随机字符串
-     * @param str 字符串
-     * @return 随机字符串
-     */
-    public static String randomString(String str) {
-        char[] chs = str.toCharArray();
-        for (int i = 0; i < chs.length; i++) {
-            // 获取随机索引
-            int index = RANDOM.nextInt(chs.length);
-            // 将 chs[i] 和 chs[index] 交换
-            char temp = chs[i];
-            chs[i] = chs[index];
-            chs[index] = temp;
-        }
-        return String.valueOf(chs);
     }
 }
 ```

@@ -35,11 +35,12 @@ export const zhSidebar: DefaultTheme.Sidebar = [
           { text: 'Java 方法', link: `/01_java-se/java-leap/05_${commonDirectoryName}/` },
           { text: 'Java 面向对象（上）', link: `/01_java-se/java-leap/06_${commonDirectoryName}/` },
           { text: '面向对象综合训练', link: `/01_java-se/java-leap/07_${commonDirectoryName}/` },
-          { text: '字符串', link: `/01_java-se/java-leap/08_${commonDirectoryName}/` },
-          { text: '学生管理系统', link: `/01_java-se/java-leap/09_${commonDirectoryName}/` },
-          { text: 'Java 面向对象（中）', link: `/01_java-se/java-leap/10_${commonDirectoryName}/` },
-          { text: 'Java 面向对象（下）', link: `/01_java-se/java-leap/11_${commonDirectoryName}/` },
-          { text: 'Java 常见 API', link: `/01_java-se/java-leap/12_${commonDirectoryName}/` },
+          { text: '字符串一', link: `/01_java-se/java-leap/08_${commonDirectoryName}/` },
+          { text: '字符串二', link: `/01_java-se/java-leap/09_${commonDirectoryName}/` },
+          { text: '学生管理系统', link: `/01_java-se/java-leap/10_${commonDirectoryName}/` },
+          { text: 'Java 面向对象（中）', link: `/01_java-se/java-leap/11_${commonDirectoryName}/` },
+          { text: 'Java 面向对象（下）', link: `/01_java-se/java-leap/12_${commonDirectoryName}/` },
+          { text: 'Java 常见 API', link: `/01_java-se/java-leap/13_${commonDirectoryName}/` },
         ]
       },
       {
