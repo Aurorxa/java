@@ -799,8 +799,6 @@ public class StringDemo7 {
 }
 ```
 
-
-
 ## 4.7 空字符串比较
 
 
@@ -1690,4 +1688,249 @@ public class StringBuilderDemo8 {
 # 第七章：String 的相关底层原理
 
 
+
+
+
+# 第八章：综合练习（⭐）
+
+## 8.1 罗马数字
+
+* 需求：键盘录入一个字符串（长度小于等于 9，只能是数字），并将内容变为罗马数字。
+
+> [!NOTE]
+>
+> * ① 阿拉伯数字和罗马数字的对比关系，如下所示：
+>
+> | 阿拉伯数字 | 罗马数字 |
+> | ---------- | -------- |
+> | 1          | I        |
+> | 2          | II       |
+> | 3          | III      |
+> | 4          | IV       |
+> | 5          | V        |
+> | 6          | VI       |
+> | 7          | VII      |
+> | 8          | VIII     |
+> | 9          | IX       |
+>
+> * ② 罗马数字中没有`0`，如果键盘录入的数字包含`0`，可以变为`"0"`。 
+
+
+
+* 示例：
+
+```java
+package com.github.test2;
+
+import java.util.Scanner;
+
+public class RomanNumeralTest {
+    public static final String[] ROMAN_NUMERAL_ARRAY = 
+                 {"0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
+
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        String str;
+        do {
+            System.out.print("请输入字符串（长度小于等于 9 ，并且只能是数字）：");
+            str = input.next();
+        } while (str.length() > 9 || !str.matches("[0-9]+"));
+
+        String roman = toRoman(str);
+        System.out.println("roman = " + roman);
+
+        input.close();
+    }
+
+    /**
+     * 将包含 0-9 的字符串转换为罗马数字
+     * @param str 包含 0-9 的字符串
+     * @return 罗马数字字符串
+     */
+    public static String toRoman(String str) {
+        StringJoiner sj = new StringJoiner(" ");
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            int index = Integer.parseInt(String.valueOf(ch));
+            String roman = ROMAN_NUMERAL_ARRAY[index];
+            sj.add(roman);
+        }
+        return sj.toString();
+    }
+}
+```
+
+## 8.2 调整字符串
+
+* 需求：给定两个字符串 A 和 B ，A 的旋转操作就是将 A 最左边的字符移动到最右边，如：A = "abcde"，移动一次之后的结果就是 "bcdea"，如果在若干次调整操作之后，A 能变为 B ，那么就返回 true；否则，返回 false。
+
+
+
+* 示例：
+
+```java
+package com.github.test2;
+
+public class StringDemoTest {
+    public static void main(String[] args) {
+        String strA = "abcde";
+        String strB = "cdeab";
+
+        boolean rotate = isRotateEquals(strA, strB);
+        System.out.println("rotate = " + rotate);
+    }
+
+    /**
+     * 每调用一次，就将最左侧的字符移动到字符串的最后面
+     * @param str 循转前的字符串
+     * @return 旋转后的字符串
+     */
+    public static String rotate(String str) {
+        return str.substring(1) + str.charAt(0);
+    }
+
+    /**
+     * 判断旋转之后是否相等
+     * @param strA 字符串 A
+     * @param strB 字符串 B
+     * @return true/false
+     */
+    public static boolean isRotateEquals(String strA, String strB) {
+        for (int i = 0; i < strA.length(); i++) {
+            strA = rotate(strA);
+            if (strA.equals(strB)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+```
+
+## 8.3 打乱字符串
+
+* 需求：键盘输入任意字符串，打乱里面的内容。
+
+
+
+* 示例：
+
+```java
+package com.github.test2;
+
+import java.security.SecureRandom;
+import java.util.Random;
+import java.util.Scanner;
+
+public class StringDemoTest2 {
+    public static final Random RANDOM = new SecureRandom();
+
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入字符串：");
+        String str = input.next();
+        System.out.println("之前字符串 = " + str);
+        str = randomString(str);
+        System.out.println("随机字符串 = " + str);
+        input.close();
+    }
+
+    /**
+     * 随机字符串
+     * @param str 字符串
+     * @return 随机字符串
+     */
+    public static String randomString(String str) {
+        char[] chs = str.toCharArray();
+        for (int i = 0; i < chs.length; i++) {
+            // 获取随机索引
+            int index = RANDOM.nextInt(chs.length);
+            // 将 chs[i] 和 chs[index] 交换
+            char temp = chs[i];
+            chs[i] = chs[index];
+            chs[index] = temp;
+        }
+        return String.valueOf(chs);
+    }
+}
+```
+
+## 8.4 验证码
+
+* 需求：定义一个方法实现随机产生一个 5 位的验证码。
+
+> [!NOTE]
+>
+> 验证码格式：
+>
+> - ① 长度为 5。
+> - ② 四位字母和一位数字，数字可以在任意位置。
+
+
+
+* 示例：
+
+```java
+package com.github.test2;
+
+import java.security.SecureRandom;
+import java.util.Random;
+
+public class RandomCodeTest {
+    private static final Random RANDOM = new SecureRandom();
+    private static final String LETTERS = "abcdefghijklmnopqrstuvwxyz" 
+        + "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    public static void main(String[] args) {
+        String code = generate5Code();
+        System.out.println("code = " + code);
+    }
+
+    /**
+     * 生成验证码
+     * @param length 长度，不能超过 53
+     * @return 验证码
+     */
+    public static String generateCode(int length) {
+        if (length < 5 || length > 52) {
+            throw new RuntimeException("验证码长度错误，范围是 [5,52] ");
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length - 1; i++) {
+            // 获取随机索引
+            int index = RANDOM.nextInt(LETTERS.length());
+            // 存放到字符数组中
+            sb.append(LETTERS.charAt(index));
+        }
+        sb.append(RANDOM.nextInt(10));
+        return randomString(sb.toString());
+    }
+
+    /**
+     * 生成验证码
+     * @return 5 位验证码
+     */
+    public static String generate5Code() {
+        return generateCode(5);
+    }
+
+    /**
+     * 随机字符串
+     * @param str 字符串
+     * @return 随机字符串
+     */
+    public static String randomString(String str) {
+        char[] chs = str.toCharArray();
+        for (int i = 0; i < chs.length; i++) {
+            // 获取随机索引
+            int index = RANDOM.nextInt(chs.length);
+            // 将 chs[i] 和 chs[index] 交换
+            char temp = chs[i];
+            chs[i] = chs[index];
+            chs[index] = temp;
+        }
+        return String.valueOf(chs);
+    }
+}
+```
 
