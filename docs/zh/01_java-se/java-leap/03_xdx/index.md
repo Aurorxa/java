@@ -1803,7 +1803,7 @@ public class Person {
 
 ## 5.3 IDEA 使用技巧
 
-* 对于构造方法，在 IDEA 中，可以通过`Alt + Insert`快捷键一键生成。
+* 构造方法、Setter 方法以及 Getter 方法，在 IDEA 中，可以通过`Alt + Insert`快捷键一键生成。
 
 
 
