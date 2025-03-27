@@ -693,7 +693,7 @@ public class StringDemo3 {
 
 ## 4.6 静态方法
 
-* String 提供了静态方法，可以将任意数据类型转换为 String 类型。
+* String 提供了静态方法 valueOf ，可以将任意数据类型转换为 String 类型。
 
 ::: code-group
 
@@ -1712,9 +1712,302 @@ public class StringDemo8 {
 }
 ```
 
-## 4.9 应用示例
+## 4.9 String 和基本数据类型的转换
 
-### 4.9.1 用户登录
+### 4.9.1 String --> 基本数据类型
+
+* 将 `String` 转换为`基本数据类型`需要使用对应包装类的 `parseXxx()` 方法，如：`Integer.parseInt()` 用于将字符串转换为 `int`。
+
+```java
+public static int parseInt(String s) throws NumberFormatException { // [!code focus]
+    return parseInt(s,10);
+} // [!code focus]
+```
+
+```java
+public static double parseDouble(String s) throws NumberFormatException { // [!code focus]
+    return FloatingDecimal.parseDouble(s);
+} // [!code focus]
+```
+
+```java
+public static boolean parseBoolean(String s) { // [!code focus]
+    return "true".equalsIgnoreCase(s);
+} // [!code focus]
+```
+
+```java
+public static long parseLong(String s) throws NumberFormatException { // [!code focus]
+    return parseLong(s, 10);
+} // [!code focus]
+```
+
+```java
+public static float parseFloat(String s) throws NumberFormatException { // [!code focus]
+    return FloatingDecimal.parseFloat(s);
+} // [!code focus]
+```
+
+```java
+public static byte parseByte(String s) throws NumberFormatException { // [!code focus]
+    return parseByte(s, 10);
+} // [!code focus]
+```
+
+```java
+public static short parseShort(String s) throws NumberFormatException { // [!code focus]
+    return parseShort(s, 10);
+} // [!code focus]
+```
+
+> [!NOTE]
+>
+> 当字符串的内容不能被解析为目标数据类型时，会抛出异常！！！
+
+
+
+* 示例：
+
+```java
+package com.github.demo4;
+
+public class StringDemo1 {
+    public static void main(String[] args) {
+        String str = "1234";
+        int num = Integer.parseInt(str);
+        System.out.println("num = " + num);
+    }
+}
+```
+
+### 4.9.2 基本数据类型 --> String
+
+* String 提供了静态方法 `valueOf(xxx)` ，可以将任意数据类型转换为 String 类型。
+
+::: code-group
+
+```java [Object --> String]
+public static String valueOf(Object obj) { // [!code focus]
+   return (obj == null) ? "null" : obj.toString();
+} // [!code focus]
+```
+
+```java [char[] --> String]
+public static String valueOf(char data[]) { // [!code focus]
+    return new String(data);
+} // [!code focus]
+public static String valueOf(char data[], int offset, int count) { // [!code focus]
+    return new String(data, offset, count);
+} // [!code focus]
+```
+
+```java [基本数据类型 --> String]
+public static String valueOf(boolean b) { // [!code focus]
+    return b ? "true" : "false";
+} // [!code focus]
+public static String valueOf(char c) { // [!code focus]
+    if (COMPACT_STRINGS && StringLatin1.canEncode(c)) {
+        return new String(StringLatin1.toBytes(c), LATIN1);
+    }
+    return new String(StringUTF16.toBytes(c), UTF16);
+} // [!code focus]
+public static String valueOf(long l) { // [!code focus]
+    return Long.toString(l);
+} // [!code focus]
+public static String valueOf(long l) { // [!code focus]
+    return Long.toString(l);
+} // [!code focus]
+public static String valueOf(float f) { // [!code focus]
+    return Float.toString(f);
+} // [!code focus]
+public static String valueOf(double d) { // [!code focus]
+    return Double.toString(d);
+} // [!code focus]
+```
+
+:::
+
+
+
+* 示例：
+
+```java
+package com.github.demo4;
+
+public class StringDemo2 {
+    public static void main(String[] args) {
+        int num = 10;
+        String str = String.valueOf(num);
+        System.out.println("str = " + str);
+    }
+}
+```
+
+## 4.10 String 和字节数组的相互转换
+
+### 4.10.1 String --> 字节数组
+
+* 通过 String 类的 `getBytes()` 方法可以将 String 转换为字节数组。
+
+```java
+public byte[] getBytes() { // [!code focus]
+    return encode(Charset.defaultCharset(), coder(), value);
+} // [!code focus]
+```
+
+```java
+public byte[] getBytes(Charset charset) { // [!code focus]
+    if (charset == null) throw new NullPointerException();
+    return encode(charset, coder(), value);
+ } // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo4;
+
+import java.nio.charset.StandardCharsets;
+
+public class StringDemo3 {
+    public static void main(String[] args) {
+        String str = "Hello World";
+        byte[] bytes = str.getBytes();
+        System.out.println(new String(bytes));
+
+        byte[] byte2 = str.getBytes(StandardCharsets.UTF_8);
+        System.out.println(new String(byte2, StandardCharsets.UTF_8));
+    }
+}
+```
+
+### 4.10.2 字节数组 --> String
+
+* 通过 String 类的`String(xxx)`构造方法可以将字节数组转换为字符串：
+
+```java
+public String(byte[] bytes) { // [!code focus]
+    this(bytes, 0, bytes.length);
+} // [!code focus]
+```
+
+```java
+public String(byte[] bytes, int offset, int length) { // [!code focus]
+    this(bytes, offset, length, Charset.defaultCharset());
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo4;
+
+public class StringDemo4 {
+    public static void main(String[] args) {
+        byte[] bytes = {97,98,99,100};
+        String string = new String(bytes);
+        System.out.println("string = " + string);
+    }
+}
+```
+
+## 4.11 String 和字符数组的相互转换
+
+### 4.11.1 String --> 字符数组
+
+* 通过 String 类的 `getChars()` 或 `toCharArray()` 方法可以将 String 转换为字符数组。
+
+```java
+public char[] toCharArray() {  // [!code focus]
+    return isLatin1() ? StringLatin1.toChars(value)
+                      : StringUTF16.toChars(value);
+} // [!code focus]
+```
+
+```java
+public void getChars(int srcBegin, int srcEnd, char dst[], int dstBegin) { // [!code focus]
+    checkBoundsBeginEnd(srcBegin, srcEnd, length());
+    checkBoundsOffCount(dstBegin, srcEnd - srcBegin, dst.length);
+    if (isLatin1()) {
+        StringLatin1.getChars(value, srcBegin, srcEnd, dst, dstBegin);
+    } else {
+        StringUTF16.getChars(value, srcBegin, srcEnd, dst, dstBegin);
+    }
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo4;
+
+public class StringDemo5 {
+    public static void main(String[] args) {
+        String str = "我很好";
+        char[] chs = new char[str.length()];
+        str.getChars(0, str.length(), chs, 0);
+        System.out.println(new String(chs));
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo4;
+
+public class StringDemo5 {
+    public static void main(String[] args) {
+        String str = "我很好";
+        char[] chs = str.toCharArray();
+        System.out.println(new String(chs));
+    }
+}
+```
+
+### 4.11.2 字符数组 --> String
+
+* 通过 String 类的`String(xxx)`构造方法可以将字符数组转换为字符串：
+
+```java
+public String(char value[]) { // [!code focus]
+    this(value, 0, value.length, null);
+} // [!code focus]
+```
+
+```java
+public String(char value[], int offset, int count) { // [!code focus]
+    this(value, offset, count, rangeCheck(value, offset, count));
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.demo4;
+
+public class StringDemo5 {
+    public static void main(String[] args) {
+        String str = "我很好";
+        char[] chs = str.toCharArray();
+        System.out.println(new String(chs));
+    }
+}
+```
+
+## 4.12 应用示例
+
+### 4.12.1 用户登录
 
 * 需求：已知正确的用户名和密码，请使用程序模拟用户登录。
 
@@ -1763,7 +2056,7 @@ public class StringDemo2 {
 }
 ```
 
-### 4.9.2 遍历字符串
+### 4.12.2 遍历字符串
 
 * 需求：键盘录入一个字符串，实现在控制台遍历字符串并输出每个字符。
 
@@ -1805,7 +2098,7 @@ public class StringTest2 {
 }
 ```
 
-### 4.9.3 统计字符个数
+### 4.12.3 统计字符个数
 
 * 需求：键盘录入一个字符串，统计该字符串中大写字母字符、小写字母字符以及数字字符出现的次数（不考虑其他字符）。
 
@@ -1845,7 +2138,7 @@ public class StringTest3 {
 }
 ```
 
-### 4.9.4 字符串拼接
+### 4.12.4 字符串拼接
 
 * 需求：定义一个方法，将 int 数组中的数据按照指定的格式拼接成一个字符串返回。
 
@@ -1894,7 +2187,7 @@ public class StringTest4 {
 }
 ```
 
-### 4.9.5 字符串反转
+### 4.12.5 字符串反转
 
 * 需求：定义一个方法，将字符串进行反转。
 
@@ -1939,7 +2232,7 @@ public class StringTest5 {
 }
 ```
 
-### 4.9.6 金额转换
+### 4.12.6 金额转换
 
 * 需求：将发票上的数字（2135）转换为大写（`零`佰`零`拾`零`万`贰`仟`壹`佰`叁`拾`伍`元）。
 
@@ -2068,7 +2361,7 @@ public class StringTest6 {
 }
 ```
 
-### 4.9.7 手机号屏蔽
+### 4.12.7 手机号屏蔽
 
 * 需求：将手机号中间的 4 个号码进行屏蔽，如：`13115899468` --> `131****9468`。
 
@@ -2098,7 +2391,7 @@ public class StringTest7 {
 }
 ```
 
-### 4.9.8 敏感词替换
+### 4.12.8 敏感词替换
 
 * 需求：将一些敏感词替换为 `*`，如：`这里有一些敏感词，比如：傻瓜和笨蛋。` --> `这里有一些敏感词，比如：**和**。`。
 
