@@ -651,10 +651,137 @@ public class StringJoinerDemo1 {
 
 # 第三章：String 底层原理
 
+## 3.1 字符串存储的内存原理
 
+* `直接赋值`会复用字符串常量池中的字符串。
 
+```java
+package com.github.demo5;
 
+public class StringDemo {
+    public static void main(String[] args) {
+        String s1 = "Hello";
+        String s2 = "Hello";
+        System.out.println(s1 == s2); // true
+    }
+}
+```
 
+![直接赋值](./assets/19.gif)
+
+* `new 构造方法`不会复用字符串常量池中的字符串，而是在堆中开辟一个新的对象。
+
+```java
+package com.github.demo5;
+
+public class StringDemo {
+    public static void main(String[] args) {
+        String s1 = "Hello";
+        String s2 = new String("Hello");
+        System.out.println(s1 == s2); // false
+    }
+}
+```
+
+![new 构造方法](./assets/20.gif)
+
+## 3.2 == 的含义
+
+* 对于基本数据类型的变量，`==` 比较的是`真实值`。
+
+```java
+package com.github.demo5;
+
+public class StringDemo {
+    public static void main(String[] args) {
+        int num1 = 10;
+        int num2 = 10;
+        System.out.println(num1 == num2);
+    }
+}
+```
+
+![基本数据类型 == 的含义](./assets/21.gif)
+
+* 对于引用数据类型的变量，`==` 比较的是`引用（堆中对象的地址值）`。
+
+```java
+package com.github.demo5;
+
+public class StringDemo {
+    public static void main(String[] args) {
+        String s1 = "Hello";
+        String s2 = new String("Hello");
+        System.out.println(s1 == s2); // false
+    }
+}
+```
+
+![引用数据类型 == 的含义](./assets/22.gif)
+
+## 3.3 字符串拼接的底层原理
+
+### 3.3.1 等号的右边没有变量
+
+* 如果字符串拼接的代码（等号右边没有变量），如下所示：
+
+```java
+public class Test {
+    public static void main(String[] args) {
+    	String str = "a" + "b" + "c";
+        System.out.println(str);
+    }
+}
+```
+
+* `如果字符串拼接的时候没有变量，即：都是字符串，就会触发字符串的优化机制，在编译的时候就已经是最终的结果`。
+
+![字符串优化机制](./assets/23.svg)
+
+* 其实，我们可以通过 IDEA 自带的反编译功能，来查看字符串的优化机制，如下所示：
+
+![IDEA 自带的反编译功能](./assets/24.png)
+
+### 3.3.2 等号的右边有变量
+
+* 如果字符串拼接的代码（等号右边有变量），如下所示：
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        String s1 = "a";
+        String s2 = s1 + "b";
+        String s3 = s2 + "c";
+        System.out.println(s3);
+    }
+}
+```
+
+* 在 JDK8 之前，底层是通过 `StringBuilder` 来提高效率的，如下所示：
+
+![JDK8 之前](./assets/25.png)
+
+* 其内存动态图，如下所示：
+
+> [!NOTE]
+>
+> * ① 在 JDK8 之前，系统会在底层自动创建一个 StringBuilder 对象，然后再调用其 append() 方法完成拼接。拼接完毕之后，再调用 toString() 方法将其转换为 String 类型，而 toString() 方法底层是直接 new String()  ，产生了一个新的字符串对象。
+>
+> * ② 在 JDK8 之前，字符串变量和字符串常量进行拼接，一个 `+` 会在堆内存中产生两个对象。
+
+![JDK8 之前的优化](./assets/26.gif)
+
+* 在 JDK8 之后，系统会预估`字符串拼接`之后的总大小，将要拼接的内容放到数组中，此时也是产生了一个新的字符串。
+
+![JDK8 之后](./assets/27.png)
+
+* 其内存动态图，如下所示：
+
+> [!NOTE]
+>
+> 在 JDK8 之后，系统会会预估`字符串拼接`之后的总大小，将要拼接的内容放到数组中，也是产生了一个新的字符串。
+
+![JDK8 之后的优化](./assets/28.gif)
 
 
 # 第四章：综合练习（⭐）
