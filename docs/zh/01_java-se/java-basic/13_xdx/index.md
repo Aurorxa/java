@@ -1926,3 +1926,378 @@ public class Main {
 }
 ```
 
+
+
+# 第七章：作业
+
+## 7.1 if 判断语句
+
+### 7.1.1 题目 1
+
+* 需求：李雷想买一个价值 7988 元的新手机，她的旧手机在二手市场能卖 1500 元，而手机专卖店推出以旧换新的优惠，把她的旧手机交给店家，新手机就能够打 8 折优惠。为了更省钱，李雷要不要以旧换新？请在控制台输出。
+
+> [!NOTE]
+>
+> * ① 计算`不使用以旧换新`时的花费。
+> * ② 计算`使用以旧换新`时的花费。
+> * ③ 使用 if...else 判断哪种方式更加省钱，并输出结果。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+public class IFTest1 {
+    public static void main(String[] args) {
+        // 计算不使用以旧换新活动购买手机
+        double money1 = 7988 - 1500;
+        // 计算使用以旧换新活动
+        double money2 = 7988 * 0.8;
+
+        if (money1 < money2) {
+            System.out.println("使用以旧换新更划算~");
+        } else {
+            System.out.println("直接购买新手机更划算~");
+        }
+    }
+}
+```
+
+### 7.1.2 题目 2
+
+* 需求：让用户依次录入三个整数，求出三个数中的最大值，并打印到控制台。
+
+> [!NOTE]
+>
+> * ① 使用 Scanner 键盘录入三个数字，使用三元运算符实现。
+> * ② 使用 Scanner 键盘录入三个数字，使用 if..else 的嵌套实现。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Scanner;
+
+public class IFTest2 {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入第一个整数：");
+        int num1 = input.nextInt();
+        System.out.print("请输入第二个整数：");
+        int num2 = input.nextInt();
+        System.out.print("请输入第三个整数：");
+        int num3 = input.nextInt();
+
+        int max = num1 > num2 ? 
+            (num1 > num3 ? num1 : num3) : (num2 > num3 ? num2 : num3);
+
+        System.out.println("max = " + max);
+
+        input.close();
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Scanner;
+
+public class IFTest2 {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入第一个整数：");
+        int num1 = input.nextInt();
+        System.out.print("请输入第二个整数：");
+        int num2 = input.nextInt();
+        System.out.print("请输入第三个整数：");
+        int num3 = input.nextInt();
+
+        int max = num1 > num2 ? 
+            (Math.max(num1, num3)) : (Math.max(num2, num3));
+
+        System.out.println("max = " + max);
+
+        input.close();
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Scanner;
+
+public class IFTest2 {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入第一个整数：");
+        int num1 = input.nextInt();
+        System.out.print("请输入第二个整数：");
+        int num2 = input.nextInt();
+        System.out.print("请输入第三个整数：");
+        int num3 = input.nextInt();
+
+        int max;
+        if (num1 > num2) {
+            if (num1 > num3) {
+                max = num1;
+            } else {
+                max = num3;
+            }
+        } else {
+            if (num2 > num3) {
+                max = num2;
+            } else {
+                max = num3;
+            }
+        }
+
+        System.out.println("max = " + max);
+
+        input.close();
+    }
+}
+```
+
+### 7.1.3 题目 3
+
+* 需求：某银行推出了整存整取定期储蓄业务，其存期分为一年、两年、三年、五年，到期凭存单支取本息。请存入一定金额（1000 起存），存一定年限（四选一），计算到期后得到的本息总额。
+
+| 存期 | 年利率（%） |
+| ---- | ----------- |
+| 一年 | 2.25        |
+| 两年 | 2.7         |
+| 三年 | 3.25        |
+| 五年 | 3.6         |
+
+> [!NOTE]
+>
+> * ① 存入金额和存入年限均由键盘录入。
+> * ② 本息计算方式：本金+本金×年利率×年限。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Scanner;
+
+public class IFTest3 {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入存入的金额：");
+        int money = input.nextInt();
+        System.out.print("请输入年限：");
+        int year = input.nextInt();
+
+        double total = 0;
+        if (year == 1) {
+            total = money + money * 2.25 / 100 * 1;
+        } else if (year == 2) {
+            total = money + money * 2.7 / 100 * 2;
+        } else if (year == 3) {
+            total = money + money * 3.25 / 100 * 3;
+        } else if (year == 5) {
+            total = money + money * 3.6 / 100 * 5;
+        } else {
+            System.out.println("输入的年限有误，请重新输入~");
+        }
+
+        System.out.println("total = " + total);
+
+        input.close();
+    }
+}
+```
+
+### 7.1.4 题目 4 
+
+* 需求：某商场购物可以打折，请根据此优惠计划进行购物结算，键盘录入顾客的类别（0 表示普通顾客，1 表示会员）和购物的折前金额（整数即可），输出应付金额（小数类型）。
+
+> [!NOTE]
+>
+> * ① 普通顾客购不满 100 元不打折，满 100 元打 9 折。
+> * ② 会员购物不满 200 元打 8 折，满 200 元打 7.5 折。
+> * ③ 不同打折规则不累加计算。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Scanner;
+
+public class IFTest4 {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入顾客的类型（0 普通客户 1 会员）：");
+        int type = input.nextInt();
+        System.out.print("请输入购物金额：");
+        double money = input.nextDouble();
+
+        if (type == 0) {
+            if (money > 0 && money < 100) {
+                System.out.println("您的应付金额为：" + money);
+            } else if (money >= 100) {
+                System.out.println("您的应付金额为：" + money * 0.9);
+            } else {
+                System.out.println("输入的购物金额错误~");
+            }
+        } else if (type == 1) {
+            if (money > 0 && money < 200) {
+                System.out.println("您的应付金额为：" + money * 0.8);
+            } else if (money >= 200) {
+                System.out.println("您的应付金额为：" + money * 0.75);
+            } else {
+                System.out.println("输入的购物金额错误~");
+            }
+        } else {
+            System.out.println("输入错误~");
+        }
+
+        input.close();
+    }
+}
+```
+
+## 7.2 switch 判断语句
+
+* 需求：模拟计算器功能，对键盘录入的两个 int 类型的数据进行加、减、乘、除的运算，并打印运算结果。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Scanner;
+
+public class SwitchTest {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("请输入第一个整数：");
+        int num1 = sc.nextInt();
+        System.out.print("请输入第二个整数：");
+        int num2 = sc.nextInt();
+        System.out.println("请输入您要进行的运算(1:加法2:减法3:乘法4:除法)");
+        int type = sc.nextInt();
+        switch (type) {
+            case 1:
+                System.out.println(num1 + " + " + num2 + " = " + (num1 + num2));
+                break;
+            case 2:
+                System.out.println(num1 + " - " + num2 + " = " + (num1 - num2));
+                break;
+            case 3:
+                System.out.println(num1 + " * " + num2 + " = " + (num1 * num2));
+                break;
+            case 4:
+                if (num2 == 0) {
+                    System.out.println("除数不能为0！");
+                    break;
+                }
+                System.out.println(num1 + " / " + num2 + " = " + (num1 * 1.0 / num2));
+                break;
+            default:
+                System.out.println("您输入的运算类别有误");
+                break;
+        }
+    }
+}
+```
+
+## 7.3 循环语句
+
+### 7.3.1 题目 1 
+
+* 需求：键盘录入两个数字 num1 和 num2 表示一个范围，求这个范围之内的数字和。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Scanner;
+
+public class ForTest {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入第一个整数：");
+        int num1 = input.nextInt();
+        System.out.print("请输入第二个整数：");
+        int num2 = input.nextInt();
+
+        int min = Math.min(num1, num2);
+        int max = Math.max(num1,num2);
+
+        int sum = 0;
+        for (int i = min; i <= max; i++) {
+            sum += i;
+        }
+
+        System.out.println("sum = " + sum);
+
+        input.close();
+    }
+}
+```
+
+### 7.3.2 题目 2
+
+* 需求：键盘录入两个数字，表示一个范围，统计这个范围中，既能被3整除，又能被5整除数字有多少个？
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Scanner;
+
+public class For2Test {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入第一个整数：");
+        int num1 = input.nextInt();
+        System.out.print("请输入第二个整数：");
+        int num2 = input.nextInt();
+
+        int min = Math.min(num1, num2);
+        int max = Math.max(num1, num2);
+
+        int count = 0;
+        for (int i = min; i <= max; i++) {
+            if (i % 3 == 0 && i % 5 == 0) {
+                count++;
+            }
+        }
+
+        System.out.println("count = " + count);
+
+        input.close();
+    }
+}
+```
+
