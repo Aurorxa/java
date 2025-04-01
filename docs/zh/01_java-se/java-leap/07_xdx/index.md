@@ -931,19 +931,137 @@ maxAge = 35
 
 ## 1.5 注意事项
 
-* ① 静态方法`只能`访问静态变量和静态方法，`不可以`访问非静态成员变量和非静态成员方法。
+### 1.5.1 静态方法中不能出现 this 关键字
 
-> [!NOTE]
->
-> 静态方法，只能访问静态。
+* `静态方法中不能出现 this 关键字。换言之，非静态方法中可以出现 this 关键字。`
 
-* ② 非静态方法`可以`访问静态变量和静态方法，`也可以`访问非静态成员变量和非静态成员方法。
+* 假设代码是这样的，如下所示：
 
-> [!NOTE]
->
-> 非静态方法，可以访问所有。
+::: code-group
 
-* ③ 静态方法中`不能`出现 this 关键字。
+```java [Student.java]
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    // 静态方法
+    public static void method() {
+        System.out.println(teacherName);
+    }
+	
+    // 非静态方法，实例方法
+    public void show() {
+        System.out.println(name + " " + teacherName);
+    }
+}
+```
+
+```java [StudentTest.java]
+public class StudentTest {
+
+    public static void main(String[] args) {
+        Student.teacherName = "许大仙";
+
+        Student s1 = new Student();
+        s1.name = "张三";
+        s1.show();
+
+        Student s2 = new Student();
+        s2.name = "李四";
+        s2.show();
+    }
+}
+```
+
+:::
+
+* 当`实例对象调用实例方法`的时候，如下所示：
+
+```java
+public class StudentTest {
+
+    public static void main(String[] args) {
+        Student.teacherName = "许大仙";
+
+        Student s1 = new Student();
+        System.out.println("s1 = " + s1);
+        s1.name = "张三";
+        s1.show(); // [!code highlight]
+
+        Student s2 = new Student();
+        System.out.println("s2 = " + s2);
+        s2.name = "李四";
+        s2.show(); // [!code highlight]
+    }
+}
+```
+
+* 其实，JVM 会自动地隐式将`Student this`作为`参数`传递给实例方法`show()`，如下所示：
+
+```java
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    public static void method() {
+        System.out.println(teacherName);
+    }
+
+    // ✅ 以下代码是正确的
+    // JVM 会隐式的传递 Student this 到非静态方法中
+    // this 表示方法调用者的地址
+    public void show(Student this) {  // [!code highlight]
+        System.out.println("this = " + this);
+        System.out.println(name + " " + teacherName);
+    }
+}
+```
+
+* 我们可以在 IDEA 中进行查看，如下所示：
+
+![IDEA 中查看 JVM 对实例方法的隐式参数传递](./assets/image-20250401111300522.png)
+
+* 但是，JVM 不会自动地隐式将`Student this`作为`参数`传递给静态方法`method()`，如下所示：
+
+```java
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    // ❌ 以下代码是错误的
+    public static void method(Student this) { // [!code error]
+        System.out.println(teacherName);
+    }
+
+    // JVM 会隐式的传递 Student this 到非静态方法中
+    // this 表示方法调用者的地址
+    public void show(Student this) {
+        System.out.println("this = " + this);
+        System.out.println(name + " " + teacherName);
+    }
+}
+```
+
+* 我们可以在 IDEA 中进行查看，如下所示：
+
+![IDEA 中查看 JVM 对静态方法的隐式参数传递](./assets/image-20250401111755062.png)
+
+### 1.5.2 非静态方法，可以访问所有。
+
+* 非静态方法`可以`访问静态变量和静态方法，`也可以`访问非静态成员变量和非静态成员方法。
+
+
+
+
+
+### 1.5.3 静态方法，只能访问静态
+
+* 静态方法`只能`访问静态变量和静态方法，`不可以`访问非静态成员变量和非静态成员方法。
+
+
 
 ## 1.6 重新认识 main 方法
 
@@ -967,19 +1085,6 @@ public class Helloworld {
 
 * 其中，`void` 表示 main 方法被 JVM 调用的时候，不需要给 JVM 返回值。
 * 其中，`main` 是一个通用的名称，虽然不是关键字，但是被 JVM 识别。
-
-> [!NOTE]
->
-> 绝大多数编程语言的入口都是 main 方法，如下所示：
->
-> ```c
-> #include <stdio.h> 
-> 
-> int main(){
->     
->     return 0;
-> }
-> ```
 
 * 其中，`String[] args` 是以前用于接收键盘录入数据的；但是，现在已经很少使用了。
 
@@ -1737,27 +1842,172 @@ public class Student extends Person {
 
 ## 2.5 应用示例
 
-* 需求：现在有 4 种动物：布偶猫、中国狸花猫、哈士奇、泰迪，要求按照继承的思想进行继承体系的设计（只考虑行为，不考虑属性）。
+* 需求：现在有 4 种动物（布偶猫、中国狸花猫、哈士奇、泰迪），要求按照继承的思想进行继承体系的设计（只考虑行为，不考虑属性）。
 
 | 动物                       | 行为                     |
 | -------------------------- | ------------------------ |
-| 布偶猫（Ragdoll）          | 吃饭、喝水、抓老鼠       |
+| 布偶猫（Ragdolls）         | 吃饭、喝水、抓老鼠       |
 | 中国狸花猫（ChineseLiHua） | 吃饭、喝水、抓老鼠       |
 | 哈士奇（Husky）            | 吃饭、喝水、看家、拆家   |
 | 泰迪（Teddy）              | 吃饭、喝水、看家、蹭一蹭 |
 
+> [!NOTE]
+>
+> ::: details 点我查看 类继承体系设计
+>
+> ```mermaid
+> ---
+> title: 类继承体系设计
+> ---
+> classDiagram
+> 	note for Animal "动物"
+>     Animal <|-- Cat
+>     Animal <|-- Dog
+>     Animal: + eat()
+>     Animal: + drink()
+>     note for Cat "猫"
+>     Cat <|-- Ragdolls
+>     note for Ragdolls "布偶猫"
+>     Cat <|-- ChineseLiHua
+>     note for ChineseLiHua "中国狸花猫"
+> 	Cat: + catchMouse()
+> 	note for Dog "狗"
+> 	Dog: + lookHome()
+> 	Dog <|-- Husky
+> 	note for Husky "哈士奇"
+> 	Dog <|-- Teddy
+> 	note for Teddy "泰迪"
+> 	Husky: + tearDown()
+> 	Teddy: + rub()
+> ```
+>
+> :::
 
 
-* 示例：
 
-```java
+* 示例：动物、猫和狗
+
+::: code-group
+
+```java [Animal.java]
+package com.github.test3;
+
+/**
+ * 动物
+ */
+public class Animal {
+
+    public void eat() {
+        System.out.println("吃饭");
+    }
+
+    public void drink() {
+        System.out.println("喝水");
+    }
+}
 ```
 
+```java [Cat.java]
+package com.github.test3;
+
+/**
+ * 猫
+ */
+public class Cat extends Animal {
+
+    public void catchMouse() {
+        System.out.println("抓老鼠~");
+    }
+}
+```
+
+```java [Dog.java]
+package com.github.test3;
+
+/**
+ * 狗
+ */
+public class Dog extends Animal {
+
+    public void look() {
+        System.out.println("看家");
+    }
+}
+```
+
+:::
+
+
+
+* 示例：布偶猫、中国狸花猫、哈士奇和泰迪
+
+::: code-group
+
+```java [Ragdolls.java]
+package com.github.test3;
+
+/**
+ * 布偶猫
+ */
+public class Ragdolls extends Cat {}
+```
+
+```java [ChineseLiHua.java]
+package com.github.test3;
+
+/**
+ * 中国狸花猫
+ */
+public class ChineseLiHua extends Cat {}
+```
+
+```java [Husky.java]
+package com.github.test3;
+
+/**
+ * 哈士奇
+ */
+public class Husky extends Dog {
+
+    public void tearDown() {
+        System.out.println("拆家");
+    }
+}
+```
+
+```java [Teddy.java]
+package com.github.test3;
+
+/**
+ * 泰迪
+ */
+public class Teddy extends Dog {
+
+    public void rub() {
+        System.out.println("蹭一蹭");
+    }
+}
+```
+
+:::
+
+## 2.6 子类到底可以继承父类中的哪些内容？
+
+### 2.6.1 内存图
 
 
 
 
-## 2.5 子类到底可以继承父类中的哪些内容（内存图/内存分析工具）？
+
+
+
+### 2.6.2 内存分析工具
+
+
+
+
+
+## 2.7 继承中成员变量、成员方法和构造方法的特点
 
 
 
@@ -1765,15 +2015,7 @@ public class Student extends Person {
 
 
 
-## 2.6 继承中成员变量、成员方法和构造方法的特点
-
-
-
-
-
-
-
-## 2.7 this 和 super 的使用总结
+## 2.8 this 和 super 的使用总结
 
 
 
