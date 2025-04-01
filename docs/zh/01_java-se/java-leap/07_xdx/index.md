@@ -933,9 +933,13 @@ maxAge = 35
 
 ### 1.5.1 静态方法中不能出现 this 关键字
 
-* `静态方法中不能出现 this 关键字。换言之，非静态方法中可以出现 this 关键字。`
+#### 1.5.1.1 概述
 
-* 假设代码是这样的，如下所示：
+* 静态方法中`不能`出现 this 关键字。换言之，非静态方法中`可以`出现 this 关键字。
+
+#### 1.5.1.2 应用示例
+
+* 示例：
 
 ::: code-group
 
@@ -975,6 +979,8 @@ public class StudentTest {
 ```
 
 :::
+
+#### 1.5.1.3 执行过程
 
 * 当`实例对象调用实例方法`的时候，如下所示：
 
@@ -1049,19 +1055,141 @@ public class Student {
 
 ![IDEA 中查看 JVM 对静态方法的隐式参数传递](./assets/image-20250401111755062.png)
 
-### 1.5.2 非静态方法，可以访问所有。
+### 1.5.2 静态方法，只能访问静态
 
-* 非静态方法`可以`访问静态变量和静态方法，`也可以`访问非静态成员变量和非静态成员方法。
-
-
-
-
-
-### 1.5.3 静态方法，只能访问静态
+#### 1.5.2.1 概述
 
 * 静态方法`只能`访问静态变量和静态方法，`不可以`访问非静态成员变量和非静态成员方法。
 
+#### 1.5.2.2 静态方法不能访问非静态成员变量
 
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    // 静态方法
+    public static void method() {
+        // ❌ 以下代码是错误的
+        System.out.println(name + " " + teacherName); // [!code error]
+    }
+	
+    // 非静态方法，实例方法
+    public void show() {
+        System.out.println(name + " " + teacherName);
+    }
+}
+```
+
+```java [StudentTest.java]
+public class StudentTest {
+
+    public static void main(String[] args) {
+        Student.teacherName = "许大仙";
+        Student.method();
+    }
+}
+```
+
+:::
+
+* 其内存的动态图，如下所示：
+
+![静态方法不能访问非静态成员变量](./assets/9.gif)
+
+#### 1.5.2.3 静态方法不能访问非静态成员方法
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    // 静态方法
+    public static void method() {
+        // ❌ 以下代码是错误的
+        show(); // [!code error]
+    }
+	
+    // 非静态方法，实例方法
+    public void show() {
+        System.out.println(name + " " + teacherName);
+    }
+}
+```
+
+```java [StudentTest.java]
+public class StudentTest {
+
+    public static void main(String[] args) {
+        Student.teacherName = "许大仙";
+        Student.method();
+    }
+}
+```
+
+:::
+
+* 其内存的动态图，如下所示：
+
+![静态方法不能访问非静态成员方法](./assets/10.gif)
+
+### 1.5.3 非静态方法，可以访问所有
+
+#### 1.5.3.1 概述
+
+* 非静态方法`可以`访问静态变量和静态方法，`也可以`访问非静态成员变量和非静态成员方法。
+
+#### 1.5.3.2 非静态方法，可以访问所有
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    // 静态方法
+    public static void method() {
+        System.out.println("method静态方法");
+    }
+	
+    // 非静态方法，实例方法
+    public void show() {
+        System.out.println(name + " " + teacherName);
+        method();
+    }
+}
+```
+
+```java [StudentTest.java]
+public class StudentTest {
+
+    public static void main(String[] args) {
+        Student s1 = new Student();
+        s1.name = "张三";
+        s1.show();
+    }
+}
+```
+
+:::
+
+* 其动态内存图，如下所示：
+
+![非静态方法，可以访问所有](./assets/11.gif)
 
 ## 1.6 重新认识 main 方法
 
