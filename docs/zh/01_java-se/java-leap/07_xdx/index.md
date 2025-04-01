@@ -1027,7 +1027,7 @@ public class Student {
 
 * 我们可以在 IDEA 中进行查看，如下所示：
 
-![IDEA 中查看 JVM 对实例方法的隐式参数传递](./assets/image-20250401111300522.png)
+![IDEA 中查看 JVM 对实例方法的隐式参数传递](./assets/13.png)
 
 * 但是，JVM 不会自动地隐式将`Student this`作为`参数`传递给静态方法`method()`，如下所示：
 
@@ -1053,7 +1053,7 @@ public class Student {
 
 * 我们可以在 IDEA 中进行查看，如下所示：
 
-![IDEA 中查看 JVM 对静态方法的隐式参数传递](./assets/image-20250401111755062.png)
+![IDEA 中查看 JVM 对静态方法的隐式参数传递](./assets/14.png)
 
 ### 1.5.2 静态方法，只能访问静态
 
@@ -1988,25 +1988,25 @@ public class Student extends Person {
 > title: 类继承体系设计
 > ---
 > classDiagram
-> 	note for Animal "动物"
->     Animal <|-- Cat
->     Animal <|-- Dog
->     Animal: + eat()
->     Animal: + drink()
->     note for Cat "猫"
->     Cat <|-- Ragdolls
->     note for Ragdolls "布偶猫"
->     Cat <|-- ChineseLiHua
->     note for ChineseLiHua "中国狸花猫"
-> 	Cat: + catchMouse()
-> 	note for Dog "狗"
-> 	Dog: + lookHome()
-> 	Dog <|-- Husky
-> 	note for Husky "哈士奇"
-> 	Dog <|-- Teddy
-> 	note for Teddy "泰迪"
-> 	Husky: + tearDown()
-> 	Teddy: + rub()
+> 	 note for Animal "动物"
+>         Animal <|-- Cat : extends
+>         Animal <|-- Dog : extends
+>         Animal: + eat()
+>         Animal: + drink()
+>         note for Cat "猫"
+>         Cat <|-- Ragdolls : extends
+>         note for Ragdolls "布偶猫"
+>         Cat <|-- ChineseLiHua : extends
+>         note for ChineseLiHua "中国狸花猫"
+>      Cat: + catchMouse()
+>      note for Dog "狗"
+>      Dog: + lookHome()
+>      Dog <|-- Husky : extends
+>      note for Husky "哈士奇"
+>      Dog <|-- Teddy : extends
+>      note for Teddy "泰迪"
+>      Husky: + tearDown()
+>      Teddy: + rub()
 > ```
 >
 > :::
@@ -2057,8 +2057,8 @@ package com.github.test3;
  */
 public class Dog extends Animal {
 
-    public void look() {
-        System.out.println("看家");
+    public void lookHome() {
+        System.out.println("看家~");
     }
 }
 ```
@@ -2121,15 +2121,265 @@ public class Teddy extends Dog {
 
 ## 2.6 子类到底可以继承父类中的哪些内容？
 
-### 2.6.1 内存图
+### 2.6.1 概述
+
+* 之前，我们已经学过类的定义语法，如下所示：
+
+```java
+public class 类名 {
+    ① 成员变量(代表属性，一般是名词)
+    ② 成员方法(代表行为，一般是动词)
+    ③ 构造方法(在创建对象的时候，给成员变量进行初始化（赋值）)
+    ④ 代码块(后面学习)
+    ⑤ 内部类(后面学习)    
+}
+```
+
+* 到目前为止，我们已经学习了类的成员变量、成员方法和构造方法，如下所示：
+
+```java
+public class 类名 {
+    ① 成员变量(代表属性，一般是名词)
+    ② 成员方法(代表行为，一般是动词)
+    ③ 构造方法(在创建对象的时候，给成员变量进行初始化（赋值）)
+}
+```
+
+* 在 Java 中，对于类中成员变量、成员方法以及构造方法等，可以使用不同的权限修饰符来进行修饰；并且，我们可以将权限修饰符大致分为两类：
+
+| 权限修饰符 | 描述                       |
+| ---------- | -------------------------- |
+| 非私有     | public、default、protected |
+| 私有       | private                    |
+
+* 不同的权限修饰符修饰类中成员（父类），会对继承（子类）造成影响，如下所示：
+
+| 类型     | 访问修饰符                          | 影响                          |
+| -------- | ----------------------------------- | ----------------------------- |
+| 构造方法 | 非私有权限修饰符<br>私有权限修饰符  | 子类无法继承<br/>子类无法继承 |
+| 成员变量 | 非私有权限修饰符<br/>私有权限修饰符 | 子类可以继承<br/>子类可以继承 |
+| 成员方法 | 非私有权限修饰符<br/>私有权限修饰符 | 子类可以继承<br/>子类无法继承 |
+
+### 2.6.2 构造方法是否可以被子类继承？
+
+* 假设构造方法是可以继承的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    String name;
+    
+    int age;
+    
+    public Fu(){}
+    
+    public Fu(String name,int age){
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+    
+    
+}
+```
+
+:::
+
+* 那么，编译之后的代码就应该是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    String name;
+    
+    int age;
+    
+    public Fu(){}
+    
+    public Fu(String name,int age){
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+    
+    public Fu(){} // [!code highlight]
+    
+    public Fu(String name,int age){ // [!code highlight]
+        this.name = name; // [!code highlight]
+        this.age = age; // [!code highlight]
+    } // [!code highlight]    
+}
+```
+
+:::
+
+* 但是，这样就违背了构造方法的定义规则，即：构造方法需要和类名保持一致，如下所示：
+
+```java [Zi.java]
+public class Zi extends Fu {
+    
+    // ❌ 以下代码是错误的
+    public Fu(){} // [!code error]
+    
+    // ❌ 以下代码是错误的
+    public Fu(String name,int age){ // [!code error]
+        this.name = name; // [!code error]
+        this.age = age; // [!code error]
+    } // [!code error]  
+}
+```
+
+* 综上所述：`父类的构造方法是不能被子类继承的`，即：子类如果需要多个重载的构造方法，需要自己手动编写。
+
+### 2.6.3 成员变量是否可以被子类继承？
+
+#### 2.6.3.1 概述
+
+* 不管父类的成员变量是`私有权限修饰符`还是`非私有权限修饰符`修饰，子类都可以继承。
+* 只是，如果父类的成员变量是`私有权限修饰符`修饰，子类继承过来的成员变量不能使用（除非通过对应的 setter 或 getter 方法）。
 
 
 
+* 示例：父类的成员变量是`非私有权限修饰符`修饰
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    String name; // [!code highlight]
+    int age; // [!code highlight]
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Fu fu = new Fu();
+        fu.name = "小头爸爸";
+        fu.age = 40;
+        System.out.println(fu.name + " " + fu.age);
+
+        Zi zi = new Zi();
+        zi.name = "大头儿子";
+        zi.age = 15;
+        System.out.println(zi.name + " " + zi.age);
+    }
+}
+```
+
+:::
 
 
 
+* 示例：父类的成员变量是`私有权限修饰符`修饰
 
-### 2.6.2 内存分析工具
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    private String name; // [!code highlight]
+    private int age; // [!code highlight]
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Fu fu = new Fu();
+        fu.setName("小头爸爸");
+        fu.setAge(40);
+        System.out.println(fu.getName() + " " + fu.getAge());
+
+        Zi zi = new Zi();
+        zi.setName("大头儿子");
+        zi.setAge(15);
+        System.out.println(zi.getName() + " " + zi.getAge());
+    }
+}
+```
+
+:::
+
+#### 2.6.3.2 内存图（父类的成员变量是`非私有权限修饰符`修饰）
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    String name; 
+    int age; 
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+    String game;
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Zi zi = new Zi();
+        zi.name = "张三";
+        zi.age = 15;
+        zi.game = "王者荣耀";
+        System.out.println(zi.name + " " + zi.age + " " + zi.game);
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![父类的成员变量是`非私有权限修饰符`修饰的内存动态图](./assets/12.gif)
+
+* 其完整内存动态图，如下所示：
+
+![父类的成员变量是`非私有权限修饰符`修饰的完整内存动态图](./assets/15.gif)
+
+#### 2.6.3.3 内存图（父类的成员变量是`私有权限修饰符`修饰）
+
+
 
 
 
@@ -2148,15 +2398,3 @@ public class Teddy extends Dog {
 
 
 
-
-
-
-
-
-# 第三章：多态（⭐）
-
-## 3.1 概述
-
-
-
-## 3.2 包、final、权限修饰符、代码块
