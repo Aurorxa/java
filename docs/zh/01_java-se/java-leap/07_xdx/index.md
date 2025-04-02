@@ -2247,11 +2247,11 @@ public class Zi extends Fu {
 
 #### 2.6.3.1 概述
 
-* 不管父类的成员变量是`私有权限修饰符`还是`非私有权限修饰符`修饰，子类都可以继承。
+* 不管父类的`成员变量`是`私有权限修饰符`还是`非私有权限修饰符`修饰，子类都可以继承。
 
 > [!NOTE]
 >
-> 如果父类的成员变量是`私有权限修饰符`修饰，子类继承过来的成员变量不能直接使用（除非通过对应的 setter 或 getter 方法）。
+> 如果父类的`成员变量`是`私有权限修饰符`修饰，子类继承过来的成员变量不能直接使用（除非通过对应的 setter 或 getter 方法）。
 
 
 
@@ -2382,11 +2382,147 @@ public class Test {
 
 #### 2.6.3.3 内存图（父类的成员变量是`私有权限修饰符`修饰）
 
+* 假设代码是这样的，如下所示：
 
+::: code-group
 
+```java [Fu.java]
+public class Fu {
+    private String name;
+    private int age;
+}
+```
 
+```java [Zi.java]
+public class Zi extends Fu {
+    String game;
+}
+```
 
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Zi zi = new Zi();
+        zi.game = "王者荣耀";
+        // ❌ 以下代码是错误的
+        zi.name = "张三"; // [!code error]
+        // ❌ 以下代码是错误的
+        zi.age = 15; // [!code error]
+        System.out.println(zi.game);
+    }
+}
+```
 
+:::
+
+* 其完整的内存动态图，如下所示：
+
+![父类的成员变量是`私有权限修饰符`修饰的完整内存动态图](./assets/16.gif)
+
+* 我们可以在 IDEA 中验证 ：
+
+![](./assets/17.png)
+
+### 2.6.4 成员方法是否可以被子类继承？
+
+#### 2.6.4.1 概述
+
+* 如果父类的`成员方法`是`私有权限修饰符`进行修饰，子类无法继承。
+* 如果父类的`成员方法`是`非私有权限修饰符`进行修饰，子类可以继承。
+
+#### 2.6.4.2 方法查找是线性查找？
+
+* 假设类的继承结构是这样的，如下所示：
+
+![](./assets/18.svg)
+
+* 现在有这样的代码，如下所示：
+
+```java
+public class Test {
+    public static void main(String[] args){
+        A a = new A();
+        a.方法c();
+    }
+}
+```
+
+* 难道`方法查找`是通过`继承链`进行简单的`线性查找`，如下所示：
+
+![方法查找是通过`继承链`进行简单的线性查找？](./assets/19.svg)
+
+* 当然不对，如果 JVM 这么设计，性能就会非常差，一旦继承链过多，Java 的运行效率将会非常低，如下所示：
+
+![](./assets/20.svg)
+
+#### 2.6.4.3 方法查找通过虚方法表进行查找
+
+* Java 会从最顶级的父类开始，给其设置了一个名为`虚方法表`的数据结构，会将该类经常使用到的方法（虚方法）抽取出来，存入到虚方法表中，如下所示：
+
+> [!NOTE]
+>
+> * ① 虚方法：非 static、非 private、非 final 的方法。
+> * ② 虚方法表的本质就是一个方法地址的数组（指针数组）。
+
+![虚方法表](./assets/21.svg)
+
+* 在继承的时候，Java 会将虚方法传递给子类，这样 B 类就会有自己的虚方法表；并且，B 类也会将自己的虚方法存入到对应的虚方法表中，如下所示：
+
+![虚方法表](./assets/22.svg)
+
+* 依次类推，C 类也会有自己的虚方法表；并且，C 类也会将自己的虚方法存入到对应的虚方法表中，如下所示：
+
+![虚方法表](./assets/23.svg)
+
+> [!CAUTION]
+>
+> 子类并不会继承父类中的所有方法，只有父类中的`虚方法`才能被子类继承！！！
+
+#### 2.6.4.4 内存图
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+
+    public void fuShow1() {
+        System.out.println("Fu --- public --- fuShow1");
+    }
+
+    private void fuShow2() {
+        System.out.println("Fu --- private --- fuShow2");
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+
+    public void ziShow() {
+        System.out.println("Zi --- public --- ziShow");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.ziShow();
+        zi.fuShow1();
+        // ❌ 以下代码是错误的
+        zi.fuShow2(); // [!code error]
+    }
+}
+```
+
+:::
+
+* 其完整的内存图，如下所示：
+
+![方法查找通过`虚方法表`进行查找的完整内存图](./assets/24.gif)
 
 ## 2.7 继承中成员变量、成员方法和构造方法的特点
 
