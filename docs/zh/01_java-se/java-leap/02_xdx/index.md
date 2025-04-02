@@ -1136,7 +1136,7 @@ public class MethodDemo6 {
 
 
 
-# 第六章：综合练习
+# 第六章：作业
 
 ## 6.1 卖飞机票
 
