@@ -2758,7 +2758,7 @@ public class Test {
 ### 2.7.5 总结
 
 * ① 继承中成员变量的访问特点：就近原则，即：先在局部位置找，本类成员位置找，父类成员位置找，逐级向上查找。
-* ② 如果出现了重命的变量，可以使用 this 或 super 关键字来解决。
+* ② 如果出现了相同名字（重名）的变量，可以使用 this 或 super 关键字来解决。
 
 ```java
 public void show(){
@@ -2931,20 +2931,251 @@ public class Test {
 #### 2.8.3.1 概述
 
 * 当父类中的方法不能满足子类的需求，就需要进行方法重写。方法重写允许子类重新定义了父类中已存在的方法的行为。
-* 方法重写的规则和要求：
 
-| 方法重写的规则和要求 | 细节                                                         |
-| -------------------- | ------------------------------------------------------------ |
-| 方法签名必须相同     | ① 方法名必须完全一致。<br>② 参数列表必须完全一致 (参数类型、顺序、数量)。<br>③ 返回类型 一致或者是父类方法返回类型的子类型。 |
-| 发生在继承关系中     | 方法重写只能发生在子类和父类之间，必须存在继承关系 。        |
-| 访问修饰符           | ① 子类重写的方法的访问修饰符`不能比父类方法更严格`。<br/>② 可以相同，也可以更宽松 ，例如：父类是 `protected`，子类可以是 `protected` 或 `public`。<br/>③ 不能更严格 ，例如：父类是 `public`，子类不能是 `protected` 或 `private`。 |
-| 异常 (Exceptions)    | ① 子类重写的方法抛出的受检异常类型`不能比父类方法抛出的受检异常类型更宽泛`。<br/>② 可以抛出更具体的受检异常，或者不抛出受检异常 (如果父类方法抛出受检异常)。<br/>③ 可以抛出相同的受检异常。<br/>④ 可以抛出`运行时异常 (Runtime Exception)`，无论父类方法是否抛出运行时异常。 |
-| `@Override` 注解     | ① 强烈建议在子类重写的方法上使用 `@Override` 注解。 <br/>② `@Override` 注解的作用是`告诉编译器`这个方法是重写父类的方法。 <br/>③ 编译器会检查子类的方法是否真的符合重写规则 (方法签名是否一致等)。 <br/>④ 如果不符合重写规则，编译器会报错，帮助开发者尽早发现错误。<br/>⑤ 提高了代码的可读性和可维护性。 |
-| `super` 关键字       | ① 在子类重写的方法中，可以使用 `super` 关键字来调用`父类被重写的方法`。 <br/>② 这允许子类在新的实现基础上，仍然保留父类原有的行为。 |
-| `final` 方法         | ① 被 `final` 关键字修饰的方法`不能被重写`。 <br/>② `final` 方法表示该方法是最终的，不允许子类修改其实现。 |
-| `static` 方法        | ① `static` 方法`不能被重写`。<br/>② 在子类中定义与父类 `static` 方法同名的方法，`不是重写，而是隐藏`。<br/>③ `static` 方法属于类，不属于对象，重写是基于对象的多态行为，所以 `static` 方法不参与重写。 |
+#### 2.8.3.2 方法重写的本质
 
-#### 2.8.3.2 应用示例
+* 方法重写的本质是`子类覆盖了从父类中继承下来的虚方法表中的方法`。
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+
+    public void show1() { // [!code highlight]
+        System.out.println("Fu --- public --- show1");
+    }
+
+    public void show2() {
+        System.out.println("Fu --- public --- show2");
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+
+    public void show1() { // [!code highlight]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+		zi.show1();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![方法重写的本质](./assets/32.gif)
+
+#### 2.8.3.3 方法重写的注意事项和要求
+
+* ① 重写方法的方法签名必须相同，即：方法名、形参列表（参数类型、顺序、数量）必须和父类一致。
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+
+    public void show1() {
+        System.out.println("Fu --- public --- show1");
+    }
+
+    public void show2() {
+        System.out.println("Fu --- public --- show2");
+    }
+}
+```
+
+```java [ZiRight.java]
+public class ZiRight extends Fu {
+
+    // ✅ 以下代码是正确的
+    @Override
+    public void show1() { // [!code highlight]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+```java [ZiError.java]
+public class ZiError extends Fu {
+
+    // ❌ 以下代码是错误的 
+    @Override
+    public void show11() { // [!code error]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+:::
+
+* ② 子类重写父类方法时，访问权限子类必须大于等于父类（default < protected < public）。
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+
+    protected void show1() {
+        System.out.println("Fu --- public --- show1");
+    }
+
+    public void show2() {
+        System.out.println("Fu --- public --- show2");
+    }
+}
+```
+
+```java [ZiRight.java]
+public class ZiRight extends Fu {
+
+    // ✅ 以下代码是正确的
+    @Override
+    public void show1() { // [!code highlight]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+```java [ZiError.java]
+public class ZiError extends Fu {
+
+    // ❌ 以下代码是错误的 
+    @Override
+    void show11() { // [!code error]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+:::
+
+* ③ 子类重写父类方法时，返回值类型必须小于等于父类。
+
+::: code-group
+
+```java [Animal.java]
+public class Animal {
+    public Animal getAnimal() {
+        System.out.println("Animal 的 getAnimal 方法");
+        return new Animal();
+    }
+}
+```
+
+```java [DogRight.java]
+public class DogRight extends Animal {
+    // ✅ 以下代码是正确的
+    @Override
+    public Dog getAnimal() { // [!code highlight]
+        System.out.println("Dog 的 getAnimal 方法");
+        return new Dog();
+    }
+}
+```
+
+```java [DogError.java]
+public class DogError extends Fu {
+
+    // ❌ 以下代码是错误的 
+    @Override
+    public Object getAnimal() { // [!code error]
+        System.out.println("Dog 的 getAnimal 方法");
+        return new Object();
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Animal animal = new Animal();
+        // 父类引用指向子类对象
+        Animal animal2 = new Dog();
+
+        // 类似于 Animal a1 = new Animal();
+        Animal a1 = animal.getAnimal();
+        // 类似于 Animal a2 = new Dog();
+        Animal a2 = animal2.getAnimal();
+
+        System.out.println(a1 instanceof Animal); // true
+        System.out.println(a2 instanceof Dog); // true
+    }
+}
+```
+
+:::
+
+* ④ 只有被添加到虚方法表中的方法才能被重写。
+
+> [!NOTE]
+>
+> * ① 虚方法：非 static、非 private、非 final 的方法。
+> * ② 虚方法表的本质就是一个方法地址的数组（指针数组）。
+
+* ⑤ 强烈建议在子类重写的方法上使用 `@Override` 注解。
+
+> [!NOTE]
+>
+> 编译器会检查子类的方法是否真的符合重写规则 (方法签名是否一致等)。 
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+
+    protected void show1() {
+        System.out.println("Fu --- public --- show1");
+    }
+
+    public void show2() {
+        System.out.println("Fu --- public --- show2");
+    }
+}
+```
+
+```java [ZiRight.java]
+public class ZiRight extends Fu {
+
+    // ✅ 以下代码是正确的
+    @Override
+    public void show1() { // [!code highlight]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+```java [ZiError.java]
+public class ZiError extends Fu {
+
+    // ❌ 以下代码是错误的 
+    @Override
+    void show11() { // [!code error]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+:::
+
+* ⑤ 子类重写的方法抛出的受检异常类型`不能比父类方法抛出的受检异常类型更宽泛`。
+
+> [!NOTE]
+>
+> 可以抛出`运行时异常 (Runtime Exception)`，无论父类方法是否抛出运行时异常。
+
+#### 2.8.3.4 应用示例
 
 * 需求：根据给出的类继承体系，完整对应的需求。
 
@@ -2956,8 +3187,6 @@ classDiagram
      Dog: + makeSound()
      Cat: + makeSound()
 ```
-
-
 
 
 
@@ -3012,7 +3241,7 @@ public class Test {
 ### 2.8.4 总结
 
 * ① 继承中成员方法的访问特点：就近原则，即：先在局部位置找，本类成员位置找，父类成员位置找，逐级向上查找。
-* ② 如果出现了重命的方法，可以使用 this 或 super 关键字来解决。
+* ② 如果出现了相同名字（重名）的方法，可以使用 this 或 super 关键字来解决。
 
 ```java
 public void lunch(){
@@ -3024,27 +3253,735 @@ public void lunch(){
 }
 ```
 
+* ③ 当父类中的方法不能满足子类的需求，就需要进行方法重写。
 
+::: code-group
+
+```java [Animal.java]
+public class Animal {
+    
+    public void makeSound() {
+        System.out.println("动物发出叫声");
+    }
+}
+```
+
+```java [Dog.java]
+public class Dog extends Animal {
+    
+    @Override
+    public void makeSound() { // [!code highlight]
+        System.out.println("狗叫：汪汪汪");
+    }
+}
+```
+
+:::
 
 ## 2.9 继承中构造方法的特点
 
+### 2.9.1 概述
 
+* 继承中构造方法的特点是`父类中的构造方法不会被子类继承。`
 
+::: code-group
 
+```java [Fu.java]
+public class Fu {
+    
+    String name;
+    
+    int age;
+    
+    public Fu(){}
+    
+    public Fu(String name,int age){
+        this.name = name;
+        this.age = age;
+    }
+}
+```
 
+```java [Zi.java]
+public class Zi extends Fu {
+    
+    // ❌ 以下代码是错误的，违反了构造方法的定义
+    public Fu(){} // [!code error]
+    
+    // ❌ 以下代码是错误的，违反了构造方法的定义
+    public Fu(String name,int age){ // [!code error]
+        this.name = name; // [!code error]
+        this.age = age; // [!code error]
+    } // [!code error]  
+}
+```
 
+:::
+
+* 继承中构造方法的特点是`子类中所有的构造方法默认先访问父类中的无参构造方法，再执行自己的构造方法`。
+
+> [!NOTE]
+>
+> 原因：
+>
+> * ① 子类在进行初始化的时候，可能会使用到父类中的数据（属性）；如果父类没有完成初始化，子类将无法使用父类的数据（属性）。
+> * ② 子类在初始化之前，一定要调用父类的构造方法，以便先完成父类数据（属性）的初始化。
+>
+> 如何调用父类的构造方法？
+>
+> * ① 子类构造方法的第一行语句默认都是：`super();`，即使不写也是存在的，且必须在第一行。
+> * ② 如果想要调用父类的有参构造，必须手动写 `super(xxx)` 进行调用，且必须在第一行。
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    String name;
+    
+    int age;
+    
+    public Fu(){}
+    
+    public Fu(String name,int age){
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+    
+    public Zi(){
+        // 默认调用父类的无参构造方法，再调用自己的构造方法
+        super();
+    } 
+
+}
+```
+
+:::
+
+### 2.9.2 演示
+
+#### 2.9.2.1 演示一
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+
+    String name;
+    int age;
+
+    public Person() {
+        System.out.println("父类的无参构造方法");
+    }
+
+    public Person(String name, int age) {
+        System.out.println("父类的全参构造方法");
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java  [Student.java]
+public class Student extends Person {}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student();
+        System.out.println("stu = " + stu);
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/33.gif)
+
+#### 2.9.2.2 演示二
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+
+    String name;
+    int age;
+
+    public Person() {
+        System.out.println("父类的无参构造方法");
+    }
+
+    public Person(String name, int age) {
+        System.out.println("父类的全参构造方法");
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java  [Student.java]
+public class Student extends Person {
+
+    public Student() {
+        // super(); // 不写也存在
+        System.out.println("子类的无参构造方法");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student();
+        System.out.println("stu = " + stu);
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/34.gif)
+
+#### 2.9.2.3 演示三
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+
+    String name;
+    int age;
+
+    public Person() {
+        System.out.println("父类的无参构造方法");
+    }
+
+    public Person(String name, int age) {
+        System.out.println("父类的全参构造方法");
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java  [Student.java]
+public class Student extends Person {
+
+    public Student() {
+        // super(); // 不写也存在
+        System.out.println("子类的无参构造方法");
+    }
+
+    public Student(String name, int age) {
+        super(name, age);
+        System.out.println("子类的全参构造方法");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student("张三", 18);
+        System.out.println("stu = " + stu);
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/35.gif)
+
+### 2.9.3 总结
+
+* ① 子类不能继承父类的构造方法，但是可以通过 `super()` 或 `super(xxx)` 进行调用。
+* ② 子类构造方法的第一行，默认有一个 `super()`，即使不写也是存在的，且必须在第一行。
+* ③ 默认先访问父类中的无参构造方法，再执行自己的构造方法。
+* ④ 如果想要访问父类的有参构造方法，必须手动写 `super(xxx)` 进行调用，且必须在第一行。
 
 ## 2.10 this 和 super 的使用总结
 
+### 2.10.1 前提
+
+#### 2.10.1.1 概述
+
+* 后续要查看字节码以及打印对象，需要在 IDEA 中安装  `jclasslib` 插件，以及在工程中引入 `JOL` 依赖。
+
+#### 2.10.1.2 IDEA 插件的安装
+
+* `设置` --> `插件` --> `jclasslib` ：
+
+![](./assets/36.png)
+
+#### 2.101.3 Java Object Layout（JOL）
+
+* 如果使用 Maven 或 Gradle 构建工具，只需要在`pom.xml`或`build.gradle`文件中，编写依赖的信息，如下所示：
+
+::: code-group
+
+```xml [Maven]
+<dependency>
+    <groupId>org.openjdk.jol</groupId>
+    <artifactId>jol-core</artifactId>
+    <version>0.17</version>
+</dependency>
+```
+
+```groovy [Gradle]
+implementation 'org.openjdk.jol:jol-core:0.17'
+```
+
+:::
+
+* 如果没有使用 Maven 或 Gradle 构建工具，先去 Maven 中央仓库下载对应的 jar 包：
+
+![](./assets/37.png)
+
+* 在 IDEA 的工程中新建`lib`目录，然后将`jol-core-xxx.jar`包复制到该目录中，如下所示：
+
+![](./assets/38.png)
+
+* 在 IDEA 中，`鼠标右键` --> `添加到库`，如下所示：
+
+![](./assets/39.png)
+
+![](./assets/40.png)
+
+* 在 IDEA 中，`项目结构` --> `项目设置` --> `依赖`中，将刚才的库文件导入到类路径中，以便 IDEA 识别，如下所示：
+
+ ![](./assets/41.png)
+
+![](./assets/42.png)
+
+### 2.10.2 this
+
+#### 2.10.2.1 概述
+
+* this 就是一个变量，表示当前调用者的地址。
+
+#### 2.10.2.2 演示
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    // 在调用该方法的时候，由 JVM 将 this 传递进来
+    public void show(Student this) { // [!code highlight]
+        int a = 10;
+        int b = 20;
+        System.out.println(a + b);
+    }
+}
+```
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student();
+        System.out.println("stu = " + stu);
+
+        stu.show();
+    }
+}
+```
+
+::: 
+
+* 其在内存中，就是这样的，如下所示：
+
+![](./assets/43.png)
+
+#### 2.10.2.3 对象中没有 this 
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    // 在调用该方法的时候，由 JVM 将 this 传递进来
+    public void show(Student this) { // [!code highlight]
+        int a = 10;
+        int b = 20;
+        System.out.println(a + b);
+    }
+}
+```
+
+```java
+import org.openjdk.jol.info.ClassLayout;
+
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student();
+        System.out.println("stu = " + stu);
+
+        stu.show();
+
+        // 将对象在内存中的结构打印出来
+        ClassLayout classLayout = ClassLayout.parseInstance(stu);
+        System.out.println(classLayout.toPrintable());
+    }
+}
+```
+
+::: 
+
+* 其执行结果，如下所示：
+
+```txt [cmd 控制台]
+stu = com.github.demo6.Student@214c265e
+30
+# WARNING: Unable to get Instrumentation. Dynamic Attach failed. You may add this JAR as -javaagent manually, or supply -Djdk.attach.allowAttachSelf
+com.github.demo6.Student object internals:
+OFF  SZ   TYPE DESCRIPTION               VALUE
+  0   8        (object header: mark)     0x000000214c265e01 (hash: 0x214c265e; age: 0)
+  8   4        (object header: class)    0x01001200
+ 12   4        (object alignment gap)    
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+```
+
+#### 2.10.2.4 this 仅仅是一个变量
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    // 在调用该方法的时候，由 JVM 将 this 传递进来
+    public void show(Student this) { // [!code highlight]
+        int a = 10;
+        int b = 20;
+        System.out.println(a + b);
+    }
+}
+```
+
+```java
+import org.openjdk.jol.info.ClassLayout;
+
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student();
+        System.out.println("stu = " + stu);
+
+        stu.show();
+
+        // 将对象在内存中的结构打印出来
+        ClassLayout classLayout = ClassLayout.parseInstance(stu);
+        System.out.println(classLayout.toPrintable());
+    }
+}
+```
+
+::: 
+
+* 在 IDEA 中，执行该代码，并通过 jclasslib 查看，查看字节码信息：
+
+![](./assets/44.gif)
+
+### 2.10.3 super
+
+* super 表示父类的存储空间。
 
 
 
+* 示例：
+
+::: code-group
+
+```java [Animal.java]
+class Animal {
+    String name;
+
+    public Animal(String name) {
+        this.name = name;
+        System.out.println("Animal constructor called with name: " + name);
+    }
+
+    public void makeSound() {
+        System.out.println("Generic animal sound");
+    }
+}
+```
+
+```java {7,15} [Dog.java]
+class Dog extends Animal {
+    String breed;
+
+    // 子类构造器
+    public Dog(String name, String breed) {
+        // 调用父类的构造器，初始化父类的 name 字段
+        super(name); // 必须是第一行
+        this.breed = breed;
+        System.out.println("Dog constructor called with breed: " + breed);
+    }
+
+    @Override // 重写父类方法
+    public void makeSound() {
+        // 调用父类的 makeSound() 方法
+        super.makeSound(); // 访问父类的方法
+        System.out.println("Woof!"); // 子类自己的实现
+    }
+
+    public void displayInfo() {
+        // 可以直接访问父类的 name
+        System.out.println("Name: " + name + ", Breed: " + breed); 
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Dog dog = new Dog("Buddy", "Golden Retriever");
+        dog.makeSound(); // 输出：Generic animal sound \n Woof!
+        dog.displayInfo(); // 输出：Name: Buddy, Breed: Golden Retriever
+    }
+}
+```
+
+:::
+
+### 2.10.4 this 和 super 的使用
+
+* this 和 super 都可以访问成员变量、成员方法以及构造方法，如下所示：
+
+| 关键字 | 访问成员变量                        | 访问成员方法                             | 访问构造方法                    |
+| ------ | ----------------------------------- | ---------------------------------------- | ------------------------------- |
+| this   | this.成员变量<br>访问本类成员变量   | this.成员方法(...)<br/>访问本类成员方法  | this(...)<br/>访问本类构造方法  |
+| super  | super.成员变量<br/>访问父类成员变量 | super.成员方法(...)<br/>访问父类成员方法 | super(...)<br/>访问父类构造方法 |
 
 
 
+* 示例：
+
+::: code-group
+
+```java [Animal.java]
+class Animal {
+    String name;
+
+    public Animal(String name) {
+        this.name = name;
+        System.out.println("Animal constructor called with name: " + name);
+    }
+
+    public void makeSound() {
+        System.out.println("Generic animal sound");
+    }
+}
+```
+
+```java {7,15} [Dog.java]
+class Dog extends Animal {
+    String breed;
+
+    // 子类构造器
+    public Dog(String name, String breed) {
+        // 调用父类的构造器，初始化父类的 name 字段
+        super(name); // 必须是第一行
+        this.breed = breed;
+        System.out.println("Dog constructor called with breed: " + breed);
+    }
+
+    @Override // 重写父类方法
+    public void makeSound() {
+        // 调用父类的 makeSound() 方法
+        super.makeSound(); // 访问父类的方法
+        System.out.println("Woof!"); // 子类自己的实现
+    }
+
+    public void displayInfo() {
+        // 可以直接访问父类的 name
+        System.out.println("Name: " + name + ", Breed: " + breed); 
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Dog dog = new Dog("Buddy", "Golden Retriever");
+        dog.makeSound(); // 输出：Generic animal sound \n Woof!
+        dog.displayInfo(); // 输出：Name: Buddy, Breed: Golden Retriever
+    }
+}
+```
+
+:::
+
+### 2.10.5 应用示例
+
+* 需求：编写带有继承体系结构的标准 JavaBean 类。
+
+> [!NOTE]
+>
+> * ① 经理：
+>
+> | 成员变量               | 成员方法                           |
+> | ---------------------- | ---------------------------------- |
+> | 工号、姓名、工资、奖金 | 工作（管理其他人）、吃饭（吃米饭） |
+>
+> * ② 厨师：
+>
+> | 成员变量         | 成员方法                     |
+> | ---------------- | ---------------------------- |
+> | 工号、姓名、工资 | 工作（炒菜）、吃饭（吃米饭） |
 
 
 
+* 示例：
 
-# 第三章：作业
+::: code-group
 
+```java [Employee.java]
+public class Employee {
+
+    private int id;
+
+    private String name;
+
+    private double salary;
+
+    public Employee() {}
+
+    public Employee(int id, String name, double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(double salary) {
+        this.salary = salary;
+    }
+
+    /**
+     * 工作
+     */
+    public void work() {
+        System.out.println("工作");
+    }
+
+    /**
+     * 吃饭
+     */
+    public void eat() {
+        System.out.println("吃米饭");
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" + 
+            "id=" + id 
+            + ", name='" + name + '\'' 
+            + ", salary=" + salary + '}';
+    }
+}
+
+```
+
+```java [Manager.java]
+public class Manager extends Employee {
+
+    private double bonus;
+
+    public Manager() {}
+
+    public Manager(double bonus) {
+        this.bonus = bonus;
+    }
+
+    public Manager(int id, String name, double salary, double bonus) {
+        super(id, name, salary);
+        this.bonus = bonus;
+    }
+
+    @Override
+    public void work() {
+        System.out.println("管理其他人");
+    }
+
+    @Override
+    public String toString() {
+        return "Manager{" + "bonus=" + bonus + "} " + super.toString();
+    }
+}
+
+```
+
+```java [Cook.java]
+public class Cook extends Employee {
+
+    public Cook() {}
+
+    public Cook(int id, String name, double salary) {
+        super(id, name, salary);
+    }
+
+    @Override
+    public void work() {
+        System.out.println("炒菜");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Manager manager = new Manager(1, "张三", 800000, 5000);
+        System.out.println("manager = " + manager);
+
+        Cook cook = new Cook(2, "李四", 2000);
+        System.out.println("cook = " + cook);
+    }
+}
+```
+
+:::
