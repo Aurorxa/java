@@ -3532,7 +3532,7 @@ public class Test {
 
 ![](./assets/36.png)
 
-#### 2.101.3 Java Object Layout（JOL）
+#### 2.10.1.3 Java Object Layout（JOL）
 
 * 如果使用 Maven 或 Gradle 构建工具，只需要在`pom.xml`或`build.gradle`文件中，编写依赖的信息，如下所示：
 
@@ -3596,7 +3596,7 @@ public class Student {
 }
 ```
 
-```java
+```java [Test.java]
 public class Test {
     public static void main(String[] args) {
         Student stu = new Student();
@@ -3631,7 +3631,7 @@ public class Student {
 }
 ```
 
-```java
+```java [Test.java]
 import org.openjdk.jol.info.ClassLayout;
 
 public class Test {
@@ -3683,7 +3683,7 @@ public class Student {
 }
 ```
 
-```java
+```java [Test.java]
 import org.openjdk.jol.info.ClassLayout;
 
 public class Test {
