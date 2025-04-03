@@ -2524,7 +2524,509 @@ public class Test {
 
 ![方法查找通过`虚方法表`进行查找的完整内存图](./assets/24.gif)
 
-## 2.7 继承中成员变量、成员方法和构造方法的特点
+## 2.7 继承中成员变量的特点
+
+### 2.7.1 概述
+
+* 继承中成员变量的特点是`就近原则`，即：谁离我近，我就用谁。
+
+### 2.7.2 演示
+
+#### 2.7.2.1 演示一
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    String name = "Fu";
+}
+```
+
+```java {5} [Zi.java]
+public class Zi extends Fu {
+    String name = "Zi";
+    
+    public void ziShow(){
+        String name = "ziShow";
+        System.out.println(name);
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.ziShow();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![继承中成员变量的特点：就近原则](./assets/25.gif)
+
+#### 2.7.2.2 演示二
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    String name = "Fu";
+}
+```
+
+```java {2,5} [Zi.java]
+public class Zi extends Fu {
+    String name = "Zi";
+    
+    public void ziShow(){
+        // String name = "ziShow";
+        System.out.println(name);
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.ziShow();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![继承中成员变量的特点：就近原则](./assets/26.gif)
+
+#### 2.7.2.4 演示三
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java {2} [Fu.java]
+public class Fu {
+    String name = "Fu";
+}
+```
+
+```java {2,5} [Zi.java]
+public class Zi extends Fu {
+    // String name = "Zi";
+    
+    public void ziShow(){
+        // String name = "ziShow";
+        System.out.println(name);
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.ziShow();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![继承中成员变量的特点：就近原则](./assets/27.gif)
+
+### 2.7.3 如何区分？
+
+#### 2.7.3.1 概述
+
+* 可以通过`this`或`super`关键字来区别成员变量。
+
+#### 2.7.3.2 演示
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java  [Fu.java]
+public class Fu {
+    String name = "Fu";
+}
+```
+
+```java {6-8} [Zi.java]
+public class Zi extends Fu {
+    String name = "Zi";
+    
+    public void ziShow(){
+        String name = "ziShow";
+        System.out.println(name);
+        System.out.println(this.name);
+        System.out.println(super.name);
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.ziShow();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/28.gif)
+
+### 2.7.4 应用示例
+
+* 需求：根据给出的类继承体系，完整对应的需求。
+
+```mermaid
+classDiagram
+     Fu <|-- Zi : extends
+     Fu: + String name = "Fu"
+     Fu: + String hobby = "喝茶"
+     Zi: + String name = "Zi"
+     Zi: + String game = "王者荣耀"
+     Zi: + show() 
+```
+
+> [!NOTE]
+>
+> * ① 如何在 show() 方法中打印 Zi ？
+> * ② 如何在 show() 方法中打印 Fu ？
+> * ③ 如何在 show() 方法中打印喝茶 ？
+> * ④ 如何在 show() 方法中打印王者荣耀 ？
+
+
+
+* 示例：
+
+::: code-group
+
+```java
+public class Fu {
+    String name = "Fu";
+    String hobby = "喝茶";
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+    String name = "Zi";
+    String game = "王者荣耀";
+    
+    public void show(){
+       // 如何打印 Zi
+       System.out.println(name);
+       // 如何打印 Fu
+       System.out.println(super.name);
+       // 如何打印喝茶
+       System.out.println(hobby);
+       // 如何打印王者荣耀
+        System.out.println(game);
+    }
+}
+```
+
+```java
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.show();
+    }
+}
+```
+
+:::
+
+### 2.7.5 总结
+
+* ① 继承中成员变量的访问特点：就近原则，即：先在局部位置找，本类成员位置找，父类成员位置找，逐级向上查找。
+* ② 如果出现了重命的变量，可以使用 this 或 super 关键字来解决。
+
+```java
+public void show(){
+    String name = "show";
+    System.out.println(name); // 从局部位置开始往上查找
+    System.out.println(this.name); // 从本类成员位置开始往上查找
+    System.out.println(super.name); // 从父类成员位置开始往上查找
+}
+```
+
+## 2.8 继承中成员方法的特点
+
+### 2.8.1 概述
+
+* 继承中成员方法的特点是`就近原则`，即：谁离我近，我就用谁。
+
+### 2.8.2 演示
+
+#### 2.8.2.1 演示一
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    public void eat(){
+        System.out.println("吃米饭，吃菜");
+    }
+    
+    public void drink(){
+        System.out.println("喝开水");
+    }
+}
+```
+
+```java {5} [Zi.java]
+public class Zi extends Fu {
+    
+    public void lunch(){
+        eat();
+        drink();
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.lunch();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/29.gif)
+
+#### 2.8.2.2 演示二
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    public void eat(){
+        System.out.println("吃米饭，吃菜");
+    }
+    
+    public void drink(){
+        System.out.println("喝开水");
+    }
+}
+```
+
+```java {5} [Zi.java]
+public class Zi extends Fu {
+    public void eat(){
+        System.out.println("吃面条");
+    }
+    
+    public void drink(){
+        System.out.println("喝凉水");
+    }
+    
+    public void lunch(){
+        eat();
+        drink();
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.lunch();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/30.gif)
+
+#### 2.8.2.3 演示三
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    public void eat(){
+        System.out.println("吃米饭，吃菜");
+    }
+    
+    public void drink(){
+        System.out.println("喝开水");
+    }
+}
+```
+
+```java {5} [Zi.java]
+public class Zi extends Fu {
+    public void eat(){
+        System.out.println("吃面条");
+    }
+    
+    public void drink(){
+        System.out.println("喝凉水");
+    }
+    
+    public void lunch(){
+        eat();
+        drink();
+        
+        super.eat();
+        super.drink();
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.lunch();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/31.gif)
+
+### 2.8.3 方法重写
+
+#### 2.8.3.1 概述
+
+* 当父类中的方法不能满足子类的需求，就需要进行方法重写。方法重写允许子类重新定义了父类中已存在的方法的行为。
+* 方法重写的规则和要求：
+
+| 方法重写的规则和要求 | 细节                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| 方法签名必须相同     | ① 方法名必须完全一致。<br>② 参数列表必须完全一致 (参数类型、顺序、数量)。<br>③ 返回类型 一致或者是父类方法返回类型的子类型。 |
+| 发生在继承关系中     | 方法重写只能发生在子类和父类之间，必须存在继承关系 。        |
+| 访问修饰符           | ① 子类重写的方法的访问修饰符`不能比父类方法更严格`。<br/>② 可以相同，也可以更宽松 ，例如：父类是 `protected`，子类可以是 `protected` 或 `public`。<br/>③ 不能更严格 ，例如：父类是 `public`，子类不能是 `protected` 或 `private`。 |
+| 异常 (Exceptions)    | ① 子类重写的方法抛出的受检异常类型`不能比父类方法抛出的受检异常类型更宽泛`。<br/>② 可以抛出更具体的受检异常，或者不抛出受检异常 (如果父类方法抛出受检异常)。<br/>③ 可以抛出相同的受检异常。<br/>④ 可以抛出`运行时异常 (Runtime Exception)`，无论父类方法是否抛出运行时异常。 |
+| `@Override` 注解     | ① 强烈建议在子类重写的方法上使用 `@Override` 注解。 <br/>② `@Override` 注解的作用是`告诉编译器`这个方法是重写父类的方法。 <br/>③ 编译器会检查子类的方法是否真的符合重写规则 (方法签名是否一致等)。 <br/>④ 如果不符合重写规则，编译器会报错，帮助开发者尽早发现错误。<br/>⑤ 提高了代码的可读性和可维护性。 |
+| `super` 关键字       | ① 在子类重写的方法中，可以使用 `super` 关键字来调用`父类被重写的方法`。 <br/>② 这允许子类在新的实现基础上，仍然保留父类原有的行为。 |
+| `final` 方法         | ① 被 `final` 关键字修饰的方法`不能被重写`。 <br/>② `final` 方法表示该方法是最终的，不允许子类修改其实现。 |
+| `static` 方法        | ① `static` 方法`不能被重写`。<br/>② 在子类中定义与父类 `static` 方法同名的方法，`不是重写，而是隐藏`。<br/>③ `static` 方法属于类，不属于对象，重写是基于对象的多态行为，所以 `static` 方法不参与重写。 |
+
+#### 2.8.3.2 应用示例
+
+* 需求：根据给出的类继承体系，完整对应的需求。
+
+```mermaid
+classDiagram
+     Animal <|-- Dog  : extends
+     Animal <|-- Cat   : extends
+     Animal: + makeSound() 
+     Dog: + makeSound()
+     Cat: + makeSound()
+```
+
+
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Animal.java]
+public class Animal {
+    public void makeSound() {
+        System.out.println("动物发出叫声");
+    }
+}
+```
+
+```java [Dog.java]
+public class Dog extends Animal {
+    // 重写父类 Animal 的 makeSound() 方法
+    @Override
+    public void makeSound() {
+        System.out.println("狗叫：汪汪汪");
+    }
+}
+```
+
+```java [Cat.java]
+public class Cat extends Animal {
+    // 重写父类 Animal 的 makeSound() 方法
+    @Override
+    public void makeSound() {
+        System.out.println("猫叫：喵喵喵");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Animal animal = new Animal();
+        Dog dog = new Dog();
+        Cat cat = new Cat();
+
+        animal.makeSound(); // 输出：动物发出叫声
+        dog.makeSound();    // 输出：狗叫：汪汪汪  (调用子类 Dog 重写的方法)
+        cat.makeSound();    // 输出：猫叫：喵喵喵  (调用子类 Cat 重写的方法)
+    }
+}
+```
+
+:::
+
+### 2.8.4 总结
+
+* ① 继承中成员方法的访问特点：就近原则，即：先在局部位置找，本类成员位置找，父类成员位置找，逐级向上查找。
+* ② 如果出现了重命的方法，可以使用 this 或 super 关键字来解决。
+
+```java
+public void lunch(){
+    eat();
+    drink();
+
+    super.eat();
+    super.drink();
+}
+```
+
+
+
+## 2.9 继承中构造方法的特点
 
 
 
@@ -2532,7 +3034,7 @@ public class Test {
 
 
 
-## 2.8 this 和 super 的使用总结
+## 2.10 this 和 super 的使用总结
 
 
 
