@@ -95,7 +95,7 @@ export const sharedConfig = withMermaid(defineConfig({
       }),
     ],
     server: {
-      port: 12099
+      port: 11089
     },
     css: {
       preprocessorOptions: {
