@@ -1057,7 +1057,7 @@ public class Test {
 
 * 其完整内存动态图，如下所示：
 
-
+![](./assets/7.gif)
 
 ## 1.5 多态的优势
 
@@ -1346,7 +1346,7 @@ public class Test {
 classDiagram
 	 Pet <|-- Dog : extends
 	 Pet <|-- Cat : extends
-	 note for Pet "动物"	
+	 note for Pet "宠物"	
      class Pet {
         - int age
         - String color
@@ -1524,15 +1524,13 @@ public class Test {
 
 
 
-# 第二章：包、final（⭐）
+# 第二章：包（⭐）
 
-## 2.1 包
-
-### 2.1.1 概述
+## 2.1 概述
 
 * 在 java 中，包（package）就是文件夹，就是用来管理各种不同功能的 Java 类，方便后期代码维护。
 
-### 2.1.2 包名的规则
+## 2.2 包名的规则
 
 * `公司域名反写+ 包的作用`，需要全部英文小写，见名知意。
 
@@ -1541,10 +1539,18 @@ public class Test {
 * 示例：
 
 ```java
-package com.github.demo1; 
+package org.apache.dubbo.rpc; 
 ```
 
-### 2.1.3 全类名
+
+
+* 示例：
+
+```java
+package org.apache.dubbo.remoting;
+```
+
+## 2.3 全类名
 
 * 在使用的时候，我们需要使用`包名.类名`的形式，即：全类名（全限定名）。
 
@@ -1572,7 +1578,7 @@ public class Test {
 }
 ```
 
-### 2.1.4 import
+## 2.4 import
 
 * 使用全类名的方式实在太繁琐了，于是 Java 提供了`import 包名.类名`的方式来简化书写。在类中，就可以使用类名而不是全限定名。
 * 语法：
@@ -1617,14 +1623,22 @@ public class Test {
 }
 ```
 
-## 2.2 final
 
-### 2.2.1 概述
+
+# 第三章：final（⭐）
+
+## 3.1 概述
 
 * `final`翻译为中文就是`最终的`，一旦在代码中使用 final 进行修饰，就表示最终的，不可被改变的。
-* `final`可以修饰`方法`、`类`和`变量`。
+* `final`可以修饰`方法`、`类`和`变量`，如下所示：
 
-### 2.2.2 final 修饰方法
+| final          | 描述                                     |
+| -------------- | ---------------------------------------- |
+| final 修饰类   | 表示该类是最终类，不可以被继承。         |
+| final 修饰方法 | 表示该方法是最终方法，不可以被重写。     |
+| final 修饰变量 | 表示该变量（常量），有且仅能被赋值一次。 |
+
+## 3.2 final 修饰方法
 
 * 如果使用 final 修饰某个方法，则表示该方法是最终方法，不可以被重写。
 
@@ -1635,19 +1649,15 @@ public class Test {
 ::: code-group
 
 ```java [Fu.java]
-package com.github.demo4;
-
 public class Fu {
 
-    public void show() {
+    public void show() { // [!code highlight]
         System.out.println("Fu --- show");
     }
 }
 ```
 
 ```java [Zi.java]
-package com.github.demo4;
-
 public class Zi extends Fu {
 
     // ✅ 以下代码是正确的
@@ -1667,19 +1677,15 @@ public class Zi extends Fu {
 ::: code-group
 
 ```java [Fu.java]
-package com.github.demo4;
-
 public class Fu {
 
-    public void show() {
+    public final void show() { // [!code highlight]
         System.out.println("Fu --- show");
     }
 }
 ```
 
 ```java [Zi.java]
-package com.github.demo4;
-
 public class Zi extends Fu {
 
     // ❌ 以下代码是错误的
@@ -1692,9 +1698,37 @@ public class Zi extends Fu {
 
 :::
 
-### 2.2.3 final 修饰类
+## 3.3 final 修饰类
 
 * 如果使用 final 修饰某个类，则表示该类是最终类，不可以被继承。
+
+> [!NOTE]
+>
+> 查询 JDK 的 API，就会发现 String、Math 以及 Scanner 等都是使用 final 修饰，目的就是让我们使用，而不是继承并改变它们。
+>
+> ::: code-group
+>
+> ```java [String.java]
+> public final class String
+>     implements java.io.Serializable, Comparable<String>, CharSequence,
+>                Constable, ConstantDesc {
+>       // 其余略            
+> }
+> ```
+>
+> ```java [Math.java]
+> public final class Math { 
+> 	// 其余略 
+> }
+> ```
+>
+> ```java [Scanner.java]
+> public final class Scanner implements Iterator<String>, Closeable { 
+> 	// 其余略 
+> }
+> ```
+>
+> :::
 
 
 
@@ -1703,16 +1737,12 @@ public class Zi extends Fu {
 ::: code-group
 
 ```java [Fu.java]
-package com.github.demo4;
-
-public class Fu {
+public class Fu { // [!code highlight]
 	
 }
 ```
 
 ```java [Zi.java]
-package com.github.demo4;
-
 // ✅ 以下代码是正确的
 public class Zi extends Fu { // [!code highlight]
 	
@@ -1728,16 +1758,12 @@ public class Zi extends Fu { // [!code highlight]
 ::: code-group
 
 ```java [Fu.java]
-package com.github.demo4;
-
-public final class Fu {
+public final class Fu { // [!code highlight]
 	
 }
 ```
 
 ```java [Zi.java]
-package com.github.demo4;
-
 // ❌ 以下代码是错误的
 public class Zi extends Fu { // [!code error]
 	
@@ -1746,29 +1772,43 @@ public class Zi extends Fu { // [!code error]
 
 :::
 
-### 2.2.4 final 修饰变量
+## 3.4 final 修饰局部变量
 
-* 如果使用 final 修饰某个变量（常量），则表示该常量只能被赋值一次。
+* 如果使用 final 修饰某个局部变量（常量），则表示该常量只能被赋值一次，不能再更改。
 
 > [!CAUTION]
 >
 > * ① 在实际开发中，常量通常作为系统的配置信息，方便维护，提高可读性。
 > * ② 常量的命名规范 --- 大驼峰，即：`XXXX_XXXX` ，如：`PI`，`MAX_VALUE` 等。
-> * ③ 如果`final`修饰的变量是基本数据类型，那么变量存储的`数据值`是不能发生改变的。
-> * ④ 如果`final`修饰的变量是引用数据类型，那么变量存储的`地址值`是不能发生改变的，对象内部是可以发生改变的。
+> * ③ 如果`final`修饰的变量（常量）是基本数据类型，那么变量存储的`数据值`是不能发生改变的。
+> * ④ 如果`final`修饰的变量（常量）是引用数据类型，那么变量存储的`地址值`是不能发生改变的，对象内部是可以发生改变的。
 
 
 
 * 示例：正例
 
-```java [Fu.java]
-package com.github.demo4;
-
+```java
 public class Test {
     public static void main(String[] args) {
-       final int num = 10;
        // ✅ 以下代码是正确的
-       System.out.println("num = " + num); // [!code highlight]
+       final int num = 10; // [!code highlight]
+       System.out.println("num = " + num); 
+    }
+}
+```
+
+
+
+* 示例：正例
+
+```java {5}
+public class Test {
+    public static void main(String[] args) {
+        for (int i = 0; i < 10; i++) {
+            // ✅ 以下代码是正确的
+            final int num = 10; // 因为每次循环，都是一个新的变量 num 
+            System.out.println("num = " + num);
+        }
     }
 }
 ```
@@ -1777,9 +1817,7 @@ public class Test {
 
 * 示例：反例
 
-```java [Zi.java]
-package com.github.demo4;
-
+```java
 public class Test {
     public static void main(String[] args) {
        final int num = 10;
@@ -1792,7 +1830,577 @@ public class Test {
 
 
 
-# 第三章：权限修饰符、代码块（⭐）
+* 示例：反例
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        final int num = 0 ;
+        for (int i = 0; i < 10; i++) {
+            // ❌ 以下代码是错误的
+            num = 10; // [!code error]
+            System.out.println("num = " + num);
+        }
+    }
+}
+```
+
+## 3.5 final 修饰成员变量
+
+* final 修饰成员变量涉及到初始化的问题，初始化的方式有`显示初始化`和`构造方法初始化`，只能选择其中的一个。
+
+* 显示初始化（在定义成员变量的时候，立即赋值，常用）：
+
+```java
+public class Student {
+    final int num = 10; // [!code highlight]
+}
+```
+
+* 构造方法初始化（在构造方法中赋值一次，不常用）：
+
+```java
+public class Student {
+    final int num ; // [!code highlight]
+
+    public Student() {
+        this.num = 20; // [!code highlight]
+    }
+
+    public Student(String name) {
+        this.num = 20; // [!code highlight]
+    }
+}
+```
+
+> [!CAUTION]
+>
+> 如果有多个构造方法，每个构造方法中都需要赋值一次！！！
 
 
+
+* 示例：
+
+```java
+public class Constants {
+    // 静态常量，声明时初始化
+    public static final double PI = 3.14159; 
+}
+```
+
+
+
+# 第四章：权限修饰符（⭐）
+
+## 4.1 概述
+
+* `权限修饰符`是用来控制一个成员能够被访问的范围。
+* `权限修饰符`可以修饰成员变量、方法、构造方法和内部类。
+
+```java
+// public 权限修饰符
+public class Student {
+    // private 权限修饰符
+    private String name;
+    // private 权限修饰符
+    private int age;
+    
+    // 其余略
+}
+```
+
+## 4.2 权限修饰符的分类
+
+* Java 提供了`四种权限修饰符`，如下所示：
+  * ① public：公共的，所有地方都可以访问。
+  * ② protected：受保护的，本地、本包或其他包中的子类都可以访问。
+  * ③ 默认（没有修饰符，有些资料会使用 default 代替）：空着不写，本类、本包可以访问。
+  * ④ private：私有的，当前类可以访问。
+* Java 中`四种权限修饰符`的访问范围比较：`private < 默认 < protected < public` 。
+
+| 权限修饰符       | 同一个类中 | 同一个包中的其他类 | 不同包下的子类 | 不同包下的无关类 |
+| ---------------- | ---------- | ------------------ | -------------- | ---------------- |
+| private          | ✅          |                    |                |                  |
+| 默认（空着不写） | ✅          | ✅                  |                |                  |
+| protected        | ✅          | ✅                  | ✅              |                  |
+| public           | ✅          | ✅                  | ✅              | ✅                |
+
+> [!NOTE]
+>
+> 在实际工作中，如果没有特殊考虑，建议如下的权限设置：
+>
+> * ① 成员变量使用`private`，隐藏细节。
+> * ② 构造方法使用`public`，方便创建对象。
+> * ③ 成员方法使用`public`，方便调用方法。
+
+## 4.3 演示
+
+### 4.3.1 项目结构
+
+* 演示的项目结构，如下所示：
+
+```txt
+📁 com/
+  └─📁 github/
+    ├─📁 demo1/
+    │ ├─📄 Animal.java
+    │ └─📄 Test.java
+    └─📁 demo2/
+      ├─📄 Dog.java
+      └─📄 Test.java
+```
+
+### 4.3.2 演示 private
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Animal.java]
+package com.github.demo1;
+
+public class Animal {
+
+    private String name; // [!code highlight]
+
+    public void show(){
+        // ✅ 以下代码是正确的
+        System.out.println(name); // [!code highlight]
+    }
+
+}
+```
+
+```java [Test.java]
+package com.github.demo1;
+
+public class Test {
+    public static void main(String[] args) {
+        Animal animal = new Animal();
+        // ❌ 以下代码是错误的
+        System.out.println(animal.name); // [!code error]
+    }
+}
+```
+
+:::
+
+* 在 IDEA 中的结果，如下所示：
+
+![](./assets/8.png)
+
+### 4.3.3 演示默认
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Animal.java]
+package com.github.demo1;
+
+public class Animal {
+
+    String name; // [!code highlight]
+
+    public void show(){
+        // ✅ 以下代码是正确的
+        System.out.println(name); // [!code highlight]
+    }
+
+}
+```
+
+```java [Test.java]
+package com.github.demo1;
+
+public class Test {
+    public static void main(String[] args) {
+        Animal animal = new Animal();
+        // ✅ 以下代码是正确的
+        System.out.println(animal.name); // [!code highlight]
+    }
+}
+```
+
+```java [Dog.java]
+package com.github.demo2;
+
+import com.github.demo1.Animal;
+
+public class Dog extends Animal {
+
+    public void show(){
+        // ❌ 以下代码是错误的
+        System.out.println(name); // [!code error]
+    }
+
+}
+```
+
+:::
+
+* 在 IDEA 中的结果，如下所示：
+
+![](./assets/9.png)
+
+### 4.3.4 演示 protected
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Animal.java]
+package com.github.demo1;
+
+public class Animal {
+
+    protected String name; // [!code highlight]
+
+    public void show(){
+        // ✅ 以下代码是正确的
+        System.out.println(name); // [!code highlight]
+    }
+
+}
+```
+
+```java [Test.java]
+package com.github.demo1;
+
+public class Test {
+    public static void main(String[] args) {
+        Animal animal = new Animal();
+        // ✅ 以下代码是正确的
+        System.out.println(animal.name); // [!code highlight]
+    }
+}
+```
+
+```java [Dog.java]
+package com.github.demo2;
+
+import com.github.demo1.Animal;
+
+public class Dog extends Animal {
+
+    public void show(){
+        // ✅ 以下代码是正确的
+        System.out.println(name); // [!code highlight]
+    }
+
+}
+```
+
+```java [Test.java]
+package com.github.demo2;
+
+public class Test {
+    public static void main(String[] args) {
+        Dog dog = new Dog();
+        // ❌ 以下代码是错误的
+        System.out.println(dog.name); // [!code error]
+    }
+}
+```
+
+:::
+
+* 在 IDEA 中的结果，如下所示：
+
+![](./assets/10.png)
+
+### 4.3.5 演示 public
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Animal.java]
+package com.github.demo1;
+
+public class Animal {
+
+    public String name; // [!code highlight]
+
+    public void show(){
+        // ✅ 以下代码是正确的
+        System.out.println(name); // [!code highlight]
+    }
+
+}
+```
+
+```java [Test.java]
+package com.github.demo1;
+
+public class Test {
+    public static void main(String[] args) {
+        Animal animal = new Animal();
+        // ✅ 以下代码是正确的
+        System.out.println(animal.name); // [!code highlight]
+    }
+}
+```
+
+```java [Dog.java]
+package com.github.demo2;
+
+import com.github.demo1.Animal;
+
+public class Dog extends Animal {
+
+    public void show(){
+        // ✅ 以下代码是正确的
+        System.out.println(name); // [!code highlight]
+    }
+
+}
+```
+
+```java [Test.java]
+package com.github.demo2;
+
+public class Test {
+    public static void main(String[] args) {
+        Dog dog = new Dog();
+        // ✅ 以下代码是正确的
+        System.out.println(dog.name); // [!code highlight]
+    }
+}
+```
+
+:::
+
+* 在 IDEA 中的结果，如下所示：
+
+![](./assets/11.png)
+
+
+
+# 第五章：代码块
+
+## 5.1 概述
+
+* 如果在代码中加上 `{}` ，就是代码块，并且代码块构成了一个作用域，如下所示：
+
+```java {4-7}
+public class Test {
+    public static void main(String[] args) { 
+    
+        { // 代码块
+            int num = 10;
+            System.out.println(dog.name);
+        } // 代码块
+    
+    }
+}
+```
+
+* 在 Java 中，根据代码块出现的位置不同，可以将代码块分为三类：
+  * ① 局部代码块。
+  * ② 构造代码块。
+  * ③ 静态代码块。
+
+## 5.2 局部代码块
+
+* `局部代码块`中的`局部`表示的是`方法`，而`代码块`表示的是`{}`，所以`局部代码块`就是`方法中的{}` 。
+
+> [!NOTE]
+>
+> 变量的作用范围是在所属`{}`范围内有效；所以，局部代码块的作用就是提前结束变量的生命周期。
+
+
+
+* 示例：
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        int outerVar = 10; // 在方法外部声明的变量
+
+        { // 局部代码块开始
+            int innerVar = 20; 
+            // 可以访问外部变量
+            System.out.println("局部代码块内部 - outerVar: " + outerVar); 
+             // 可以访问内部变量
+            System.out.println("局部代码块内部 - innerVar: " + innerVar);
+        } // 局部代码块结束
+        
+		// 可以访问外部变量
+        System.out.println("方法外部 - outerVar: " + outerVar); 
+        // ❌ 以下代码是错误的
+        // 无法访问局部代码块内部变量
+        System.out.println("方法外部 - innerVar: " + innerVar); // [!code error]
+    }
+}
+```
+
+## 5.3 构造代码块
+
+* 构造代码块是写在类中，方法之外的代码块，使用`{}`包裹。
+* 构造代码块在构造方法之前执行，并且每次创建对象时都会执行。 它可以用来提取多个构造方法中重复的初始化代码，简化代码。
+
+> [!NOTE]
+>
+> 在构造代码块中可以做一些通用的准备工作，如：打印日志、设置默认值等。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.demo3;
+
+public class Student {
+
+    private String name;
+
+    { // 构造代码块开始
+        System.out.println("构造代码块执行了!");
+        name = "呵呵哒";
+    } // 构造代码块结束
+
+    public Student() {
+        System.out.println("无参构造方法执行了");
+    }
+
+    public Student(String name) {
+        System.out.println("有参构造方法执行了");
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+
+```
+
+```java [Test.java]
+package com.github.demo3;
+
+public class Test {
+    public static void main(String[] args) {
+        Student student = new Student();
+        System.out.println(student.getName());
+
+        System.out.println("---------------");
+
+        Student student2 = new Student("张三");
+        System.out.println(student2.getName());
+    }
+}
+```
+
+```txt [cmd 控制台]
+构造代码块执行了!
+无参构造方法执行了
+呵呵哒
+---------------
+构造代码块执行了!
+有参构造方法执行了
+张三
+```
+
+:::
+
+## 5.4 静态代码块（⭐）
+
+* 静态代码块：直接写在类中，方法之外的代码块，用花括号`{}`包围，并且使用 `static` 关键字修饰。
+* 静态代码块在`类加载`时执行，并且`只执行一次`。 无论创建多少个对象，或者不创建对象，静态代码块都只会在类加载时执行一次。
+* 静态代码块是类加载时执行，而构造代码块和构造方法是对象创建时执行。 因此，静态代码块的执行顺序总是优先于构造代码块和构造方法。
+
+> [!NOTE]
+>
+> 静态代码块非常适合在类加载时执行一些只需要执行一次的系统级别的初始化操作，如：加载配置文件、初始化数据库连接池、注册 JDBC 驱动程序、加载本地库等。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.demo3;
+
+public class Student {
+    // 静态变量
+    private static String staticVar;
+
+    static { // 静态代码块开始
+        System.out.println("静态代码块执行了!");
+        staticVar = "静态变量初始值";
+    } // 静态代码块结束
+
+    private String name;
+
+
+    {
+        System.out.println("构造代码块执行了!");
+        name = "呵呵哒";
+    }
+
+    public Student() {
+        System.out.println("无参构造方法执行了");
+    }
+
+    public Student(String name) {
+        System.out.println("有参构造方法执行了");
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public static void printStaticVar() {
+        System.out.println("静态变量: " + staticVar);
+    }
+}
+```
+
+```java [Test.java]
+package com.github.demo3;
+
+public class Test {
+    public static void main(String[] args) {
+        Student.printStaticVar();
+
+        System.out.println("---------------");
+
+        Student student = new Student();
+        System.out.println(student.getName());
+
+        System.out.println("---------------");
+
+        Student student2 = new Student("张三");
+        System.out.println(student2.getName());
+    }
+}
+```
+
+```txt [cmd 控制台]
+静态代码块执行了!
+静态变量: 静态变量初始值
+---------------
+构造代码块执行了!
+无参构造方法执行了
+呵呵哒
+---------------
+构造代码块执行了!
+有参构造方法执行了
+张三
+```
+
+:::
 
