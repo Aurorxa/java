@@ -1828,7 +1828,7 @@ classDiagram
         <<interface>>
      	+ sayEnglish() void*
      }
- 
+     <<Abstract>> Person
      class Person {
         - String name
         - int age
@@ -1867,7 +1867,7 @@ classDiagram
 ```java [Person.java]
 package com.github.demo4;
 
-public class Person {
+public abstract class Person {
 
     private String name;
 
@@ -2102,6 +2102,8 @@ basketballCoach = Person{name='赵六', age=24}
 ```
 
 :::
+
+## 2.9 JDK8 之后接口中的成员
 
 
 
