@@ -1820,15 +1820,15 @@ classDiagram
 	 Coach <|-- PingPongCoach : extends
 	 note for PingPongCoach "乒乓球教练"
 	 Coach <|-- BasketballCoach : extends
-	 note for BasketballCoach "篮球球教练"
+	 note for BasketballCoach "篮球教练"
 	 Say   <|-- PingPongPlayer : implements
 	 Say   <|-- PingPongCoach : implements
 	 note for Say "说英语"
      class Say {
         <<interface>>
-     	+ sayEnglish() void
+     	+ sayEnglish() void*
      }
-     <<Abstract>> Person
+ 
      class Person {
         - String name
         - int age
@@ -1867,7 +1867,7 @@ classDiagram
 ```java [Person.java]
 package com.github.demo4;
 
-public abstract class Person {
+public class Person {
 
     private String name;
 
