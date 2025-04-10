@@ -1538,9 +1538,33 @@ public class Test {
 
 :::
 
-## 2.4 JDK 7 之前接口中的成员
+## 2.4 JDK 8 之前接口中的成员
+
+### 2.4.1 概述
+
+* JDK 8 之前接口中只允许出现：成员变量和成员方法，没有构造方法。
+* 其中，`成员变量`是`公共的静态常量`，默认修饰符是：`public static final`。
+* 其中，`成员方法`是`公共的抽象方法`，默认修饰符是：`public abstract`。
+
+### 2.4.2 IDEA 验证
+
+* 我们可以在 IDEA 中，通过`JclassLib`插件来验证`接口`中的`公共静态常量`，如下所示：
+
+![接口中的公共静态常量](./assets/24.png)
+
+* 我们可以在 IDEA 中，通过`JclassLib`插件来验证`接口`中的`公共抽象方法`，如下所示：
+
+![接口中的公共抽象方法](./assets/25.png)
+
+### 2.4.3 接口中成员的思考？
+
+* 【问】为什么接口中只能声明公共的静态常量？
+* 【答】因为接口是标准规范，那么在规范中需要声明一些底线边界值，当实现者在实现这些规范的时候，不能随意的去修改和触碰这些底线边界值，否则就有 `危险` ，如：USB 1.0 规范中规定最大传输速率是 1.5 Mbps ，最大输出电流是 5V/500 mA 。 USB 3.0 规范中规定最大传输速率是5Gbps (500MB/s) ，最大输出电流是 5V/900 mA 。 
 
 
+
+* 【问】为什么 JDK 8 之前，只允许出现公共的默认方法？
+* 【答】因为接口是代表行为标准，它只规定方法的 `签名` ，方法 = 方法头 + 方法体；其中，方法头又称为方法签名，方法签名 = `修饰符 返回值类型 方法名(形参列表);` ，而方法体是 `{ // 执行逻辑 }`；换言之，方法签名已经提供了功能的描述信息，调用者无需关注具体的方法实现细节。
 
 ## 2.5 应用示例
 
@@ -1765,32 +1789,242 @@ rabbit = Animal{name='兔子--兔兔', age=9}
 
 ## 2.6 接口和类之间的关系
 
+### 2.6.1 类和类之间的关系
+
+* 类和类之间，是`继承`的关系，可以是单继承，不能多继承，但是可以多层继承。
 
 
-> * ① 接口和类的实现关系，可以是单实现，也可以是多实现。
->
-> ```java
-> interface B {}
-> interface C {}
-> public class A implements B,C {}
-> ```
->
-> * ② 实现类可以继承一个类的同时，实现多个接口。
->
-> ```java
-> interface C {}
-> interface D {}
-> class B {}
-> public class A extends B implements C,D {}
-> ```
->
-> * ③ 接口和接口之间是继承关系，可以是单继承，也可以是多继承。
->
-> ```java
-> interface B {}
-> interface C {}
-> public interface A extends B,C {}
-> ```
+
+* 示例：类和类之间，可以是单继承
+
+::: code-group
+
+```java [Animal.java]
+public class Animal {}
+```
+
+```java [Dog.java]
+public class Dog extends Animal {} // [!code highlight]
+```
+
+:::
+
+
+
+* 示例：类和类之间，可以是多层继承
+
+::: code-group
+
+```java [Animal.java]
+public class Animal {}
+```
+
+```java [Dog.java]
+public class Dog extends Animal {} // [!code highlight]
+```
+
+```java [Husky.java]
+public class Husky extends Dog {} // [!code highlight]
+```
+
+:::
+
+### 2.6.2 类和接口之间的关系
+
+* 类和接口之间是`实现`的关系，可以是单实现，也可以是多实现，甚至可以在继承一个类的同时实现多个接口。
+
+
+
+* 示例：类和接口之间，可以是单实现
+
+::: code-group
+
+```java [Fly.java]
+public interface Fly {
+
+    void fly();
+}
+```
+
+```java [Bird.java]
+public class Bird implements Fly { // [!code highlight]
+    @Override
+    public void fly() {
+        System.out.println("小鸟在飞");
+    }
+}
+```
+
+:::
+
+
+
+* 示例：类和接口之间，可以是多实现
+
+::: code-group
+
+```java [Fly.java]
+public interface Fly {
+
+    void fly();
+}
+```
+
+```java [Jump.java]
+public interface Jump {
+
+    void jump();
+}
+```
+
+```java [Bird.java]
+public class Bird implements Fly,Jump { // [!code highlight]
+    @Override
+    public void jump() {
+        System.out.println("小鸟在跳");
+    }
+    
+    @Override
+    public void fly() {
+        System.out.println("小鸟在飞");
+    }
+}
+```
+
+:::
+
+
+
+* 示例：实现类可以继承一个类的同时，实现多个接口
+
+::: code-group
+
+```java [Animal.java]
+public abstract class Animal {
+    
+    // 吃饭
+    public abstract void eat();
+}
+```
+
+```java [Fly.java]
+public interface Fly {
+
+    void fly();
+}
+```
+
+```java [Jump.java]
+public interface Jump {
+
+    void jump();
+}
+```
+
+```java [Bird.java]
+public class Bird extends Animal implements Fly,Jump { // [!code highlight]
+    @Override
+    public void eat() {
+        System.out.println("小鸟吃虫子");
+    }
+    
+    @Override
+    public void jump() {
+        System.out.println("小鸟在跳");
+    }
+    
+    @Override
+    public void fly() {
+        System.out.println("小鸟在飞");
+    }
+}
+```
+
+:::
+
+### 2.6.3 接口和接口之间的关系
+
+* 接口和接口之间是继承关系，可以是单继承，也可以是多继承。
+
+
+
+* 示例：接口和接口之间，可以是单继承
+
+::: code-group
+
+```java
+public interface Printable {
+    void print();
+}
+```
+
+```java
+public interface Displayable extends Printable { // [!code highlight]
+    void display();
+}
+```
+
+```java [Printer.java]
+public class Printer implements Displayable {
+    @Override
+    public void print() {
+        System.out.println("Printing...");
+    }
+
+    @Override
+    public void display() {
+        System.out.println("Displaying...");
+    }
+}
+```
+
+:::
+
+
+
+* 示例：接口和接口之间，可以是多继承
+
+::: code-group
+
+```java
+public interface Printable {
+    void print();
+}
+```
+
+```java [Showable.java]
+public interface Showable {
+    void show();
+}
+```
+
+```java [Displayable.java]
+public interface Displayable extends Printable,Showable { // [!code highlight]
+    void display();
+}
+```
+
+```java [Printer.java]
+
+public class Printer implements Displayable {
+    @Override
+    public void print() {
+        System.out.println("Printing...");
+    }
+    
+    @Override
+    public void show() {
+        System.out.println("Showing...");
+    }
+    
+    @Override
+    public void display() {
+        System.out.println("Displaying...");
+    }
+}
+```
+
+:::
 
 ## 2.8 应用示例
 
@@ -2103,10 +2337,747 @@ basketballCoach = Person{name='赵六', age=24}
 
 :::
 
-## 2.9 JDK8 之后接口中的成员
+## 2.9 JDK 8 接口中的成员
+
+### 2.9.1 概述
+
+* JDK 8 的新特性：接口中可以定义有方法体的方法，即：默认方法和静态方法。
+* JDK 9 的新特性：接口中可以定义私有方法。
+
+### 2.9.2 解释为什么 JDK8 中出现默认方法？
+
+* 项目刚开始创建的时候，`架构师`创建了一个接口并在接口中创建了一个抽象方法，让子类去实现该接口并重写抽象方法，如下所示：
+
+![](./assets/26.svg)
+
+* 随着项目的开发，V1.0 成功上线了。此时，V2.0 的需求随之而来，为了实现需求，架构师一口气（不喘气）地在接口中增加 10 个抽象方法，按照 JDK8 之前的用法，所有的子类都必须重写接口中的所有抽象方法，如下所示：
+
+![](./assets/27.svg)
+
+* 但是，此时`实习生小A` 和`实现生小B` 说了：“老大，你这些抽象方法也太多了吧，都不一定要使用到，我们改起来，太痛苦，我们拒绝”，如下所示：
+
+![](./assets/28.svg)
+
+* 此时，`架构师`想到了一个设计模式：适配器模式，于是就和实习生说：“你们现在不要实现我这个接口了，你们是继承我的抽象类，你们根据需要重写对应的方法就可以了”，如下所示：
+
+![](./assets/29.svg)
+
+* 随着项目的开发，V2.0 成功上线了。突然，有一天，`实习生小A`突然对`架构师`说：“老大，我们的 JDK 版本都 17 了，JDK8 中的方法早就有方法体了（默认方法），我们可以不用适配器模式了，直接采用 JDK8 中的默认方法，岂不很优雅”，如下所示：
+
+![](./assets/30.svg)
 
 
 
+> [!NOTE]
+>
+> 综上所述：JDK8 中之所以允许定义默认方法，就是为了解决接口升级的问题，即：为了兼容 JDK8 之前的代码。
+
+> [!IMPORTANT]
+>
+> * ① 在 JDK 设计者开发 JDK8 的时候，如果直接在 JDK 中的接口中添加抽象方法，按照 JDK 原先的设计，就需要在这些接口的实现类都重写抽象方法（工作量太大），为了保持和旧版本代码的兼容，只能在接口中添加默认方法，如：JDK8 中对 Collection 、List 、Comparator 等接口都提供了丰富的默认方法。
+> * ② 如果在多个实现类中发现重写接口的抽象方法的逻辑都是类似的，此时就应该将该抽象方法设计为默认方法更为合适，这样实现类可以根据需求选择是否去重写默认方法。
+
+### 2.9.3 默认方法
+
+* 语法：
+
+```java
+public interface 接口名 {
+    
+    default 返回值类型 方法名(参数列表){
+        ...
+    }
+}
+```
+
+> [!CAUTION]
+>
+> * ① 默认方法的权限修饰符是`public`；换言之，即使你不写，Java 也会帮你写上。
+> * ② 默认方法不是抽象方法，不会强制子类必须重写默认方法；但是，如果子类重写默认方法，在重写的时候，需要去掉`default`关键字。
+> * ③ 默认方法中的`public`可以省略；但是，`default`不可以省略。
+> * ④ 如果实现了多个接口，多个接口中存在相同名字的默认方法，子类必须对该方法进行重写。
+> * ⑤ 对于接口中的抽象方法、默认方法，只能通过实现类对象才可以调用。
 
 
-# 第三章：内部类
+
+* 示例：
+
+::: code-group
+
+```java [Fly.java]
+package com.github.demo5;
+
+public interface Fly {
+
+    void fly();
+
+    default void addOil(){ // [!code highlight]
+        System.out.println("加油");
+    }
+
+}
+```
+
+```java [Bird.java]
+package com.github.demo5;
+
+public class Bird implements Fly {
+    @Override
+    public void fly() {
+        System.out.println("小鸟在飞");
+    }
+}
+```
+
+```java [Plane.java]
+package com.github.demo5;
+
+public class Plane implements Fly {
+    @Override
+    public void fly() {
+        System.out.println("飞机在飞");
+    }
+
+    @Override
+    public void addOil() { // [!code highlight]
+        System.out.println("飞机加航空煤油");
+    }
+}
+```
+
+```java [Test.java]
+package com.github.demo5;
+
+public class Test {
+    public static void main(String[] args) {
+        Fly bird = new Bird();
+        bird.fly();
+
+        System.out.println("-----------------");
+
+        Fly plane = new Plane();
+        plane.fly();
+        plane.addOil();
+    }
+}
+```
+
+```txt [cmd 控制台]
+小鸟在飞
+-----------------
+飞机在飞
+飞机加航空煤油
+```
+
+:::
+
+### 2.9.4 默认方法冲突问题
+
+#### 2.9.4.1 亲爹原则
+
+* 如果一个类，既继承了一个父类，又实现了若干个接口，并且父类中的成员方法和接口中的默认方法重名，子类将采用`就近原则`执行父类中的成员方法。
+
+> [!NOTE]
+>
+> ::: details 点我查看 具体细节
+>
+> * ① `当子类遇到方法签名冲突时，优先级顺序是`：
+>   * **子类自身定义的方法:** 如果子类自己定义了与父类或接口相同签名的方法，那么子类方法优先级最高，会覆盖父类和接口的方法。
+>   * **父类方法:** 如果子类没有定义，并且父类存在与接口方法相同签名的方法，那么 **父类的方法会优先于接口的默认方法**，即所谓的"就近原则"。
+>   * **接口默认方法 (如果只有一个接口提供该方法):** 如果父类没有该方法，但只有一个接口提供了同名默认方法，那么子类会继承并使用该接口的默认方法。
+>   * **接口默认方法冲突 (如果有多个接口提供同名默认方法):** 如果多个接口提供了同名默认方法，并且父类没有该方法，子类必须**显式地覆盖**该方法，并指明要调用哪个接口的默认方法，否则会产生编译错误。
+> * ② `“就近原则”在这里实际上体现的是继承体系的优先级`：
+>   * **类继承** 的优先级高于 **接口实现**。
+>   * **类继承体系中，越靠近子类的祖先类，优先级越高。**
+> * ③ `之所以这么设计，主要为了解决菱形继承(Diamond Problem) 的潜在问题，并保持类继承体系的清晰性和可预测性`：
+>   * **避免菱形继承的歧义：** 如果允许接口的默认方法优先于父类的方法，可能会导致菱形继承场景下方法调用的歧义性，难以确定最终执行哪个实现。
+>   * **保持类继承体系的中心地位：** 类继承通常被视为更重要的 "is-a" 关系，父类定义了子类的基本行为和状态。优先选择父类的方法，保持了类继承体系的权威性和一致性。
+>   * **接口主要用于定义契约：** 接口更多地是用于定义一组规范和契约，而不是提供核心实现。默认方法的引入是为了在不破坏现有接口兼容性的前提下，为接口增加一些通用功能。因此，默认方法的优先级相对较低。
+>
+> :::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [A.java]
+package com.github.demo6;
+
+public interface A {
+
+    default void method(){
+        System.out.println("A 接口中的 method 方法");
+    }
+}
+```
+
+```java [B.java]
+package com.github.demo6;
+
+public class B {
+
+    public void method() {
+        System.out.println("B 类中的 method 方法");
+    }
+}
+```
+
+```java [C.java]
+package com.github.demo6;
+
+public class C extends B implements A {
+
+}
+```
+
+```java [Test.java]
+package com.github.demo6;
+
+public class Test {
+    public static void main(String[] args) {
+        C c = new C();
+        c.method();
+    }
+}
+```
+
+```txt [cmd 控制台]
+B 类中的 method 方法
+```
+
+:::
+
+#### 2.9.4.2 必须选择
+
+* 当一个类同时实现多个接口，而多个接口中包含方法签名相同的默认方法时，必须进行重写，否则编译报错。
+* 在重写的方法中，可以选择使用 `接口名.super.方法名` 的方法选择保留哪个接口中的默认方法，也可以选择完全自己重写。
+
+> [!NOTE]
+>
+> ::: details 点我查看 具体细节
+>
+> `接口名.super.方法名()` 这种语法是为了`明确地指定要调用哪个接口的默认方法实现`。
+>
+> * ① `super` 关键字的传统含义 (类继承中)：在传统的类继承中，`super` 关键字用于调用 **父类** 的成员 (方法或属性)。  `super.methodName()`  意味着 "调用父类中定义的 `methodName()` 方法"。  它指向的是**直接父类**。
+> * ② 接口的默认方法和多接口实现带来的新问题：当一个类实现多个接口，并且这些接口中存在同名默认方法时，传统的 `super` 关键字就变得 **不明确** 了。  `super.methodName()`  在这种情况下，编译器无法知道你想调用哪个接口的默认方法，因为：
+>   * **接口之间没有像类那样的 "父子" 关系。** 接口是平级的，都是类实现的契约。
+>   * **`super` 本身默认指向父类，但在接口上下文中，没有直接的 "接口父类" 的概念。**
+> * ③ `接口名.super.方法名()`  语法被引入，正是为了 **解决在多接口实现场景下 `super` 关键字的歧义性**。
+>   * **显式指定接口:** `接口名` 部分明确地告诉编译器，你要调用的默认方法是来自哪个接口的。
+>   * **仍然使用 `super` 的概念:** `super` 关键字在这里仍然保留了 "调用父类 (或者说，接口作为父类契约) 的实现" 的含义，但被限定在了指定的 `接口名` 的上下文中。
+>   * **消除歧义:** 通过 `接口名.super.方法名()`，你可以清晰地选择要调用 `InterfaceA` 的默认方法，还是 `InterfaceB` 的默认方法，从而避免了编译错误和运行时困惑。
+> * ④ 我们可以把 `接口名.super` 理解为一种 **限定作用域** 的方式，用于在接口的 "命名空间" 中访问 `super`。 就像在访问静态成员时，你需要使用类名或接口名来限定作用域一样。  `接口名.super`  将 `super` 的作用域限定在了指定的接口内部，让你能够访问该接口提供的默认实现。
+>
+> :::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [A.java]
+package com.github.demo6;
+
+public interface A {
+
+    default void method() {
+        System.out.println("今天晚上陪我吃饭");
+    }
+}
+```
+
+```java [B.java]
+package com.github.demo6;
+
+public interface B {
+
+    default void method() {
+        System.out.println("今天晚上陪我逛街");
+    }
+}
+```
+
+```java [C.java]
+package com.github.demo6;
+
+public class C implements A, B {
+    @Override
+    public void method() {
+        // 选择保留其中一个，通过“接口名.super.方法名"的方法选择保留哪个接口的默认方法。
+        A.super.method();
+    }
+}
+```
+
+```java [D.java]
+package com.github.demo6;
+
+public class D implements A, B {
+    @Override
+    public void method() {
+        System.out.println("滚，写代码，它不香吗？");
+    }
+}
+```
+
+```java [Test.java]
+package com.github.demo6;
+
+public class Test {
+    public static void main(String[] args) {
+        C c = new C();
+        c.method(); // 今天晚上陪我吃饭
+
+        System.out.println("----------");
+
+        D d = new D();
+        d.method(); // 滚，写代码，它不香吗？
+    }
+}
+```
+
+```txt [cmd 控制台]
+今天晚上陪我吃饭
+----------
+滚，写代码，它不香吗？
+```
+
+:::
+
+### 2.9.5 静态方法
+
+* 语法：
+
+```java
+public interface 接口名 {
+    
+    static 返回值类型 方法名(参数列表){
+        ...
+    }
+}
+```
+
+> [!CAUTION]
+>
+> * ① 静态方法的权限修饰符是`public`；换言之，即使你不写，Java 也会帮你写上。
+> * ②  静态方法只能通过`接口名`调用，不能通过`实现类类名`或`实现类对象`调用。
+> * ③ 静态方法中的`public`可以省略；但是，`static`不可以省略。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [LiveAble.java]
+package com.github.demo7;
+
+public interface LiveAble {
+
+    /**
+     * 喝水
+     */
+    static void drink() {
+        System.out.println("喝水");
+    }
+
+    /**
+     * 呼吸
+     */
+    void breathe();
+
+    /**
+     * 吃饭
+     */
+    void eat();
+
+    /**
+     * 睡觉
+     */
+    default void sleep() {
+        System.out.println("静止不动");
+    }
+}
+```
+
+```java [Animal.java]
+package com.github.demo7;
+
+public class Animal implements LiveAble {
+    @Override
+    public void breathe() {
+        System.out.println("吸入氧气呼出二氧化碳");
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("吃东西");
+    }
+
+    @Override
+    public void sleep() {
+        System.out.println("闭上眼睛睡觉");
+    }
+}
+```
+
+```java [Plant.java]
+package com.github.demo7;
+
+public class Plant implements LiveAble {
+    @Override
+    public void breathe() {
+        System.out.println("吸入二氧化碳呼出氧气");
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("吸收营养");
+    }
+}
+```
+
+```java [Test.java]
+package com.github.demo7;
+
+public class Test {
+    public static void main(String[] args) {
+        LiveAble.drink();
+
+        System.out.println("-------------------");
+
+        Animal animal = new Animal();
+        animal.breathe();
+        animal.eat();
+        animal.sleep();
+
+        System.out.println("-------------------");
+
+        Plant plant = new Plant();
+        plant.breathe();
+        plant.sleep();
+        plant.eat();
+    }
+}
+```
+
+```txt [cmd 控制台]
+喝水
+-------------------
+吸入氧气呼出二氧化碳
+吃东西
+闭上眼睛睡觉
+-------------------
+吸入二氧化碳呼出氧气
+静止不动
+吸收营养
+```
+
+:::
+
+### 2.9.6 解释为什么 JDK8 中出现静态方法？
+
+* 在 JDK8 之前的类库设计中，有很多`Collection/Collections` 、`Path/Paths`这样成对的接口和类，如下所示：
+
+> [!NOTE]
+>
+> 像`Collections`和`Paths`类中的方法都是静态方法，而这样的静态方法都是为了前面的接口服务的，和之前我们自定义的 Java 工具类的作用是类似的，早期 SUN 工程师就是推荐这么设计。
+
+::: code-group
+
+```java [Collection.java]
+package java.util;
+
+import java.util.*;
+/**
+* @since 1.2
+*/
+public interface Collection<E> extends Iterable<E> { 
+
+	int size();
+    
+    boolean isEmpty();
+    
+    default <T> T[] toArray(IntFunction<T[]> generator) {
+        return toArray(generator.apply(0));
+    }
+    
+    // 其余略
+}
+```
+
+```java [Collections.java]
+package java.util;
+
+import java.io.*;
+import java.util.*;
+
+/**
+* @since 1.2
+*/
+public class Collections {
+    
+    private Collections() {}
+    
+    public static <T extends Comparable<? super T>> void sort(List<T> list) {
+        list.sort(null);
+    }
+    
+    // 其余略
+    
+}    
+```
+
+```java [Path.java]
+package java.nio.file;
+
+import java.io.*;
+import java.nio.*;
+import java.util.*;
+
+/**
+* @since 1.7
+*/
+public interface Path
+    extends Comparable<Path>, Iterable<Path>, Watchable {
+
+	int size();
+    
+    boolean isEmpty();
+    
+    FileSystem getFileSystem();
+    
+    // 其余略
+}
+```
+
+```java [Paths.java]
+package java.nio.file;
+
+import java.nio.file.spi.FileSystemProvider;
+import java.net.URI;
+
+/**
+* @since 1.7
+*/
+public final class Paths {
+    private Paths() { }
+    
+    private Collections() {}
+    
+    public static Path get(String first, String... more) {
+        return Path.of(first, more);
+    }
+    
+    // 其余略
+    
+}    
+```
+
+:::
+
+* 但是，到了 JDK8 的时候，Oracle 工程师觉得这样实在太繁琐，会造成 JDK 内部的工具类膨胀，所以将静态方法也加入接口，这样接口从单纯的`规范`变为了`规范+辅助工具`，如下所示：
+
+```java
+package java.nio.file;
+
+import java.io.*;
+import java.nio.*;
+import java.util.*;
+
+/**
+* @since 1.7
+*/
+public interface Path
+    extends Comparable<Path>, Iterable<Path>, Watchable {
+    
+    private Collections() {}
+    
+    /**
+    * @since 11
+    */
+    public static Path of(String first, String... more) {
+        ...
+    }
+    
+    /**
+    * @since 11
+    */
+    public static Path of(URI uri) {
+        ...
+    }
+    
+    // 其余略
+    
+}    
+```
+
+## 2.10 JDK 9 接口中的成员
+
+### 2.10.1 概述
+
+* JDK8 中的默认方法和静态方法有了具体的方法体，那么就有可能出现多个默认方法或多个静态方法中有相同的代码，为了复用这些代码，JDK9 就在接口中提供了私有方法。
+
+> [!NOTE]
+>
+> 这些相同的代码只对接口提供服务，并不需要让实现类访问！！！
+
+![](./assets/31.svg)
+
+### 2.10.2 私有方法
+
+* 接口默认方法中的相同代码，可以抽取到私有方法中：
+
+```java
+private 返回值类型 方法名(参数列表) {}
+```
+
+* 接口静态方法中的相同代码，可以抽取到静态私有方法中：
+
+```java
+private static void 方法名(参数列表) {}
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [LiveAble.java]
+package com.github.demo7;
+
+public interface LiveAble {
+
+    /**
+     * 喝水
+     */
+    static void drink() {
+        System.out.println("喝水");
+    }
+
+    /**
+     * 呼吸
+     */
+    void breathe();
+
+    /**
+     * 吃饭
+     */
+    void eat();
+
+    /**
+     * 睡觉
+     */
+    default void sleep() {
+        System.out.println("静止不动");
+    }
+
+    /**
+     * 开始
+     */
+    static void start(){
+        System.out.println("start");
+        log(); // [!code highlight]
+    }
+
+    private static void log() { // [!code highlight]
+        System.out.println("log ...");
+    }
+
+    /**
+     * 开始
+     */
+    static void end(){ 
+        System.out.println("end");
+        log(); // [!code highlight]
+    }
+
+}
+```
+
+```java [Animal.java]
+package com.github.demo7;
+
+public class Animal implements LiveAble {
+    @Override
+    public void breathe() {
+        System.out.println("吸入氧气呼出二氧化碳");
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("吃东西");
+    }
+
+    @Override
+    public void sleep() {
+        System.out.println("闭上眼睛睡觉");
+    }
+}
+```
+
+```java [Plant.java]
+package com.github.demo7;
+
+public class Plant implements LiveAble {
+    @Override
+    public void breathe() {
+        System.out.println("吸入二氧化碳呼出氧气");
+    }
+
+    @Override
+    public void eat() {
+        System.out.println("吸收营养");
+    }
+}
+```
+
+```java [Test.java]
+package com.github.demo7;
+
+public class Test {
+    public static void main(String[] args) {
+        LiveAble.drink();
+        LiveAble.start();
+        LiveAble.end();
+
+        System.out.println("-------------------");
+
+        Animal animal = new Animal();
+        animal.breathe();
+        animal.eat();
+        animal.sleep();
+
+        System.out.println("-------------------");
+
+        Plant plant = new Plant();
+        plant.breathe();
+        plant.sleep();
+        plant.eat();
+    }
+}
+```
+
+```txt [cmd 控制台]
+喝水
+start
+log ...
+end
+log ...
+-------------------
+吸入氧气呼出二氧化碳
+吃东西
+闭上眼睛睡觉
+-------------------
+吸入二氧化碳呼出氧气
+静止不动
+吸收营养
+```
+
+:::
+
+
