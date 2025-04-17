@@ -77,9 +77,9 @@
 
 ![Java API 帮助文档](./assets/3.png)
 
-## 1.5 API 学习方法
+## 1.5 API 学习方法（⭐）
 
-* ① 千万不要去背 Java 中的 API （根据背不完），因为 Java 中的 API 实在是太多太多了！！！
+* ① 千万不要去背 Java 中的 API （根据背不完），因为 Java 中的 API 实现是太多了！！！
 * ② 只需要记住`类名`和`类的作用`就可以了。
 * ③ 平常养成查询 API 帮助文档的习惯。
 
@@ -567,7 +567,7 @@ public class MathDemo2 {
 
 
 
-# 第三章：System
+# 第三章：System 类
 
 ## 3.1 概述
 
@@ -646,9 +646,66 @@ public class SystemDemo2 {
 }
 ```
 
-### 3.2.3 获取属性
+### 3.2.3 获取操作系统环境变量
 
-* 获取系统所有属性：
+* 获取操作系统所有环境变量：
+
+```java
+public static java.util.Map<String,String> getenv() {
+   ...   
+}    
+```
+
+* 根据`环境变量名`获取`环境变量值`：
+
+```java
+public static String getenv(String name) {
+   ...   
+}    
+```
+
+> [!NOTE]
+>
+> * ① 环境变量：从运行 Java 应用程序的操作系统环境中获取。这些环境变量通常在操作系统级别或启动应用程序的 shell 环境中设置。
+> * ② 应用场景：
+>   * 配置应用程序的外部依赖，如：数据库连接字符串、API 密钥、文件路径等，而无需将这些敏感信息硬编码到应用程序中（不常用）。
+>   * 获取操作系统相关的信息，如：用户的家目录（Maven 中的`.m2`默认目录在 Windows 是`C:\Users\<你的用户名>\.m2`）、临时目录等。
+>   * 根据不同的环境（开发、测试、生产）进行不同的配置（Java 中不怎么常用；但是，前端（Vite）中非常常见）。
+> * ③ 操作系统环境变量通常对同一个用户或系统中的所有进程可见。
+
+> [!CAUTION]
+>
+> * ① 由于环境变量通常在系统级别设置，因此需要注意潜在的安全风险，避免泄露敏感信息。
+> * ② 环境变量的应用场景是`项目构建工具`开发，如：Maven 或 Gradle 等。
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+import java.util.Map;
+import java.util.Set;
+
+public class SystemDemo5 {
+    public static void main(String[] args) {
+        Map<String, String> map = System.getenv();
+
+        Set<Map.Entry<String, String>> entries = map.entrySet();
+        for (Map.Entry<String, String> entry : entries) {
+            System.out.println(entry.getKey() + "=" + entry.getValue());
+        }
+
+        String javaHome = System.getenv("JAVA_HOME");
+        System.out.println("javaHome = " + javaHome);
+    }
+}
+```
+
+### 3.2.4 获取 Java 系统属性（值）
+
+* 获取Java 系统（JVM 和应用程序相关）所有属性：
 
 ```java
 public static Properties getProperties() {
@@ -663,6 +720,18 @@ public String getProperty(String key) {
 	...
 }
 ```
+
+> [!NOTE]
+>
+> * ① Java 系统属性：Java 虚拟机（JVM）和正在运行的 Java 应用程序相关的键值对，这些属性可以在如下的几种方式设置。
+>   * 在命令行启动 JVM 的时候使用`-D<name>=<value>`参数指定，如：`java -Dspring.profile=dev abc.jar`。
+>   * 在程序中通过`System.setProperty(String key, String value)`方法动态设置。
+>   * 某些系统属性是 JVM 启动的时候自动设置的，如：`java.version`（Java 版本）、`os.version`（操作系统版本）。
+> * ② 应用场景：
+>   * 配置 JVM 的行为，如：设置默认的文件编码、代理服务器等。
+>   * 向应用程序传递配置信息，类似于环境变量，但作用范围更局限于当前的 JVM 实例。
+>   * 获取 Java 运行时环境的信息。
+> * ③ Java 系统属性（JVM 和应用程序相关）仅限于当前的 JVM 实例。
 
 
 
@@ -687,7 +756,7 @@ public class SystemDemo3 {
 
 ```
 
-### 3.2.4 数组复制（拷贝）
+### 3.2.5 数组复制（拷贝）
 
 * 从指定源数组中复制一个数组，复制从指定的位置开始，到目标数组的指定位置结束。
 
@@ -699,9 +768,9 @@ public static native void arraycopy(Object src,  int  srcPos,
 
 > [!NOTE]
 >
-> * ① 如果数据源数组和目的地数组都是基本数据类型，两者的数据类型必须保持一致，否则将会报错！！！
+> * ① 如果`数据源数组`和`目的地数组`都是基本数据类型，两者的数据类型必须保持一致，否则将会报错！！！
 > * ② 在拷贝的时候，需要考虑数组的长度，如果超出范围将会报错！！！
-> * ③ 如果数据源数组和目的地数组都是引用数据类型，那么子类类型可以赋值给父类类型。
+> * ③ 如果`数据源数组`和`目的地数组`都是引用数据类型，那么子类类型可以赋值给父类类型。
 
 
 
@@ -721,4 +790,1128 @@ public class SystemDemo4 {
     }
 }
 ```
+
+
+
+# 第四章：Runtime 类
+
+## 4.1 概述
+
+* 每个应用程序都有一个 Runtime 类的实例，使得应用程序能够和其运行的环境相连接。
+
+> [!NOTE]
+>
+> * ① 每个 Java 应用程序都有一个 Runtime 类的实例。
+> * ② Runtime 类的实例表示当前虚拟机的运行时环境。
+
+* 应用程序不能创建自己的 Runtime 实例，只能通过 getRuntime() 方法获取当前虚拟机的运行时环境。
+
+## 4.2 常用 API
+
+### 4.2.1 当前系统的运行时环境
+
+* 返回当前系统的运行时环境对象：
+
+```java
+private static final Runtime currentRuntime = new Runtime();
+
+private Runtime() {}
+
+public static Runtime getRuntime() { // [!code focus]
+	return currentRuntime;
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+public class RuntimeDemo {
+    public static void main(String[] args){
+        Runtime rt = Runtime.getRuntime();
+        System.out.println("rt = " + rt);
+    }
+}
+```
+
+### 4.2.2 退出当前系统
+
+* 终止当前运行的 JVM 虚拟机：
+
+```java
+public void exit(int status) { 
+   ...
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+import java.util.Scanner;
+
+public class RuntimeDemo {
+    public static void main(String[] args){
+        Scanner input = new Scanner(System.in);
+        Runtime rt = Runtime.getRuntime();
+        do {
+            System.out.print("请输入数字（0 退出）：");
+            int num = input.nextInt();
+            if (num == 0) {
+                rt.exit(0);
+            }
+            System.out.println("num = " + num);
+        } while (true);
+    }
+}
+```
+
+### 4.2.3 获取 CPU 的线程数
+
+* 获取 CPU 的线程数：
+
+```java
+public native int availableProcessors();
+```
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+public class RuntimeDemo2 {
+    public static void main(String[] args){
+        Runtime rt = Runtime.getRuntime();
+        int num = rt.availableProcessors();
+        System.out.println("num = " + num); // 24
+    }
+}
+```
+
+### 4.2.4 获取 JVM 的最大内存总量
+
+* 返回 JVM 能从系统中获取的最大内存总数量（单位字节）：
+
+```java
+public native long maxMemory();
+```
+
+> [!NOTE]
+>
+> * ① 返回 Java 虚拟机将尝试使用的最大内存量。如果没有固有限制，则将返回该值 `Long.MAX_VALUE`。
+> * ② 此方法返回的值可能随时间的推移而变化，这取决于主机环境！！！
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+public class RuntimeDemo3 {
+
+    private static final long KB = 1024;
+    private static final long MB = KB * KB;
+    private static final long GB = MB * KB;
+    private static final long TB = GB * KB;
+    private static final long PB = TB * KB;
+    public static void main(String[] args){
+        Runtime rt = Runtime.getRuntime();
+        long maxMemory = rt.maxMemory();
+        System.out.println(maxMemory); // 25753026560
+        System.out.println(formatBytes(maxMemory)); // 23.98 GB
+    }
+
+    // 使用二进制单位 (KiB, MiB, GiB 等)
+    public static String formatBytes(long bytes) {
+        if (bytes < KB) {
+            return bytes + " B";
+        } else if (bytes < MB) {
+            return String.format("%.2f KB", (double) bytes / KB);
+        } else if (bytes < GB) {
+            return String.format("%.2f MB", (double) bytes / MB);
+        } else if (bytes < TB) {
+            return String.format("%.2f GB", (double) bytes / GB);
+        } else if (bytes < PB) {
+            return String.format("%.2f TB", (double) bytes / TB);
+        } else {
+            return String.format("%.2f PB", (double) bytes / PB);
+        }
+    }
+}
+```
+
+### 4.2.5 获取 JVM 的内存总量
+
+* 返回 JVM 已经从系统中获取的内存总数量（单位字节）：
+
+```java
+public native long totalMemory();
+```
+
+> [!NOTE]
+>
+> * ① 返回 Java 虚拟机中的内存总量。
+> * ② 此方法返回的值可能随时间的推移而变化，这取决于主机环境！！！
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+public class RuntimeDemo3 {
+
+    private static final long KB = 1024;
+    private static final long MB = KB * KB;
+    private static final long GB = MB * KB;
+    private static final long TB = GB * KB;
+    private static final long PB = TB * KB;
+    public static void main(String[] args){
+        Runtime rt = Runtime.getRuntime();
+        long maxMemory = rt.maxMemory();
+        System.out.println(maxMemory); // 25753026560
+        System.out.println(formatBytes(maxMemory)); // 23.98 GB
+        long totalMemory = rt.totalMemory();
+        System.out.println(totalMemory); // 1610612736
+        System.out.println(formatBytes(totalMemory)); // 1.50 GB
+    }
+
+    // 使用二进制单位 (KiB, MiB, GiB 等)
+    public static String formatBytes(long bytes) {
+        if (bytes < KB) {
+            return bytes + " B";
+        } else if (bytes < MB) {
+            return String.format("%.2f KB", (double) bytes / KB);
+        } else if (bytes < GB) {
+            return String.format("%.2f MB", (double) bytes / MB);
+        } else if (bytes < TB) {
+            return String.format("%.2f GB", (double) bytes / GB);
+        } else if (bytes < PB) {
+            return String.format("%.2f TB", (double) bytes / TB);
+        } else {
+            return String.format("%.2f PB", (double) bytes / PB);
+        }
+    }
+}
+```
+
+### 4.2.6 获取 JVM 的空闲内存总量
+
+* 获取 JVM 的空闲内存总数量（单位字节）：
+
+```java
+public native long freeMemory();
+```
+
+> [!NOTE]
+>
+> * ① 返回 Java 虚拟机中的可用内存量。
+> * ② 调用 gc 方法可能导致 freeMemory 返回值的增加！！！
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+public class RuntimeDemo3 {
+
+    private static final long KB = 1024;
+    private static final long MB = KB * KB;
+    private static final long GB = MB * KB;
+    private static final long TB = GB * KB;
+    private static final long PB = TB * KB;
+    
+    public static void main(String[] args){
+        Runtime rt = Runtime.getRuntime();
+        long maxMemory = rt.maxMemory();
+        System.out.println(maxMemory); // 25753026560
+        System.out.println(formatBytes(maxMemory)); // 23.98 GB
+        long totalMemory = rt.totalMemory();
+        System.out.println(totalMemory); // 1610612736
+        System.out.println(formatBytes(totalMemory)); // 1.50 GB
+        long freeMemory = rt.freeMemory();
+        System.out.println(freeMemory); // 1599874488
+        System.out.println(formatBytes(freeMemory)); // 1.49 GB
+    }
+
+    // 使用二进制单位 (KiB, MiB, GiB 等)
+    public static String formatBytes(long bytes) {
+        if (bytes < KB) {
+            return bytes + " B";
+        } else if (bytes < MB) {
+            return String.format("%.2f KB", (double) bytes / KB);
+        } else if (bytes < GB) {
+            return String.format("%.2f MB", (double) bytes / MB);
+        } else if (bytes < TB) {
+            return String.format("%.2f GB", (double) bytes / GB);
+        } else if (bytes < PB) {
+            return String.format("%.2f TB", (double) bytes / TB);
+        } else {
+            return String.format("%.2f PB", (double) bytes / PB);
+        }
+    }
+}
+```
+
+### 4.2.7 执行 cmd 命令
+
+* 执行 cmd 命令：
+
+```java
+public Process exec(String command) throws IOException { 
+	...
+}
+```
+
+```java
+public Process exec(String command, String[] envp) throws IOException {
+    ...
+}
+```
+
+```java
+public Process exec(String command, String[] envp, File dir) {
+    ...
+}
+```
+
+```java
+public Process exec(String cmdarray[]) throws IOException {
+    ...
+}
+```
+
+```java
+public Process exec(String[] cmdarray, String[] envp) throws IOException {
+    ...
+}
+```
+
+```java
+public Process exec(String[] cmdarray, String[] envp, File dir) {
+    ...
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+
+public class RuntimeDemo4 {
+
+    public static void main(String[] args) 
+        	throws IOException, InterruptedException {
+        Runtime rt = Runtime.getRuntime();
+        Process process = rt.exec("cmd /c dir");
+        // 获取命令的输出流
+        BufferedReader reader = new BufferedReader(
+            new InputStreamReader(process.getInputStream(), 
+                                  Charset.forName("GBK")));
+        String line;
+        System.out.println("命令输出：");
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+        }
+
+        // 获取命令的错误流（如果有）
+        BufferedReader errorReader = new BufferedReader(
+            new InputStreamReader(process.getErrorStream(), 
+                                  Charset.forName("GBK")));
+        System.out.println("命令错误：");
+        while ((line = errorReader.readLine()) != null) {
+            System.out.println(line);
+        }
+
+        // 等待命令执行完成
+        int exitCode = process.waitFor();
+        System.out.println("命令执行完成，退出代码: " + exitCode);
+    }
+
+}
+```
+
+
+
+# 第五章：Object 类（⭐）
+
+## 5.1 概述
+
+* 在 Java 中，Object 类是所有类的根父类，所有类都直接或间接地继承于 Object 类。
+
+> [!NOTE]
+>
+> 如果在类的声明处没有使用`extends`关键字指明其父类，则默认父类为`java.lang.Object`类。
+
+* Object 类中的方法可以被所有子类访问，所以我们要学习 Object 类和其中的方法。
+
+## 5.2 常用 API
+
+### 5.2.1 构造方法
+
+* Object 类只有一个无参构造方法：
+
+```java
+public Object() {}
+```
+
+> [!NOTE]
+>
+> * ① Object 类是没有成员变量（属性）的，在学习继承的时候，我们知道，如果类中有共性的部分（属性），就可以抽取到父类中。但是，Object 类是所有类的父类，对于所有类来说，是没有共性部分的，所以 Object 类是没有成员变量（属性），也就没有带参数的构造方法。
+> * ② 之前说过，对于任意类的构造方法，在第一行都隐藏了一个 `super();`语句，其就是用来访问父类的无参构造，因为顶级父类 Object 类只有无参构造方法。
+>
+> ::: details 点我查看 具体细节
+>
+> ```java {6,10}
+> public class Person {
+>     String name;
+>     int age;
+>     
+>     public Person(){
+>         super(); // 默认访问父类的无参构造，就是因为顶级父类 Object 只有无参构造方法
+>     }
+>     
+>     public Person(String name,int age){
+>         super(); // 默认访问父类的无参构造，就是因为顶级父类 Object 只有无参构造方法
+>         this.name = name;
+>         this.age = age;
+>     }
+> }
+> ```
+> :::
+
+
+
+* 示例：
+
+```java
+package com.github.object;
+
+public class ObjectDemo1 {
+    public static void main(String[] args){
+        Object o = new Object();
+        System.out.println("o = " + o);
+    }
+}
+```
+
+### 5.2.2 获取对象的字符串表示形式
+
+* 返回对象的字符串表现形式：
+
+```java
+public String toString() {
+    return getClass().getName() + "@" + Integer.toHexString(hashCode());
+}
+```
+
+> [!NOTE]
+>
+> * ① 默认情况下，该方法的返回值是：`对象类型@对象hashCode值的十六进制`。
+> * ② 在实际开发中，通常建议子类重写`toString()`方法。
+> * ③ 如果我们直接使用`System.out.println(对象);` 输出语句，默认会自动调用该对象的`toString()`方法。
+>
+> ::: details 点我查看 具体细节
+>
+> ```java [PrintStream.java]
+> public class PrintStream extends FilterOutputStream
+>     implements Appendable, Closeable
+> {   
+> 	public void println(Object x) {
+>         String s = String.valueOf(x); // [!code highlight]
+>         if (getClass() == PrintStream.class) {
+>             // need to apply String.valueOf again since first invocation
+>             // might return null
+>             writeln(String.valueOf(s));
+>         } else {
+>             synchronized (this) {
+>                 print(s);
+>                 newLine();
+>             }
+>         }
+>     }
+>     ...
+> }
+> ```
+>
+> ```java [String.java]
+> public final class String
+>     implements java.io.Serializable, Comparable<String>, CharSequence,
+>                Constable, ConstantDesc {   
+>                    
+> 	public static String valueOf(Object obj) { // [!code highlight]
+>         return (obj == null) ? "null" : obj.toString();
+>     }
+>                    ...
+> }
+> ```
+>
+> :::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Person.java]
+package com.github.object;
+
+public class Person {
+
+    private String name;
+
+    private int age;
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() { // [!code highlight]
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+
+```
+
+```java [Test.java]
+package com.github.object;
+
+public class Test {
+    public static void main(String[] args){
+        Person p1 = new Person("张三", 18);
+        System.out.println(p1); // [!code highlight]
+
+        Person p2 = new Person("李四", 18);
+        System.out.println(p2); // [!code highlight]
+    }
+}
+```
+
+```txt [cmd 控制台]
+Person{name='张三', age=18}
+Person{name='李四', age=18}
+```
+
+:::
+
+### 5.2.3 获取表示对象运行时类的 Class 对象
+
+* 返回表示对象运行时类的 Class 对象：
+
+```java
+public final native Class<?> getClass();
+```
+
+> [!NOTE]
+>
+> * ① 因为 Java 的多态特性，可能会导致`编译时类型`和`运行时类型`不一样，如：`Person p = new Student();`。
+> * ② 如果需要查看一个`引用类型变量`实际指向的对象类型，即：运行时类型，就需要使用到此方法了。
+> * ③ 该方法返回的是一个`java.lang.Class`类的对象，这个`Class`对象包含了`引用类型变量`实际指向的`对象类所属类型`的所有信息，如：类名、包名、父类、实现的接口、方法、字段、构造方法、注解等。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Person.java]
+package com.github.object;
+
+public class Person {
+
+    private String name;
+
+    private int age;
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+```java [Student.java]
+package com.github.object;
+
+public class Student extends Person {
+
+    public Student() {
+    }
+
+    public Student(String name, int age) {
+        super(name, age);
+    }
+}
+```
+
+```java [Test.java]
+package com.github.object;
+
+public class Test {
+    public static void main(String[] args){
+        Person p1 = new Person("张三", 18);
+        System.out.println(p1);
+        System.out.println(p1.getClass()); // [!code highlight]
+
+        Person p2 = new Student("李四", 18);
+        System.out.println(p2);
+        System.out.println(p2.getClass()); // [!code highlight]
+    }
+}
+```
+
+```txt [cmd 控制台]
+Person{name='张三', age=18}
+class com.github.object.Person
+Person{name='李四', age=18}
+class com.github.object.Student
+```
+
+:::
+
+### 5.2.4 哈希表（补充）
+
+#### 5.2.4.1 概述
+
+* 假设一个班级有 n 个学生，不可避免的会出现`学生姓名`重名的现象，如：张伟等，那么老师通常会在开学第一天给每个学生进行编号（学号），这样后期讲课的时候，直接叫同学的学号，就可以很好的解决`学生姓名`重名的问题，如下所示：
+
+![](./assets/6.svg)
+
+* 其实，上述的方案就是哈希表（映射表），如下所示：
+
+> [!NOTE]
+>
+> * ① 哈希表（映射表）就是通过键（key，如：学号）和值（value，如：姓名）建立映射关系，实现高效元素的查询。
+> * ② 当我们向哈希表中输入一个键（key）的时候，可以在`O(1)`时间内获取到对应的值（value）。
+
+![](./assets/7.svg)
+
+* Java 中的`HashMap`就是典型的哈希表数据结构，如下所示：
+
+```java
+package com.github.object2;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Test {
+    public static void main(String[] args){
+        Map<String,String> map = new HashMap<>();
+
+        // 添加数据
+        map.put("12836", "张三");
+        map.put("15937", "李四");
+        map.put("20339", "张三");
+        map.put("13276", "王五");
+
+        // 查询数据
+        String value = map.get("12836");
+        System.out.println("12836 = " + value); // 12836 = 张三
+        value = map.get("15937");
+        System.out.println("15937 = " + value); // 15937 = 李四
+        value = map.get("20336");
+        System.out.println("20339 = " + value); // 20339 = 张三
+        value = map.get("20339");
+        System.out.println("13276 = " + value); // 13276 = 王五
+
+        // 删除数据
+        map.remove("13276");
+
+        // 查询数据
+        System.out.println(map); // {12836=张三, 15937=李四, 20339=张三}
+    }
+}
+```
+
+#### 5.2.4.2 哈希表的简单实现
+
+* 我们可以使用`数组`来实现哈希表，在哈希表中，我们将数组中的每个`空位`称为`桶`（bucket），每个桶可以存储一个`键值对`（key-value），如下所示：
+
+![](./assets/8.svg)
+
+* 那么，查询操作就是根据`key`找到数组中对应的桶，并在桶中获取`value`，如下所示：
+
+![](./assets/9.svg)
+
+* 那么，如何通过`key`定位到桶，以便存储数据或查询数据？其实，就是通过`哈希函数`来实现的，如下所示：
+
+> [!NOTE]
+>
+> * ① 哈希函数的作用就是将任意长度的输入变为固定长度的输出，如：12836 --> 36 、15937 --> 37 。
+> * ② 在哈希函数中，通常输出空间要远小于输入空间，如：12836（输入空间） --> 36（输出空间） 。
+> * ③ 在哈希函数中，不同的输入（输入空间）可能会散列成相同的输出（输出空间），但是不可能从散列值（输出空间）确定唯一的输入值（输入空间），这就是`哈希冲突`（哈希碰撞），如：12836 --> 36、20336 --> 36 。
+> * ④ 在哈希表中，输入空间是所有的 key，而输出空间是数组桶（数组索引）。
+
+![](./assets/10.svg)
+
+* 如果输入一个`key`，哈希函数的计算过程就是这样的：
+  * ① 通过某种哈希算法`hash(key)`获取到哈希值。
+  * ② 将哈希值对桶数量（数组长度，`capacity`）进行取模，从而获取该`key`对应的数组索引`index`，即：`index = hash(key) % capacity`。
+
+> [!NOTE]
+>
+> 假设数组长度`capacity`是`100`，哈希算法`hash(key)`是`key`，那么哈希函数就是`key%100`。
+
+![](./assets/11.svg)
+
+#### 5.2.4.3 哈希冲突的解决
+
+* 从本质上看，哈希函数的作用是将所有`key`构成的输入空间映射到`数组所有索引`构成的输出空间，而输入空间往往远大于输出空间。因此，`理论上一定存在“多个输入对应相同输出”的情况`，如：12836 --> 36、20336 --> 36。
+
+![](./assets/12.svg)
+
+* 如果哈希表的容量 n （数组长度 capacity）越大，那么多个`key`被分配到同一个桶中的概率就越低，冲突也就越少，即：可以通过`扩容哈希表`来减少哈希冲突，如下所示：
+
+![](./assets/13.svg)
+
+### 5.2.5 获取对象的哈希代码值
+
+* 返回对象的 hashCode 值：
+
+```java
+public native int hashCode();
+```
+
+> [!NOTE]
+>
+> * ① 如果两个对象的 hashCode 不相等，那么这两个对象一定不相等。
+> * ② 如果两个对象的 hashCode 相等，那么这两个对象不一定相等。
+> * ③ 默认情况下，Object 类提供的`hashCode()`方法，通常会返回对象的内存地址的某种转换形式。这意味着，即使两个对象的内容相同，但是如果它们是不同的对象实例，它们的 hashCode 也不相同；所以，在实际开发中，经常需要重写`hashCode()`方法，以便对象属性相同的 hashCode 是一样的。
+
+> [!NOTE]
+>
+> ::: details 点我查看 为什么需要重写 hashCode() 方法？
+>
+> `hashCode()`方法的主要目的是为了提高基于哈希表的集合的性能，如下所示：
+>
+> * ① **快速查找：** 当向 `HashMap` 或 `HashSet` 中添加一个对象时，集合会首先使用对象的哈希码来确定该对象应该存储在哪个“桶”（bucket）中。这样，在查找、删除或检查对象是否存在时，集合只需要在对应的桶中进行比较，而不需要遍历整个集合，从而大大提高了效率。
+> * ② **确定唯一性：** 在 `HashSet` 中，哈希码被用来快速判断两个对象是否可能相等。如果两个对象的哈希码不同，那么它们肯定是不相等的，可以直接判断为不同的元素。如果哈希码相同，则需要进一步使用 `equals()` 方法进行比较，以确定它们是否真的相等。
+>
+> :::
+
+
+
+* 示例：默认实现
+
+::: code-group
+
+```java [Person.java]
+package com.github.object2;
+
+public class Person {
+
+    private String name;
+
+    private int age;
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.object2;
+
+public class Test {
+    public static void main(String[] args){
+        Person p1 = new Person("张三", 18);
+        Person p2 = new Person("张三", 18);
+        System.out.println(p1.hashCode()); // 1096979270
+        System.out.println(p2.hashCode()); // 1078694789
+        System.out.println(p1.hashCode() == p2.hashCode()); // false
+    }
+}
+```
+
+```txt [cmd 控制台]
+1096979270
+1078694789
+false
+```
+
+:::
+
+
+
+* 示例：重写 hashCode 方法
+
+::: code-group
+
+```java [Person.java]
+package com.github.object2;
+
+import java.util.Objects;
+
+public class Person {
+
+    private String name;
+
+    private int age;
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public int hashCode() { // [!code highlight]
+        return Objects.hash(getName(), getAge());
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.object2;
+
+public class Test {
+    public static void main(String[] args){
+        Person p1 = new Person("张三", 18);
+        Person p2 = new Person("张三", 18);
+        System.out.println(p1.hashCode()); // 24022538
+        System.out.println(p2.hashCode()); // 24022538
+        System.out.println(p1.hashCode() == p2.hashCode()); // true
+    }
+}
+```
+
+```txt [cmd 控制台]
+24022538
+24022538
+true
+```
+
+:::
+
+### 5.2.6 判断两个对象是否相等
+
+* 判断两个对象是否相等：
+
+```java
+public boolean equals(Object obj) {
+    return (this == obj);
+}
+```
+
+> [!NOTE]
+>
+> * ① 默认情况下，`equals()`比较的是两个对象的地址是否相等。
+> * ② 在实际开发下，我们经常希望：如果两个对象的属性相同就认为这两个对象相等，所以需要重写`equals()`方法。
+
+
+
+* 示例：默认实现
+
+::: code-group
+
+```java [Person.java]
+package com.github.object2;
+
+import java.util.Objects;
+
+public class Person {
+
+    private String name;
+
+    private int age;
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getAge());
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.object2;
+
+public class Test {
+    public static void main(String[] args){
+        Person p1 = new Person("张三", 18);
+        Person p2 = new Person("张三", 18);
+        System.out.println(p1); // Person{name='张三', age=18}
+        System.out.println(p2); // Person{name='张三', age=18}
+        System.out.println(p1.equals(p2)); // false
+    }
+}
+```
+
+```txt [cmd 控制台]
+Person{name='张三', age=18}
+Person{name='张三', age=18}
+false
+```
+
+:::
+
+
+
+* 示例：重写 equals 方法
+
+::: code-group
+
+```java [Person.java]
+package com.github.object2;
+
+import java.util.Objects;
+
+public class Person {
+
+    private String name;
+
+    private int age;
+
+    public Person() {
+    }
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public boolean equals(Object o) { // [!code highlight]
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return getAge() == person.getAge() 
+            && Objects.equals(getName(), person.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getAge());
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+
+```
+
+```java [Test.java]
+package com.github.object2;
+
+public class Test {
+    public static void main(String[] args){
+        Person p1 = new Person("张三", 18);
+        Person p2 = new Person("张三", 18);
+        System.out.println(p1); // Person{name='张三', age=18}
+        System.out.println(p2); // Person{name='张三', age=18}
+        System.out.println(p1.equals(p2)); // true
+    }
+}
+```
+
+```txt [cmd 控制台]
+Person{name='张三', age=18}
+Person{name='张三', age=18}
+true
+```
+
+:::
+
+### 5.2.7 浅克隆
+
+
+
+
+
+
+
+### 5.2.8 深克隆
+
+
+
+
+
+# 第六章：Objects 类（⭐）
+
+## 6.1 概述
+
+
+
+
+
+# 第七章：BIgInteger 类和 BigDecimal 类（⭐）
+
+## 7.1 概述
 
