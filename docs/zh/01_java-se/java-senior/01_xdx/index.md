@@ -1891,15 +1891,418 @@ true
 
 ### 5.2.7 浅克隆
 
+* 将 A 对象的属性值完全拷贝给 B 对象，即：对象拷贝（对象复制）。
+
+```java
+protected native Object clone() throws CloneNotSupportedException;
+```
+
+> [!NOTE]
+>
+> * ① native 关键字是本地的、原生的意思。
+> * ② native 关键字的用法：
+>   * 只能用来修饰方法。
+>   * 表示该方法的方法体不是用 Java 语言实现的，而是用 C/C++  是的。
+>   * 对于 Java 程序员来说，可以当做普通的 Java 方法正常调用，或者使用子类重写 native 方法。
+> * ③ 当调用 clone() 方法的时候，会在底层帮我们创建一个对象，并将原对象的数据拷贝过去。
+>   * 需要重写 Object 类的 clone() 方法。
+>   * 需要让 JavaBean 类实现`java.lang.Cloneable`接口。
+>   * 创建原对象并调用 clone() 方法。
+
+> [!CAUTION]
+>
+> * ① 对于基本数据类型变量，存储的是真实的值。对于引用数据类型的变量，存储的是另一个空间的地址值。
+>
+> ::: details 点我查看 具体细节
+>
+> ![](./assets/14.svg)
+>
+> :::
+>
+> * ② 当调用 clone() 方法的时候，如果属性是基本数据类型，就拷贝真实的值；如果属性是引用数据类型，就拷贝地址值，这就是浅克隆（浅拷贝）。
+>
+> ::: details 点我查看 具体细节
+>
+> ![](./assets/15.svg)
+>
+> :::
 
 
 
+* 示例：
 
+::: code-group
 
+```java [Person.java]
+package com.github.object3;
+
+import java.util.Arrays;
+import java.util.Objects;
+
+public class Person implements Cloneable { // [!code highlight]
+
+    private String name;
+
+    private int age;
+
+    private String[] hobbies;
+
+    public Person() {}
+
+    public Person(String name, int age, String[] hobbies) {
+        this.name = name;
+        this.age = age;
+        this.hobbies = hobbies;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String[] getHobbies() {
+        return hobbies;
+    }
+
+    public void setHobbies(String[] hobbies) {
+        this.hobbies = hobbies;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return getAge() == person.getAge()
+                && Objects.equals(getName(), person.getName())
+                && Objects.deepEquals(getHobbies(), person.getHobbies());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getAge(), 
+                            Arrays.hashCode(getHobbies()));
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" 
+            + "name='" + name + '\'' 
+            + ", age=" + age 
+            + ", hobbies=" + Arrays.toString(hobbies) + '}';
+    }
+
+    @Override
+    public Person clone() { // [!code highlight]
+        try {
+            Person clone = (Person) super.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
+}
+```
+
+```java [Test.java]
+package com.github.object3;
+
+public class Test {
+    public static void main(String[] args) {
+        String[] hobbies = new String[] {"王者荣耀", "英雄联盟", "诛仙"};
+        Person p1 = new Person("张三", 18, hobbies);
+        Person p2 = p1.clone();
+
+        System.out.println(p1 == p2);
+        System.out.println(p1);
+        System.out.println(p2);
+
+        System.out.println(hobbies == p1.getHobbies());
+        System.out.println(hobbies == p2.getHobbies());
+    }
+}
+```
+
+```txt [cmd 控制台]
+false
+Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
+Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
+true
+true
+```
+
+:::
 
 ### 5.2.8 深克隆
 
+* 和`浅克隆（浅拷贝）`对应的是`深克隆（深拷贝）`。
+* 深克隆的特点是：
+  * 如果对象的属性是基本数据类型，就拷贝真实的值。
+  * 如果属性是引用数据类型，不是直接拷贝地址值，而是再创建一个新的对象，并将该对象的地址值赋值给该属性（字符串除外，字符串会进行复用，这样可以节省内存）。
 
+> [!NOTE]
+>
+> ::: details 点我查看 具体细节
+>
+> ![](./assets/16.svg)
+>
+> :::
+
+> [!NOTE]
+>
+> 深克隆的实现方式：
+>
+> * ① 手动实现：如果属性是引用数据类型，就创建新的对象，并赋值给该属性。
+> * ② 借助第三方库，如：GSON 等。
+
+
+
+* 示例：手动实现
+
+::: code-group
+
+```java [Person.java]
+package com.github.object5;
+
+import java.util.Arrays;
+import java.util.Objects;
+
+public class Person implements Cloneable { // [!code highlight]
+
+    private String name;
+
+    private int age;
+
+    private String[] hobbies;
+
+    public Person() {}
+
+    public Person(String name, int age, String[] hobbies) {
+        this.name = name;
+        this.age = age;
+        this.hobbies = hobbies;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String[] getHobbies() {
+        return hobbies;
+    }
+
+    public void setHobbies(String[] hobbies) {
+        this.hobbies = hobbies;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return getAge() == person.getAge()
+                && Objects.equals(getName(), person.getName())
+                && Objects.deepEquals(getHobbies(), person.getHobbies());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getAge(), 
+                            Arrays.hashCode(getHobbies()));
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" 
+            + "name='" + name + '\'' 
+            + ", age=" + age 
+            + ", hobbies=" + Arrays.toString(hobbies) + '}';
+    }
+
+    @Override
+    public Person clone() { // [!code highlight]
+        try {
+            Person clone = (Person) super.clone();
+            String[] newHobbies = new String[this.hobbies.length];
+            System.arraycopy(hobbies, 0, newHobbies, 0, this.hobbies.length);
+            clone.setHobbies(newHobbies);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
+}
+```
+
+```java [Test.java]
+package com.github.object5;
+
+public class Test {
+    public static void main(String[] args) {
+        String[] hobbies = new String[] {"王者荣耀", "英雄联盟", "诛仙"};
+        Person p1 = new Person("张三", 18, hobbies);
+        Person p2 = p1.clone();
+
+        System.out.println(p1 == p2); // false
+        System.out.println(p1);
+        System.out.println(p2);
+
+        System.out.println(hobbies == p1.getHobbies()); // true
+        System.out.println(hobbies == p2.getHobbies()); // false
+    }
+}
+```
+
+```txt [cmd 控制台]
+false
+Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
+Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
+true
+false
+```
+
+:::
+
+
+
+* 示例：借助第三方库
+
+::: code-group
+
+```java [Person.java]
+package com.github.object4;
+
+import java.util.Arrays;
+import java.util.Objects;
+
+public class Person {
+
+    private String name;
+
+    private int age;
+
+    private String[] hobbies;
+
+    public Person() {}
+
+    public Person(String name, int age, String[] hobbies) {
+        this.name = name;
+        this.age = age;
+        this.hobbies = hobbies;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String[] getHobbies() {
+        return hobbies;
+    }
+
+    public void setHobbies(String[] hobbies) {
+        this.hobbies = hobbies;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return getAge() == person.getAge()
+                && Objects.equals(getName(), person.getName())
+                && Objects.deepEquals(getHobbies(), person.getHobbies());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getAge(), 
+                            Arrays.hashCode(getHobbies()));
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" 
+            + "name='" + name + '\'' 
+            + ", age=" + age + ", hobbies=" + Arrays.toString(hobbies) + '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.object4;
+
+import com.google.gson.Gson;
+
+public class Test {
+    public static void main(String[] args) {
+        String[] hobbies = new String[] {"王者荣耀", "英雄联盟", "诛仙"};
+        Person p1 = new Person("张三", 18, hobbies);
+
+        Person p2 = deepCopy(p1);
+
+        System.out.println("p1 = " + p1);
+        System.out.println("p2 = " + p2);
+
+        System.out.println(p1 == p2); // false
+
+        System.out.println(hobbies == p1.getHobbies()); // true
+        System.out.println(hobbies == p2.getHobbies()); // false
+    }
+
+    /**
+     * 深克隆
+     * @param person 对象
+     * @return 深克隆后的对象
+     */
+    public static Person deepCopy(Person person) {
+        Gson gson = new Gson();
+        String json = gson.toJson(person);
+        return gson.fromJson(json, Person.class);
+    }
+}
+```
+
+```txt [cmd 控制台]
+false
+Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
+Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
+true
+false
+```
+
+:::
 
 
 
@@ -1911,7 +2314,24 @@ true
 
 
 
-# 第七章：BIgInteger 类和 BigDecimal 类（⭐）
+## 6.2 常用 API
+
+
+
+
+
+# 第七章：BIgInteger 类
 
 ## 7.1 概述
 
+
+
+
+
+
+
+
+
+# 第八章：BigDecimal 类（⭐）
+
+## 8.1 概述
