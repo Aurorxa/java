@@ -889,7 +889,7 @@ public class Test {
 
 * 我们知道，在 Java 中，对于整数，实际会转换为`二进制补码`来进行存储和计算，如下所示：
 
-![](./assets/4.svg)
+![long 的最大值 9,223,372,036,854,775,807 转换为二进制补码](./assets/4.svg)
 
 * 但是，如果超过了`9,223,372,036,854,775,807`就会出现`数据溢出`现象，如下所示：
 
@@ -902,7 +902,7 @@ public class Test {
 }
 ```
 
-* 之前，可以通过`Math`类提供的`addExact(s1,s2)`方法来解决，一旦出现数据溢出现象，就报错，如下所示：
+* 之前，可以通过`Math`类提供的`addExact(s1,s2)`方法来解决，一旦出现`数据溢出`现象，就报错，如下所示：
 
 ```java
 public class Test {
@@ -970,7 +970,7 @@ public static BigInteger valueOf(long val) {
 >     private static final BigInteger[] negConst = new BigInteger[MAX_CONSTANT+1];
 > 
 > 	static {
->         
+> 
 >         for (int i = 1; i <= MAX_CONSTANT; i++) {
 >             int[] magnitude = new int[1];
 >             magnitude[0] = i;
@@ -980,7 +980,7 @@ public static BigInteger valueOf(long val) {
 > 
 >        ...
 >     }
->     
+> 
 >     public static BigInteger valueOf(long val) {
 >         // If -MAX_CONSTANT < val < MAX_CONSTANT, return stashed constant
 >         if (val == 0)
@@ -992,7 +992,7 @@ public static BigInteger valueOf(long val) {
 > 
 >         return new BigInteger(val);
 >     }
->     
+> 
 >     ...
 > }    
 > ```
@@ -1001,6 +1001,8 @@ public static BigInteger valueOf(long val) {
 >
 > * ③ 对象一旦创建，BigInteger 内部记录的值不能发生改变。
 > * ④ 只有进行计算，就会产生一个新的 BigInteger 对象。
+> * ⑤ 如果 BigInteger 表示的数字`没有超出` long 的范围，可以使用静态方法获取。
+> * ⑥ 如果 BigInteger 表示的数字`超出` long 的范围，可以使用构造方法获取。
 
 
 
@@ -1307,32 +1309,34 @@ public int intValue() {
 ```
 
 ```java
-public int intValueExact() {
+public int intValueExact() { // 推荐
     ...
 }
 ```
 
 > [!NOTE]
 >
-> 推荐使用 `intValueExact()`，当 BitInteger 中内部的数据超过 int 范围的时候，将报错！！！
+> * ① 如果 BigInteger 内部维护的数据超过 int 的取值范围，将会出现`数据溢出`现象。
+> * ② 推荐使用 `intValueExact()`，当 BigInteger 中内部的数据超过 int 范围的时候，将报错！！！
 
 * 转换为 long 类型：
 
 ```java
-public long longValue() {
+public long longValue() { 
     ...
 }
 ```
 
 ```java
-public long longValueExact() {
+public long longValueExact() { // 推荐
     ...
 }
 ```
 
 > [!NOTE]
 >
-> 推荐使用 `longValueExact()`，当 BitInteger 中内部的数据超过 long 范围的时候，将报错！！！
+> * ① 如果 BigInteger 内部维护的数据超过 long 的取值范围，将会出现`数据溢出`现象。
+> * ② 推荐使用 `longValueExact()`，当 BigInteger 中内部的数据超过 long 范围的时候，将报错！！！
 
 
 
@@ -1360,22 +1364,69 @@ public class BIgIntegerDemo10 {
 }
 ```
 
-## 3.4 内部原理
+## 3.4 底层原理
 
 ### 3.4.1 概述
 
-* 对于计算机而言，其实是没有`数据类型`的概念的，都是`01010101`，如下所示：
+* 对于计算机而言，其实是没有`数据类型`的概念（在计算机的世界中，所有的东西都是`01010101`），如下所示：
 
 ![](./assets/5.png)
 
-* 数据类型是编程语言自己的规定，如下所示：
+* 数据类型是编程语言自己的规定，如：Java 语言中的 char 类型占用 2 个字节，而 C 语言中的 char 类型只占用 1 个字节。
+
+### 3.4.2 底层原理
+
+* 假如现在有一个大整数 `27670116110564327424`，那么其在计算机底层存储应该是`11000000000000000000000000000000000000000000000000000000000000000`，如下所示：
+
+![](./assets/6.svg)
 
 > [!NOTE]
 >
-> * ① BigInteger 内部维护了一个 3 位长度数组 ，如：`int[] mag = new int[3]`。
-> * ② 如果是正数，mag[0] 就是 1；如果是 0 ，mag[0] 就是 0 ；如果是负数，mag[0] 就是 -1。
+> Java 中整型的最大值是 long 类型 64 位，而 `27670116110564327424`转换为二进制是 65 位，已经超过了 long 类型的取值范围，所以 long 类型是存储不了 `27670116110564327424` 的。
 
+* 我们可以查看下 BigInteger 的源码片段，如下所示：
 
+```java
+public class BigInteger extends Number implements Comparable<BigInteger> {
+    /**
+     * The signum of this BigInteger: -1 for negative, 0 for zero, or
+     * 1 for positive.  Note that the BigInteger zero <em>must</em> have
+     * a signum of 0.  This is necessary to ensures that there is exactly one
+     * representation for each BigInteger value.
+     */
+    final int signum;
+
+    /**
+     * The magnitude of this BigInteger, in <i>big-endian</i> order: the
+     * zeroth element of this array is the most-significant int of the
+     * magnitude.  The magnitude must be "minimal" in that the most-significant
+     * int ({@code mag[0]}) must be non-zero.  This is necessary to
+     * ensure that there is exactly one representation for each BigInteger
+     * value.  Note that this implies that the BigInteger zero has a
+     * zero-length mag array.
+     */
+    final int[] mag;
+ 	
+    // 其余略
+}    
+```
+
+* 其中，属性`signum`用来表示`new BigInteger("xxx")`中`xxx`的符号，如下所示：
+  * 如果`xxx`是`正数`，则`signum`等于`1`。
+  * 如果`xxx`是`负数`，则`signum`等于`-1`。
+  * 如果`xxx`是`0`，则`signum`等于`0`。
+
+* 其实，属性`mag`是一个数组，用来存储 BigInteter 中的拆分的数据，如果原始数据太大，如：`new BigInteger("xxx")`中`xxx`，BigIntger 会按照`一定的规则`将其进行拆分，每一个被拆分的部分都被单独的存储到数组中，如下所示：
+
+![](./assets/7.svg)
+
+* BIgInteger 会将`new BigInteger("xxx")`中`xxx`，转换为二进制补码的形式，按照大端存储法，以 32 位为一组将其转换为对应的十进制，并存储到数组中对应的位置，如下所示：
+
+![](./assets/8.svg)
+
+* 我们可以在 IDEA ，进行验证，如下所示：
+
+![](./assets/9.png)
 
 
 
