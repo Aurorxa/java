@@ -1416,7 +1416,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
   * 如果`xxx`是`负数`，则`signum`等于`-1`。
   * 如果`xxx`是`0`，则`signum`等于`0`。
 
-* 其实，属性`mag`是一个数组，用来存储 BigInteter 中的拆分的数据，如果原始数据太大，如：`new BigInteger("xxx")`中`xxx`，BigIntger 会按照`一定的规则`将其进行拆分，每一个被拆分的部分都被单独的存储到数组中，如下所示：
+* 其实，属性`mag`是一个数组，用来存储 BigInteter 中拆分的数据，如果原始数据太大，如：`new BigInteger("xxx")`中`xxx`，BigIntger 会按照`一定的规则`将其进行拆分，每一个被拆分的部分都被单独的存储到数组中，如下所示：
 
 ![](./assets/7.svg)
 
