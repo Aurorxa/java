@@ -1420,7 +1420,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
 
 ![](./assets/7.svg)
 
-* BIgInteger 会将`new BigInteger("xxx")`中`xxx`，转换为二进制补码的形式，按照大端存储法，以 32 位为一组将其转换为对应的十进制，并存储到数组中对应的位置，如下所示：
+* BIgInteger 会将`new BigInteger("xxx")`中`xxx`，先转换为二进制补码，然后按照大端存储法，以 32 位为一组将其转换为对应的十进制，并存储到数组中对应的位置，如下所示：
 
 ![](./assets/8.svg)
 
