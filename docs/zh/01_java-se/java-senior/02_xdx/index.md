@@ -929,7 +929,7 @@ public BigInteger(int numBits, Random rnd) {
 } 
 ```
 
-* 获取指定的 BigInteger 对象（常用）：
+* 获取指定的 BigInteger 对象（推荐）：
 
 ```java
 public BigInteger(String val) {
@@ -945,7 +945,7 @@ public BigInteger(String val, int radix) {
 }
 ```
 
-* 静态方法获取 BigInteger 对象（常用，内部有优化）：
+* 静态方法获取 BigInteger 对象（推荐，内部有优化）：
 
 ```java
 public static BigInteger valueOf(long val) {
@@ -1202,7 +1202,7 @@ public boolean equals(Object x) {
 }
 ```
 
-> [!NOTE]
+> [!CAUTION]
 >
 > 【强制】在实际开发中，需要通过调用 equals() 方法来判断两个 BigInteger 对象是否相等！！！
 
@@ -1406,6 +1406,101 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
      * zero-length mag array.
      */
     final int[] mag;
+    
+     /**
+     * Translates the String representation of a BigInteger in the
+     * specified radix into a BigInteger.  The String representation
+     * consists of an optional minus or plus sign followed by a
+     * sequence of one or more digits in the specified radix.  The
+     * character-to-digit mapping is provided by {@link
+     * Character#digit(char, int) Character.digit}.  The String may
+     * not contain any extraneous characters (whitespace, for
+     * example).
+     *
+     * @param val String representation of BigInteger.
+     * @param radix radix to be used in interpreting {@code val}.
+     * @throws NumberFormatException {@code val} is not a valid representation
+     *         of a BigInteger in the specified radix, or {@code radix} is
+     *         outside the range from {@link Character#MIN_RADIX} to
+     *         {@link Character#MAX_RADIX}, inclusive.
+     */
+    public BigInteger(String val, int radix) {
+        int cursor = 0, numDigits;
+        final int len = val.length();
+
+        if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX)
+            throw new NumberFormatException("Radix out of range");
+        if (len == 0)
+            throw new NumberFormatException("Zero length BigInteger");
+
+        // Check for at most one leading sign
+        int sign = 1;
+        int index1 = val.lastIndexOf('-');
+        int index2 = val.lastIndexOf('+');
+        if (index1 >= 0) {
+            if (index1 != 0 || index2 >= 0) {
+                throw new NumberFormatException("Illegal embedded sign character");
+            }
+            sign = -1;
+            cursor = 1;
+        } else if (index2 >= 0) {
+            if (index2 != 0) {
+                throw new NumberFormatException("Illegal embedded sign character");
+            }
+            cursor = 1;
+        }
+        if (cursor == len)
+            throw new NumberFormatException("Zero length BigInteger");
+
+        // Skip leading zeros and compute number of digits in magnitude
+        while (cursor < len &&
+               Character.digit(val.charAt(cursor), radix) == 0) {
+            cursor++;
+        }
+
+        if (cursor == len) {
+            signum = 0;
+            mag = ZERO.mag;
+            return;
+        }
+
+        numDigits = len - cursor;
+        signum = sign;
+
+        // Pre-allocate array of expected size. May be too large but can
+        // never be too small. Typically exact.
+        long numBits = ((numDigits * bitsPerDigit[radix]) >>> 10) + 1;
+        if (numBits + 31 >= (1L << 32)) {
+            reportOverflow();
+        }
+        int numWords = (int) (numBits + 31) >>> 5;
+        int[] magnitude = new int[numWords];
+
+        // Process first (potentially short) digit group
+        int firstGroupLen = numDigits % digitsPerInt[radix];
+        if (firstGroupLen == 0)
+            firstGroupLen = digitsPerInt[radix];
+        String group = val.substring(cursor, cursor += firstGroupLen);
+        magnitude[numWords - 1] = Integer.parseInt(group, radix);
+        if (magnitude[numWords - 1] < 0)
+            throw new NumberFormatException("Illegal digit");
+
+        // Process remaining digit groups
+        int superRadix = intRadix[radix];
+        int groupVal = 0;
+        while (cursor < len) {
+            group = val.substring(cursor, cursor += digitsPerInt[radix]);
+            groupVal = Integer.parseInt(group, radix);
+            if (groupVal < 0)
+                throw new NumberFormatException("Illegal digit");
+            destructiveMulAdd(magnitude, superRadix, groupVal);
+        }
+        // Required for cases where the array was overallocated.
+        mag = trustedStripLeadingZeroInts(magnitude);
+        if (mag.length >= MAX_MAG_LENGTH) {
+            checkRange();
+        }
+    }
  	
     // 其余略
 }    
@@ -1444,3 +1539,548 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
 # 第四章：BigDecimal 类（⭐）
 
 ## 4.1 概述
+
+* 如果对浮点数进行运算，如下所示：
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(0.09 + 0.01); // 0.09999999999999999
+        System.out.println(0.216 - 0.1); // 0.11599999999999999
+        System.out.println(0.226 * 0.1); // 0.022600000000000002
+        System.out.println(0.09 / 0.1); // 0.8999999999999999
+    }
+}
+```
+
+* 你可能会发现结果和我们想象的不一样，如：`0.09 + 0.01`在数学上就应该是`0.1`，为什么在计算机中却是`0.09999999999999999`；其实，这和`浮点数`在计算机中的存储有关！！！
+
+## 4.2 计算机中的浮点数
+
+### 4.2.1 任意进制转为十进制
+
+* `二进制`、`八进制`和`十六进制`转为`十进制`非常容易，就是`位权相加法`。
+
+> [!NOTE]
+>
+> * ① 如果当前数字是 N 进制，那么：
+>
+>   * 对于整数，从右往左看，第 i 位的位权等于 `N^(i-1)`。
+>
+>   * 对于小数，从左往右看，第 j 位的维权等于 `N^(-j)`。
+>
+> * ② 如果当前数字是 8 进制，转换为二进制，如下所示：
+>
+> ![](./assets/10.svg)
+
+
+
+* 示例：(53627)<sub>8</sub> --> (22423)<sub>10</sub>
+
+```txt
+53627 = 5×8^4 + 3×8^3 + 6×8^2 + 2×8^1 + 7×8^0
+      = 20480 + 1536 + 384 + 16 + 7
+      = 22423
+```
+
+
+
+* 示例：(9FA8C)<sub>16</sub> --> (653964)<sub>10</sub>
+
+```txt
+9FA8C = 9×16^4 + 15×16^3 + 10×16^2 + 8×16^1 + 12×16^0
+      = 589824 + 61440 + 2560 + 128 + 12
+      = 653964
+```
+
+
+
+* 示例：(11010)<sub>2</sub> --> (26)<sub>10</sub>
+
+```txt
+11010 = 1×2^4 + 1×2^3 + 0×2^2 + 1×2^1 + 0×2^0
+      = 16 + 8 + 0 + 2 + 0
+      = 26
+```
+
+
+
+* 示例：(423.5176)<sub>8</sub> --> (275.65576171875)<sub>10</sub>
+
+```txt
+423.5176 = 4×8^2 + 2×8^1 + 3×8^0 + 5×8^(-1) + 1×8^(-2) + 7×8^(-3) + 6×8^(-4)
+         = 256 + 16 + 3 + 0.625 + 0.015625 + 0.013671875 + 0.00146484375
+         = 275.65576171875
+```
+
+
+
+* 示例：(1010.1101)<sub>2</sub> --> (10.8125)<sub>10</sub>
+
+```txt
+1010.1101 = 1×2^3 + 0×2^2 + 1×2^1 + 0×2^0 + 1×2^(-1) + 1×2^(-2) + 0×2^(-3) + 1×2^(-4)
+		  = 8 + 0 + 2 + 0 + 0.5 + 0.25 + 0 + 0.0625
+          = 10.8125
+```
+
+### 4.2.2 将十进制转为任意机制
+
+#### 4.2.2.1 整数
+
+* 对于`整数部分`转换为 N 进制整数采取 `"除 N 取余，逆序排序"`法，具体做法是：
+  * 将 N 作为除数，用十进制整数除以 N，可以得到一个商和余数；
+  * 保留余数，用商继续除以 N，又得到一个新的商和余数；
+  * 仍然保留余数，用商继续除以 N，还会得到一个新的商和余数；
+  * ……
+  * 如此反复进行，每次都保留余数，用商接着除以 N，直到商为 0 时为止。
+  * 将先得到的余数作为 N 进制数的低位数字，后得到的余数作为 N 进制数的高位数字，依次排列起来，就得到了 N 进制数字。
+
+
+
+* 示例：(36926)<sub>10</sub> --> (110076)<sub>8</sub>
+
+![](./assets/11.svg)
+
+
+
+* 示例：(42)<sub>10</sub> --> (101010)<sub>2</sub>
+
+![](./assets/12.svg)
+
+#### 4.2.2.2 小数
+
+* 十进制小数转换成 N 进制小数采用`"乘 N 取整，顺序排列"`法，具体做法是：
+
+  - 用 N 乘以十进制小数，可以得到一个积，这个积包含了整数部分和小数部分；
+
+  - 将积的整数部分取出，再用 N 乘以余下的小数部分，又得到一个新的积；
+
+  - 再将积的整数部分取出，继续用 N 乘以余下的小数部分；
+
+  - ……
+
+  - 如此反复进行，每次都取出整数部分，用 N 接着乘以小数部分，直到积中的小数部分为 0，或者达到所要求的精度为止。
+
+  * 把取出的整数部分按顺序排列起来，先取出的整数作为 N 进制小数的高位数字，后取出的整数作为低位数字，这样就得到了 N 进制小数。
+
+> [!CAUTION]
+>
+> 十进制小数转换为其他进制小数的时候，结果可能是一个无限位的小数，如下所示：
+>
+> * ① (0.51)<sub>10</sub> --> (0.100000101000111101011100001010001111010111...)<sub>2</sub>，是一个无限循环小数。
+> * ② (0.72)<sub>10</sub> --> (0.1011100001010001111010111000010100011110...)<sub>2</sub>，是一个无限循环小数。
+> * ③ (0.625)<sub>10</sub> --> (0.101)<sub>2</sub>，是一个有限小数。
+
+
+
+* 示例：(0.930908203125)<sub>10</sub> --> (0.7345)<sub>8</sub>
+
+![](./assets/13.svg)
+
+### 4.2.3 计算机的妥协
+
+* 在 Java 中，float 和 double 在计算机中存储采取的类似`科学计数法`的形式，如下所示：
+
+| 类型   | 占用字节数 | 总 bit 位数 | 小数部分 bit 位数 |
+| ------ | ---------- | ----------- | ----------------- |
+| float  | 4          | 32          | 23                |
+| double | 8          | 64          | 52                |
+
+* 像十进制小数`0.51`，转换为二进制小数就是一个无限循环小数，而 double 对于小数部分最大只能存储 52 位，那么超过 double 表示小数部分的位数就只能舍弃了，所以浮点数在存储的时候就有可能是不精确的，那么进行四则运算的时候，当然就很有可能更不精确了。
+
+> [!NOTE]
+>
+> * ① 在实际开发中，如果说数据不精确，在大多数场景中可能问题不大。
+> * ② 但是，在金融领域以及航空领域的精密仪器上，都需要小数的精确运算。
+>
+> ::: details 点我查看 具体细节
+>
+> ![](./assets/14.svg)
+>
+> :::
+
+* 在实际开发中，对于小数的精确运算，我们会使用 BigDecimal 类，其有如下的作用：
+  * ① 用于小数的精确计算。
+  * ② 用来表示很大的小数。
+
+## 4.3 构造方法
+
+* ~~获取指定的 BigDecimal 对象（不推荐）~~：
+
+```java
+public BigDecimal(double val) {
+    ...
+}
+```
+
+> [!CAUTION]
+>
+> 【强制】禁止使用构造方法 BigDecimal(double) 的方式把 double 值转化为 BigDecimal 对象，因为该构造方法的结果可能有些不可预测，如：`new BigDecimal(0.1)` 实际上并不完全等于`0.1`。
+
+* 获取指定的 BigDecimal 对象（推荐）：
+
+```java
+public BigDecimal(String val) {
+    ...
+}
+```
+
+* 静态方法获取 BigDecimal 对象（推荐）：
+
+```java
+public static BigDecimal valueOf(double val) {
+    ...
+}
+```
+
+> [!NOTE]
+>
+> * ① 如果要表示的数字不大，没有超过 double 的取值范围，建议使用静态方法。
+> * ② 如果要表示的数字很大，超过了 double 的取值范围，建议使用构造方法。
+
+
+
+* 示例：
+
+```java
+package com.github.big2;
+
+import java.math.BigDecimal;
+
+public class Test {
+    public static void main(String[] args) {
+        // 不推荐
+        BigDecimal bd = new BigDecimal(0.1);
+  
+        // 0.1000000000000000055511151231257827021181583404541015625
+        System.out.println(bd); 
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.big2;
+
+import java.math.BigDecimal;
+
+public class Test {
+    public static void main(String[] args) {
+        BigDecimal bd1 = new BigDecimal("0.1");
+        BigDecimal bd2 = BigDecimal.valueOf(0.1);
+
+        System.out.println(bd1); // 0.1
+        System.out.println(bd2); // 0.1
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.big2;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+public class Test {
+    public static void main(String[] args) {
+        BigDecimal bd1 = BigDecimal.valueOf(0.09);
+        BigDecimal bd2 = BigDecimal.valueOf(0.01);
+        BigDecimal bd3 = BigDecimal.valueOf(0.216);
+        BigDecimal bd4 = BigDecimal.valueOf(0.1);
+        BigDecimal bd5 = BigDecimal.valueOf(0.226);
+
+        System.out.println(bd1.add(bd2)); // 0.10
+        System.out.println(bd3.subtract(bd4)); // 0.116
+        System.out.println(bd5.multiply(bd4)); // 0.0226
+        System.out.println(bd1.divide(bd4, RoundingMode.HALF_UP)); // 0.90
+    }
+}
+```
+
+## 4.4 常用 API
+
+### 4.4.1 设置精确位数和舍入模式
+
+* 设置精确位数（小数点后几位数字）和舍入模式：
+
+```java
+public BigDecimal setScale(int newScale, RoundingMode roundingMode) {
+    ...
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.big2;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+public class Test {
+    public static void main(String[] args) {
+        BigDecimal b1 = BigDecimal.valueOf(0.09);
+        BigDecimal b2 = b1.setScale(4, RoundingMode.HALF_UP);
+
+        System.out.println(b1); // 0.09
+        System.out.println(b2); // 0.0900
+    }
+}
+```
+
+### 4.4.1 四则运算
+
+* 加法：
+
+```java
+public BigDecimal add(BigDecimal augend) { 
+	...
+}
+```
+
+* 减法：
+
+```java
+public BigDecimal subtract(BigDecimal subtrahend) {
+    ...
+}
+```
+
+* 乘法：
+
+```java
+public BigDecimal multiply(BigDecimal multiplicand) {
+    ...
+}
+```
+
+* 除法：
+
+```java
+// scale 精确位数（小数点后几位）
+// roundingMode 舍入模式
+public BigDecimal divide(BigDecimal divisor, int scale, 
+                         RoundingMode roundingMode) {
+    ...
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.big2;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+public class Test {
+    public static void main(String[] args) {
+        BigDecimal b1 = BigDecimal.valueOf(0.09);
+        BigDecimal b2 = BigDecimal.valueOf(0.01);
+
+        BigDecimal add = b1.add(b2);
+        System.out.println(add); // 0.10
+
+        BigDecimal subtract = b1.subtract(b2);
+        System.out.println(subtract); // 0.08
+
+        BigDecimal multiply = b1.multiply(b2);
+        System.out.println(multiply); // 0.0009
+
+        BigDecimal divide = b1.divide(b2, 2, RoundingMode.HALF_UP);
+        System.out.println(divide); // 9.00
+    }
+}
+```
+
+### 4.4.2 比较是否相等
+
+* 比较两个 BigInteger 对象是否相等：
+
+```java
+public boolean equals(Object x) {
+    ...
+}
+```
+
+> [!CAUTION]
+>
+> * ① `equals()` 方法在判断数据是否相等之前，会判断数据的精确位数。
+> * ② 在实际开发中，更推荐 `compareTo()` 方法，因为其会忽略精确位数（ scale）的差异。
+
+
+
+* 示例：
+
+```java
+package com.github.big2;
+
+import java.math.BigDecimal;
+
+public class Test {
+    public static void main(String[] args) {
+        BigDecimal b1 = new BigDecimal("1.00");
+        BigDecimal b2 = BigDecimal.valueOf(1.0);
+
+        System.out.println(b1.equals(b2)); // false
+        System.out.println(b1.compareTo(b2) == 0); // true
+    }
+}
+```
+
+### 4.4.3 指数运算
+
+* 求指数运算的结果：
+
+```java
+public BigDecimal pow(int n) {
+    ...
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.big2;
+
+import java.math.BigDecimal;
+
+public class Test {
+    public static void main(String[] args) {
+        BigDecimal b1 = BigDecimal.valueOf(2);
+
+        System.out.println(b1.pow(2)); // 4
+    }
+}
+```
+
+### 4.4.4 求最值
+
+* 求最大值：
+
+```java
+public BigDecimal max(BigDecimal val) {
+    ...
+}
+```
+
+* 求最小值：
+
+```java
+public BigDecimal min(BigDecimal val) {
+    ...
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.big2;
+
+import java.math.BigDecimal;
+
+public class Test {
+    public static void main(String[] args) {
+        BigDecimal b1 = BigDecimal.valueOf(2);
+        BigDecimal b2 = BigDecimal.valueOf(-4);
+
+        System.out.println(b1.max(b2)); // 2
+        System.out.println(b1.min(b2)); // -4
+    }
+}
+```
+
+### 4.4.5 转换为基本数据类型
+
+* 转换为 int 类型：
+
+```java
+public int intValue() {
+    ...
+}
+```
+
+```java
+public int intValueExact() { // 推荐
+    ...
+}
+```
+
+> [!NOTE]
+>
+> * ① 如果 BigDecimal 内部维护的数据超过 int 的取值范围，将会出现`数据溢出`现象。
+> * ② 推荐使用 `intValueExact()`，当 BigDecimal 中内部的数据超过 int 范围的时候，将报错！！！
+
+* 转换为 long 类型：
+
+```java
+public long longValue() { 
+    ...
+}
+```
+
+```java
+public long longValueExact() { // 推荐
+    ...
+}
+```
+
+> [!NOTE]
+>
+> * ① 如果 BigDecimal 内部维护的数据超过 long 的取值范围，将会出现`数据溢出`现象。
+> * ② 推荐使用 `longValueExact()`，当 BigDecimal 中内部的数据超过 long 范围的时候，将报错！！！
+
+* 转换为 float 类型：
+
+```java
+public float floatValue(){
+    ...
+}
+```
+
+* 转换为 double 类型：
+
+```java
+public double doubleValue(){
+    ...
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.big2;
+
+import java.math.BigDecimal;
+
+public class Test {
+    public static void main(String[] args) {
+        BigDecimal bd = BigDecimal.valueOf(2);
+
+        System.out.println(bd.intValue()); // 2
+        System.out.println(bd.longValue()); // 2
+        System.out.println(bd.floatValue()); // 2.0
+        System.out.println(bd.doubleValue()); // 2.0
+    }
+}
+```
+
+## 4.5 底层原理（了解）
+
