@@ -1677,7 +1677,7 @@ public class Test {
 
 ![](./assets/13.svg)
 
-### 4.2.3 计算机的妥协
+### 4.2.3 浮点类型的妥协
 
 * 在 Java 中，float 和 double 在计算机中存储采取的类似`科学计数法`的形式，如下所示：
 
@@ -2084,3 +2084,29 @@ public class Test {
 
 ## 4.5 底层原理（了解）
 
+* 假设十进制小数是`0.226`，其二进制是：`0.1000001010001111010111000010100011110101110000101001`，如下所示：
+
+![](./assets/15.svg)
+
+* 在 Java 中，BigDecimal 并没有采取 BigInteger 那种分组存储方式，因为有可能小数部分转换为二进制的位数实在太多太多了，如果采取那样的方式效率太低，如下所示：
+
+![](./assets/16.svg)
+
+* 无论我们采取静态方法还是构造方法，在底层都是创建 BigDecimal 对象，如下所示：
+
+```java
+BigDecimal bd1 = new BigDecimal("0.1");
+BigDecimal bd2 = BigDecimal.valueOf(0.1);
+```
+
+* 在 Java 中，BigDecimal 会将字符串`“0.226”`，转换为字符数组，然后再将这些字符转换为 ASCII 码表中对应的数值来进行存储，如下所示：
+
+![](./assets/17.svg)
+
+* 如果 BigDecimal 中传递的是`负数`，也会将`负号`转换为 ASCII 码表中对应的数值进行存储，如下所示：
+
+![](./assets/18.svg)
+
+* 我们可以在 IDEA ，进行验证，如下所示：
+
+![](./assets/19.png)
