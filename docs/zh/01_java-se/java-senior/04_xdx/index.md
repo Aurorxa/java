@@ -829,7 +829,7 @@ public class Test {
 | 代码层面                                                | 安全层面                                                     |
 | ------------------------------------------------------- | ------------------------------------------------------------ |
 | JDK7 编码麻烦，日期对象 <--> 毫秒值。                   | JDK7 在多线程环境下会导致数据安全问题。                      |
-| JDK8 编码简单，提供了判断的方法以及计算时间间隔的方法。 | JDK8 的时间日期对象都是不可变对象，解决了多线程下导致数据安全问题。 |
+| JDK8 编码简单，提供了判断的方法以及计算时间间隔的方法。 | JDK8 的时间日期对象都是不可变对象，一举解决了之前在多线程下导致数据安全的问题。 |
 
 ## 2.2 JDK8 新增的时间相关类
 
@@ -864,7 +864,7 @@ public class Test {
 
 > [!CAUTION]
 >
-> * ① Java 在定义时区的时候是没有北京的，即：`Asia/Beijing`。
+> * ① Java 在定义时区的时候是没有北京的，如：`Asia/Beijing`。
 > * ② 在实际开发中，我们通常会使用`Asia/Shanghai`来表示中国的时区。
 
 ![](./assets/12.png)
@@ -922,7 +922,47 @@ public class Test {
 }
 ```
 
-## 2.3 时间
+## 2.3 时间戳（Instant）
+
+### 2.3.1 概述
+
+* Instant 类在 Java 中表示的是时间线上的一个瞬时点（时间戳），它并不直接关联任何特定的时区。 
+* Instant 对象本质上是以 UTC（世界协调时间）为基准的时间戳，记录自 1970 年 1 月 1 日 00:00:00（UTC）以来的秒数和纳秒数。 
+
+### 2.3.2 常用 API
+
+#### 2.3.2.1 获取 Instant 对象
+
+* 获取当前时间的 Instant 对象（标准时间 UTC）：
+
+```java
+public static Instant now() { // [!code focus]
+    return Clock.currentInstant();
+} // [!code focus]
+```
+
+* 根据秒、毫秒、纳秒获取 Instant 对象：
+
+```java
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+
+public class Test {
+    public static void main(String[] args) {
+        Instant now = Instant.now();
+        // now = 2025-04-22T14:02:20.896565900Z
+        System.out.println("now = " + now);
+    }
+}
+```
 
 
 
