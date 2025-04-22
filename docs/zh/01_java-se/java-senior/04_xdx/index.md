@@ -818,17 +818,109 @@ public class Test {
   - ③ 格式化：格式化只对 Date 有效，Calendar 则不行。
   - ④ 它们不是线程安全的，不能处理闰秒等。
 * 在 JDK8 之前，对日期和时间的操作一直是 Java 程序员最为痛苦的地方，没有之一。第三方库 joda-time 在 JDK8 出现之前的很长时间备受 Java 程序员欢迎。JDK8 吸收了 joda-time 的精华，以一个新的开始，为 Java 程序员提供优秀的时间日期 API 。
-  * ① `java.time` – 包含值对象的基础包
+  * ① `java.time` – 包含值对象的基础包。
   - ② `java.time.chrono` – 提供对不同的日历系统的访问。
   - ③ `java.time.format` – 格式化和解析时间和日期。
   - ④ `java.time.temporal` – 包括底层框架和扩展特性。
   - ⑤ `java.time.zone` – 包含时区支持的类。
+  
+* JDK7 和 JDK8 的对比，如下所示：
 
-## 2.2 时区
+| 代码层面                                                | 安全层面                                                     |
+| ------------------------------------------------------- | ------------------------------------------------------------ |
+| JDK7 编码麻烦，日期对象 <--> 毫秒值。                   | JDK7 在多线程环境下会导致数据安全问题。                      |
+| JDK8 编码简单，提供了判断的方法以及计算时间间隔的方法。 | JDK8 的时间日期对象都是不可变对象，解决了多线程下导致数据安全问题。 |
+
+## 2.2 JDK8 新增的时间相关类
+
+* JDK8 新增的时间相关类非常多，如下所示：
+
+| JDK8 新增的时间相关类 | 描述                   |
+| --------------------- | ---------------------- |
+| ZoneId                | 时区                   |
+| Instant               | 时间戳                 |
+| ZoneDateTime          | 带时区的时间           |
+| DateTimeFormatter     | 用于时间的格式化和解析 |
+| LocalDate             | 年、月、日             |
+| LocalTime             | 时、分、秒             |
+| LocalDateTime         | 年、月、日、时、分、秒 |
+| Duration              | 时间间隔（秒，纳秒）   |
+| Period                | 时间间隔（年、月、日） |
+| ChronoUnit            | 时间间隔（所有单位）   |
+
+* 我们可以对比 JDK7 之前的 API 来学习，如下所示：
+
+![](./assets/10.svg)
+
+## 2.2 时区（ZoneId）
+
+### 2.2.1 概述
+
+* 全世界一共分为 24 个时区，每个时区都是按照`标准世界时间`进行`加`或`减`，中国处于东八区，如下所示：
+
+![](./assets/11.png)
+
+* Java 在定义时区的时候，并不是采取`东一区`、`东二区`、... ，而是采取`洲名/城市名`或`国家名/城市名`，如下所示：
+
+> [!CAUTION]
+>
+> * ① Java 在定义时区的时候是没有北京的，即：`Asia/Beijing`。
+> * ② 在实际开发中，我们通常会使用`Asia/Shanghai`来表示中国的时区。
+
+![](./assets/12.png)
+
+### 2.2.2 常用 API
+
+* 获取 Java 中支持的所有时区：
+
+```java
+public static Set<String> getAvailableZoneIds() { // [!code focus]
+    return new HashSet<String>(ZoneRulesProvider.getAvailableZoneIds());
+} // [!code focus]
+```
+
+* 获取系统默认的时区：
+
+```java
+public static ZoneId systemDefault() { // [!code focus]
+    return TimeZone.getDefault().toZoneId();
+} // [!code focus]
+```
+
+* 获取指定的时区：
+
+```java
+public static ZoneId of(String zoneId) { // [!code focus]
+    return of(zoneId, true);
+} // [!code focus]
+```
+
+> [!CAUTION]
+>
+> Java 提供的时区太多了，我们并不需要记住，只需要使用上面的 API 就可以获取对应的时区！！！
 
 
 
+* 示例：
 
+```java
+package com.github.jdk8;
+
+import java.time.ZoneId;
+import java.util.Set;
+
+public class Test {
+
+    public static void main(String[] args) throws InterruptedException {
+        Set<String> availableZoneIds = ZoneId.getAvailableZoneIds();
+        System.out.println("availableZoneIds = " + availableZoneIds);
+        ZoneId zoneId = ZoneId.systemDefault();
+        System.out.println("zoneId = " + zoneId);
+        ZoneId zoneId2 = ZoneId.of("Asia/Chongqing");
+        System.out.println("zoneId2 = " + zoneId2);
+    }
+}
+```
 
 ## 2.3 时间
 
@@ -857,64 +949,6 @@ public class Test {
 
 
 
-
-
-
-2.2 ZoneId
-
-
-
-
-
-2.3 Instant
-
-
-
-
-
-2.4 ZoneDateTime
-
-
-
-
-
-2.5 DateTimeFormatter
-
-
-
-
-
-2.6 LocalDate
-
-
-
-
-
-2.7 LocalTime
-
-
-
-
-
-2.8 LocalDateTime
-
-
-
-
-
-2.9 Duration
-
-
-
-
-
-2.10 Period
-
-
-
-
-
-2.11 ChronoUnit
 
 
 
