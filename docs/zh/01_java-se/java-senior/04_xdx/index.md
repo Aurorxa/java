@@ -518,7 +518,7 @@ public class Test {
 >
 > Calendar 是一个抽象类，不能直接创建对象；但是，其提供一个静态方法返回 Calendar 实例。
 
-### 1.4.2 构造方法
+### 1.4.2 静态方法
 
 * 静态方法获取 Calendar 实例：
 
@@ -1685,19 +1685,869 @@ public class Test {
 }
 ```
 
-## 2.5 日历
+## 2.6 日历类
+
+### 2.6.1 概述
+
+* 在 JDK 7 中，我们可以使用 Calendar 来对年、月、日、时、分、秒等进行操作（翻日历），也可以获取年、月、日、时、分、秒等。
+* 在 JDK 8 中新增了 LocalDate、LocalTime 和 LocalDateTime 就是对标 JDK7 中的 Calendar 。
+
+> [!CAUTION]
+>
+> * ① LocalDate 只有`年、月、日`。
+> * ② LocalTime 只有`时、分、秒`。
+> * ③ LocalDateTime = LocalDate  + LocalTime ，既有`年、月、日`，也有`时、分、秒`。
+
+### 2.6.2 静态方法
+
+* 静态方法获取`当前`日期、时间或日期时间的对象：
+
+```java
+public static LocalDate now() { // [!code focus]
+    return now(Clock.systemDefaultZone());
+} // [!code focus]
+```
+
+```java
+public static LocalTime now() { // [!code focus]
+    return now(Clock.systemDefaultZone());
+} // [!code focus]
+```
+
+```java
+public static LocalDateTime now() { // [!code focus]
+    return now(Clock.systemDefaultZone());
+} // [!code focus]
+```
+
+* 静态方法获取`指定`日期、时间或日期时间的对象：
+
+```java
+public static LocalDate of(int year, int month, int dayOfMonth) { // [!code focus]
+    YEAR.checkValidValue(year);
+    MONTH_OF_YEAR.checkValidValue(month);
+    DAY_OF_MONTH.checkValidValue(dayOfMonth);
+    return create(year, month, dayOfMonth);
+} // [!code focus]
+```
+
+```java
+public static LocalTime of(int hour, int minute, int second) { // [!code focus]
+    HOUR_OF_DAY.checkValidValue(hour);
+    if ((minute | second) == 0) {
+        return HOURS[hour];  // for performance
+    }
+    MINUTE_OF_HOUR.checkValidValue(minute);
+    SECOND_OF_MINUTE.checkValidValue(second);
+    return new LocalTime(hour, minute, second, 0);
+} // [!code focus]
+```
+
+```java
+public static LocalDateTime of(int year, int month, int dayOfMonth, int hour, int minute) { // [!code focus]
+    LocalDate date = LocalDate.of(year, month, dayOfMonth);
+    LocalTime time = LocalTime.of(hour, minute);
+    return new LocalDateTime(date, time);
+} // [!code focus]
+```
 
 
 
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+public class Test {
+    public static void main(String[] args){
+        LocalDate now1 = LocalDate.now();
+        LocalTime now2 = LocalTime.now();
+        LocalDateTime now3 = LocalDateTime.now();
+        // now1 = 2025-04-23
+        System.out.println("now1 = " + now1); 
+        // now2 = 11:12:41.556228200
+        System.out.println("now2 = " + now2); 
+        // now3 = 2025-04-23T11:12:41.556228200
+        System.out.println("now3 = " + now3); 
+    }
+}
+```
 
 
-## 2.6 工具类
+
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDate now1 = LocalDate.of(2012, 12, 12);
+        LocalTime now2 = LocalTime.of(3, 5, 6);
+        LocalDateTime now3 = LocalDateTime.of(2012, 12, 12, 11, 11);
+        System.out.println("now1 = " + now1); // now1 = 2012-12-12
+        System.out.println("now2 = " + now2); // now2 = 03:05:06
+        System.out.println("now3 = " + now3); // now3 = 2012-12-12T11:11
+    }
+}
+```
+
+### 2.6.3 常用 API
+
+#### 2.6.3.1 获取日历中的某个字段信息
+
+* 获取年：
+
+```java
+public int getYear() { // [!code focus]
+    return date.getYear();
+} // [!code focus]
+```
+
+* 获取秒：
+
+```java
+public int getSecond() { // [!code focus]
+    return time.getSecond();
+} // [!code focus]
+```
+
+* 获取任意时间（年、月、日、时、分、秒、毫秒、纳秒）：
+
+```java
+public int get(TemporalField field) { // [!code focus]
+    if (field instanceof ChronoField chronoField) {
+        return (chronoField.isTimeBased() ? time.get(field) : date.get(field));
+    }
+    return ChronoLocalDateTime.super.get(field);
+} // [!code focus]
+```
+
+> [!CAUTION]
+>
+> * ① LocalDate 只能获取`年、月、日`。
+> * ② LocalTime 只能获取`时、分、秒`。
+> * ③ LocalDateTime = LocalDate  + LocalTime ，既能获取`年、月、日`，也能获取`时、分、秒`。
 
 
 
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+
+public class Demo3 {
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        // 获取年
+        int year = now.getYear();
+        System.out.println("year = " + year);
+        // 获取月
+        int monthValue = now.getMonthValue();
+        System.out.println("monthValue = " + monthValue);
+        // 获取一个月的第几天
+        int dayOfMonth = now.getDayOfMonth();
+        System.out.println("dayOfMonth = " + dayOfMonth);
+        // 获取一年中的第几天
+        int dayOfYear = now.getDayOfYear();
+        System.out.println("dayOfYear = " + dayOfYear);
+        // 获取一周中的第几天
+        int dayOfWeek = now.getDayOfWeek().getValue();
+        System.out.println("dayOfWeek = " + dayOfWeek);
+        // 获取时
+        int hour = now.getHour();
+        System.out.println("hour = " + hour);
+        // 获取分钟
+        int minute = now.getMinute();
+        System.out.println("minute = " + minute);
+        // 获取秒
+        int second = now.getSecond();
+        System.out.println("second = " + second);
+        // 获取毫秒
+        int milliOfSecond = now.get(ChronoField.MILLI_OF_SECOND);
+        System.out.println("milliOfSecond = " + milliOfSecond);
+        // 获取纳秒
+        int nano = now.getNano();
+        System.out.println("nano = " + nano);
+    }
+}
+```
+
+#### 2.6.3.2 判断系列方法
+
+* 判断`当前时间`是否在`指定时间`之前：
+
+```java
+public boolean isBefore(ChronoLocalDateTime<?> other) { // [!code focus]
+    if (other instanceof LocalDateTime) {
+        return compareTo0((LocalDateTime) other) < 0;
+    }
+    return ChronoLocalDateTime.super.isBefore(other);
+} // [!code focus]
+```
+
+* 判断`当前时间`是否在`指定时间`之后：
+
+```java
+public boolean isAfter(ChronoLocalDateTime<?> other) { // [!code focus]
+    if (other instanceof LocalDateTime) {
+        return compareTo0((LocalDateTime) other) > 0;
+    }
+    return ChronoLocalDateTime.super.isAfter(other);
+} // [!code focus]
+```
 
 
 
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime newLocalDateTime = LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault());
+
+        System.out.println(now.isBefore(newLocalDateTime)); // false
+        System.out.println(now.isAfter(newLocalDateTime)); // true
+    }
+}
+```
+
+#### 2.6.3.3 修改时间系列方法
+
+* 修改年：
+
+```java
+public LocalDateTime withYear(int year) { // [!code focus] 
+    return with(date.withYear(year), time);
+} // [!code focus]
+```
+
+* 修改秒：
+
+```java
+public LocalDateTime withSecond(int second) {  // [!code focus] 
+    LocalTime newTime = time.withSecond(second);
+    return with(date, newTime);
+}  // [!code focus] 
+```
+
+* 修改纳秒：
+
+```java
+public LocalDateTime withNano(int nanoOfSecond) { // [!code focus] 
+    LocalTime newTime = time.withNano(nanoOfSecond);
+    return with(date, newTime);
+} // [!code focus] 
+```
+
+* 修改任意时间（年、月、日、时、分、秒、毫秒、纳秒）：
+
+```java
+public LocalDateTime with(TemporalField field, long newValue) { // [!code focus] 
+    if (field instanceof ChronoField chronoField) {
+        if (chronoField.isTimeBased()) {
+            return with(date, time.with(field, newValue));
+        } else {
+            return with(date.with(field, newValue), time);
+        }
+    }
+    return field.adjustInto(this, newValue);
+} // [!code focus] 
+```
+
+> [!CAUTION]
+>
+> * ① LocalDate 只能修改`年、月、日`。
+> * ② LocalTime 只能修改`时、分、秒`。
+> * ③ LocalDateTime = LocalDate  + LocalTime ，既能修改`年、月、日`，也能修改`时、分、秒`。
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        // 修改年
+        LocalDateTime localDateTime1 = now.withYear(2012);
+        System.out.println("localDateTime1 = " + localDateTime1);
+        // 修改月
+        LocalDateTime localDateTime2 = now.withMonth(1);
+        System.out.println("localDateTime2 = " + localDateTime2);
+        // 修改一个月的第几天
+        LocalDateTime localDateTime3 = now.withDayOfMonth(1);
+        System.out.println("localDateTime3 = " + localDateTime3);
+        // 修改一年中的第几天
+        LocalDateTime localDateTime4 = now.withDayOfYear(5);
+        System.out.println("localDateTime4 = " + localDateTime4);
+        // 修改一周中的第几天
+        LocalDateTime localDateTime5 = now.with(ChronoField.DAY_OF_WEEK, 2);
+        System.out.println("localDateTime5 = " + localDateTime5);
+        // 修改时
+        LocalDateTime localDateTime6 = now.withHour(5);
+        System.out.println("localDateTime6 = " + localDateTime6);
+        // 修改分钟
+        LocalDateTime localDateTime7 = now.withMinute(10);
+        System.out.println("localDateTime7 = " + localDateTime7);
+        // 修改秒
+        LocalDateTime localDateTime8 = now.withSecond(10);
+        System.out.println("localDateTime8 = " + localDateTime8);
+        // 修改毫秒
+        LocalDateTime localDateTime9 = now.with(ChronoField.MILLI_OF_SECOND, 2);
+        System.out.println("localDateTime9 = " + localDateTime9);
+        // 修改纳秒
+        LocalDateTime localDateTime10 = now.withNano(10);
+        System.out.println("localDateTime10 = " + localDateTime10);
+    }
+}
+
+```
+
+#### 2.6.3.4 增加时间系列方法
+
+* 在`当前时间`基础上增加`年`：
+
+```java
+public LocalDateTime plusYears(long years) { // [!code focus]
+    LocalDate newDate = date.plusYears(years);
+    return with(newDate, time);
+} // [!code focus]
+```
+
+* 在`当前时间`基础上增加`秒`：
+
+```java
+public LocalDateTime plusSeconds(long seconds) { // [!code focus]
+    return plusWithOverflow(date, 0, 0, seconds, 0, 1);
+} // [!code focus]
+```
+
+* 在`当前时间`基础上增加`纳秒`：
+
+```java
+public LocalDateTime plusNanos(long nanos) { // [!code focus]
+    return plusWithOverflow(date, 0, 0, 0, nanos, 1);
+} // [!code focus]
+```
+
+* 在`当前时间`基础上增加`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
+
+```java
+public LocalDateTime plus(long amountToAdd, TemporalUnit unit) { // [!code focus]
+    if (unit instanceof ChronoUnit chronoUnit) {
+        switch (chronoUnit) {
+            case NANOS: return plusNanos(amountToAdd);
+            case MICROS: return plusDays(amountToAdd / MICROS_PER_DAY).plusNanos((amountToAdd % MICROS_PER_DAY) * 1000);
+            case MILLIS: return plusDays(amountToAdd / MILLIS_PER_DAY).plusNanos((amountToAdd % MILLIS_PER_DAY) * 1000_000);
+            case SECONDS: return plusSeconds(amountToAdd);
+            case MINUTES: return plusMinutes(amountToAdd);
+            case HOURS: return plusHours(amountToAdd);
+            case HALF_DAYS: return plusDays(amountToAdd / 256).plusHours((amountToAdd % 256) * 12);  // no overflow (256 is multiple of 2)
+        }
+        return with(date.plus(amountToAdd, unit), time);
+    }
+    return unit.addTo(this, amountToAdd);
+} // [!code focus]
+```
+
+> [!CAUTION]
+>
+> * ① LocalDate 只能增加`年、月、日`。
+> * ② LocalTime 只能增加`时、分、秒`。
+> * ③ LocalDateTime = LocalDate  + LocalTime ，既能增加`年、月、日`，也能增加`时、分、秒`。
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        // 增加年
+        LocalDateTime localDateTime1 = now.plusYears(2012);
+        System.out.println("localDateTime1 = " + localDateTime1);
+        // 增加月
+        LocalDateTime localDateTime2 = now.plusMonths(1);
+        System.out.println("localDateTime2 = " + localDateTime2);
+        // 增加几天
+        LocalDateTime localDateTime3 = now.plusDays(1);
+        System.out.println("localDateTime3 = " + localDateTime3);
+        // 增加时
+        LocalDateTime localDateTime6 = now.plusHours(5);
+        System.out.println("localDateTime6 = " + localDateTime6);
+        // 增加分钟
+        LocalDateTime localDateTime7 = now.plusMinutes(10);
+        System.out.println("localDateTime7 = " + localDateTime7);
+        // 增加秒
+        LocalDateTime localDateTime8 = now.plusSeconds(10);
+        System.out.println("localDateTime8 = " + localDateTime8);
+        // 增加毫秒
+        LocalDateTime localDateTime9 = now.plus(2, ChronoUnit.MILLIS);
+        System.out.println("localDateTime9 = " + localDateTime9);
+        // 增加纳秒
+        LocalDateTime localDateTime10 = now.plusNanos(10);
+        System.out.println("localDateTime10 = " + localDateTime10);
+    }
+}
+
+```
+
+#### 2.6.3.5 减少时间系列方法
+
+* 在`当前时间`基础上减少`年`：
+
+```java
+public LocalDateTime minusYears(long years) { // [!code focus]
+    return (years == Long.MIN_VALUE 
+            ? plusYears(Long.MAX_VALUE).plusYears(1) 
+            : plusYears(-years));
+} // [!code focus]
+```
+
+* 在`当前时间`基础上减少`秒`：
+
+```java
+public LocalDateTime minusSeconds(long seconds) { // [!code focus]
+    return plusWithOverflow(date, 0, 0, seconds, 0, -1);
+} // [!code focus]
+```
+
+* 在`当前时间`基础上减少`纳秒`：
+
+```java
+public LocalDateTime minusNanos(long nanos) { // [!code focus]
+    return plusWithOverflow(date, 0, 0, 0, nanos, -1);
+} // [!code focus]
+```
+
+* 在`当前时间`基础上减少`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
+
+```java
+public LocalDateTime minus(long amountToSubtract, TemporalUnit unit) { // [!code focus]
+    return (amountToSubtract == Long.MIN_VALUE 
+            ? plus(Long.MAX_VALUE, unit).plus(1, unit) 
+            : plus(-amountToSubtract, unit));
+} // [!code focus]
+```
+
+> [!CAUTION]
+>
+> * ① LocalDate 只能减少`年、月、日`。
+> * ② LocalTime 只能减少`时、分、秒`。
+> * ③ LocalDateTime = LocalDate  + LocalTime ，既能减少`年、月、日`，也能减少`时、分、秒`。
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        // 减少年
+        LocalDateTime localDateTime1 = now.minusYears(2012);
+        System.out.println("localDateTime1 = " + localDateTime1);
+        // 减少月
+        LocalDateTime localDateTime2 = now.minusMonths(1);
+        System.out.println("localDateTime2 = " + localDateTime2);
+        // 减少几天
+        LocalDateTime localDateTime3 = now.minusDays(1);
+        System.out.println("localDateTime3 = " + localDateTime3);
+        // 减少时
+        LocalDateTime localDateTime6 = now.minusHours(5);
+        System.out.println("localDateTime6 = " + localDateTime6);
+        // 减少分钟
+        LocalDateTime localDateTime7 = now.minusMinutes(10);
+        System.out.println("localDateTime7 = " + localDateTime7);
+        // 减少秒
+        LocalDateTime localDateTime8 = now.minusSeconds(10);
+        System.out.println("localDateTime8 = " + localDateTime8);
+        // 减少毫秒
+        LocalDateTime localDateTime9 = now.minus(2, ChronoUnit.MILLIS);
+        System.out.println("localDateTime9 = " + localDateTime9);
+        // 减少纳秒
+        LocalDateTime localDateTime10 = now.minusNanos(10);
+        System.out.println("localDateTime10 = " + localDateTime10);
+    }
+}
+```
+
+### 2.6.4 应用示例
+
+* 需求：判断今天是否是生日？
+
+> [!NOTE]
+>
+> * ① 获取生日的 LocalDate 对象。
+> * ② 获取当前日期的 LocalDate 对象。
+> * ③ 将`生日的 LocalDate 对象`和`当前日期的 LocalDate 对象`都转换为 MonthDay 对象，然后再比较。
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDate;
+import java.time.MonthDay;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDate birthDate = LocalDate.of(1999, 10, 1);
+        LocalDate now = LocalDate.now();
+
+        // MonthDay 只包含月和日
+        MonthDay birthMonthDay = MonthDay.of(birthDate.getMonth(), 
+                                             birthDate.getDayOfMonth());
+        MonthDay nowMonthDay = MonthDay.from(now);
+
+        if (birthMonthDay.equals(nowMonthDay)) {
+            System.out.println("今天是生日o(*￣︶￣*)o");
+        } else {
+            System.out.println("今天不是生日o(╥﹏╥)o");
+        }
+    }
+}
+```
+
+## 2.7 工具类
+
+### 2.7.1 Period 
+
+#### 2.7.1.1 概述
+
+* Period 侧重于计算`日期`的间隔，如：年、月、日。
+
+#### 2.7.1.2 常用 API
+
+* 静态方法获取 Period 对象：
+
+```java
+public static Period between(LocalDate startDateInclusive, LocalDate endDateExclusive) { // [!code focus]
+    return startDateInclusive.until(endDateExclusive);
+} // [!code focus]
+```
+
+* 获取区间相差的年份：
+
+```java
+public int getYears() { // [!code focus]
+    return years;
+} // [!code focus]
+```
+
+* 获取区间相差的月份：
+
+```java
+public int getMonths() { // [!code focus]
+    return months;
+} // [!code focus]
+```
+
+* 获取区间相差的天数：
+
+```java
+public int getDays() { // [!code focus]
+    return days;
+} // [!code focus]
+```
+
+* 获取区间相差总的月份：
+
+```java
+public long toTotalMonths() { // [!code focus]
+    return years * 12L + months;  // no overflow
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.utils;
+
+import java.time.LocalDate;
+import java.time.Period;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDate start = LocalDate.of(2000, 8, 10);
+        LocalDate end = LocalDate.now();
+
+        Period period = Period.between(start, end);
+
+        // 获取日期间隔 -- 年
+        int years = period.getYears();
+        // years = 24 即：（end 的 years）-（start 的 years）
+        System.out.println("years = " + years);
+
+        // 获取日期间隔 -- 月
+        int months = period.getMonths();
+        // months = 8 即：（end 的 months）-（start 的 months）
+        System.out.println("months = " + months);
+
+        // 获取日期间隔 -- 日
+        int days = period.getDays();
+        // days = 13 即：（end 的 days）-（start 的 days）
+        System.out.println("days = " + days);
+
+        // 获取日期间隔 -- 总月数
+        long totalMonths = period.toTotalMonths();
+        // totalMonths = 296 实际相差的月份
+        System.out.println("totalMonths = " + totalMonths);
+    }
+}
+```
+
+### 2.7.2 Duration 
+
+#### 2.7.2.1 概述
+
+* Duration 侧重于计算`时间`的间隔，如：时、分、秒等。此类以`秒`和`纳秒`为单位模拟时间量或时间量。
+
+#### 2.7.2.2 常用 API
+
+* 静态方法获取 Duration 对象：
+
+```java
+public static Duration between(Temporal startInclusive, Temporal endExclusive) { // [!code focus]
+    try {
+        return ofNanos(startInclusive.until(endExclusive, NANOS));
+    } catch (DateTimeException | ArithmeticException ex) {
+        long secs = startInclusive.until(endExclusive, SECONDS);
+        long nanos;
+        try {
+            nanos = endExclusive.getLong(NANO_OF_SECOND) 
+                - startInclusive.getLong(NANO_OF_SECOND);
+            if (secs > 0 && nanos < 0) {
+                secs++;
+            } else if (secs < 0 && nanos > 0) {
+                secs--;
+            }
+        } catch (DateTimeException ex2) {
+            nanos = 0;
+        }
+        return ofSeconds(secs, nanos);
+    }
+} // [!code focus]
+```
+
+* 获取相差的天数：
+
+```java
+public long toDays() { // [!code focus]
+    return seconds / SECONDS_PER_DAY;
+} // [!code focus]
+```
+
+* 获取相差的小时：
+
+```java
+public long toHours() { // [!code focus]
+    return seconds / SECONDS_PER_HOUR;
+} // [!code focus]
+```
+
+* 获取相差的分钟：
+
+```java
+public long toMinutes() { // [!code focus]
+    return seconds / SECONDS_PER_MINUTE;
+} // [!code focus]
+```
+
+* 获取相差的秒：
+
+```java
+public long toSeconds() { // [!code focus]
+    return seconds;
+} // [!code focus]
+```
+
+* 获取相差的毫秒：
+
+```java
+public long toMillis() { // [!code focus]
+    long tempSeconds = seconds;
+    long tempNanos = nanos;
+    if (tempSeconds < 0) {
+        // change the seconds and nano value to
+        // handle Long.MIN_VALUE case
+        tempSeconds = tempSeconds + 1;
+        tempNanos = tempNanos - NANOS_PER_SECOND;
+    }
+    long millis = Math.multiplyExact(tempSeconds, 1000);
+    millis = Math.addExact(millis, tempNanos / NANOS_PER_MILLI);
+    return millis;
+} // [!code focus]
+```
+
+* 获取相差的纳秒：
+
+```java
+public long toNanos() {  // [!code focus]
+    long tempSeconds = seconds;
+    long tempNanos = nanos;
+    if (tempSeconds < 0) {
+        // change the seconds and nano value to
+        // handle Long.MIN_VALUE case
+        tempSeconds = tempSeconds + 1;
+        tempNanos = tempNanos - NANOS_PER_SECOND;
+    }
+    long totalNanos = Math.multiplyExact(tempSeconds, NANOS_PER_SECOND);
+    totalNanos = Math.addExact(totalNanos, tempNanos);
+    return totalNanos;
+}  // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.utils;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.now()
+                .plusYears(1)
+                .plusMonths(1)
+                .plusDays(1)
+                .plusHours(1)
+                .plusMonths(1)
+                .plusSeconds(1)
+                .plusNanos(1);
+
+        Duration period = Duration.between(start, end);
+
+        // 获取相差的天数
+        long days = period.toDays();
+        System.out.println("days = " + days);
+
+        // 获取相差的小时
+        long hours = period.toHours();
+        System.out.println("hours = " + hours);
+
+        // 获取相差的分钟
+        long minutes = period.toMinutes();
+        System.out.println("minutes = " + minutes);
+
+        // 获取相差的秒
+        long seconds = period.toSeconds();
+        System.out.println("seconds = " + seconds);
+
+        // 获取相差的毫秒
+        long millis = period.toMillis();
+        System.out.println("millis = " + millis);
+
+        // 获取相差的纳秒
+        long nanos = period.toNanos();
+        System.out.println("nanos = " + nanos);
+    }
+}
+```
+
+### 2.7.3 ChronoUnit（推荐）
+
+#### 2.7.3.1 概述
+
+* ChronoUnit 侧重于计算`日期时间`（所有时间单位）的间隔，如：年、月、日、时、分、秒等。
+
+#### 2.7.3.2 常用 API
+
+* 获取相差的年数：
+
+```java
+long num = ChronoUnit.YEARS.between(start, end);
+```
+
+* 获取相差的天数：
+
+```java
+long num = ChronoUnit.DAYS.between(start, end);
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.utils;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class Demo3 {
+    public static void main(String[] args) {
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.now()
+                .plusYears(1)
+                .plusMonths(1)
+                .plusDays(1)
+                .plusHours(1)
+                .plusMonths(1)
+                .plusSeconds(1)
+                .plusNanos(1);
+
+        System.out.println("相差的年数：" + ChronoUnit.YEARS.between(start, end));
+        System.out.println("相差的月数：" + ChronoUnit.MONTHS.between(start, end));
+        System.out.println("相差的周数：" + ChronoUnit.WEEKS.between(start, end));
+        System.out.println("相差的天数：" + ChronoUnit.DAYS.between(start, end));
+        System.out.println("相差的时数：" + ChronoUnit.HOURS.between(start, end));
+        System.out.println("相差的分数：" + ChronoUnit.MINUTES.between(start, end));
+        System.out.println("相差的秒数：" + ChronoUnit.SECONDS.between(start, end));
+        System.out.println("相差的毫秒数：" + ChronoUnit.MILLIS.between(start, end));
+        System.out.println("相差的微妙数：" + ChronoUnit.MICROS.between(start, end));
+        System.out.println("相差的纳秒数：" + ChronoUnit.NANOS.between(start, end));
+        System.out.println("相差的半天数：" + ChronoUnit.HALF_DAYS.between(start, end));
+        System.out.println("相差的十年数：" + ChronoUnit.DECADES.between(start, end));
+        System.out.println("相差的世纪（百年）数：" + ChronoUnit.CENTURIES.between(start, end));
+        System.out.println("相差的千年数：" + ChronoUnit.MILLENNIA.between(start, end));
+        System.out.println("相差的纪元数：" + ChronoUnit.ERAS.between(start, end));
+    }
+}
+```
 
 
 
@@ -1705,62 +2555,318 @@ public class Test {
 
 ## 3.1 概述
 
-
-
-
-
-# 第四章：综合练习
-
-## 4.1 练习一
-
-* 需求：键盘录入一些 1~10 日之间的整数，并添加到集合中。直到集合中所有数据和超过 200 为止。
-
-
-
-
-
-## 4.2 练习二
-
-* 需求：手动实现 parseInt 方法的效果，将字符串形式的数据转成整数。
+* 在 Java 中，`包装类`就是`基本数据类型`对应的`引用数据类型`的`对象`。
 
 > [!NOTE]
 >
-> 字符串中只能是数字不能有其他字符最少一位，最多 10 位日不能开头。
+> 所谓的`包装类`就是将`基本数据类型`的`数据`变为一个`对象`！！！
 
+* Java 中的基本数据类型和包装类的对比表，如下所示：
 
-
-
-
-
-
-## 4.3 练习三
-
-* 需求：定义一个方法自己实现 toBinaryString 方法的效果，将一个十进制整数转成字符串表示的二进制。
-
-
-
-
-
-
-
-## 4.4 练习四
-
-* 需求：请使用代码实现计算你活了多少天。
+| 基本数据类型 | 包装类（java.lang 包） |
+| ------------ | ---------------------- |
+| byte         | Byte                   |
+| short        | Short                  |
+| `int`        | `Integer`              |
+| long         | Long                   |
+| float        | Float                  |
+| double       | Double                 |
+| `char`       | `Character`            |
+| boolean      | Boolean                |
+| void         | Void                   |
 
 > [!NOTE]
 >
-> 用 JDK7 和 JDK8 两种方式完成。
+> * ① Byte 、Short 、Integer 、Long 、Float 、Double 的父类是 Number 。
+> * ② 在实际开发中，最常用的包装类是 Integer 类，下面将以此类作为例子讲解！！！
 
+## 3.2 如何理解包装类？
 
+* 所谓的基本数据类型，在变量中记录的是真实的数据值，如下所示：
 
+```java
+public class Test {
+    public static void main(String[] args){
+        int num = 10; // [!code focus]
+        
+        System.out.println(num);
+    }
+}
+```
 
+* 其对应的内存图，如下所示：
 
-## 4.5 练习五
+![基本数据类型的变量记录的是真实的数据值](./assets/13.png)
 
-* 需求：判断任意的一个年份是闰年还是平年？
+* 基本数据类型 int 对应的包装类是 Integer，如下所示：
+
+```java
+public final class Integer extends Number
+        implements Comparable<Integer>, Constable, ConstantDesc {
+	
+    private final int value;
+    
+    // 其余略
+    ...
+    
+}
+```
+
+* 所谓的包装类（引用数据类型），在变量中记录的是对象的地址值，如下所示：
+
+```java
+public class Test {
+    public static void main(String[] args){
+        Integer i = new Integer(10); // [!code focus]
+        
+        System.out.println(i);
+    }
+}
+```
+
+* 其对应的内存图，如下所示：
+
+![引用数据类型（包装类）的变量记录的是对象的地址值](./assets/14.png)
 
 > [!NOTE]
 >
-> * ① 用 JDK7 和 JDK8 两种方式判断。
-> * ② 二月有 29 天是闰年，一年有 366 天是闰年。
+> 综上所述：包装类就是用一个`对象`将`基本数据类型`的`变量`（真实的数据值）包起来！！！
+
+## 3.3 为什么要学习包装类？
+
+* ① Java 是一个纯面向对象的编程语言，即：Java 中万物皆对象（可以将所有的东西都看做对象）。由于多态的存在，所有的对象都可以使用 Object 类表示，如：`Object o = new Student();`，如果此时我们设计如下的通用方法，假设没有包装类的存在，当我们调用方法的时候，传入基本数据类型的变量，程序就会报错：
+
+```java
+public class Test {
+    public static void main(String[] args){
+        
+        int num = 10;
+        
+        // ❌ 错误：Object o != num 
+        method(num); // [!code error]
+    }
+    
+    public static void method(Object o){
+        ...
+    }
+}
+```
+
+* ② 在集合中，是不能存储基本数据类型的，只能存储对象，即：当我们向集合中存储基本数据类型的变量的时候，也需要使用包装类，如下所示：
+
+```java
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args){
+        
+        List<Integer> list = new ArrayList<>();
+        
+        list.add(new Integer(10)); // [!code focus]
+    }
+
+}
+```
+
+## 3.4 装箱和拆箱
+
+### 3.4.1 装箱（获取 Integer 对象，了解）
+
+* ~~根据传递的整数创建一个 Integer 对象（构造方法，JDK9 之后过时）：~~
+
+```java
+@Deprecated(since="9", forRemoval = true)
+public Integer(int value) { // [!code focus]
+    this.value = value;
+} // [!code focus]
+```
+
+* ~~根据传递的字符串创建一个 Integer 对象（构造方法，JDK9 之后过时）：~~
+
+```java
+@Deprecated(since="9", forRemoval = true)
+public Integer(String s) throws NumberFormatException { // [!code focus]
+    this.value = parseInt(s, 10);
+} // [!code focus]
+```
+
+* 根据传递的`整数`创建一个 Integer 对象（静态方法）：
+
+```java
+public static Integer valueOf(int i) {  // [!code focus]
+    if (i >= IntegerCache.low && i <= IntegerCache.high)
+        return IntegerCache.cache[i + (-IntegerCache.low)];
+    return new Integer(i);
+} // [!code focus]
+```
+
+* 根据传递的`字符串`创建一个 Integer 对象（静态方法）：
+
+```java
+public static Integer valueOf(String s) throws NumberFormatException { // [!code focus]
+    return Integer.valueOf(parseInt(s, 10));
+} // [!code focus]
+```
+
+* 根据传递的`字符串`和`进制`创建一个 Integer 对象（静态方法，不常用）：
+
+```java
+public static Integer valueOf(String s, int radix) throws NumberFormatException { // [!code focus]
+    return Integer.valueOf(parseInt(s,radix));
+} // [!code focus]
+```
+
+> [!NOTE]
+>
+> * 装箱的定义：将`基本数据类型`的`变量`转换为`包装类对象`。
+> * 装箱的目的：就是为了使用专门为对象设计的 API 和特性。
+
+
+
+* 示例：
+
+```java
+package com.github.wrapper;
+
+public class Test {
+    public static void main(String[] args) {
+        Integer i1 = Integer.valueOf(10);
+        System.out.println("i1 = " + i1); // i1 = 10
+
+        Integer i2 = Integer.valueOf("10");
+        System.out.println("i2 = " + i2); // i2 = 10
+    }
+}
+```
+
+### 3.4.2 拆箱（将 Integer 对象转换为基本数据类型，了解）
+
+* 将 Integer 对象转换为基本数据类型的变量：
+
+```java
+public int intValue() { // [!code focus]
+    return value;
+} // [!code focus]
+```
+
+> [!NOTE]
+>
+> * 拆箱的定义：将`包装类对象`转换为`基本数据类型`的`变量`。
+> * 拆箱的目的：一般是因为需要运算，Java 中的大多数的运算符都是为基本数据类型而设计的，比如：比较、算术等。
+
+
+
+* 示例：
+
+```java
+package com.github.wrapper;
+
+public class Test {
+    public static void main(String[] args) {
+        // 因为对象之间不能直接进行计算，所以需要拆箱
+        Integer i1 = Integer.valueOf(1);
+        Integer i2 = Integer.valueOf(2);
+
+        // 将对象进行拆箱
+        int num1 = i1.intValue();
+        int num2 = i2.intValue();
+
+        // 基本数据类型之间可以进行计算
+        int sum = num1 + num2;
+
+        // 将得到的结果再次进行装箱
+        Integer result = Integer.valueOf(sum);
+        System.out.println("result = " + result);
+    }
+}
+```
+
+### 3.4.3 自动装箱和拆箱
+
+* 在 JDK 5 之后，Java 提供一种机制：自动装箱和自动拆箱：
+  * 自动装箱：将`基本数据类型的变量`自动变为其对应的`包装类对象`。
+  * 自动拆箱：将`包装类对象`自动变为对应的`基本数据类型的变量`。
+
+> [!CAUTION]
+>
+> * ① Java 是一种强类型语言，每种数据都有自己的数据类型。
+> * ② 在计算的时候，如果不是同一种数据类型，是无法直接计算的。
+> * ③ 基本数据类型的变量和自己对应的包装类之间才可以实现自动装箱和自动拆箱。
+
+
+
+* 示例：
+
+```java
+package com.github.wrapper;
+
+public class Test {
+    public static void main(String[] args) {
+        // 自动装箱，即：直接将基本类型的数据赋值给包装类类型
+        // 在底层依然会调用 Integer.valueof(xxx)得到一个 Integer 对象
+        // 对程序员是透明的，换言之，程序员无需关心
+        Integer i = 10;
+
+        System.out.println("i = " + i);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.wrapper;
+
+public class Test {
+    public static void main(String[] args) {
+        
+        Integer i = Integer.valueOf(10);
+        
+        // 自动拆箱，即：将包装类对象直接赋值给基本数据类型
+        // 在底层依然会调用 int.intvalue() 得到一个 int 变量
+        // 对程序员是透明的，换言之，程序员无需关心
+        int num = i;
+        
+        System.out.println("num = " + num);
+    }
+}
+```
+
+## 3.5 基本数据类型和 String 之间的转换
+
+* ① 基本数据类型 --> String ：
+  * 使用 `+ ` 拼接`""`，如：`String str = 5 + "";`。
+  * 使用 String 的静态方法`valueOf()`，如：`String str = String.valueOf(5)`。
+* ② String --> 基本数据类型：
+  * 通过包装类（除了 Character 类）的静态方法`parseXxx()`，如：`int i = Integer.parsetInt("12");`。
+  * 通过包装类的静态方法`valueOf()`，如：`int i = Integer.valueOf("12");`。
+
+
+> [!CAUTION]
+>
+> 在 String 转换为基本数据类型的时候，如果字符串参数的内容无法正确的转换为对应的基本数据类型，将会抛出`java.lang.NumberFormatException` 异常。
+
+
+
+* 示例：
+
+```java
+package com.wrapper.demo3;
+
+public class Test {
+    public static void main(String[] args) {
+        String str = "12";
+
+        int num = Integer.parseInt(str);
+
+        System.out.println("num = " + num);
+
+        num = Integer.valueOf(str);
+        
+        System.out.println("num = " + num);
+    }
+}
+```
 
