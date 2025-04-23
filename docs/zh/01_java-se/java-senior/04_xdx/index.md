@@ -383,14 +383,14 @@ public class Test {
 * 解析（字符串 --> 日期对象）：
 
 ```java
-public Date parse(String source) throws ParseException {
+public Date parse(String source) throws ParseException {  // [!code focus]
     ParsePosition pos = new ParsePosition(0);
     Date result = parse(source, pos);
     if (pos.index == 0)
         throw new ParseException("Unparseable date: \"" + source + "\"" ,
             pos.errorIndex);
     return result;
-}
+}  // [!code focus]
 ```
 
 > [!CAUTION]
@@ -941,9 +941,31 @@ public static Instant now() { // [!code focus]
 } // [!code focus]
 ```
 
-* 根据秒、毫秒、纳秒获取 Instant 对象：
+* 根据秒、毫秒、纳秒获取 Instant 对象（标准时间 UTC）：
 
 ```java
+// 根据秒获取 Instant 对象
+public static Instant ofEpochSecond(long epochSecond) { // [!code focus]
+    return create(epochSecond, 0);
+} // [!code focus]
+```
+
+```java
+// 根据毫秒获取 Instant 对象
+public static Instant ofEpochMilli(long epochMilli) { // [!code focus]
+    long secs = Math.floorDiv(epochMilli, 1000);
+    int mos = Math.floorMod(epochMilli, 1000);
+    return create(secs, mos * 1000_000);
+} // [!code focus]
+```
+
+```java
+// 根据秒和纳秒获取 Instant 对象
+public static Instant ofEpochSecond(long epochSecond, long nanoAdjustment) { // [!code focus]
+    long secs = Math.addExact(epochSecond, Math.floorDiv(nanoAdjustment, NANOS_PER_SECOND));
+    int nos = (int)Math.floorMod(nanoAdjustment, NANOS_PER_SECOND);
+    return create(secs, nos);
+} // [!code focus]
 ```
 
 
@@ -958,7 +980,7 @@ import java.time.Instant;
 public class Test {
     public static void main(String[] args) {
         Instant now = Instant.now();
-        // now = 2025-04-22T14:02:20.896565900Z
+        // now = 2025-04-23T01:02:02.398288Z
         System.out.println("now = " + now);
     }
 }
@@ -966,15 +988,702 @@ public class Test {
 
 
 
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+
+public class Test {
+    public static void main(String[] args) {
+
+        Instant instant1 = Instant.ofEpochSecond(1);
+        // instant1 = 1970-01-01T00:00:01Z
+        System.out.println("instant1 = " + instant1);
+
+        Instant instant2 = Instant.ofEpochMilli(1000);
+        // instant2 = 1970-01-01T00:00:01Z
+        System.out.println("instant2 = " + instant2);
+
+        Instant instant3 = Instant.ofEpochSecond(0, (long) Math.pow(10, 9));
+        // instant3 = 1970-01-01T00:00:01Z
+        System.out.println("instant3 = " + instant3);
+    }
+}
+```
+
+#### 2.3.2.2 转换时区
+
+* 将 UTC 表示的时间戳转换为指定时区的时间：
+
+```java
+public ZonedDateTime atZone(ZoneId zone) { // [!code focus]
+    return ZonedDateTime.ofInstant(this, zone);
+} // [!code focus]
+```
 
 
-## 2.4 格式化
+
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+public class Test {
+    public static void main(String[] args) {
+        Instant now = Instant.now();
+
+        // UTC = 2025-04-23T01:09:18.513139200Z
+        System.out.println("UTC = " + now);
+
+        ZonedDateTime zonedDateTime = now.atZone(ZoneId.of("Asia/Shanghai"));
+
+        // 2025-04-23T09:09:18.513139200+08:00[Asia/Shanghai]
+        System.out.println("zonedDateTime = " + zonedDateTime);
+    }
+}
+```
+
+#### 2.3.2.3 判断系列方法
+
+* 判断`当前时间戳（时刻）`是否在`指定时间戳（时刻）`之前：
+
+```java
+public boolean isBefore(Instant otherInstant) { // [!code focus]
+    return compareTo(otherInstant) < 0;
+} // [!code focus]
+```
+
+* 判断`当前时间戳（时刻）`是否在`指定时间戳（时刻）`之后：
+
+```java
+public boolean isAfter(Instant otherInstant) { // [!code focus]
+    return compareTo(otherInstant) > 0;
+} // [!code focus]
+```
 
 
 
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+
+public class Test {
+    public static void main(String[] args) {
+        Instant instant = Instant.ofEpochSecond(0);
+        Instant now = Instant.now();
+
+        System.out.println(instant.isBefore(now)); // true
+        System.out.println(instant.isAfter(now)); // false
+    }
+}
+```
+
+#### 2.3.2.4 增加时间系列方法
+
+* 在`当前时间戳（时刻）`基础上增加`秒`：
+
+```java
+public Instant plusSeconds(long secondsToAdd) { // [!code focus]
+    return plus(secondsToAdd, 0);
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上增加`毫秒`：
+
+```java
+public Instant plusMillis(long millisToAdd) { // [!code focus]
+    return plus(millisToAdd / 1000, (millisToAdd % 1000) * 1000_000);
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上增加`纳秒`：
+
+```java
+public Instant plusNanos(long nanosToAdd) { // [!code focus]
+    return plus(0, nanosToAdd);
+} // [!code focus]
+```
 
 
 
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+
+public class Test {
+    public static void main(String[] args) {
+        Instant instant = Instant.ofEpochSecond(0);
+        // instant = 1970-01-01T00:00:00Z
+        System.out.println("instant = " + instant);
+        Instant instant2 = instant.plusSeconds(7);
+        // instant2 = 1970-01-01T00:00:07Z
+        System.out.println("instant2 = " + instant2);
+        Instant instant3 = instant.plusMillis(1000);
+        // instant3 = 1970-01-01T00:00:01Z
+        System.out.println("instant3 = " + instant3);
+        Instant instant4 = instant.plusNanos((long) Math.pow(10, 9));
+        // instant4 = 1970-01-01T00:00:01Z
+        System.out.println("instant4 = " + instant4);
+    }
+}
+```
+
+#### 2.3.2.5 减少时间系列方法
+
+* 在`当前时间戳（时刻）`基础上减少`秒`：
+
+```java
+public Instant minusSeconds(long secondsToSubtract) { // [!code focus]
+    if (secondsToSubtract == Long.MIN_VALUE) {
+        return plusSeconds(Long.MAX_VALUE).plusSeconds(1);
+    }
+    return plusSeconds(-secondsToSubtract);
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上减少`毫秒`：
+
+```java
+public Instant minusMillis(long millisToSubtract) { // [!code focus]
+    if (millisToSubtract == Long.MIN_VALUE) {
+        return plusMillis(Long.MAX_VALUE).plusMillis(1);
+    }
+    return plusMillis(-millisToSubtract);
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上减少`纳秒`：
+
+```java
+public Instant minusNanos(long nanosToSubtract) { // [!code focus]
+    if (nanosToSubtract == Long.MIN_VALUE) {
+        return plusNanos(Long.MAX_VALUE).plusNanos(1);
+    }
+    return plusNanos(-nanosToSubtract);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+
+public class Test {
+    public static void main(String[] args) {
+        Instant instant = Instant.now();
+        // instant = 2025-04-23T01:37:22.990790600Z
+        System.out.println("instant = " + instant);
+        Instant instant2 = instant.minusSeconds(7);
+        // instant2 = 2025-04-23T01:37:15.990790600Z
+        System.out.println("instant2 = " + instant2);
+        Instant instant3 = instant.minusMillis(1000);
+        // instant3 = 2025-04-23T01:37:21.990790600Z
+        System.out.println("instant3 = " + instant3);
+        Instant instant4 = instant.minusNanos((long) Math.pow(10, 9));
+        // instant4 = 2025-04-23T01:37:21.990790600Z
+        System.out.println("instant4 = " + instant4);
+    }
+}
+```
+
+## 2.4 带时区的时间（ZoneDateTime）
+
+### 2.4.1 概述
+
+* ZoneDateTime 用于表示带有时区信息的日期和时间。
+
+### 2.4.2 常用 API
+
+#### 2.4.2.1 获取 ZoneDateTime 对象
+
+* 获取当前时间的 ZoneDateTime 对象（带有时区）：
+
+```java
+public static ZonedDateTime now() { // [!code focus]
+    return now(Clock.systemDefaultZone());
+} // [!code focus]
+```
+
+* 年、月、日、时、分、秒、纳秒方式获取 ZoneDateTime 对象（带有时区）：
+
+```java
+public static ZonedDateTime of( // [!code focus]
+        int year, int month, int dayOfMonth,  // [!code focus]
+        int hour, int minute, int second, int nanoOfSecond, ZoneId zone) { // [!code focus]
+    LocalDateTime dt = LocalDateTime.of(year, month, dayOfMonth, 
+                                        hour, minute, second, nanoOfSecond);
+    return ofLocal(dt, zone, null);
+} // [!code focus]
+```
+
+* Instant + 时区方式获取 ZoneDateTime 对象（带有时区）：
+
+```java
+public static ZonedDateTime ofInstant(Instant instant, ZoneId zone) { // [!code focus]
+    Objects.requireNonNull(instant, "instant");
+    Objects.requireNonNull(zone, "zone");
+    return create(instant.getEpochSecond(), instant.getNano(), zone);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.zonedatetime;
+
+import java.time.ZonedDateTime;
+
+public class Test {
+    public static void main(String[] args) {
+        ZonedDateTime now = ZonedDateTime.now();
+        // now = 2025-04-23T09:50:51.743019300+08:00[Asia/Shanghai]
+        System.out.println("now = " + now);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.zonedatetime;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+public class Test {
+    public static void main(String[] args) {
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(2025, 4, 3,
+                11, 11, 11,
+                11, ZoneId.of("Asia/Shanghai"));
+        // zonedDateTime = 2025-04-03T11:11:11.000000011+08:00[Asia/Shanghai]
+        System.out.println("zonedDateTime = " + zonedDateTime);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.zonedatetime;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+public class Test {
+    public static void main(String[] args) {
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(
+            Instant.now(), ZoneId.of("Asia/Shanghai"));
+        // zonedDateTime = 2025-04-23T09:57:52.336562200+08:00[Asia/Shanghai]
+        System.out.println("zonedDateTime = " + zonedDateTime);
+    }
+}
+```
+
+#### 2.4.2.2 修改时间系列方法
+
+* 修改年：
+
+```java
+public ZonedDateTime withYear(int year) { // [!code focus]
+    return resolveLocal(dateTime.withYear(year));
+} // [!code focus]
+```
+
+* 修改秒：
+
+```java
+public ZonedDateTime withSecond(int second) { // [!code focus]
+    return resolveLocal(dateTime.withSecond(second));
+} // [!code focus]
+```
+
+* 修改纳秒：
+
+```java
+public ZonedDateTime withNano(int nanoOfSecond) { // [!code focus]
+    return resolveLocal(dateTime.withNano(nanoOfSecond));
+} // [!code focus]
+```
+
+* 修改任意时间（年、月、日、时、分、秒、毫秒、纳秒）：
+
+```java
+public ZonedDateTime with(TemporalField field, long newValue) { // [!code focus]
+    if (field instanceof ChronoField chronoField) {
+        switch (chronoField) {
+            case INSTANT_SECONDS:
+                return create(newValue, getNano(), zone);
+            case OFFSET_SECONDS:
+                ZoneOffset offset = 
+                    ZoneOffset.ofTotalSeconds(
+                    chronoField.checkValidIntValue(newValue));
+                return resolveOffset(offset);
+        }
+        return resolveLocal(dateTime.with(field, newValue));
+    }
+    return field.adjustInto(this, newValue);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.zonedatetime;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+
+public class Test {
+    public static void main(String[] args) {
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.now();
+        System.out.println("zonedDateTime = " + zonedDateTime);
+        // 修改年
+        ZonedDateTime zonedDateTime1 = zonedDateTime.withYear(2024);
+        System.out.println("zonedDateTime1 = " + zonedDateTime1);
+        // 修改月
+        ZonedDateTime zonedDateTime2 = zonedDateTime.withMonth(1);
+        System.out.println("zonedDateTime2 = " + zonedDateTime2);
+        // 修改日
+        ZonedDateTime zonedDateTime3 = zonedDateTime.withDayOfMonth(20);
+        System.out.println("zonedDateTime3 = " + zonedDateTime3);
+        // 修改小时
+        ZonedDateTime zonedDateTime4 = zonedDateTime.withHour(1);
+        System.out.println("zonedDateTime4 = " + zonedDateTime4);
+        // 修改分钟
+        ZonedDateTime zonedDateTime5 = zonedDateTime.withMinute(1);
+        System.out.println("zonedDateTime5 = " + zonedDateTime5);
+        // 修改秒
+        ZonedDateTime zonedDateTime6 = zonedDateTime.withSecond(1);
+        System.out.println("zonedDateTime6 = " + zonedDateTime6);
+        // 修改毫秒
+        ZonedDateTime zonedDateTime7 = zonedDateTime.with(ChronoField.MILLI_OF_SECOND, 1);
+        System.out.println("zonedDateTime7 = " + zonedDateTime7);
+        // 修改纳秒
+        ZonedDateTime zonedDateTime8 = zonedDateTime.withNano(1);
+        System.out.println("zonedDateTime8 = " + zonedDateTime8);
+    }
+}
+```
+
+#### 2.4.2.3 增加时间系列方法
+
+* 在`当前时间戳（时刻）`基础上增加`年`：
+
+```java
+public ZonedDateTime plusYears(long years) { // [!code focus]
+    return resolveLocal(dateTime.plusYears(years));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上增加`秒`：
+
+```java
+public ZonedDateTime plusSeconds(long seconds) { // [!code focus]
+    return resolveInstant(dateTime.plusSeconds(seconds));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上增加`纳秒`：
+
+```java
+public ZonedDateTime plusNanos(long nanos) { // [!code focus]
+    return resolveInstant(dateTime.plusNanos(nanos));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上增加`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
+
+```java
+public ZonedDateTime plus(long amountToAdd, TemporalUnit unit) { // [!code focus]
+    if (unit instanceof ChronoUnit) {
+        if (unit.isDateBased()) {
+            return resolveLocal(dateTime.plus(amountToAdd, unit));
+        } else {
+            return resolveInstant(dateTime.plus(amountToAdd, unit));
+        }
+    }
+    return unit.addTo(this, amountToAdd);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.zonedatetime;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class Test {
+    public static void main(String[] args) {
+        ZonedDateTime zonedDateTime = ZonedDateTime.now();
+        System.out.println("zonedDateTime = " + zonedDateTime);
+        // 增加年
+        ZonedDateTime zonedDateTime1 = zonedDateTime.plusYears(2024);
+        System.out.println("zonedDateTime1 = " + zonedDateTime1);
+        // 增加月
+        ZonedDateTime zonedDateTime2 = zonedDateTime.plusMonths(1);
+        System.out.println("zonedDateTime2 = " + zonedDateTime2);
+        // 增加日
+        ZonedDateTime zonedDateTime3 = zonedDateTime.plusDays(20);
+        System.out.println("zonedDateTime3 = " + zonedDateTime3);
+        // 增加小时
+        ZonedDateTime zonedDateTime4 = zonedDateTime.plusHours(1);
+        System.out.println("zonedDateTime4 = " + zonedDateTime4);
+        // 增加分钟
+        ZonedDateTime zonedDateTime5 = zonedDateTime.plusMinutes(1);
+        System.out.println("zonedDateTime5 = " + zonedDateTime5);
+        // 增加秒
+        ZonedDateTime zonedDateTime6 = zonedDateTime.plusSeconds(1);
+        System.out.println("zonedDateTime6 = " + zonedDateTime6);
+        // 增加毫秒
+        ZonedDateTime zonedDateTime7 = zonedDateTime.plus(1L, ChronoUnit.MILLIS);
+        System.out.println("zonedDateTime7 = " + zonedDateTime7);
+        // 增加纳秒
+        ZonedDateTime zonedDateTime8 = zonedDateTime.plusNanos(1);
+        System.out.println("zonedDateTime8 = " + zonedDateTime8);
+    }
+}
+```
+
+#### 2.4.2.4 减少时间系列方法
+
+* 在`当前时间戳（时刻）`基础上减少`年`：
+
+```java
+public ZonedDateTime minusYears(long years) { // [!code focus]
+    return (years == Long.MIN_VALUE ? 
+            plusYears(Long.MAX_VALUE).plusYears(1) : plusYears(-years));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上减少`秒`：
+
+```java
+public ZonedDateTime minusSeconds(long seconds) { // [!code focus]
+    return (seconds == Long.MIN_VALUE ? 
+            plusSeconds(Long.MAX_VALUE).plusSeconds(1) : 
+            plusSeconds(-seconds));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上减少`纳秒`：
+
+```java
+public ZonedDateTime minusNanos(long nanos) { // [!code focus]
+    return (nanos == Long.MIN_VALUE ? 
+            plusNanos(Long.MAX_VALUE).plusNanos(1) : 
+            plusNanos(-nanos));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上减少`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
+
+```java
+public ZonedDateTime minus(long amountToSubtract, TemporalUnit unit) { // [!code focus]
+    return (amountToSubtract == Long.MIN_VALUE ? 
+            plus(Long.MAX_VALUE, unit).plus(1, unit) : 
+            plus(-amountToSubtract, unit));
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.zonedatetime;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class Test {
+    public static void main(String[] args) {
+        ZonedDateTime zonedDateTime = ZonedDateTime.now();
+        System.out.println("zonedDateTime = " + zonedDateTime);
+        // 减少年
+        ZonedDateTime zonedDateTime1 = zonedDateTime.minusYears(2024);
+        System.out.println("zonedDateTime1 = " + zonedDateTime1);
+        // 减少月
+        ZonedDateTime zonedDateTime2 = zonedDateTime.minusMonths(1);
+        System.out.println("zonedDateTime2 = " + zonedDateTime2);
+        // 减少日
+        ZonedDateTime zonedDateTime3 = zonedDateTime.minusDays(20);
+        System.out.println("zonedDateTime3 = " + zonedDateTime3);
+        // 减少小时
+        ZonedDateTime zonedDateTime4 = zonedDateTime.minusHours(1);
+        System.out.println("zonedDateTime4 = " + zonedDateTime4);
+        // 减少分钟
+        ZonedDateTime zonedDateTime5 = zonedDateTime.minusMinutes(1);
+        System.out.println("zonedDateTime5 = " + zonedDateTime5);
+        // 减少秒
+        ZonedDateTime zonedDateTime6 = zonedDateTime.minusSeconds(1);
+        System.out.println("zonedDateTime6 = " + zonedDateTime6);
+        // 减少毫秒
+        ZonedDateTime zonedDateTime7 = zonedDateTime.minus(1L, ChronoUnit.MILLIS);
+        System.out.println("zonedDateTime7 = " + zonedDateTime7);
+        // 减少纳秒
+        ZonedDateTime zonedDateTime8 = zonedDateTime.minusNanos(1);
+        System.out.println("zonedDateTime8 = " + zonedDateTime8);
+    }
+}
+```
+
+## 2.5 格式化（DateTimeFormatter）
+
+### 2.5.1 概述
+
+* `DateTimeFormatter` 和 `SimpleDateFormat` 类似，是 JDK8 新增的用于格式化时间的类。
+
+### 2.5.2 静态方法
+
+* 使用静态方法，获取一个 DateTimeFormatter 对象：
+
+```java
+public static DateTimeFormatter ofPattern(String pattern) { // [!code focus]
+    return new DateTimeFormatterBuilder().appendPattern(pattern).toFormatter();
+} // [!code focus]
+```
+
+> [!NOTE]
+>
+> ::: details 点我查看 pattern 的具体含义
+>
+> ![日期格式化规则](./assets/8.webp)
+>
+> :::
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.format;
+
+import java.time.format.DateTimeFormatter;
+
+public class Test {
+    public static void main(String[] args) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        System.out.println("df = " + df);
+    }
+}
+```
+
+### 2.5.3 常用 API
+
+#### 2.5.3.1 将日期对象格式化为字符串
+
+* 格式化（日期对象 --> 字符串）：
+
+```java
+public String format(TemporalAccessor temporal) { // [!code focus]
+    StringBuilder buf = new StringBuilder(32);
+    formatTo(temporal, buf);
+    return buf.toString();
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.format;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class Test {
+    public static void main(String[] args) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        // 格式化
+        String format = df.format(ZonedDateTime.now());
+        // format = 2025-04-23 10:36:35
+        System.out.println("format = " + format);
+    }
+}
+```
+
+#### 2.5.3.2 将字符串解析为日期对象
+
+* 解析（字符串 --> 日期对象）：
+
+```java
+public TemporalAccessor parse(CharSequence text) { // [!code focus]
+    Objects.requireNonNull(text, "text");
+    try {
+        return parseResolved0(text, null);
+    } catch (DateTimeParseException ex) {
+        throw ex;
+    } catch (RuntimeException ex) {
+        throw createError(text, ex);
+    }
+} // [!code focus]
+```
+
+> [!CAUTION]
+>
+> 如果给定的字符串内容和 DateTimeFormatter 对象中传递的 pattern 参数不匹配，将会报错！！！
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.format;
+
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+
+public class Test {
+    public static void main(String[] args) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        // 格式化
+        String format = df.format(ZonedDateTime.now());
+        // format = 2025-04-23 10:36:35
+        System.out.println("format = " + format);
+        // 解析
+        TemporalAccessor parse = df.parse("2025-05-05 11:11:11");
+        LocalDateTime localDateTime = LocalDateTime.from(parse);
+        // localDateTime = 2025-05-05T11:11:11
+        System.out.println("localDateTime = " + localDateTime);
+    }
+}
+```
 
 ## 2.5 日历
 

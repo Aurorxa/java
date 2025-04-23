@@ -85,14 +85,3 @@ html {
   color: var(--vp-c-brand-1) !important;
   transition: color 0.25s !important;
 }
-
-/* .VPSidebarItem.level-0 h2.text{
-    background: -webkit-linear-gradient(10deg, #bd34fe 5%, #e43498 15%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-} */
-
-/* .VPSidebarItem.level-1 {
-  margin-left: 20px;
-} */
