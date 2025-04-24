@@ -1,8 +1,14 @@
+> [!IMPORTANT]
+>
+> * ① 在 AI 时代，并不需要`记住`正则表达式的规则，只需要了解一下。
+> * ② 如果不会写正则表达式，没有关系，直接问 AI 就可以了。
+
 # 第一章：前言
 
 ## 1.1 概述
 
-* [正则表达式](https://regex-vis.com/)可以`校验字符串`是否满足一定的`规则`，并用来校验数据格式的合法性。
+* [正则表达式](https://regex-vis.com/)可以`校验字符串`是否满足一定的`规则`。
+* [正则表达式](https://any-rule.vercel.app/)可以`校验数据格式`的合法性。
 
 ## 1.2 引入
 
@@ -377,17 +383,17 @@ public class Test {
 
 ### 2.2.1 练习一
 
-* 需求：编写正则表达式验证用户输入的手机号码、邮箱以及电话号码是否满足要求。
+* 需求：编写正则表达式，验证用户输入的`手机号码`、`邮箱`以及`座机号码`是否满足要求。
 
 > [!NOTE]
 >
 > * ① 手机号码：13112345678、13712345667、13945679027、13945679021。
-> * ② 电话号码：020-23242421、021-22442111、027-42421324、0712-32422434。
+> * ② 座机号码：020-23242421、22442111、027-42421324、0712-32422434、3242243。
 > * ③ 邮箱：3232323@qq.com、abc@163.com。
 
 
 
-* 示例：
+* 示例：校验手机号码
 
 ```java
 package com.github.test;
@@ -396,11 +402,16 @@ import java.util.Objects;
 
 public class Test {
     public static void main(String[] args) {
-
-        System.out.println(validateMobilePhone("13112345678"));
-        System.out.println(validateMobilePhone("13712345667"));
-        System.out.println(validateMobilePhone("13945679027"));
-        System.out.println(validateMobilePhone("13945679021"));
+        System.out.println(checkPhone("14559862048")); // true
+        System.out.println(checkPhone("13407924148")); // true
+        System.out.println(checkPhone("18740982533")); // true
+        System.out.println(checkPhone("18977767532")); // true
+        System.out.println(checkPhone("18384559968")); // true
+        System.out.println(checkPhone("13400964453")); // true
+        System.out.println(checkPhone("17389014861")); // true
+        System.out.println(checkPhone("15687263208")); // true
+        System.out.println(checkPhone("18726392246")); // true
+        System.out.println(checkPhone("133184610101")); // false
     }
 
     /**
@@ -408,7 +419,7 @@ public class Test {
      * @param phone 手机号码
      * @return true 成功，false 失败
      */
-    public static boolean validateMobilePhone(String phone) {
+    public static boolean checkPhone(String phone) {
         if (Objects.isNull(phone)) {
             return false;
         }
@@ -417,27 +428,29 @@ public class Test {
 
         return phone.matches(regex);
     }
-
 }
 ```
 
 
 
-* 示例：
+* 示例：校验座机号码
 
 ```java
 package com.github.test;
 
 import java.util.Objects;
 
-public class Test {
+public class Test2 {
     public static void main(String[] args) {
-
-        System.out.println(validatePhone("020-23242421"));
-        System.out.println(validatePhone("021-22442111"));
-        System.out.println(validatePhone("027-4242132"));
-        System.out.println(validatePhone("0712-32422434"));
-
+        System.out.println(checkPhone("020-23242421")); // true
+        System.out.println(checkPhone("021-22442111")); // true
+        System.out.println(checkPhone("027-4242132")); // true
+        System.out.println(checkPhone("0712-32422434")); // true
+        System.out.println(checkPhone("0970-36890760")); // true
+        System.out.println(checkPhone("0712-29613526")); // true
+        System.out.println(checkPhone("29613526")); // true
+        System.out.println(checkPhone("2324242")); // true
+        System.out.println(checkPhone("2324242111111")); // false
     }
 
     /**
@@ -447,22 +460,21 @@ public class Test {
      * @param phone 座机号码
      * @return true 成功，false 失败
      */
-    public static boolean validatePhone(String phone) {
+    public static boolean checkPhone(String phone) {
         if (Objects.isNull(phone)) {
             return false;
         }
 
-        String regex = "^0\\d{2,3}-\\d{7,8}$";
+        String regex = "^(0\\d{2,3}-)?[1-9]\\d{6,7}$";
 
         return phone.matches(regex);
     }
-
 }
 ```
 
 
 
-* 示例：
+* 示例：校验邮箱
 
 ```java
 package com.github.test;
@@ -471,9 +483,9 @@ import java.util.Objects;
 
 public class Test {
     public static void main(String[] args) {
-
-        System.out.println(validateEmail("3232323@qq.com"));
-        System.out.println(validateEmail("abc@163.com"));
+        System.out.println(checkEmail("3232323@qq.com")); // true
+        System.out.println(checkEmail("abc@163.com")); // true
+        System.out.println(checkEmail("abc@163")); // false
     }
 
     /**
@@ -481,7 +493,7 @@ public class Test {
      * @param email 邮箱
      * @return true 成功，false 失败
      */
-    public static boolean validateEmail(String email) {
+    public static boolean checkEmail(String email) {
         if (Objects.isNull(email)) {
             return false;
         }
@@ -494,4 +506,245 @@ public class Test {
 ```
 
 ### 2.2.2 练习二
+
+* 需求：请编写正则表达式，验证用户名是否满足要求。
+
+> [!NOTE]
+>
+> 规则：大小写字母，数字，下划线，一共 4~16 位。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(checkUserName("swyLEpk0")); // true
+        System.out.println(checkUserName("XE2h8")); // true
+        System.out.println(checkUserName("bv5fXpF0k")); // true
+        System.out.println(checkUserName("gTTt6nyb4v")); // true
+        System.out.println(checkUserName("aisf1HH")); // true
+        System.out.println(checkUserName("ai_dfda")); // true
+        System.out.println(checkUserName("_df")); // false
+    }
+
+    /**
+     * 验证用户名
+     * @param username 用户名
+     * @return true 成功，false 失败
+     */
+    public static boolean checkUserName(String username) {
+        if (Objects.isNull(username)) {
+            return false;
+        }
+
+        String regex = "^\\w{4,16}$";
+
+        return username.matches(regex);
+    }
+}
+```
+
+### 2.2.3 练习三
+
+* 需求：请编写正则表达式，验证身份证号码是否满足要求。
+
+> [!NOTE]
+>
+> 规则：18位，前 17 位任意数字，最后一位可以是数字可以是大写或小写的 x 。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(checkIdCard("150928195106037110")); // true
+        System.out.println(checkIdCard("350124201102148311")); // true
+        System.out.println(checkIdCard("520526201306240810")); // true
+        System.out.println(checkIdCard("42282319500718393X")); // true
+        System.out.println(checkIdCard("542524197605269078")); // true
+        System.out.println(checkIdCard("420981199512047176")); // true
+        System.out.println(checkIdCard("42112420101014163X")); // true
+        System.out.println(checkIdCard("42112420101014163Xa")); // false
+    }
+
+    /**
+     * 身份证号码
+     * @param code 身份证号码
+     * @return true 成功，false 失败
+     */
+    public static boolean checkIdCard(String code) {
+        if (Objects.isNull(code)) {
+            return false;
+        }
+
+        String regex =
+                "^([1-6][1-9]|50)\\d{4}(18|19|20)\\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$";
+
+        return code.matches(regex);
+    }
+}
+
+```
+
+
+
+# 第三章：爬虫
+
+## 3.1 概述
+
+* 爬虫（网络爬虫、网络蜘蛛、网络机器人）是一种自动浏览互联网的程序或脚本。
+
+![](./assets/1.png)
+
+* 爬虫就是**代替人手动去浏览网页，但是速度更快、效率更高，并且能够大规模地自动化进行**。
+
+> [!NOTE]
+>
+> ::: details 点我查看 爬虫出现的主要目的
+>
+> * ① **发现和收集信息：** 爬虫会访问网页，读取其中的内容。
+> * ② **跟踪链接：** 它会查找网页中的超链接（links），然后访问这些链接指向的其他网页，就像蜘蛛在网上爬行一样。
+> * ③ **建立索引：** 最常见的用途是为搜索引擎（Google, Bing）建立网页索引。爬虫抓取了大量网页内容后，搜索引擎会对这些内容进行分析、处理，然后存入数据库，这样用户搜索时就能快速找到相关的网页。
+> * ④ **数据抓取 (Web Scraping)：** 有时候，爬虫也被用来从网页中提取特定的结构化数据，用于数据分析、价格比较、信息聚合等目的（这通常称为 Web Scraping，但爬虫是其基础）。
+>
+> :::
+
+![](./assets/2.png)
+
+> [!NOTE]
+>
+> 其实，正则表达式的第二个作用：在一段文本中查找满足要求的内容，就类似于爬虫！！！
+
+## 3.2 本地爬虫
+
+* 需求：找出如下文本中的所有 `JavaXxx` 。
+
+> [!NOTE]
+>
+> * ① 文本的内容是：“Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。”
+> * ② 可以通过 Java 的 Pattern 类和 Matcher 类来实现：
+>   * Pattern 类就是用来表示正则表达式。
+>   * Matcher 类是一个文本匹配器，其作用就是按照`正则表达式的规则`从头开始读取字符串，并在大的字符串去寻找符合规则的子串。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        // 获取正则表达式对象
+        Pattern pattern = Pattern.compile("Java\\d+");
+
+        // 通过正则表达式对象(pattern)，传入大串(str)，以便获取文本匹配器对象(matcher)
+        // matcher 要在 str 中寻找符合 pattern 规则的子串
+        Matcher matcher = pattern.matcher(str);
+
+        // 判断是否找到
+        // 如果没有，返回false
+        // 如果找到，返回true，底层会记录子串的起始索引和结束索引+1
+        while (matcher.find()) {
+            // 底层会根据 find 方法记录的索引进行字符串的截取，即：str.substring(start,end)
+            // 并将截取之后的小串返回
+            String group = matcher.group();
+            System.out.println(group);
+        }
+    }
+}
+```
+
+## 3.3 综合练习
+
+* 需求：把下面文本中的`电话`，`邮箱`，`手机号`，`热线`都爬取出来。
+
+> [!NOTE]
+>
+> 如果您有任何疑问，可以通过我们的客服**热线**（400-618-9090、400-618-4000）进行咨询，或者拨打页面下方的**电话**（010-36517895、010-98951256）。您也可以选择发送邮件至我们的官方**邮箱**（abc@qq.com、bcd@163.com），留下您的联系方式和问题，我们会尽快回复。如果您急需帮助，也可以直接拨打我们的指定**手机号**（18512516758、18512508907）。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        如果您有任何疑问，可以通过我们的客服热线（400-618-9090、400-618-4000）进行咨询，或者拨打页面下方的电话（010-36517895、010-98951256）。
+        您也可以选择发送邮件至我们的官方邮箱（abc@qq.com、bcd@qq.com），留下您的联系方式和问题，我们会尽快回复。
+        如果您急需帮助，也可以直接拨打我们的指定手机号（18512516758、18512508907）""";
+
+        // 获取座机号码
+        String regex = "[1-9]\\d{2}-?[1-9]\\d{2}-?{2}-\\d{4}";
+        List<String> reptile = reptile(regex, str);
+        System.out.println(reptile);
+
+        // 国内电话
+        regex = "(0\\d{2,3}-)?[1-9]\\d{6,7}";
+        reptile = reptile(regex, str);
+        System.out.println(reptile);
+
+        // 手机号码
+        regex = "1[3-9]\\d{9}";
+        reptile = reptile(regex, str);
+        System.out.println(reptile);
+
+        // 邮箱
+        regex = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
+        reptile = reptile(regex, str);
+        System.out.println(reptile);
+    }
+
+    /**
+     * 根据正则表达式提取信息，并存储到集合中
+     * @param regex 正则表达式
+     * @param str 文本
+     * @return 集合
+     */
+    public static List<String> reptile(String regex, String str) {
+
+        List<String> list = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(str);
+
+        while (matcher.find()) {
+            list.add(matcher.group());
+        }
+
+        return list;
+    }
+}
+```
+
+
 
