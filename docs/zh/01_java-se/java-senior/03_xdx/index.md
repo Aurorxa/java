@@ -346,14 +346,14 @@ public class Test {
 
 * 数量类：
 
-| 正则表达式（数量类） | 含义                                            |
-| -------------------- | ----------------------------------------------- |
-| `X?`                 | X 字符最多只能出现一次（ 0 次或 1 次）          |
-| `X*`                 | X 字符可以出现 0 次或多次                       |
-| `X+`                 | X 字符可以出现 1 次或多次                       |
-| `X{n}`               | X 字符只能出现 n 次                             |
-| `X{n,}`              | X 字符至少出现 n 次（在数学中表示 [n,+∞) ）     |
-| `X{n,m}`             | X 字符只能出现 n 到 m 次（在数学中表示 [n,m] ） |
+| 正则表达式（数量类） | 含义                                                    |
+| -------------------- | ------------------------------------------------------- |
+| `X{n}`               | X 字符只能出现 n 次                                     |
+| `X{n,}`              | X 字符至少出现 n 次，类似于数学中的 `[n,+∞)`            |
+| `X{n,m}`             | X 字符只能出现 n 到 m 次，类似于数学中的 `[n,m]`        |
+| `X?`                 | X 字符最多只能出现一次（ 0 次或 1 次），相当于 `X{0,1}` |
+| `X*`                 | X 字符可以出现 0 次或多次，相当于 `X{0,}`               |
+| `X+`                 | X 字符可以出现 1 次或多次，相当于 `X{1,}`               |
 
 
 
@@ -782,25 +782,18 @@ public class RegexDemo3 {
 
 ![](./assets/3.svg)
 
-> [!NOTE]
->
-> * 在数学中，如果表达式是这样的，如下所示：
->
-> ```txt
-> a + a
-> ```
->
-> * 我们会使用`()`将多个项视为一个整体（分组），如下所示：
->
-> ```txt
-> (a) * 2
-> ```
-
-* 其实，在正则表达式中，也是一样的，我们也可以使用`()`来将多个项作为一个整体（分组），来达到简化正则表达式的书写，如下所示：
+* 其实，我们可以使用`()`来将多个项作为一个整体（分组），来达到简化正则表达式的书写，如下所示：
 
 ```txt
 [0-2][0-3](:[0-5]\\d){2}
 ```
+
+> [!NOTE]
+>
+> 所谓的分组就是将`多个元素视为一个整体`，即：我们想要的是一个`序列`，而不是单个字符应用量词（`X*`、`X+`、`X{n,m}`）：
+>
+> * ① `ab+`表示的是 a 后面跟着多个 b，如：ab、abb、abbb 等，量词 `+` 只作用于 `b`。
+> * ② `(ab)+`表示的 `ab`作为一个整体（序列）会重复一次或多次，如：ab、abab、ababab 等，量词 `+` 只作用于 `ab`。
 
 * 如下所示：
 
@@ -811,6 +804,14 @@ public class RegexDemo3 {
 ```txt
 ([01]\\d|2[0-3])(:[0-5]\\d){2}
 ```
+
+> [!NOTE]
+>
+> 当我们需要限制`|`运算符的作用范围时，也需要分组：
+>
+> * ① `cat|dog` 匹配的是 cat 或 dog。
+> * ② `gr(a|e)y` 匹配的是 gray 或 grey。
+> * ③ `grae|ey` 匹配的是 grae 或 ey。
 
 * 如下所示：
 
@@ -825,9 +826,11 @@ public class RegexDemo3 {
 >
 > ::: details 点我查看 具体细节
 >
-> ![](./assets/6.svg)
+> ![](./assets/6.png)
 >
 > :::
+>
+> * ③ 如果后续还需要使用本组的数据，在正则内部可以使用 `\\组号`，在正则外部可以使用 `$组号`。
 
 ### 3.4.2 捕获分组
 
@@ -845,6 +848,25 @@ public class RegexDemo3 {
 
 
 
+* 示例：
+
+```java
+package com.github.regex3;
+
+public class Test {
+    public static void main(String[] args) {
+        // \\组号：表示将 X 组的内容拿出来再用一次
+        String regex = "(.).+\\1";
+
+        System.out.println("a123a".matches(regex)); // true
+        System.out.println("b456b".matches(regex)); // true
+        System.out.println("17891".matches(regex)); // true
+        System.out.println("&abc&".matches(regex)); // true
+        System.out.println("a123b".matches(regex)); // false
+    }
+}
+```
+
 #### 3.4.2.3 应用示例
 
 * 需求：判断一个字符串的开始部分和结束部分是否一致？可以有多个字符。
@@ -854,6 +876,26 @@ public class RegexDemo3 {
 > 举例：`abc`123`abc`、`b`456`b`、`123`789`123`、`&!@`abc`&!@`。
 
 
+
+* 示例：
+
+```java
+package com.github.regex3;
+
+public class Test {
+    public static void main(String[] args) {
+        // \\组号：表示将 X 组的内容拿出来再用一次
+        String regex = "(.+).+\\1";
+
+        System.out.println("abc123abc".matches(regex)); // true
+        System.out.println("b456b".matches(regex)); // true
+        System.out.println("1237891123".matches(regex)); // true
+        System.out.println("&abc&".matches(regex)); // true
+        System.out.println("&!@abc&!@".matches(regex)); // false
+        System.out.println("&!abc&!@".matches(regex)); // false
+    }
+}
+```
 
 #### 3.4.2.4 应用示例
 
@@ -865,9 +907,503 @@ public class RegexDemo3 {
 
 
 
+* 示例：
+
+```java
+package com.github.regex3;
+
+public class Test {
+    public static void main(String[] args) {
+        // \\组号：表示将 X 组的内容拿出来再用一次
+        String regex = "((.)\\2+).+\\1";
+
+        System.out.println("aaa123aaa".matches(regex)); // true
+        System.out.println("bbb456bbb".matches(regex)); // true
+        System.out.println("111789111".matches(regex)); // true
+        System.out.println("&&abc&&".matches(regex)); // true
+        System.out.println("&abc&&".matches(regex)); // false
+    }
+}
+```
+
+#### 3.4.2.5 应用示例
+
+* 需求：将字符串`我要学学编编编编编编编程程程程程程`，替换为`我要学编程`。
+
+
+
+* 示例：
+
+```java
+package com.github.regex3;
+
+public class Test {
+    public static void main(String[] args) {
+        String str = "我要学学编编编编编编编程程程程程程";
+
+        // 将重复的内容替换为单个，如：学学 --> 学
+        // (.) 将重复内容的第一个字符看成一组
+        // \\1 表示第一个字符会再次出现
+        // + 至少一次
+        // $1 表示将正则表达式中第一组的内容，再拿出来用
+        String result = str.replaceAll("(.)\\1+", "$1");
+
+        System.out.println("result = " + result);
+    }
+}
+```
+
+### 3.4.3 非捕获分组
+
+#### 3.4.3.1 概述
+
+* 有的时候，我们可能只需要分组（为了应用量词或限制`|`的范围），但是不需要捕获匹配的文本，此时就可以使用非捕获分组。
+
+> [!NOTE]
+>
+> * ① 分组捕获有两个作用：
+>   * 分组：将 `()`里面的内容当做一个整体来处理，如：对这个整体应用量词（`+`, `*` 等）或限制 `|` (或) 的范围。
+>   * 捕获：其实就是将捕获的分组内容`()`，即：从文本中匹配到的片段存储起来，以便后续可以使用反向引用`\组号`来访问这些被捕获的文本。
+> * ② 非捕获分组有两个作用（只分组，不捕获）：
+>   * 分组：将 `()`里面的内容当做一个整体来处理，如：对这个整体应用量词（`+`, `*` 等）或限制 `|` (或) 的范围。
+>   * 不捕获：放弃了捕获功能，即：不会将从文本中匹配到的片段存储起来。
+
+| 符号       | 含义                       | 例子              |
+| ---------- | -------------------------- | ----------------- |
+| `(?:正则)` | 捕获所有                   | Java(?:8\|11\|17) |
+| `(?=正则)` | 获取前面部分               | Java(?=8\|11\|17) |
+| `(?!正则)` | 获取不是指定内容的前面部分 | Java(?!8\|11\|17) |
+
+#### 3.4.3.2 应用示例
+
+* 需求：把下面文本中的版本号为 8、11、17 的 Java 文本都爬取出来；但是，只需要 Java ，不需要版本号。
+
+> [!NOTE]
+>
+> Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+>
+> 下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
+
+
+
+* 示例：
+
+```java
+package com.github.regex2;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        // ? 占位符，理解为前面的Java
+        // = 表示在 Java 后面跟随的数据
+        // 但是，在获取的时候，只获取前半部分
+        Pattern pattern = Pattern.compile("Java(?=8|11|17)");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            String group = matcher.group();
+            System.out.println(group);
+        }
+    }
+}
+
+```
+
+#### 3.4.3.3 应用示例
+
+* 需求：把下面文本中的版本号为 8、11、17 的 Java 文本都爬取出来。正确的爬取结果是 Java8、Java11、Java17、Java17。
+
+> [!NOTE]
+>
+> Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+>
+> 下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
+
+
+
+* 示例：
+
+```java
+package com.github.regex2;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        Pattern pattern = Pattern.compile("Java(?:8|11|17)");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            String group = matcher.group();
+            System.out.println(group);
+        }
+    }
+}
+```
+
+#### 3.4.3.4 应用示例
+
+* 需求：把下面文本中除了版本号为 8、11、17 的 Java 文本都爬取出来。
+
+> [!NOTE]
+>
+> Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+>
+> 下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
+
+
+
+* 示例：
+
+```java
+package com.github.regex2;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        Pattern pattern = Pattern.compile("Java(?!8|11|17)");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            String group = matcher.group();
+            System.out.println(group);
+        }
+    }
+}
+```
+
+## 3.5 贪婪匹配和非贪婪匹配
+
+### 3.5.1 概述
+
+* 所谓的贪婪匹配，就是在爬取数据的时候，进可能得多获取数据。
+
+> [!NOTE]
+>
+> 正则表达式默认采取的是贪婪匹配，如：`abbbbbbaaaa`使用 `ab+`进行匹配，匹配的结果是 `abbbbbb`。
+
+* 所谓的非贪婪匹配，就是在爬取数据的时候，进可能得少获取数据。
+
+> [!NOTE]
+>
+> 正则表达式默认采取的是贪婪匹配，但是我们可以添加`?`表示非贪婪匹配，如：`+?` 或 `*?`，如：`abbbbbbaaaa`使用 `ab+?`进行匹配，匹配的结果是 `ab`。
+
+### 3.5.2 应用示例
+
+* 需求：按照`ab+`的方式爬取`ab`，`b`尽可能多的获取。
+
+> [!NOTE]
+>
+> Java自从 95 年问世以来，abbbbbbbbbbaaaaaaaaaa 经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+> 下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
+
+
+
+* 示例：
+
+```java
+package com.github.regex2;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java自从 95 年问世以来，abbbbbbbbbbaaaaaaaaaa
+        经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        Pattern pattern = Pattern.compile("ab+");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            String group = matcher.group();
+            System.out.println(group); // abbbbbbbbbb
+        }
+    }
+}
+```
+
+### 3.5.3 应用示例
+
+* 需求：按照`ab+`的方式爬取`ab`，`b`尽可能少的获取。
+
+> [!NOTE]
+>
+> Java自从 95 年问世以来，abbbbbbbbbbaaaaaaaaaa 经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+> 下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
+
+
+
+* 示例：
+
+```java
+package com.github.regex2;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java自从 95 年问世以来，abbbbbbbbbbaaaaaaaaaa
+        经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        Pattern pattern = Pattern.compile("ab+?");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            String group = matcher.group();
+            System.out.println(group); // ab
+        }
+    }
+}
+```
+
+## 3.6 String 中关于正则表达式的方法
+
+### 3.6.1 拆分字符串
+
+* 根据指定的`正则表达式`拆分字符串：
+
+```java
+public String[] split(String regex) { // [!code focus]
+    return split(regex, 0);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.regex2;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+        String str = "192.168.2.5";
+
+        String[] ips = str.split("\\.");
+
+        System.out.println(Arrays.toString(ips));
+    }
+}
+```
+
+```txt [cmd 控制台]
+[192, 168, 2, 5]
+```
+
+:::
+
+### 3.6.2 匹配字符串
+
+* 判断字符串是否匹配指定的`正则表达式`：
+
+```java
+public boolean matches(String regex) { // [!code focus]
+    return Pattern.matches(regex, this);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.regex2;
+
+public class Test {
+    public static void main(String[] args) {
+        String iphone = "13800138000";
+        boolean matches = iphone.matches("^1[3-9]\\d{9}$");
+        System.out.println("matches = " + matches);
+    }
+}
+```
+
+```txt [cmd 控制台]
+matches = true
+```
+
+:::
+
+### 3.6.3 替换子串
+
+* 根据指定的`子串`（不支持正则表达式）替换字符串中匹配的子串：
+
+```java
+public String replace(CharSequence target, CharSequence replacement) { // [!code focus]
+    String trgtStr = target.toString();
+    String replStr = replacement.toString();
+    int thisLen = length();
+    int trgtLen = trgtStr.length();
+    int replLen = replStr.length();
+
+    if (trgtLen > 0) {
+        if (trgtLen == 1 && replLen == 1) {
+            return replace(trgtStr.charAt(0), replStr.charAt(0));
+        }
+
+        boolean thisIsLatin1 = this.isLatin1();
+        boolean trgtIsLatin1 = trgtStr.isLatin1();
+        boolean replIsLatin1 = replStr.isLatin1();
+        String ret = (thisIsLatin1 && trgtIsLatin1 && replIsLatin1)
+                ? StringLatin1.replace(value, thisLen,
+                                       trgtStr.value, trgtLen,
+                                       replStr.value, replLen)
+                : StringUTF16.replace(value, thisLen, thisIsLatin1,
+                                      trgtStr.value, trgtLen, trgtIsLatin1,
+                                      replStr.value, replLen, replIsLatin1);
+        if (ret != null) {
+            return ret;
+        }
+        return this;
+
+    } else { // trgtLen == 0
+        int resultLen;
+        try {
+            resultLen = Math.addExact(thisLen, Math.multiplyExact(
+                    Math.addExact(thisLen, 1), replLen));
+        } catch (ArithmeticException ignored) {
+            throw new OutOfMemoryError("Required length exceeds implementation limit");
+        }
+
+        StringBuilder sb = new StringBuilder(resultLen);
+        sb.append(replStr);
+        for (int i = 0; i < thisLen; ++i) {
+            sb.append(charAt(i)).append(replStr);
+        }
+        return sb.toString();
+    }
+} // [!code focus]
+```
+
+* 根据指定的`正则表达式`替换字符串中匹配到的第一个子串：
+
+```java
+public String replaceFirst(String regex, String replacement) { // [!code focus]
+    return Pattern.compile(regex).matcher(this).replaceFirst(replacement);
+} // [!code focus]
+```
+
+* 根据指定的`正则表达式`替换字符串中匹配到的所有子串：
+
+```java
+public String replaceAll(String regex, String replacement) { // [!code focus]
+    return Pattern.compile(regex).matcher(this).replaceAll(replacement);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.regex2;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        String str2 = str.replace("Java", "C#");
+        System.out.println("str2 = " + str2);
+    }
+}
+```
+```txt [cmd 控制台]
+str2 = C#自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 C#8 和 C#11，因为这两个是长期支持版本。
+下一个长期支持版本是 C#17，相信在未来不久 C#17 也会逐渐登上历史舞台。
+```
+
+:::
 
 
 
 
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.regex2;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        String str2 = str.replaceFirst("(?i)java", "C#");
+        System.out.println("str2 = " + str2);
+    }
+}
+
+```
+```txt [cmd 控制台]
+str2 = C#自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
+```
+
+:::
 
 
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.regex2;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        String str2 = str.replaceAll("(?i)java", "C#");
+        System.out.println("str2 = " + str2);
+    }
+}
+
+```
+
+```txt [cmd 控制台]
+str2 = C#自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 C#8 和 C#11，因为这两个是长期支持版本。
+下一个长期支持版本是 C#17，相信在未来不久 C#17 也会逐渐登上历史舞台。
+```
+
+:::
