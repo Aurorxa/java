@@ -1153,7 +1153,8 @@ public class GrilFriend {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         GrilFriend that = (GrilFriend) o;
-        return Objects.equals(name, that.name) && Objects.equals(age, that.age);
+        return Objects.equals(name, that.name) 
+            && Objects.equals(age, that.age);
     }
 
     @Override
