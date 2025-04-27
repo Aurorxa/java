@@ -454,9 +454,10 @@ Exception in thread "main" java.lang.RuntimeException: 学生的年龄的范围�
 ## 3.1 概述
 
 * 在 Java 中，针对异常处理，有如下的三种方式：
-  * ① JVM 默认处理方式。
-  * ② 自己处理。
-  * ③ 抛出异常。
+
+- [x] JVM 默认处理方式。
+- [x] 自己处理。
+- [x] 抛出异常，让调用者决定如何处理。
 
 ## 3.2 JVM 默认处理方式
 
