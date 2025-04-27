@@ -1102,6 +1102,14 @@ public class AgeOutOfBoundsException extends RuntimeException {
 }
 ```
 
+:::
+
+
+
+* 示例：
+
+::: code-group
+
 ```java [GrilFriend.java]
 package com.github.exec;
 
