@@ -782,7 +782,7 @@ public class Test {
 
 ### 3.4.1 概述
 
-* Throwable 是 Java 异常继承体系的顶级父类，其定义的公共方法将会被 Java 中的所有异常类继承。
+* Throwable 是 Java 异常继承体系的顶级父类，其定义的公共方法都将被所有的异常类继承。
 
 ### 3.4.2 常见 API
 
