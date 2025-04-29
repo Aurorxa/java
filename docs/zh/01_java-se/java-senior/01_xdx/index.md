@@ -1,479 +1,87 @@
-# 第一章：API 和 API 帮助文档
+> [!IMPORTANT]
+>
+> * ① 在 AI 时代，并不需要`记住`正则表达式的规则，只需要了解一下。
+> * ② 如果不会写正则表达式，直接问 AI ，在此基础上，会修改也行。
+
+# 第一章：前言
 
 ## 1.1 概述
 
-* 之前我们已经学习过了面向对象了。并且我们知道，面向对象具体就是两个部分：
-  * ① `如何使用别人已经写好的东西`。
-  * ② `我们自己如何设计一个类，并使用`。
-* 之前，我们都是学习`自己如何设计一个类，并使用`。但是，不可能所有的功能都是我们自己去手动实现，这样效率太低。
+* [正则表达式](https://regex-vis.com/)可以`校验字符串`是否满足一定的`规则`。
+* [正则表达式](https://any-rule.vercel.app/)可以`校验数据格式`的合法性。
+
+## 1.2 引入
+
+* 需求：校验 QQ 号码是否正确？
 
 > [!NOTE]
 >
-> * ① 为了降低开发的难度，Java 官方将一些常用的功能进行了封装，并形成 API 供我们调用。
-> * ② 有的时候，我们需要实现一些功能，Java 官方并没有实现，如：通过 Java 代码去操作 Word、Excel 等，这个时候就需要调用一些第三方库提供的 API，如：Apache POI 等。
-
-* 之后，在学习和工作的时候，我们也需要学习`如何使用别人已经写好的东西`。
-
-## 1.2 ISA、ABI 和 API
-
-* ISA 、ABI 和 API 的参考模型，如下所示：
-
-![ISA 、ABI 和 API 的参考模型](./assets/1.jpg)
-
-* 在底层，硬件模型以指令集架构 （ISA） 表示，该架构定义了处理器、寄存器、存储器和中断管理的指令集。ISA 是硬件和软件之间的接口，对于操作系统 （OS） 开发人员 （System ISA） 和直接管理底层硬件的应用程序 （User ISA） 的开发人员来说非常重要。
-
-> [!NOTE]
->
-> - ① ISA 是计算机体系结构中定义的一组指令，它规定了处理器能够执行的操作。ISA 包括指令的编码、寄存器的使用、内存访问模式等。不同的处理器可能有不同的 ISA，例如：x86、ARM、MIPS 等。
-> - ② 在设计一个新的操作系统时，开发者需要确保操作系统能够支持特定的 ISA ，以便在特定的硬件上运行。例如：如果操作系统旨在运行在 ARM 架构的处理器上，那么它必须能够理解和执行 ARM ISA 定义的指令集。
-
-* 应用程序二进制接口 （ABI） 将`操作系统层`与由操作系统管理的`应用程序`和`库`分开。ABI 涵盖了低级数据类型、对齐方式和调用约定等详细信息，并定义了可执行程序的格式。系统调用在此级别定义。此接口允许应用程序和库在实现相同 ABI 的操作系统之间移植。
-
-> [!NOTE]
->
-> - ① ABI 是指在二进制级别上，应用程序与操作系统、库或应用程序的不同部分之间的接口。它定义了数据类型的大小、布局、对齐方式，以及函数调用的约定（如参数如何传递、返回值如何处理等）。ABI 确保了编译后的二进制文件能够在特定的操作系统和硬件平台上正确地运行。
-> - ② 在 windows 上的应用程序的运行格式是：`PE`（portable executable）格式、`.dll` （dynamic link library）格式和 `.lib` 格式；而在 Linux 上的应用程序的运行格式是：`ELF`（executable and linking format）格式、`.so` （shared object）格式和 `.a` 格式。
-> - ③ 在 Linux 中可以通过 `file /bin/ls` 命令查看指定可执行应用程序的 ABI 格式；从而也可以论证，在 Windows 上可以运行的程序，在 Linux 上运行不了。
-> - ④ 当开发者在 Linux 系统上编写 C 语言程序，并使用特定的编译器（如：GCC）编译时，编译器会遵循 Linux 平台的 ABI 规范来生成二进制文件。这样，生成的可执行文件就可以在任何遵循相同 ABI 规范的 Linux 系统上运行。
-> - ⑤ 如果一个应用程序需要跨平台（操作系统）运行，就需要使用`一套代码，多平台编译`的方式（针对 C 或 C++ 等），即：相同的源代码，在不同平台（操作系统）上使用特定平台的编译器（如：GCC）来分别编译成符合自己平台的 ABI 规范的二进制文件。
-
-* 最高级别的抽象由应用程序编程接口 （API） 表示，它将`应用程序`连接到`库`或`底层操作系统`。
-
-> [!NOTE]
->
-> - ① API 是一组预定义的函数、协议和工具，用于构建软件和应用程序。API 允许不同的软件系统相互交互，它定义了软件组件之间如何相互通信。API 可以是库、框架、协议或服务。
-> - ② 在 Web 开发中，开发者可能会使用 JavaScript 的 Fetch API 来与服务器进行通信，获取数据或提交表单。这个 API 提供了一种标准化的方式来发送 HTTP 请求和处理响应，而不需要开发者关心底层的网络协议细节。
-
-## 1.3 API
-
-* `API`（`A`pplication `P`rogramming `I`nterface）：应用程序编程接口。
-
-> [!NOTE]
->
-> API 的简单理解：API 就是别人已经写好的东西，我们不需要自己编写，直接使用。（无情的调参侠）
-
-* `Java API`：指的是 JDK 中提供的各种功能的 Java 类。
-
-> [!NOTE]
->
-> * ① Java API（应用程序编程接口）是 Java 编程语言提供的一组预定义的类、接口、方法和工具，它们用于帮助开发人员快速构建应用程序。
-> * ② Java API 是 Java 平台的重要组成部分，提供了大量的功能模块，开发人员可以直接使用这些模块来避免重复造轮子。
-> * ③ Java API 涵盖了广泛的领域，包括输入/输出、网络、数据库连接、图形用户界面等。
-> * ④ 这些类将底层的实现封装起来，我们并不需要关心这些类是如何实现的，只需要学习如何使用这些类。
-
-* `第三方 API`：指的是开源组织或个人提供用于实现特定功能的 Java 类，如：Apache 的 POI 。
-
-## 1.4 API 帮助文档
-
-* Java 本身提供的 API 实在是太多太多，如果每个类，我们都需要背诵并记忆，那么我们想哭的心都有，如下所示：
-
-![Java API 太多，想哭 🥺](./assets/2.gif)
-
-* 为了帮助开发人员（程序员）能快速的搜索、了解以及学习的 Java 中的 API，Java 提供了文档，如下所示：
-
-> [!NOTE]
->
-> Java 中的`API 帮助文档`是通过`java doc`工具根据`文档注释`来生成的！！！
-
-![Java API 帮助文档](./assets/3.png)
-
-## 1.5 API 学习方法（⭐）
-
-* ① 千万不要去背 Java 中的 API （根据背不完），因为 Java 中的 API 实现是太多了！！！
-* ② 只需要记住`类名`和`类的作用`就可以了。
-* ③ 平常养成查询 API 帮助文档的习惯。
-
-
-
-# 第二章：Math 类
-
-## 2.1 概述
-
-* Math 类是一个帮助我们用于数学计算的`工具类`。
-* Math 类的构造方法是私有的，所有的方法都是静态方法。
-
-## 2.2 常用 API
-
-### 2.2.1 绝对值
-
-* 求一个数的绝对值：
-
-```java
-public static int abs(int a){
-    ...
-}
-```
-
-```java
-public static long abs(long a){
-    ...
-}
-```
-
-```java
-public static float abs(float a){
-    ...
-}
-```
-
-```java
-public static double abs(double a){
-    ...
-}
-```
-
-> [!NOTE]
->
-> * ① int 取值范围是：`[-2147483648,2147483647]`，如果对`abs(-2147483648)`求绝对值，其值还是`-2147483648`，因为`-2147483648`对应的绝对值`2147483648`，不在 int 的取值范围内。
-> * ② 在实际开发中，更推荐使用`absExact`方法代替`abs`方法，因为对于`-2147483648`这种问题，`absExact`直接抛出异常。
+> * ① 规则：6 ~ 20 位之内，0 不能在开头，必须全部是数字。
+> * ② 使用之前学习的知识完成上述需求。
+> * ③ 使用正则表达式来简化书写。
 
 
 
 * 示例：
 
-```java
-package com.github;
+```java {25-47,54-62}
+package com.github.regex;
 
-public class MathDemo {
+import java.util.Objects;
+import java.util.Scanner;
+
+public class Test {
     public static void main(String[] args) {
-        int abs = Math.abs(1);
-        System.out.println("abs = " + abs); // abs = 1
-
-        abs = Math.abs(-1);
-        System.out.println("abs = " + abs); // abs = 1
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class MathDemo {
-    public static void main(String[] args) {
-        int abs = Math.abs(-2147483648);
-        System.out.println("abs = " + abs); // abs = -2147483648
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class MathDemo {
-    public static void main(String[] args) {
-        // 运行报错
-        // Exception in thread "main" java.lang.ArithmeticException:
-        // Overflow to represent absolute value of Integer.MIN_VALUE
-        int abs = Math.absExact(-2147483648);
-        System.out.println("abs = " + abs); // 
-    }
-}
-```
-
-### 2.2.2 向上取整和向下取值
-
-* 向上取整：
-
-```java
-public static double ceil(double a){
-    ...
-}
-```
-
-* 向下取整：
-
-```java
-public static double floor(double a){
-    ...
-}
-```
-
-> [!NOTE]
->
-> * ① `向上取整`类似于数学中的`进一法`，即：向正无穷大的方向获取距离最近的整数。
->
-> ::: details 点我查看 具体细节
->
-> ![向上取整](./assets/4.png)
->
-> :::
->
-> * ② `向下取整`类似于数学中的`去尾法`，即：向负无穷大的方向获取距离最近的整数。
->
-> ::: details 点我查看 具体细节
->
-> ![向下取整](./assets/5.png)
->
-> :::
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class MathDemo {
-    public static void main(String[] args) {
-        System.out.println(Math.ceil(12.34)); // 13.0
-        System.out.println(Math.ceil(12.54)); // 13.0
-        System.out.println(Math.ceil(-12.34)); // -12.0
-        System.out.println(Math.ceil(-12.54)); // -12.0
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class MathDemo {
-    public static void main(String[] args) {
-        System.out.println(Math.floor(12.34)); // 12.0
-        System.out.println(Math.floor(12.54)); // 12.0
-        System.out.println(Math.floor(-12.34)); // -13.0
-        System.out.println(Math.floor(-12.54)); // -13.0
-    }
-}
-```
-
-### 2.2.3 四舍五入
-
-* 求一个数的四舍五入：
-
-```java
-public static int round(float a){
-    ...
-}
-```
-
-```java
-public static long round(double a){
-    ...
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class MathDemo {
-    public static void main(String[] args) {
-        System.out.println(Math.round(2.34)); // 2
-        System.out.println(Math.round(2.54)); // 3
-        System.out.println(Math.round(-2.34)); // -2
-        System.out.println(Math.round(-2.54)); // -3
-    }
-}
-```
-
-### 2.2.4  最值（最大值和最小值）
-
-* 求一个数的最大值：
-
-```java
-public static int max(int a, int b) {
-    ...
-}
-```
-
-```java
-public static long max(long a, long b) {
-    ...
-}
-```
-
-```java
-public static float max(float a, float b) {
-    ...
-}
-```
-
-```java
-public static double max(double a, double b) {
-    ...
-}
-```
-
-* 求一个数的最小值：
-
-```java
-public static int min(int a, int b) {
-    ...
-}
-```
-
-```java
-public static long min(long a, long b) {
-    ...
-}
-```
-
-```java
-public static float min(float a, float b) {
-    ...
-}
-```
-
-```java
-public static double min(double a, double b) {
-    ...
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class MathDemo {
-    public static void main(String[] args) {
-        System.out.println(Math.max(1, 1.1)); // 1.1
-        System.out.println(Math.max(10, 1.1)); // 10.0
-        System.out.println(Math.min(1, 1.1)); // 1.0
-        System.out.println(Math.min(10, 1.1)); // 1.1
-    }
-}
-```
-
-### 2.2.5 指数、平方根和立方根
-
-* 求一个数的指数：
-
-```java
-public static double pow(double a, double b) {
-    ...
-}
-```
-
-* 求一个数的平方根：
-
-```java
-public static double sqrt(double a) {
-    ...
-}
-```
-
-* 求一个数的立方根：
-
-```java
-public static double cbrt(double a){
-    ...
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class MathDemo {
-    public static void main(String[] args) {
-        System.out.println("2^3 = " + Math.pow(2, 3)); // 2^3 = 8.0
-        System.out.println("4 的平方根 = " + Math.sqrt(4)); // 4 的平方根 = 2.0
-        System.out.println("8 的立方根 = " + Math.cbrt(8)); // 8 的立方根 = 2.0
-    }
-}
-```
-
-### 2.2.6 随机值
-
-* 求一个数的随机值，范围是`[0.0,1.0)`：
-
-```java
-public static double random() { 
-	...
-}
-```
-
-> [!NOTE]
->
-> * ① 在 Java 中，我们通常会使用`Random`类，而不是 Math.random() 方法获取随机值，因为 Random 类中的 nextInt(10) 方法就是获取 [0,10) 之间的随机值。
-> * ② 在其他编程语言中，如：JavaScript ，就只有 `Math.random()` 方法用来获取随机值。
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-import java.util.Random;
-
-public class MathDemo {
-    public static void main(String[] args) {
-        Random random = new Random();
-        for (int i = 0; i < 100; i++) {
-            // 获取 1 - 100 之间的随机值
-            int num = random.nextInt(100) + 1;
-            System.out.println("num = " + num);
+        Scanner input = new Scanner(System.in);
+        System.out.print("请输入 QQ 号码：");
+        String qq = input.next();
+        boolean flag = validate(qq);
+        if (flag) {
+            System.out.println(qq + " 合法！！！");
+        } else {
+            System.out.println(qq + " 不合法！！！");
         }
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class MathDemo {
-    public static void main(String[] args) {
-        for (int i = 0; i < 10; i++) {
-            // 获取 1 - 100 之间的随机值
-            int num = (int) (Math.floor(Math.random() * 100)) + 1;
-            System.out.println("num = " + num);
-        }
-    }
-}
-```
-
-## 2.3 应用示例
-
-* 需求：判断一个数是否为质数。
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class MathDemo {
-    public static void main(String[] args) {
-        System.out.println(isPrime(2));
-        System.out.println(isPrime(3));
-        System.out.println(isPrime(4));
+        input.close();
     }
 
     /**
-     * 判断一个数是否为质数
-     * @param num 整数
-     * @return true 表示质数，false 表示非质数
+     * 6 位或 20 位之内，0 不能在开头，必须全部是数字。
+     * @param qq QQ 号码
+     * @return true 表示合法，false 表示非法
      */
-    public static boolean isPrime(int num) {
-        for (int i = 2; i < num; i++) {
-            if (num % i == 0) {
+    public static boolean validate(String qq) {
+        // 如果字符串为空，则返回 false
+        if (Objects.isNull(qq) || qq.isBlank()) {
+            return false;
+        }
+
+        // 将字符串转换为字符数组
+        char[] chs = qq.toCharArray();
+
+        // 判断字符串的长度
+        int length = chs.length;
+        if (length < 6 || length > 20) {
+            return false;
+        }
+
+        // 不能为 0 开头
+        if (qq.startsWith("0")) {
+            return false;
+        }
+
+        // 必须都是数字
+        return validateDigit(chs);
+    }
+
+    /**
+     * 判断数组中是否都是数字
+     * @param chs 数组
+     * @return true 都是数字；false 含有非数字
+     */
+    private static boolean validateDigit(char[] chs) {
+        char[] chsResult = Objects.requireNonNull(chs);
+        for (char ch : chsResult) {
+            if (!Character.isDigit(ch)) {
                 return false;
             }
         }
@@ -487,338 +95,1099 @@ public class MathDemo {
 * 示例：
 
 ```java
-package com.github;
-
-public class MathDemo {
-    public static void main(String[] args) {
-        System.out.println(isPrime(2));
-        System.out.println(isPrime(3));
-        System.out.println(isPrime(4));
-    }
-
-    /**
-     * 判断一个数是否为质数
-     * @param num 整数
-     * @return true 表示质数，false 表示非质数
-     */
-    public static boolean isPrime(int num) {
-        for (int i = 2; i <= Math.sqrt(num); i++) {
-            if (num % i == 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-}
-```
-
-## 2.4 应用示例
-
-* 自幂数：一个 n 位自然数等于自身给位上的数字的 n 次幂之和。
-
-> [!NOTE]
->
-> * ① 三位数 `1^3 + 2^3 + 3^3 = 153`。
-> * ② 四位数 `1^4 + 6 ^4 + 3^4 + 4^4 = 1634`。
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-
-public class MathDemo2 {
-    public static void main(String[] args) {
-        System.out.println(isSelfPower(1634));
-        System.out.println(isSelfPower(153));
-    }
-
-    /**
-     * 判断一个数是否为自幂数
-     *
-     * @param num 整数
-     * @return true 表示自幂数，false 表示非自幂数
-     */
-    public static boolean isSelfPower(int num) {
-        // 缓存 num
-        int original = num;
-        // 获取 num 各个位上的数
-        List<Integer> list = new ArrayList<>();
-        while (num != 0) {
-            list.add(num % 10);
-            num /= 10;
-        }
-        // 逆序遍历，并获取结果
-        int result = 0;
-        ListIterator<Integer> iterator = list.listIterator(list.size());
-        while (iterator.hasPrevious()) {
-            int element = iterator.previous();
-            result += (int) Math.pow(element, list.size());
-        }
-        return result == original;
-    }
-}
-```
-
-
-
-# 第三章：System 类
-
-## 3.1 概述
-
-* System 是一个工具类，提供了一些和系统相关的属性或方法。
-* System 类的构造方法是私有的，所有的方法都是静态方法。
-
-## 3.2 常用 API
-
-### 3.2.1 当前系统时间戳
-
-* 返回当前系统时间距离`1970-01-01 00:00:00`的毫秒值：
-
-```java
-public static native long currentTimeMillis();
-```
-
-* 返回当前系统时间距离`1970-01-01 00:00:00`的纳秒值：
-
-```java
-public static native long nanoTime();
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-import java.util.Date;
-
-public class SystemDemo {
-    public static void main(String[] args) {
-        long timeMillis = System.currentTimeMillis();
-        // timeMillis = 1744791339759
-        System.out.println("timeMillis = " + timeMillis); 
-
-        Date date = new Date(timeMillis);
-        // date = Wed Apr 16 16:16:04 CST 2025
-        System.out.println("date = " + date); 
-    }
-}
-```
-
-### 3.2.2 退出当前系统
-
-* 终止当前运行的 JVM 虚拟机：
-
-```java
-public static void exit(int status) {
-    ...
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
+package com.github.regex;
 
 import java.util.Scanner;
 
-public class SystemDemo2 {
+public class RegexDemo2 {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
-        do {
-            System.out.print("请输入数字（0 退出）：");
-            int num = input.nextInt();
-            if (num == 0) {
-                System.exit(0);
-            }
-            System.out.println("num = " + num);
-        } while (true);
+        System.out.print("请输入 QQ 号码：");
+        String qq = input.next();
+        boolean flag = qq.matches("[1-9]\\d{5,19}"); // [!code highlight]
+        if (flag) {
+            System.out.println(qq + " 合法！！！");
+        } else {
+            System.out.println(qq + " 不合法！！！");
+        }
+        input.close();
     }
 }
 ```
 
-### 3.2.3 获取操作系统环境变量
+## 1.3 正则表达式的作用
 
-* 获取操作系统所有环境变量：
-
-```java
-public static java.util.Map<String,String> getenv() {
-   ...   
-}    
-```
-
-* 根据`环境变量名`获取`环境变量值`：
+* ① 校验`字符串`是否满足一定的规则。
 
 ```java
-public static String getenv(String name) {
-   ...   
-}    
+String regex = "[1-9]\\d{5,19}"; // [!code highlight]
+boolean flag = qq.matches(regex); 
 ```
 
-> [!NOTE]
->
-> * ① 环境变量：从运行 Java 应用程序的操作系统环境中获取。这些环境变量通常在操作系统级别或启动应用程序的 shell 环境中设置。
-> * ② 应用场景：
->   * 配置应用程序的外部依赖，如：数据库连接字符串、API 密钥、文件路径等，而无需将这些敏感信息硬编码到应用程序中（不常用）。
->   * 获取操作系统相关的信息，如：用户的家目录（Maven 中的`.m2`默认目录在 Windows 是`C:\Users\<你的用户名>\.m2`）、临时目录等。
->   * 根据不同的环境（开发、测试、生产）进行不同的配置（Java 中不怎么常用；但是，前端（Vite）中非常常见）。
-> * ③ 操作系统环境变量通常对同一个用户或系统中的所有进程可见。
+* ② 在一段文本中查找满足要求的内容。
 
-> [!CAUTION]
->
-> * ① 由于环境变量通常在系统级别设置，因此需要注意潜在的安全风险，避免泄露敏感信息。
-> * ② 环境变量的应用场景是`项目构建工具`开发，如：Maven 或 Gradle 等。
+```java {1}
+String regex = "\\d{6}(?:18|19|20)?\\d{2}(?:0[1-9]|1[012])(?:0[1-9]|[12][0-9]|3[01])\\d{3}[\\dxX]";
+String words =
+        """
+        向玉宇 41080119930228457x 男 河南省焦作市市辖区
+        高新瑶 510801197609022309 女 四川省广元市市辖区
+        孔弘济 150401198107053872 男 内蒙古自治区赤峰市市辖区
+        林冬卉 130133197204039024 女 河北省石家庄市赵县
+        邱迎海 430102197606046442 女 湖南省长沙市芙蓉区
+        刘如松 632722197112040806 女 青海省玉树藏族自治州杂多县
+        侯含雁 130683199011300601 女 河北省保定市安国市
+        赵弘新 350111199409241690 男 福建省福州市晋安区
+        杜力强 522323198705037737 男 贵州省黔西南布依族苗族自治州普安县
+        白香彤 510182197109294463 女 四川省成都市彭州市
+        万明辉 653221197910077436 男 新疆维吾尔族自治区和田地区和田县
+        张元彤 533526197206260908 女 云南省临沧地区双江拉祜族佤族布朗族傣族自治县
+        肖乐珍 230305198909078721 女 黑龙江省鸡西市梨树区
+        石初曼 232304198204030301 女 黑龙江省绥化地区海伦市
+        董华采 411425198812189711 男 河南省商丘市虞城县
+        高乐音 350521197404071798 男 福建省泉州市惠安县
+        孔弘阔 542128198709025957 男 西藏自治区昌都地区左贡县
+        刘含灵 350321198401316749 女 福建省莆田市莆田县
+        金丹琴 440804197710034663 女 广东省湛江市坡头区
+        陆雨信 372900197507012999 男 山东省菏泽地区
+        向玉宇 41080119930228457x 男 河南省焦作市市辖区
+        高新瑶 510801197609022309 女 四川省广元市市辖区
+        孔弘济 150401198107053872 男 内蒙古自治区赤峰市市辖区
+        林冬卉 130133197204039024 女 河北省石家庄市赵县
+        邱迎海 430102197606046442 女 湖南省长沙市芙蓉区
+        刘如松 632722197112040806 女 青海省玉树藏族自治州杂多县
+        侯含雁 130683199011300601 女 河北省保定市安国市
+        """;
+
+Pattern pattern = Pattern.compile(regex);
+Matcher matcher = pattern.matcher(words);
+while (matcher.find()) {
+    System.out.println("找到的身份证号: " + matcher.group());
+}
+```
+
+
+
+# 第二章：正则表达式
+
+## 2.1 书写规则
+
+### 2.1.1 字符类
+
+* 字符类：只匹配一个字符。
+
+| 正则表达式（字符类） | 含义                                                     |
+| -------------------- | -------------------------------------------------------- |
+| `[abc]`              | 只能是 a、b、c 中的任意一个字符                          |
+| `[^abc]`             | 除了 a、b、c 以外的任意一个字符                          |
+| `[a-zA-Z]`           | 必须是 a-z、A-Z 中的任意一个字符                         |
+| `[^a-zA-Z]`          | 除了 a-z、A-Z 中的任意一个字符                           |
+| `[a-d[m-p]]`         | 必须是 a-d 或 m-p 中的任意一个字符                       |
+| `[a-z&&[def]]`       | 必须是 a-z 和 def 的交集中的任意一个字符，即：[def]      |
+| `[a-z&&[^bc]]`       | 必须是 a-z 和非 bc 的交集中的任意一个字符，即：[ad-z]    |
+| `[a-z&&[^m-p]]`      | 必须是 a-z 和非 m-p  的交集中的任意一个字符，即：[alq-z] |
 
 
 
 * 示例：
 
 ```java
-package com.github;
+package com.github.regex;
 
-import java.util.Map;
-import java.util.Set;
-
-public class SystemDemo5 {
+public class Test {
     public static void main(String[] args) {
-        Map<String, String> map = System.getenv();
+        // 只能是 a 或 b 或 c
+        System.out.println("a".matches("[abc]")); // true
+        System.out.println("b".matches("[abc]")); // true
+        System.out.println("c".matches("[abc]")); // true
+        System.out.println("z".matches("[abc]")); // false
+        System.out.println("ab".matches("[abc]")); // false
+        System.out.println("ab".matches("[abc][abc]")); // true
 
-        Set<Map.Entry<String, String>> entries = map.entrySet();
-        for (Map.Entry<String, String> entry : entries) {
-            System.out.println(entry.getKey() + "=" + entry.getValue());
+        System.out.println("--------------------------");
+
+        // 不能出现 a b c
+        System.out.println("a".matches("[^abc]")); // false
+        System.out.println("z".matches("[^abc]")); // true
+        System.out.println("zz".matches("[^abc]")); // false
+        System.out.println("zz".matches("[^abc][^abc]")); // true
+
+        System.out.println("--------------------------");
+
+        // [a-zA-Z] 只能是 a-zA-Z 中的任意一个字符，包括头和尾
+        System.out.println("a".matches("[a-zA-Z]")); // true
+        System.out.println("z".matches("[a-zA-Z]")); // true
+        System.out.println("aa".matches("[a-zA-Z]")); // false
+        System.out.println("zz".matches("[a-zA-Z]")); // false
+        System.out.println("0".matches("[a-zA-Z]")); // false
+
+        System.out.println("--------------------------");
+
+        // [a-d[m-p]] 只能是 a-d 或 m-p 中的任意一个字符
+        System.out.println("a".matches("[a-d[m-p]]")); // true
+        System.out.println("d".matches("[a-d[m-p]]")); // true
+        System.out.println("m".matches("[a-d[m-p]]")); // true
+        System.out.println("p".matches("[a-d[m-p]]")); // true
+        System.out.println("e".matches("[a-d[m-p]]")); // false
+        System.out.println("0".matches("[a-d[m-p]]")); // false
+
+        System.out.println("--------------------------");
+
+        // [a-z&&[def]] 只能是 a-z 或 def 中的任意一个字符，即：[def]
+        System.out.println("a".matches("[a-z&&[def]]")); // false
+        System.out.println("d".matches("[a-z&&[def]]")); // true
+        System.out.println("0".matches("[a-z&&[def]]")); // false
+
+        System.out.println("--------------------------");
+
+        // [a-z&&[^bc]] 必须是 a-z 和非 bc 的交集中的任意一个字符，即：[ad-z]
+        System.out.println("a".matches("[a-z&&[^bc]]")); // true
+        System.out.println("b".matches("[a-z&&[^bc]]")); // false
+        System.out.println("0".matches("[a-z&&[^bc]]")); // false
+
+        System.out.println("--------------------------");
+
+        // [a-z&&[^m-p]] 必须是 a-z 和非 m-p 的交集中的任意一个字符，即：[alq-z]
+        System.out.println("a".matches("[a-z&&[^bc]]")); // true
+        System.out.println("m".matches("[a-z&&[^bc]]")); // true
+        System.out.println("0".matches("[a-z&&[^bc]]")); // false
+    }
+}
+```
+
+### 2.1.2 预定义字符类
+
+* 预定义字符类：只匹配一个字符。
+
+| 正则表达式（预定义字符类） | 含义                                                   |
+| -------------------------- | ------------------------------------------------------ |
+| `.`                        | 匹配所有字符                                           |
+| `\d`                       | 一个数字，等同于 `[0-9]`                               |
+| `\D`                       | 非数字，等同于`[^0-9]`                                 |
+| `\s`                       | 空白字符，等同于`[\t\n\xOB\f\r]`                       |
+| `\S`                       | 非空白字符，等同于`[^s]`                               |
+| `\w`                       | 单词字符（英文、数字、下划线），等同于`[a-zA-z_0-9]`。 |
+| `\W`                       | 非单词字符，等同于`[^a-zA-Z_0-9]`                      |
+
+
+
+* 示例：
+
+```java
+package com.github.regex;
+
+public class Test {
+    public static void main(String[] args) {
+        // . 表示任意字符
+        System.out.println("你".matches(".")); // true
+        System.out.println("你a".matches(".")); // false
+        System.out.println("你a".matches("..")); // true
+
+        System.out.println("--------------------------");
+
+        // \d 只能是一个数字，因为 \ 有特殊含义，所以采用 \\ 表示一个 \
+        System.out.println("a".matches("\\d")); // false
+        System.out.println("3".matches("\\d")); // true
+        System.out.println("33".matches("\\d")); // false
+
+        System.out.println("--------------------------");
+
+        // \w 只能是一个单词字符，即：[a-zA-z_0-9]
+        System.out.println("z".matches("\\w")); // true
+        System.out.println("2".matches("\\w")); // true
+        System.out.println("21".matches("\\w")); // false
+        System.out.println("您".matches("\\w")); // false
+
+        System.out.println("--------------------------");
+
+        // \W 非单词字符，即：[^a-zA-z_0-9]
+        System.out.println("您".matches("\\W")); // true
+        System.out.println("&".matches("\\W")); // true
+        System.out.println("9".matches("\\W")); // false
+    }
+}
+```
+
+### 2.1.3 边界匹配器
+
+* 边界匹配器：
+
+| 正则表达式（边界匹配器） | 含义     |
+| ------------------------ | -------- |
+| `^`                      | 行的开头 |
+| `$`                      | 行的结尾 |
+
+
+
+* 示例：
+
+```java
+package com.github.regex;
+
+public class Test {
+    public static void main(String[] args) {
+        // 必须以 abc 开头
+        System.out.println("abc".matches("^abc")); // true
+        System.out.println("abcd".matches("^abc")); // false
+        System.out.println("abcd".matches("^abc.*")); // true
+        System.out.println("bcde".matches("^abc")); // false
+
+        System.out.println("--------------------------");
+
+        // 必须以 .com 结尾
+        System.out.println("abc@qq.com".matches(".*com$")); // true
+        System.out.println("abc".matches(".*com$")); // false
+        System.out.println("abc@qq.cn".matches(".*com$")); // false
+    }
+}
+```
+
+### 2.1.4 数量类
+
+* 数量类：
+
+| 正则表达式（数量类） | 含义                                                    |
+| -------------------- | ------------------------------------------------------- |
+| `X{n}`               | X 字符只能出现 n 次                                     |
+| `X{n,}`              | X 字符至少出现 n 次，类似于数学中的 `[n,+∞)`            |
+| `X{n,m}`             | X 字符只能出现 n 到 m 次，类似于数学中的 `[n,m]`        |
+| `X?`                 | X 字符最多只能出现一次（ 0 次或 1 次），相当于 `X{0,1}` |
+| `X*`                 | X 字符可以出现 0 次或多次，相当于 `X{0,}`               |
+| `X+`                 | X 字符可以出现 1 次或多次，相当于 `X{1,}`               |
+
+
+
+* 示例：
+
+```java
+package com.github.regex;
+
+public class Test {
+    public static void main(String[] args) {
+        // 必须是字母、数字、下划线，且至少 6 位
+        System.out.println("abcefgh_".matches("\\w{6,}")); // true
+        System.out.println("224f".matches("\\w{6,}")); // false
+
+        System.out.println("--------------------------");
+
+        // 必须是数字、字符，且必须是 4 位
+        System.out.println("23dF".matches("[a-zA-Z0-9]{4}")); // true
+        System.out.println("23_F".matches("[a-zA-Z0-9]{4}")); // false
+        System.out.println("23dF".matches("[\\w&&[^_]]{4}")); // true
+        System.out.println("23_F".matches("[\\w&&[^_]]{4}")); // false
+    }
+}
+```
+
+## 2.2 综合练习
+
+### 2.2.1 练习一
+
+* 需求：编写正则表达式，验证用户输入的`手机号码`、`邮箱`以及`座机号码`是否满足要求。
+
+> [!NOTE]
+>
+> * ① 手机号码：13112345678、13712345667、13945679027、13945679021。
+> * ② 座机号码：020-23242421、22442111、027-42421324、0712-32422434、3242243。
+> * ③ 邮箱：3232323@qq.com、abc@163.com。
+
+
+
+* 示例：校验手机号码
+
+```java
+package com.github.test;
+
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(checkPhone("14559862048")); // true
+        System.out.println(checkPhone("13407924148")); // true
+        System.out.println(checkPhone("18740982533")); // true
+        System.out.println(checkPhone("18977767532")); // true
+        System.out.println(checkPhone("18384559968")); // true
+        System.out.println(checkPhone("13400964453")); // true
+        System.out.println(checkPhone("17389014861")); // true
+        System.out.println(checkPhone("15687263208")); // true
+        System.out.println(checkPhone("18726392246")); // true
+        System.out.println(checkPhone("133184610101")); // false
+    }
+
+    /**
+     * 验证手机号码
+     * @param phone 手机号码
+     * @return true 成功，false 失败
+     */
+    public static boolean checkPhone(String phone) {
+        if (Objects.isNull(phone)) {
+            return false;
         }
 
-        String javaHome = System.getenv("JAVA_HOME");
-        System.out.println("javaHome = " + javaHome);
+        String regex = "^1[3-9]\\d{9}$";
+
+        return phone.matches(regex);
     }
 }
 ```
 
-### 3.2.4 获取 Java 系统属性（值）
 
-* 获取Java 系统（JVM 和应用程序相关）所有属性：
+
+* 示例：校验座机号码
 
 ```java
-public static Properties getProperties() {
-    ...
+package com.github.test;
+
+import java.util.Objects;
+
+public class Test2 {
+    public static void main(String[] args) {
+        System.out.println(checkPhone("020-23242421")); // true
+        System.out.println(checkPhone("021-22442111")); // true
+        System.out.println(checkPhone("027-4242132")); // true
+        System.out.println(checkPhone("0712-32422434")); // true
+        System.out.println(checkPhone("0970-36890760")); // true
+        System.out.println(checkPhone("0712-29613526")); // true
+        System.out.println(checkPhone("29613526")); // true
+        System.out.println(checkPhone("2324242")); // true
+        System.out.println(checkPhone("2324242111111")); // false
+    }
+
+    /**
+     * 验证座机号码
+     * 区号-本地号码，区号 3-4 位，如：010、0755
+     * 区号-本地号码，本地号码 7-8 位，如：010-12345678、0755-1234567
+     * @param phone 座机号码
+     * @return true 成功，false 失败
+     */
+    public static boolean checkPhone(String phone) {
+        if (Objects.isNull(phone)) {
+            return false;
+        }
+
+        String regex = "^(0\\d{2,3}-)?[1-9]\\d{6,7}$";
+
+        return phone.matches(regex);
+    }
 }
 ```
 
-* 根据`系统属性名`获取`系统属性值`：
+
+
+* 示例：校验邮箱
 
 ```java
-public String getProperty(String key) { 
-	...
+package com.github.test;
+
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(checkEmail("3232323@qq.com")); // true
+        System.out.println(checkEmail("abc@163.com")); // true
+        System.out.println(checkEmail("abc@163")); // false
+    }
+
+    /**
+     * 验证邮箱
+     * @param email 邮箱
+     * @return true 成功，false 失败
+     */
+    public static boolean checkEmail(String email) {
+        if (Objects.isNull(email)) {
+            return false;
+        }
+
+        String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+
+        return email.matches(regex);
+    }
 }
 ```
+
+### 2.2.2 练习二
+
+* 需求：请编写正则表达式，验证用户名是否满足要求。
 
 > [!NOTE]
 >
-> * ① Java 系统属性：Java 虚拟机（JVM）和正在运行的 Java 应用程序相关的键值对，这些属性可以在如下的几种方式设置。
->   * 在命令行启动 JVM 的时候使用`-D<name>=<value>`参数指定，如：`java -Dspring.profile=dev abc.jar`。
->   * 在程序中通过`System.setProperty(String key, String value)`方法动态设置。
->   * 某些系统属性是 JVM 启动的时候自动设置的，如：`java.version`（Java 版本）、`os.version`（操作系统版本）。
-> * ② 应用场景：
->   * 配置 JVM 的行为，如：设置默认的文件编码、代理服务器等。
->   * 向应用程序传递配置信息，类似于环境变量，但作用范围更局限于当前的 JVM 实例。
->   * 获取 Java 运行时环境的信息。
-> * ③ Java 系统属性（JVM 和应用程序相关）仅限于当前的 JVM 实例。
+> 规则：大小写字母，数字，下划线，一共 4~16 位。
 
 
 
 * 示例：
 
 ```java
-package com.github;
+package com.github.test;
 
-import java.util.Properties;
-import java.util.Set;
+import java.util.Objects;
 
-public class SystemDemo3 {
+public class Test {
     public static void main(String[] args) {
-        Properties properties = System.getProperties();
-        Set<String> propertyNames = properties.stringPropertyNames();
-        for (String propertyName : propertyNames) {
-            String property = properties.getProperty(propertyName);
-            System.out.println(propertyName + " = " + property);
+        System.out.println(checkUserName("swyLEpk0")); // true
+        System.out.println(checkUserName("XE2h8")); // true
+        System.out.println(checkUserName("bv5fXpF0k")); // true
+        System.out.println(checkUserName("gTTt6nyb4v")); // true
+        System.out.println(checkUserName("aisf1HH")); // true
+        System.out.println(checkUserName("ai_dfda")); // true
+        System.out.println(checkUserName("_df")); // false
+    }
+
+    /**
+     * 验证用户名
+     * @param username 用户名
+     * @return true 成功，false 失败
+     */
+    public static boolean checkUserName(String username) {
+        if (Objects.isNull(username)) {
+            return false;
+        }
+
+        String regex = "^\\w{4,16}$";
+
+        return username.matches(regex);
+    }
+}
+```
+
+### 2.2.3 练习三
+
+* 需求：请编写正则表达式，验证身份证号码是否满足要求。
+
+> [!NOTE]
+>
+> 规则：18位，前 17 位任意数字，最后一位可以是数字可以是大写或小写的 x 。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(checkIdCard("150928195106037110")); // true
+        System.out.println(checkIdCard("350124201102148311")); // true
+        System.out.println(checkIdCard("520526201306240810")); // true
+        System.out.println(checkIdCard("42282319500718393X")); // true
+        System.out.println(checkIdCard("542524197605269078")); // true
+        System.out.println(checkIdCard("420981199512047176")); // true
+        System.out.println(checkIdCard("42112420101014163X")); // true
+        System.out.println(checkIdCard("42112420101014163Xa")); // false
+    }
+
+    /**
+     * 身份证号码
+     * @param code 身份证号码
+     * @return true 成功，false 失败
+     */
+    public static boolean checkIdCard(String code) {
+        if (Objects.isNull(code)) {
+            return false;
+        }
+
+        String regex =
+                "^([1-6][1-9]|50)\\d{4}(18|19|20)\\d{2}((0[1-9])|10|11|12)(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$";
+
+        return code.matches(regex);
+    }
+}
+
+```
+
+
+
+# 第三章：爬虫
+
+## 3.1 概述
+
+* 爬虫（网络爬虫、网络蜘蛛、网络机器人）是一种自动浏览互联网的程序或脚本。
+
+![](./assets/1.png)
+
+* 爬虫就是**代替人手动去浏览网页，但是速度更快、效率更高，并且能够大规模地自动化进行**。
+
+> [!NOTE]
+>
+> ::: details 点我查看 爬虫出现的主要目的
+>
+> * ① **发现和收集信息：** 爬虫会访问网页，读取其中的内容。
+> * ② **跟踪链接：** 它会查找网页中的超链接（links），然后访问这些链接指向的其他网页，就像蜘蛛在网上爬行一样。
+> * ③ **建立索引：** 最常见的用途是为搜索引擎（Google, Bing）建立网页索引。爬虫抓取了大量网页内容后，搜索引擎会对这些内容进行分析、处理，然后存入数据库，这样用户搜索时就能快速找到相关的网页。
+> * ④ **数据抓取 (Web Scraping)：** 有时候，爬虫也被用来从网页中提取特定的结构化数据，用于数据分析、价格比较、信息聚合等目的（这通常称为 Web Scraping，但爬虫是其基础）。
+>
+> :::
+
+![](./assets/2.png)
+
+> [!NOTE]
+>
+> 其实，正则表达式的第二个作用：在一段文本中查找满足要求的内容，就类似于爬虫！！！
+
+## 3.2 本地爬虫
+
+* 需求：找出如下文本中的所有 `JavaXxx` 。
+
+> [!NOTE]
+>
+> * ① 文本的内容是：“Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。”
+> * ② 可以通过 Java 的 Pattern 类和 Matcher 类来实现：
+>   * Pattern 类就是用来表示正则表达式。
+>   * Matcher 类是一个文本匹配器，其作用就是按照`正则表达式的规则`从头开始读取字符串，并在大的字符串去寻找符合规则的子串。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        // 获取正则表达式对象
+        Pattern pattern = Pattern.compile("Java\\d+");
+
+        // 通过正则表达式对象(pattern)，传入大串(str)，以便获取文本匹配器对象(matcher)
+        // matcher 要在 str 中寻找符合 pattern 规则的子串
+        Matcher matcher = pattern.matcher(str);
+
+        // 判断是否找到
+        // 如果没有，返回false
+        // 如果找到，返回true，底层会记录子串的起始索引和结束索引+1
+        while (matcher.find()) {
+            // 底层会根据 find 方法记录的索引进行字符串的截取，即：str.substring(start,end)
+            // 并将截取之后的小串返回
+            String group = matcher.group();
+            System.out.println(group);
+        }
+    }
+}
+```
+
+## 3.3 综合练习
+
+* 需求：把下面文本中的`电话`、`邮箱`、`手机号`、`热线`都爬取出来。
+
+> [!NOTE]
+>
+> 如果您有任何疑问，可以通过我们的客服**热线**（400-618-9090、400-618-4000）进行咨询，或者拨打页面下方的**电话**（010-36517895、010-98951256）。您也可以选择发送邮件至我们的官方**邮箱**（abc@qq.com、bcd@163.com），留下您的联系方式和问题，我们会尽快回复。如果您急需帮助，也可以直接拨打我们的指定**手机号**（18512516758、18512508907）。
+
+
+
+* 示例：
+
+```java
+package com.github.test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        如果您有任何疑问，可以通过我们的客服热线（400-618-9090、400-618-4000）进行咨询，或者拨打页面下方的电话（010-36517895、010-98951256）。
+        您也可以选择发送邮件至我们的官方邮箱（abc@qq.com、bcd@qq.com），留下您的联系方式和问题，我们会尽快回复。
+        如果您急需帮助，也可以直接拨打我们的指定手机号（18512516758、18512508907）""";
+
+        // 获取座机号码
+        String regex = "[1-9]\\d{2}-?[1-9]\\d{2}-?{2}-\\d{4}";
+        List<String> reptile = reptile(regex, str);
+        System.out.println(reptile);
+
+        // 国内电话
+        regex = "(0\\d{2,3}-)?[1-9]\\d{6,7}";
+        reptile = reptile(regex, str);
+        System.out.println(reptile);
+
+        // 手机号码
+        regex = "1[3-9]\\d{9}";
+        reptile = reptile(regex, str);
+        System.out.println(reptile);
+
+        // 邮箱
+        regex = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
+        reptile = reptile(regex, str);
+        System.out.println(reptile);
+    }
+
+    /**
+     * 根据正则表达式提取信息，并存储到集合中
+     * @param regex 正则表达式
+     * @param str 文本
+     * @return 集合
+     */
+    public static List<String> reptile(String regex, String str) {
+
+        List<String> list = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(str);
+
+        while (matcher.find()) {
+            list.add(matcher.group());
+        }
+
+        return list;
+    }
+}
+```
+
+## 3.4 分组
+
+### 3.4.1 概述
+
+* 如果需要编写校验 24小时制时间的正则表达式，如：`12:00:00` 、`23:59:59`。我们或许会这么写，如下所示：
+
+```java
+package com.github.regex2;
+
+public class RegexDemo3 {
+    public static void main(String[] args) {
+        String str = "12:00:00";
+        System.out.println(check24Time(str));
+        str = "23:59:59";
+        System.out.println(check24Time(str));
+    }
+
+    /**
+     * 校验 24 小时
+     */
+    public static boolean check24Time(String str) {
+        return str.matches("[0-2][0-3]:[0-5]\\d:[0-5]\\d"); // [!code highlight]
+    }
+}
+```
+
+* 我们将该表达式提取出来，如下所示：
+
+```txt
+[0-2][0-3]:[0-5]\\d:[0-5]\\d
+```
+
+* 难道不觉得，有些地方是重复的？
+
+![](./assets/3.svg)
+
+* 其实，我们可以使用`()`来将多个项作为一个整体（分组），来达到简化正则表达式的书写，如下所示：
+
+```txt
+[0-2][0-3](:[0-5]\\d){2}
+```
+
+> [!NOTE]
+>
+> 所谓的分组就是将`多个元素视为一个整体`，即：我们想要的是一个`序列`，而不是单个字符应用量词（`X*`、`X+`、`X{n,m}`）：
+>
+> * ① `ab+`表示的是 a 后面跟着多个 b，如：ab、abb、abbb 等，量词 `+` 只作用于 `b`。
+> * ② `(ab)+`表示的 `ab`作为一个整体（序列）会重复一次或多次，如：ab、abab、ababab 等，量词 `+` 只作用于 `ab`。
+
+* 如下所示：
+
+![](./assets/4.svg)
+
+* 当然，上面的正则表达式还可以进一步简化，可以是`00:00:00 ~ 19:59:59`以及 `20:00:00 ~ 23:59:59`，如下所示：
+
+```txt
+([01]\\d|2[0-3])(:[0-5]\\d){2}
+```
+
+> [!NOTE]
+>
+> 当我们需要限制`|`运算符的作用范围时，也需要分组：
+>
+> * ① `cat|dog` 匹配的是 cat 或 dog。
+> * ② `gr(a|e)y` 匹配的是 gray 或 grey。
+> * ③ `grae|ey` 匹配的是 grae 或 ey。
+
+* 如下所示：
+
+![](./assets/5.svg)
+
+> [!NOTE]
+>
+> 每组其实都是有组号的，也就是序号。
+>
+> * ① 从 1 开始，连续不间断。
+> * ② 以左括号为基准，最左边的是第一组，其次是第二组，依次类推。
+>
+> ::: details 点我查看 具体细节
+>
+> ![](./assets/6.png)
+>
+> :::
+>
+> * ③ 如果后续还需要使用本组的数据，在正则内部可以使用 `\\组号`，在正则外部可以使用 `$组号`。
+
+### 3.4.2 捕获分组
+
+#### 3.4.2.1 概述
+
+* 所谓的捕获分组，就是将这一组的数据捕获出来，再用一次。
+
+#### 3.4.2.2 应用示例
+
+* 需求：判断一个字符串的开始字符和结束字符是否一致？只考虑一个字符。
+
+> [!NOTE]
+>
+> 举例：`a`123`a`、`b`456`b`、`1`789`1`、`&`abc`&`。
+
+
+
+* 示例：
+
+```java
+package com.github.regex3;
+
+public class Test {
+    public static void main(String[] args) {
+        // \\组号：表示将 X 组的内容拿出来再用一次
+        String regex = "(.).+\\1";
+
+        System.out.println("a123a".matches(regex)); // true
+        System.out.println("b456b".matches(regex)); // true
+        System.out.println("17891".matches(regex)); // true
+        System.out.println("&abc&".matches(regex)); // true
+        System.out.println("a123b".matches(regex)); // false
+    }
+}
+```
+
+#### 3.4.2.3 应用示例
+
+* 需求：判断一个字符串的开始部分和结束部分是否一致？可以有多个字符。
+
+> [!NOTE]
+>
+> 举例：`abc`123`abc`、`b`456`b`、`123`789`123`、`&!@`abc`&!@`。
+
+
+
+* 示例：
+
+```java
+package com.github.regex3;
+
+public class Test {
+    public static void main(String[] args) {
+        // \\组号：表示将 X 组的内容拿出来再用一次
+        String regex = "(.+).+\\1";
+
+        System.out.println("abc123abc".matches(regex)); // true
+        System.out.println("b456b".matches(regex)); // true
+        System.out.println("1237891123".matches(regex)); // true
+        System.out.println("&abc&".matches(regex)); // true
+        System.out.println("&!@abc&!@".matches(regex)); // false
+        System.out.println("&!abc&!@".matches(regex)); // false
+    }
+}
+```
+
+#### 3.4.2.4 应用示例
+
+* 需求：判断一个字符串的开始部分和结束部分是否一致？开始部分内部的每个字符也需要一致。
+
+> [!NOTE]
+>
+> 举例：`aaa`123`aaa`、`bbb`456`bbb`、`111`789`111`、`&&`abc`&&`。
+
+
+
+* 示例：
+
+```java
+package com.github.regex3;
+
+public class Test {
+    public static void main(String[] args) {
+        // \\组号：表示将 X 组的内容拿出来再用一次
+        String regex = "((.)\\2+).+\\1";
+
+        System.out.println("aaa123aaa".matches(regex)); // true
+        System.out.println("bbb456bbb".matches(regex)); // true
+        System.out.println("111789111".matches(regex)); // true
+        System.out.println("&&abc&&".matches(regex)); // true
+        System.out.println("&abc&&".matches(regex)); // false
+    }
+}
+```
+
+#### 3.4.2.5 应用示例
+
+* 需求：将字符串`我要学学编编编编编编编程程程程程程`，替换为`我要学编程`。
+
+
+
+* 示例：
+
+```java
+package com.github.regex3;
+
+public class Test {
+    public static void main(String[] args) {
+        String str = "我要学学编编编编编编编程程程程程程";
+
+        // 将重复的内容替换为单个，如：学学 --> 学
+        // (.) 将重复内容的第一个字符看成一组
+        // \\1 表示第一个字符会再次出现
+        // + 至少一次
+        // $1 表示将正则表达式中第一组的内容，再拿出来用
+        String result = str.replaceAll("(.)\\1+", "$1");
+
+        System.out.println("result = " + result);
+    }
+}
+```
+
+### 3.4.3 非捕获分组
+
+#### 3.4.3.1 概述
+
+* 有的时候，我们可能只需要分组（为了应用量词或限制`|`的范围），但是不需要捕获匹配的文本，此时就可以使用非捕获分组。
+
+> [!NOTE]
+>
+> * ① 分组捕获有两个作用：
+>   * 分组：将 `()`里面的内容当做一个整体来处理，如：对这个整体应用量词（`+`, `*` 等）或限制 `|` (或) 的范围。
+>   * 捕获：其实就是将捕获的分组内容`()`，即：从文本中匹配到的片段存储起来，以便后续可以使用反向引用`\组号`来访问这些被捕获的文本。
+> * ② 非捕获分组有两个作用（只分组，不捕获）：
+>   * 分组：将 `()`里面的内容当做一个整体来处理，如：对这个整体应用量词（`+`, `*` 等）或限制 `|` (或) 的范围。
+>   * 不捕获：放弃了捕获功能，即：不会将从文本中匹配到的片段存储起来。
+
+| 符号       | 含义                       | 例子              |
+| ---------- | -------------------------- | ----------------- |
+| `(?:正则)` | 捕获所有                   | Java(?:8\|11\|17) |
+| `(?=正则)` | 获取前面部分               | Java(?=8\|11\|17) |
+| `(?!正则)` | 获取不是指定内容的前面部分 | Java(?!8\|11\|17) |
+
+#### 3.4.3.2 应用示例
+
+* 需求：把下面文本中的版本号为 8、11、17 的 Java 文本都爬取出来；但是，只需要 Java ，不需要版本号。
+
+> [!NOTE]
+>
+> Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+>
+> 下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
+
+
+
+* 示例：
+
+```java
+package com.github.regex2;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        // ? 占位符，理解为前面的Java
+        // = 表示在 Java 后面跟随的数据
+        // 但是，在获取的时候，只获取前半部分
+        Pattern pattern = Pattern.compile("Java(?=8|11|17)");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            String group = matcher.group();
+            System.out.println(group);
         }
     }
 }
 
 ```
 
-### 3.2.5 数组复制（拷贝）
+#### 3.4.3.3 应用示例
 
-* 从指定源数组中复制一个数组，复制从指定的位置开始，到目标数组的指定位置结束。
-
-```java
-public static native void arraycopy(Object src,  int  srcPos,
-                                        Object dest, int destPos,
-                                        int length);
-```
+* 需求：把下面文本中的版本号为 8、11、17 的 Java 文本都爬取出来。正确的爬取结果是 Java8、Java11、Java17、Java17。
 
 > [!NOTE]
 >
-> * ① 如果`数据源数组`和`目的地数组`都是基本数据类型，两者的数据类型必须保持一致，否则将会报错！！！
-> * ② 在拷贝的时候，需要考虑数组的长度，如果超出范围将会报错！！！
-> * ③ 如果`数据源数组`和`目的地数组`都是引用数据类型，那么子类类型可以赋值给父类类型。
+> Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+>
+> 下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
 
 
 
 * 示例：
 
 ```java
-package com.github;
+package com.github.regex2;
 
-import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class SystemDemo4 {
+public class Test {
     public static void main(String[] args) {
-        int[] arr = {1, 2, 3, 4, 5, 6};
-        int[] target = new int[arr.length];
-        System.arraycopy(arr, 0, target, 0, 2);
-        System.out.println(Arrays.toString(target)); // [1, 2, 0, 0, 0, 0]
+        String str =
+                """
+        Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        Pattern pattern = Pattern.compile("Java(?:8|11|17)");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            String group = matcher.group();
+            System.out.println(group);
+        }
     }
 }
 ```
 
+#### 3.4.3.4 应用示例
 
-
-# 第四章：Runtime 类
-
-## 4.1 概述
-
-* 每个应用程序都有一个 Runtime 类的实例，使得应用程序能够和其运行的环境相连接。
+* 需求：把下面文本中除了版本号为 8、11、17 的 Java 文本（只要 Java ，不要 Java8、Java11 等）都爬取出来。
 
 > [!NOTE]
 >
-> * ① 每个 Java 应用程序都有一个 Runtime 类的实例。
-> * ② Runtime 类的实例表示当前虚拟机的运行时环境。
+> Java 自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+>
+> 下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
 
-* 应用程序不能创建自己的 Runtime 实例，只能通过 getRuntime() 方法获取当前虚拟机的运行时环境。
 
-## 4.2 常用 API
 
-### 4.2.1 当前系统的运行时环境
-
-* 返回当前系统的运行时环境对象：
+* 示例：
 
 ```java
-private static final Runtime currentRuntime = new Runtime();
+package com.github.regex2;
 
-private Runtime() {}
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public static Runtime getRuntime() { // [!code focus]
-	return currentRuntime;
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        Pattern pattern = Pattern.compile("Java(?!8|11|17)");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            String group = matcher.group();
+            System.out.println(group);
+        }
+    }
+}
+```
+
+## 3.5 贪婪匹配和非贪婪匹配
+
+### 3.5.1 概述
+
+* 所谓的贪婪匹配，就是在爬取数据的时候，进可能得多获取数据。
+
+> [!NOTE]
+>
+> 正则表达式默认采取的是贪婪匹配，如：`abbbbbbaaaa`使用 `ab+`进行匹配，匹配的结果是 `abbbbbb`。
+
+* 所谓的非贪婪匹配，就是在爬取数据的时候，进可能得少获取数据。
+
+> [!NOTE]
+>
+> 正则表达式默认采取的是贪婪匹配，但是我们可以添加`?`表示非贪婪匹配，如：`+?` 或 `*?`，如：`abbbbbbaaaa`使用 `ab+?`进行匹配，匹配的结果是 `ab`。
+
+### 3.5.2 应用示例
+
+* 需求：按照`ab+`的方式爬取`ab`，`b`尽可能多的获取。
+
+> [!NOTE]
+>
+> Java自从 95 年问世以来，abbbbbbbbbbaaaaaaaaaa 经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+> 下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
+
+
+
+* 示例：
+
+```java
+package com.github.regex2;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java自从 95 年问世以来，abbbbbbbbbbaaaaaaaaaa
+        经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        Pattern pattern = Pattern.compile("ab+");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            String group = matcher.group();
+            System.out.println(group); // abbbbbbbbbb
+        }
+    }
+}
+```
+
+### 3.5.3 应用示例
+
+* 需求：按照`ab+`的方式爬取`ab`，`b`尽可能少的获取。
+
+> [!NOTE]
+>
+> Java自从 95 年问世以来，abbbbbbbbbbaaaaaaaaaa 经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+> 下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
+
+
+
+* 示例：
+
+```java
+package com.github.regex2;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java自从 95 年问世以来，abbbbbbbbbbaaaaaaaaaa
+        经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        Pattern pattern = Pattern.compile("ab+?");
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()) {
+            String group = matcher.group();
+            System.out.println(group); // ab
+        }
+    }
+}
+```
+
+## 3.6 String 中关于正则表达式的方法
+
+### 3.6.1 拆分字符串
+
+* 根据指定的`正则表达式`拆分字符串：
+
+```java
+public String[] split(String regex) { // [!code focus]
+    return split(regex, 0);
 } // [!code focus]
 ```
 
@@ -826,1481 +1195,215 @@ public static Runtime getRuntime() { // [!code focus]
 
 * 示例：
 
-```java
-package com.github;
-
-public class RuntimeDemo {
-    public static void main(String[] args){
-        Runtime rt = Runtime.getRuntime();
-        System.out.println("rt = " + rt);
-    }
-}
-```
-
-### 4.2.2 退出当前系统
-
-* 终止当前运行的 JVM 虚拟机：
-
-```java
-public void exit(int status) { 
-   ...
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-import java.util.Scanner;
-
-public class RuntimeDemo {
-    public static void main(String[] args){
-        Scanner input = new Scanner(System.in);
-        Runtime rt = Runtime.getRuntime();
-        do {
-            System.out.print("请输入数字（0 退出）：");
-            int num = input.nextInt();
-            if (num == 0) {
-                rt.exit(0);
-            }
-            System.out.println("num = " + num);
-        } while (true);
-    }
-}
-```
-
-### 4.2.3 获取 CPU 的线程数
-
-* 获取 CPU 的线程数：
-
-```java
-public native int availableProcessors();
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class RuntimeDemo2 {
-    public static void main(String[] args){
-        Runtime rt = Runtime.getRuntime();
-        int num = rt.availableProcessors();
-        System.out.println("num = " + num); // 24
-    }
-}
-```
-
-### 4.2.4 获取 JVM 的最大内存总量
-
-* 返回 JVM 能从系统中获取的最大内存总数量（单位字节）：
-
-```java
-public native long maxMemory();
-```
-
-> [!NOTE]
->
-> * ① 返回 Java 虚拟机将尝试使用的最大内存量。如果没有固有限制，则将返回该值 `Long.MAX_VALUE`。
-> * ② 此方法返回的值可能随时间的推移而变化，这取决于主机环境！！！
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class RuntimeDemo3 {
-
-    private static final long KB = 1024;
-    private static final long MB = KB * KB;
-    private static final long GB = MB * KB;
-    private static final long TB = GB * KB;
-    private static final long PB = TB * KB;
-    public static void main(String[] args){
-        Runtime rt = Runtime.getRuntime();
-        long maxMemory = rt.maxMemory();
-        System.out.println(maxMemory); // 25753026560
-        System.out.println(formatBytes(maxMemory)); // 23.98 GB
-    }
-
-    // 使用二进制单位 (KiB, MiB, GiB 等)
-    public static String formatBytes(long bytes) {
-        if (bytes < KB) {
-            return bytes + " B";
-        } else if (bytes < MB) {
-            return String.format("%.2f KB", (double) bytes / KB);
-        } else if (bytes < GB) {
-            return String.format("%.2f MB", (double) bytes / MB);
-        } else if (bytes < TB) {
-            return String.format("%.2f GB", (double) bytes / GB);
-        } else if (bytes < PB) {
-            return String.format("%.2f TB", (double) bytes / TB);
-        } else {
-            return String.format("%.2f PB", (double) bytes / PB);
-        }
-    }
-}
-```
-
-### 4.2.5 获取 JVM 的内存总量
-
-* 返回 JVM 已经从系统中获取的内存总数量（单位字节）：
-
-```java
-public native long totalMemory();
-```
-
-> [!NOTE]
->
-> * ① 返回 Java 虚拟机中的内存总量。
-> * ② 此方法返回的值可能随时间的推移而变化，这取决于主机环境！！！
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class RuntimeDemo3 {
-
-    private static final long KB = 1024;
-    private static final long MB = KB * KB;
-    private static final long GB = MB * KB;
-    private static final long TB = GB * KB;
-    private static final long PB = TB * KB;
-    public static void main(String[] args){
-        Runtime rt = Runtime.getRuntime();
-        long maxMemory = rt.maxMemory();
-        System.out.println(maxMemory); // 25753026560
-        System.out.println(formatBytes(maxMemory)); // 23.98 GB
-        long totalMemory = rt.totalMemory();
-        System.out.println(totalMemory); // 1610612736
-        System.out.println(formatBytes(totalMemory)); // 1.50 GB
-    }
-
-    // 使用二进制单位 (KiB, MiB, GiB 等)
-    public static String formatBytes(long bytes) {
-        if (bytes < KB) {
-            return bytes + " B";
-        } else if (bytes < MB) {
-            return String.format("%.2f KB", (double) bytes / KB);
-        } else if (bytes < GB) {
-            return String.format("%.2f MB", (double) bytes / MB);
-        } else if (bytes < TB) {
-            return String.format("%.2f GB", (double) bytes / GB);
-        } else if (bytes < PB) {
-            return String.format("%.2f TB", (double) bytes / TB);
-        } else {
-            return String.format("%.2f PB", (double) bytes / PB);
-        }
-    }
-}
-```
-
-### 4.2.6 获取 JVM 的空闲内存总量
-
-* 获取 JVM 的空闲内存总数量（单位字节）：
-
-```java
-public native long freeMemory();
-```
-
-> [!NOTE]
->
-> * ① 返回 Java 虚拟机中的可用内存量。
-> * ② 调用 gc 方法可能导致 freeMemory 返回值的增加！！！
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-public class RuntimeDemo3 {
-
-    private static final long KB = 1024;
-    private static final long MB = KB * KB;
-    private static final long GB = MB * KB;
-    private static final long TB = GB * KB;
-    private static final long PB = TB * KB;
-    
-    public static void main(String[] args){
-        Runtime rt = Runtime.getRuntime();
-        long maxMemory = rt.maxMemory();
-        System.out.println(maxMemory); // 25753026560
-        System.out.println(formatBytes(maxMemory)); // 23.98 GB
-        long totalMemory = rt.totalMemory();
-        System.out.println(totalMemory); // 1610612736
-        System.out.println(formatBytes(totalMemory)); // 1.50 GB
-        long freeMemory = rt.freeMemory();
-        System.out.println(freeMemory); // 1599874488
-        System.out.println(formatBytes(freeMemory)); // 1.49 GB
-    }
-
-    // 使用二进制单位 (KiB, MiB, GiB 等)
-    public static String formatBytes(long bytes) {
-        if (bytes < KB) {
-            return bytes + " B";
-        } else if (bytes < MB) {
-            return String.format("%.2f KB", (double) bytes / KB);
-        } else if (bytes < GB) {
-            return String.format("%.2f MB", (double) bytes / MB);
-        } else if (bytes < TB) {
-            return String.format("%.2f GB", (double) bytes / GB);
-        } else if (bytes < PB) {
-            return String.format("%.2f TB", (double) bytes / TB);
-        } else {
-            return String.format("%.2f PB", (double) bytes / PB);
-        }
-    }
-}
-```
-
-### 4.2.7 执行 cmd 命令
-
-* 执行 cmd 命令：
-
-```java
-public Process exec(String command) throws IOException { 
-	...
-}
-```
-
-```java
-public Process exec(String command, String[] envp) throws IOException {
-    ...
-}
-```
-
-```java
-public Process exec(String command, String[] envp, File dir) {
-    ...
-}
-```
-
-```java
-public Process exec(String cmdarray[]) throws IOException {
-    ...
-}
-```
-
-```java
-public Process exec(String[] cmdarray, String[] envp) throws IOException {
-    ...
-}
-```
-
-```java
-public Process exec(String[] cmdarray, String[] envp, File dir) {
-    ...
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-
-public class RuntimeDemo4 {
-
-    public static void main(String[] args) 
-        	throws IOException, InterruptedException {
-        Runtime rt = Runtime.getRuntime();
-        Process process = rt.exec("cmd /c dir");
-        // 获取命令的输出流
-        BufferedReader reader = new BufferedReader(
-            new InputStreamReader(process.getInputStream(), 
-                                  Charset.forName("GBK")));
-        String line;
-        System.out.println("命令输出：");
-        while ((line = reader.readLine()) != null) {
-            System.out.println(line);
-        }
-
-        // 获取命令的错误流（如果有）
-        BufferedReader errorReader = new BufferedReader(
-            new InputStreamReader(process.getErrorStream(), 
-                                  Charset.forName("GBK")));
-        System.out.println("命令错误：");
-        while ((line = errorReader.readLine()) != null) {
-            System.out.println(line);
-        }
-
-        // 等待命令执行完成
-        int exitCode = process.waitFor();
-        System.out.println("命令执行完成，退出代码: " + exitCode);
-    }
-
-}
-```
-
-
-
-# 第五章：Object 类（⭐）
-
-## 5.1 概述
-
-* 在 Java 中，Object 类是所有类的根父类，所有类都直接或间接地继承于 Object 类。
-
-> [!NOTE]
->
-> 如果在类的声明处没有使用`extends`关键字指明其父类，则默认父类为`java.lang.Object`类。
-
-* Object 类中的方法可以被所有子类访问，所以我们要学习 Object 类和其中的方法。
-
-## 5.2 常用 API
-
-### 5.2.1 构造方法
-
-* Object 类只有一个无参构造方法：
-
-```java
-public Object() {}
-```
-
-> [!NOTE]
->
-> * ① Object 类是没有成员变量（属性）的，在学习继承的时候，我们知道，如果类中有共性的部分（属性），就可以抽取到父类中。但是，Object 类是所有类的父类，对于所有类来说，是没有共性部分的，所以 Object 类是没有成员变量（属性），也就没有带参数的构造方法。
-> * ② 之前说过，对于任意类的构造方法，在第一行都隐藏了一个 `super();`语句，其就是用来访问父类的无参构造，因为顶级父类 Object 类只有无参构造方法。
->
-> ::: details 点我查看 具体细节
->
-> ```java {6,10}
-> public class Person {
->     String name;
->     int age;
->     
->     public Person(){
->         super(); // 默认访问父类的无参构造，就是因为顶级父类 Object 只有无参构造方法
->     }
->     
->     public Person(String name,int age){
->         super(); // 默认访问父类的无参构造，就是因为顶级父类 Object 只有无参构造方法
->         this.name = name;
->         this.age = age;
->     }
-> }
-> ```
-> :::
-
-
-
-* 示例：
-
-```java
-package com.github.object;
-
-public class ObjectDemo1 {
-    public static void main(String[] args){
-        Object o = new Object();
-        System.out.println("o = " + o);
-    }
-}
-```
-
-### 5.2.2 获取对象的字符串表示形式
-
-* 返回对象的字符串表现形式：
-
-```java
-public String toString() {
-    return getClass().getName() + "@" + Integer.toHexString(hashCode());
-}
-```
-
-> [!NOTE]
->
-> * ① 默认情况下，该方法的返回值是：`对象类型@对象hashCode值的十六进制`。
-> * ② 在实际开发中，通常建议子类重写`toString()`方法。
-> * ③ 如果我们直接使用`System.out.println(对象);` 输出语句，默认会自动调用该对象的`toString()`方法。
->
-> ::: details 点我查看 具体细节
->
-> ```java [PrintStream.java]
-> public class PrintStream extends FilterOutputStream
->     implements Appendable, Closeable
-> {   
-> 	public void println(Object x) {
->         String s = String.valueOf(x); // [!code highlight]
->         if (getClass() == PrintStream.class) {
->             // need to apply String.valueOf again since first invocation
->             // might return null
->             writeln(String.valueOf(s));
->         } else {
->             synchronized (this) {
->                 print(s);
->                 newLine();
->             }
->         }
->     }
->     ...
-> }
-> ```
->
-> ```java [String.java]
-> public final class String
->     implements java.io.Serializable, Comparable<String>, CharSequence,
->                Constable, ConstantDesc {   
->                    
-> 	public static String valueOf(Object obj) { // [!code highlight]
->         return (obj == null) ? "null" : obj.toString();
->     }
->                    ...
-> }
-> ```
->
-> :::
-
-
-
-* 示例：
-
 ::: code-group
-
-```java [Person.java]
-package com.github.object;
-
-public class Person {
-
-    private String name;
-
-    private int age;
-
-    public Person() {
-    }
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public String toString() { // [!code highlight]
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-
-```
 
 ```java [Test.java]
-package com.github.object;
-
-public class Test {
-    public static void main(String[] args){
-        Person p1 = new Person("张三", 18);
-        System.out.println(p1); // [!code highlight]
-
-        Person p2 = new Person("李四", 18);
-        System.out.println(p2); // [!code highlight]
-    }
-}
-```
-
-```txt [cmd 控制台]
-Person{name='张三', age=18}
-Person{name='李四', age=18}
-```
-
-:::
-
-### 5.2.3 获取表示对象运行时类的 Class 对象
-
-* 返回表示对象运行时类的 Class 对象：
-
-```java
-public final native Class<?> getClass();
-```
-
-> [!NOTE]
->
-> * ① 因为 Java 的多态特性，可能会导致`编译时类型`和`运行时类型`不一样，如：`Person p = new Student();`。
-> * ② 如果需要查看一个`引用类型变量`实际指向的对象类型，即：运行时类型，就需要使用到此方法了。
-> * ③ 该方法返回的是一个`java.lang.Class`类的对象，这个`Class`对象包含了`引用类型变量`实际指向的`对象类所属类型`的所有信息，如：类名、包名、父类、实现的接口、方法、字段、构造方法、注解等。
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Person.java]
-package com.github.object;
-
-public class Person {
-
-    private String name;
-
-    private int age;
-
-    public Person() {
-    }
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-```
-
-```java [Student.java]
-package com.github.object;
-
-public class Student extends Person {
-
-    public Student() {
-    }
-
-    public Student(String name, int age) {
-        super(name, age);
-    }
-}
-```
-
-```java [Test.java]
-package com.github.object;
-
-public class Test {
-    public static void main(String[] args){
-        Person p1 = new Person("张三", 18);
-        System.out.println(p1);
-        System.out.println(p1.getClass()); // [!code highlight]
-
-        Person p2 = new Student("李四", 18);
-        System.out.println(p2);
-        System.out.println(p2.getClass()); // [!code highlight]
-    }
-}
-```
-
-```txt [cmd 控制台]
-Person{name='张三', age=18}
-class com.github.object.Person
-Person{name='李四', age=18}
-class com.github.object.Student
-```
-
-:::
-
-### 5.2.4 哈希表（补充）
-
-#### 5.2.4.1 概述
-
-* 假设一个班级有 n 个学生，不可避免的会出现`学生姓名`重名的现象，如：张伟等，那么老师通常会在开学第一天给每个学生进行编号（学号），这样后期讲课的时候，直接叫同学的学号，就可以很好的解决`学生姓名`重名的问题，如下所示：
-
-![](./assets/6.svg)
-
-* 其实，上述的方案就是哈希表（映射表），如下所示：
-
-> [!NOTE]
->
-> * ① 哈希表（映射表）就是通过键（key，如：学号）和值（value，如：姓名）建立映射关系，实现高效元素的查询。
-> * ② 当我们向哈希表中输入一个键（key）的时候，可以在`O(1)`时间内获取到对应的值（value）。
-
-![](./assets/7.svg)
-
-* Java 中的`HashMap`就是典型的哈希表数据结构，如下所示：
-
-```java
-package com.github.object2;
-
-import java.util.HashMap;
-import java.util.Map;
-
-public class Test {
-    public static void main(String[] args){
-        Map<String,String> map = new HashMap<>();
-
-        // 添加数据
-        map.put("12836", "张三");
-        map.put("15937", "李四");
-        map.put("20339", "张三");
-        map.put("13276", "王五");
-
-        // 查询数据
-        String value = map.get("12836");
-        System.out.println("12836 = " + value); // 12836 = 张三
-        value = map.get("15937");
-        System.out.println("15937 = " + value); // 15937 = 李四
-        value = map.get("20336");
-        System.out.println("20339 = " + value); // 20339 = 张三
-        value = map.get("20339");
-        System.out.println("13276 = " + value); // 13276 = 王五
-
-        // 删除数据
-        map.remove("13276");
-
-        // 查询数据
-        System.out.println(map); // {12836=张三, 15937=李四, 20339=张三}
-    }
-}
-```
-
-#### 5.2.4.2 哈希表的简单实现
-
-* 我们可以使用`数组`来实现哈希表，在哈希表中，我们将数组中的每个`空位`称为`桶`（bucket），每个桶可以存储一个`键值对`（key-value），如下所示：
-
-![](./assets/8.svg)
-
-* 那么，查询操作就是根据`key`找到数组中对应的桶，并在桶中获取`value`，如下所示：
-
-![](./assets/9.svg)
-
-* 那么，如何通过`key`定位到桶，以便存储数据或查询数据？其实，就是通过`哈希函数`来实现的，如下所示：
-
-> [!NOTE]
->
-> * ① 哈希函数的作用就是将任意长度的输入变为固定长度的输出，如：12836 --> 36 、15937 --> 37 。
-> * ② 在哈希函数中，通常输出空间要远小于输入空间，如：12836（输入空间） --> 36（输出空间） 。
-> * ③ 在哈希函数中，不同的输入（输入空间）可能会散列成相同的输出（输出空间），但是不可能从散列值（输出空间）确定唯一的输入值（输入空间），这就是`哈希冲突`（哈希碰撞），如：12836 --> 36、20336 --> 36 。
-> * ④ 在哈希表中，输入空间是所有的 key，而输出空间是数组桶（数组索引）。
-
-![](./assets/10.svg)
-
-* 如果输入一个`key`，哈希函数的计算过程就是这样的：
-  * ① 通过某种哈希算法`hash(key)`获取到哈希值。
-  * ② 将哈希值对桶数量（数组长度，`capacity`）进行取模，从而获取该`key`对应的数组索引`index`，即：`index = hash(key) % capacity`。
-
-> [!NOTE]
->
-> 假设数组长度`capacity`是`100`，哈希算法`hash(key)`是`key`，那么哈希函数就是`key%100`。
-
-![](./assets/11.svg)
-
-#### 5.2.4.3 哈希冲突的解决
-
-* 从本质上看，哈希函数的作用是将所有`key`构成的输入空间映射到`数组所有索引`构成的输出空间，而输入空间往往远大于输出空间。因此，`理论上一定存在“多个输入对应相同输出”的情况`，如：12836 --> 36、20336 --> 36。
-
-![](./assets/12.svg)
-
-* 如果哈希表的容量 n （数组长度 capacity）越大，那么多个`key`被分配到同一个桶中的概率就越低，冲突也就越少，即：可以通过`扩容哈希表`来减少哈希冲突，如下所示：
-
-![](./assets/13.svg)
-
-### 5.2.5 获取对象的哈希代码值
-
-* 返回对象的 hashCode 值：
-
-```java
-public native int hashCode();
-```
-
-> [!NOTE]
->
-> * ① 如果两个对象的 hashCode 不相等，那么这两个对象一定不相等。
-> * ② 如果两个对象的 hashCode 相等，那么这两个对象不一定相等。
-> * ③ 默认情况下，Object 类提供的`hashCode()`方法，通常会返回对象的内存地址的某种转换形式。这意味着，即使两个对象的内容相同，但是如果它们是不同的对象实例，它们的 hashCode 也不相同；所以，在实际开发中，经常需要重写`hashCode()`方法，以便属性相同的两个对象的 hashCode 是一样的。
-
-> [!NOTE]
->
-> ::: details 点我查看 为什么需要重写 hashCode() 方法？
->
-> `hashCode()`方法的主要目的是为了提高基于哈希表的集合的性能，如下所示：
->
-> * ① **快速查找：** 当向 `HashMap` 或 `HashSet` 中添加一个对象时，集合会首先使用对象的哈希码来确定该对象应该存储在哪个“桶”（bucket）中。这样，在查找、删除或检查对象是否存在时，集合只需要在对应的桶中进行比较，而不需要遍历整个集合，从而大大提高了效率。
-> * ② **确定唯一性：** 在 `HashSet` 中，哈希码被用来快速判断两个对象是否可能相等。如果两个对象的哈希码不同，那么它们肯定是不相等的，可以直接判断为不同的元素。如果哈希码相同，则需要进一步使用 `equals()` 方法进行比较，以确定它们是否真的相等。
->
-> :::
-
-
-
-* 示例：默认实现
-
-::: code-group
-
-```java [Person.java]
-package com.github.object2;
-
-public class Person {
-
-    private String name;
-
-    private int age;
-
-    public Person() {
-    }
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-```
-
-```java [Test.java]
-package com.github.object2;
-
-public class Test {
-    public static void main(String[] args){
-        Person p1 = new Person("张三", 18);
-        Person p2 = new Person("张三", 18);
-        System.out.println(p1.hashCode()); // 1096979270
-        System.out.println(p2.hashCode()); // 1078694789
-        System.out.println(p1.hashCode() == p2.hashCode()); // false
-    }
-}
-```
-
-```txt [cmd 控制台]
-1096979270
-1078694789
-false
-```
-
-:::
-
-
-
-* 示例：重写 hashCode 方法
-
-::: code-group
-
-```java [Person.java]
-package com.github.object2;
-
-import java.util.Objects;
-
-public class Person {
-
-    private String name;
-
-    private int age;
-
-    public Person() {
-    }
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public int hashCode() { // [!code highlight]
-        return Objects.hash(getName(), getAge());
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-```
-
-```java [Test.java]
-package com.github.object2;
-
-public class Test {
-    public static void main(String[] args){
-        Person p1 = new Person("张三", 18);
-        Person p2 = new Person("张三", 18);
-        System.out.println(p1.hashCode()); // 24022538
-        System.out.println(p2.hashCode()); // 24022538
-        System.out.println(p1.hashCode() == p2.hashCode()); // true
-    }
-}
-```
-
-```txt [cmd 控制台]
-24022538
-24022538
-true
-```
-
-:::
-
-### 5.2.6 判断两个对象是否相等
-
-* 判断两个对象是否相等：
-
-```java
-public boolean equals(Object obj) {
-    return (this == obj);
-}
-```
-
-> [!NOTE]
->
-> * ① 默认情况下，`equals()`比较的是两个对象的地址是否相等。
-> * ② 在实际开发下，我们经常希望：如果两个对象的属性相同就认为这两个对象相等，所以需要重写`equals()`方法。
-
-
-
-* 示例：默认实现
-
-::: code-group
-
-```java [Person.java]
-package com.github.object2;
-
-import java.util.Objects;
-
-public class Person {
-
-    private String name;
-
-    private int age;
-
-    public Person() {
-    }
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getName(), getAge());
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-```
-
-```java [Test.java]
-package com.github.object2;
-
-public class Test {
-    public static void main(String[] args){
-        Person p1 = new Person("张三", 18);
-        Person p2 = new Person("张三", 18);
-        System.out.println(p1); // Person{name='张三', age=18}
-        System.out.println(p2); // Person{name='张三', age=18}
-        System.out.println(p1.equals(p2)); // false
-    }
-}
-```
-
-```txt [cmd 控制台]
-Person{name='张三', age=18}
-Person{name='张三', age=18}
-false
-```
-
-:::
-
-
-
-* 示例：重写 equals 方法
-
-::: code-group
-
-```java [Person.java]
-package com.github.object2;
-
-import java.util.Objects;
-
-public class Person {
-
-    private String name;
-
-    private int age;
-
-    public Person() {
-    }
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public boolean equals(Object o) { // [!code highlight]
-        if (o == null || getClass() != o.getClass()) return false;
-        Person person = (Person) o;
-        return getAge() == person.getAge() 
-            && Objects.equals(getName(), person.getName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getName(), getAge());
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-
-```
-
-```java [Test.java]
-package com.github.object2;
-
-public class Test {
-    public static void main(String[] args){
-        Person p1 = new Person("张三", 18);
-        Person p2 = new Person("张三", 18);
-        System.out.println(p1); // Person{name='张三', age=18}
-        System.out.println(p2); // Person{name='张三', age=18}
-        System.out.println(p1.equals(p2)); // true
-    }
-}
-```
-
-```txt [cmd 控制台]
-Person{name='张三', age=18}
-Person{name='张三', age=18}
-true
-```
-
-:::
-
-### 5.2.7 浅克隆
-
-* 将 A 对象的属性值完全拷贝给 B 对象，即：对象拷贝（对象复制）。
-
-```java
-protected native Object clone() throws CloneNotSupportedException;
-```
-
-> [!NOTE]
->
-> * ① native 关键字是本地的、原生的意思。
-> * ② native 关键字的用法：
->   * 只能用来修饰方法。
->   * 表示该方法的方法体不是用 Java 语言实现的，而是用 C/C++  是的。
->   * 对于 Java 程序员来说，可以当做普通的 Java 方法正常调用，或者使用子类重写 native 方法。
-> * ③ 当调用 clone() 方法的时候，会在底层帮我们创建一个对象，并将原对象的数据拷贝过去。
->   * 需要重写 Object 类的 clone() 方法。
->   * 需要让 JavaBean 类实现`java.lang.Cloneable`接口。
->   * 创建原对象并调用 clone() 方法。
-
-> [!CAUTION]
->
-> * ① 对于基本数据类型变量，存储的是真实的值。对于引用数据类型的变量，存储的是另一个空间的地址值。
->
-> ::: details 点我查看 具体细节
->
-> ![](./assets/14.svg)
->
-> :::
->
-> * ② 当调用 clone() 方法的时候，如果属性是基本数据类型，就拷贝真实的值；如果属性是引用数据类型，就拷贝地址值，这就是浅克隆（浅拷贝）。
->
-> ::: details 点我查看 具体细节
->
-> ![](./assets/15.svg)
->
-> :::
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Person.java]
-package com.github.object3;
+package com.github.regex2;
 
 import java.util.Arrays;
-import java.util.Objects;
 
-public class Person implements Cloneable { // [!code highlight]
+public class Test {
+    public static void main(String[] args) {
+        String str = "192.168.2.5";
 
-    private String name;
+        String[] ips = str.split("\\.");
 
-    private int age;
-
-    private String[] hobbies;
-
-    public Person() {}
-
-    public Person(String name, int age, String[] hobbies) {
-        this.name = name;
-        this.age = age;
-        this.hobbies = hobbies;
+        System.out.println(Arrays.toString(ips));
     }
+}
+```
 
-    public String getName() {
-        return name;
+```txt [cmd 控制台]
+[192, 168, 2, 5]
+```
+
+:::
+
+### 3.6.2 匹配字符串
+
+* 判断字符串是否匹配指定的`正则表达式`：
+
+```java
+public boolean matches(String regex) { // [!code focus]
+    return Pattern.matches(regex, this);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.regex2;
+
+public class Test {
+    public static void main(String[] args) {
+        String iphone = "13800138000";
+        boolean matches = iphone.matches("^1[3-9]\\d{9}$");
+        System.out.println("matches = " + matches);
     }
+}
+```
 
-    public void setName(String name) {
-        this.name = name;
-    }
+```txt [cmd 控制台]
+matches = true
+```
 
-    public int getAge() {
-        return age;
-    }
+:::
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+### 3.6.3 替换子串
 
-    public String[] getHobbies() {
-        return hobbies;
-    }
+* 根据指定的`子串`（不支持正则表达式）替换字符串中匹配的子串：
 
-    public void setHobbies(String[] hobbies) {
-        this.hobbies = hobbies;
-    }
+```java
+public String replace(CharSequence target, CharSequence replacement) { // [!code focus]
+    String trgtStr = target.toString();
+    String replStr = replacement.toString();
+    int thisLen = length();
+    int trgtLen = trgtStr.length();
+    int replLen = replStr.length();
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Person person = (Person) o;
-        return getAge() == person.getAge()
-                && Objects.equals(getName(), person.getName())
-                && Objects.deepEquals(getHobbies(), person.getHobbies());
-    }
+    if (trgtLen > 0) {
+        if (trgtLen == 1 && replLen == 1) {
+            return replace(trgtStr.charAt(0), replStr.charAt(0));
+        }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getName(), getAge(), 
-                            Arrays.hashCode(getHobbies()));
-    }
+        boolean thisIsLatin1 = this.isLatin1();
+        boolean trgtIsLatin1 = trgtStr.isLatin1();
+        boolean replIsLatin1 = replStr.isLatin1();
+        String ret = (thisIsLatin1 && trgtIsLatin1 && replIsLatin1)
+                ? StringLatin1.replace(value, thisLen,
+                                       trgtStr.value, trgtLen,
+                                       replStr.value, replLen)
+                : StringUTF16.replace(value, thisLen, thisIsLatin1,
+                                      trgtStr.value, trgtLen, trgtIsLatin1,
+                                      replStr.value, replLen, replIsLatin1);
+        if (ret != null) {
+            return ret;
+        }
+        return this;
 
-    @Override
-    public String toString() {
-        return "Person{" 
-            + "name='" + name + '\'' 
-            + ", age=" + age 
-            + ", hobbies=" + Arrays.toString(hobbies) + '}';
-    }
-
-    @Override
-    public Person clone() { // [!code highlight]
+    } else { // trgtLen == 0
+        int resultLen;
         try {
-            Person clone = (Person) super.clone();
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
+            resultLen = Math.addExact(thisLen, Math.multiplyExact(
+                    Math.addExact(thisLen, 1), replLen));
+        } catch (ArithmeticException ignored) {
+            throw new OutOfMemoryError("Required length exceeds implementation limit");
         }
+
+        StringBuilder sb = new StringBuilder(resultLen);
+        sb.append(replStr);
+        for (int i = 0; i < thisLen; ++i) {
+            sb.append(charAt(i)).append(replStr);
+        }
+        return sb.toString();
     }
-}
+} // [!code focus]
 ```
 
-```java [Test.java]
-package com.github.object3;
+* 根据指定的`正则表达式`替换字符串中匹配到的第一个子串：
 
-public class Test {
-    public static void main(String[] args) {
-        String[] hobbies = new String[] {"王者荣耀", "英雄联盟", "诛仙"};
-        Person p1 = new Person("张三", 18, hobbies);
-        Person p2 = p1.clone();
-
-        System.out.println(p1 == p2);
-        System.out.println(p1);
-        System.out.println(p2);
-
-        System.out.println(hobbies == p1.getHobbies());
-        System.out.println(hobbies == p2.getHobbies());
-    }
-}
+```java
+public String replaceFirst(String regex, String replacement) { // [!code focus]
+    return Pattern.compile(regex).matcher(this).replaceFirst(replacement);
+} // [!code focus]
 ```
 
-```txt [cmd 控制台]
-false
-Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
-Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
-true
-true
+* 根据指定的`正则表达式`替换字符串中匹配到的所有子串：
+
+```java
+public String replaceAll(String regex, String replacement) { // [!code focus]
+    return Pattern.compile(regex).matcher(this).replaceAll(replacement);
+} // [!code focus]
 ```
 
-:::
-
-### 5.2.8 深克隆
-
-* 和`浅克隆（浅拷贝）`对应的是`深克隆（深拷贝）`。
-* 深克隆的特点是：
-  * 如果对象的属性是基本数据类型，就拷贝真实的值。
-  * 如果属性是引用数据类型，不是直接拷贝地址值，而是再创建一个新的对象，并将该对象的地址值赋值给该属性（字符串除外，字符串会进行复用，这样可以节省内存）。
-
-> [!NOTE]
->
-> ::: details 点我查看 具体细节
->
-> ![](./assets/16.svg)
->
-> :::
-
-> [!NOTE]
->
-> 深克隆的实现方式：
->
-> * ① 手动实现：如果属性是引用数据类型，就创建新的对象，并赋值给该属性（如果是循环引用，实现比较繁琐）。
-> * ② 借助第三方库，如：GSON 等。
 
 
-
-* 示例：手动实现
+* 示例：
 
 ::: code-group
 
-```java [Person.java]
-package com.github.object5;
-
-import java.util.Arrays;
-import java.util.Objects;
-
-public class Person implements Cloneable { // [!code highlight]
-
-    private String name;
-
-    private int age;
-
-    private String[] hobbies;
-
-    public Person() {}
-
-    public Person(String name, int age, String[] hobbies) {
-        this.name = name;
-        this.age = age;
-        this.hobbies = hobbies;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String[] getHobbies() {
-        return hobbies;
-    }
-
-    public void setHobbies(String[] hobbies) {
-        this.hobbies = hobbies;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Person person = (Person) o;
-        return getAge() == person.getAge()
-                && Objects.equals(getName(), person.getName())
-                && Objects.deepEquals(getHobbies(), person.getHobbies());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getName(), getAge(), 
-                            Arrays.hashCode(getHobbies()));
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" 
-            + "name='" + name + '\'' 
-            + ", age=" + age 
-            + ", hobbies=" + Arrays.toString(hobbies) + '}';
-    }
-
-    @Override
-    public Person clone() { // [!code highlight]
-        try {
-            Person clone = (Person) super.clone();
-            String[] newHobbies = new String[this.hobbies.length];
-            System.arraycopy(hobbies, 0, newHobbies, 0, this.hobbies.length);
-            clone.setHobbies(newHobbies);
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
-}
-```
-
 ```java [Test.java]
-package com.github.object5;
+package com.github.regex2;
 
 public class Test {
     public static void main(String[] args) {
-        String[] hobbies = new String[] {"王者荣耀", "英雄联盟", "诛仙"};
-        Person p1 = new Person("张三", 18, hobbies);
-        Person p2 = p1.clone();
+        String str =
+                """
+        Java自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
 
-        System.out.println(p1 == p2); // false
-        System.out.println(p1);
-        System.out.println(p2);
-
-        System.out.println(hobbies == p1.getHobbies()); // true
-        System.out.println(hobbies == p2.getHobbies()); // false
+        String str2 = str.replace("Java", "C#");
+        System.out.println("str2 = " + str2);
     }
 }
 ```
-
 ```txt [cmd 控制台]
-false
-Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
-Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
-true
-false
+str2 = C#自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 C#8 和 C#11，因为这两个是长期支持版本。
+下一个长期支持版本是 C#17，相信在未来不久 C#17 也会逐渐登上历史舞台。
 ```
 
 :::
 
 
 
-* 示例：借助第三方库
+
+* 示例：
 
 ::: code-group
 
-```java [Person.java]
-package com.github.object4;
-
-import java.util.Arrays;
-import java.util.Objects;
-
-public class Person {
-
-    private String name;
-
-    private int age;
-
-    private String[] hobbies;
-
-    public Person() {}
-
-    public Person(String name, int age, String[] hobbies) {
-        this.name = name;
-        this.age = age;
-        this.hobbies = hobbies;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String[] getHobbies() {
-        return hobbies;
-    }
-
-    public void setHobbies(String[] hobbies) {
-        this.hobbies = hobbies;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Person person = (Person) o;
-        return getAge() == person.getAge()
-                && Objects.equals(getName(), person.getName())
-                && Objects.deepEquals(getHobbies(), person.getHobbies());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getName(), getAge(), 
-                            Arrays.hashCode(getHobbies()));
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" 
-            + "name='" + name + '\'' 
-            + ", age=" + age + ", hobbies=" + Arrays.toString(hobbies) + '}';
-    }
-}
-```
-
 ```java [Test.java]
-package com.github.object4;
-
-import com.google.gson.Gson;
+package com.github.regex2;
 
 public class Test {
     public static void main(String[] args) {
-        String[] hobbies = new String[] {"王者荣耀", "英雄联盟", "诛仙"};
-        Person p1 = new Person("张三", 18, hobbies);
+        String str =
+                """
+        Java自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
 
-        Person p2 = deepCopy(p1);
-
-        System.out.println("p1 = " + p1);
-        System.out.println("p2 = " + p2);
-
-        System.out.println(p1 == p2); // false
-
-        System.out.println(hobbies == p1.getHobbies()); // true
-        System.out.println(hobbies == p2.getHobbies()); // false
-    }
-
-    /**
-     * 深克隆
-     * @param person 对象
-     * @return 深克隆后的对象
-     */
-    public static Person deepCopy(Person person) {
-        Gson gson = new Gson();
-        String json = gson.toJson(person);
-        return gson.fromJson(json, Person.class);
+        String str2 = str.replaceFirst("(?i)java", "C#");
+        System.out.println("str2 = " + str2);
     }
 }
-```
 
+```
 ```txt [cmd 控制台]
-false
-Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
-Person{name='张三', age=18, hobbies=[王者荣耀, 英雄联盟, 诛仙]}
-true
-false
+str2 = C#自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。
 ```
 
 :::
 
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.regex2;
+
+public class Test {
+    public static void main(String[] args) {
+        String str =
+                """
+        Java自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 Java8 和 Java11，因为这两个是长期支持版本。
+        下一个长期支持版本是 Java17，相信在未来不久 Java17 也会逐渐登上历史舞台。""";
+
+        String str2 = str.replaceAll("(?i)java", "C#");
+        System.out.println("str2 = " + str2);
+    }
+}
+
+```
+
+```txt [cmd 控制台]
+str2 = C#自从 95 年问世以来，经历了很多版本，目前企业中用的最多的是 C#8 和 C#11，因为这两个是长期支持版本。
+下一个长期支持版本是 C#17，相信在未来不久 C#17 也会逐渐登上历史舞台。
+```
+
+:::
