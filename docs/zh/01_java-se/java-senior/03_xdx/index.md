@@ -400,8 +400,719 @@ public class Test {
 
 ## 4.1 概述
 
+* Arrays 是用来操作数组的工具类，如：对数组中的元素进行排序、搜索数组中指定的元素等。
+
+## 4.2 常用 API
+
+### 4.2.1 将数组内容拼接为字符串
+
+* 返回指定数组内容的字符串表示形式，如：`[元素1，元素2，元素3...]`：
+
+```java
+public static String toString(boolean[] a) { ... }
+```
+
+```java
+public static String toString(char[] a) { ... }
+```
+
+```java
+public static String toString(double[] a) { ... }
+```
+
+```java
+public static String toString(long[] a) { ... }
+```
+
+```java
+public static String toString(Object[] a) { ... }
+```
+
+* 返回多维数组内容的字符串表示形式：
+
+```java
+public static String deepToString(Object[] a) { ... }
+```
 
 
 
+* 示例：
 
+::: code-group
+
+```java [Test.java]
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+
+        int[] arr = {1, 2, 3, 4, 5, 6};
+
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
+```txt [cmd 控制台]
+[1, 2, 3, 4, 5, 6]
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.algorithm.arrays;
+
+import java.util.Objects;
+
+public class Student {
+    private String name;
+
+    private Integer age;
+
+    public Student() {}
+
+    public Student(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return Objects.equals(name, student.name) 
+            && Objects.equals(age, student.age);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" + "name='" + name + '\'' + ", age=" + age + '}';
+    }
+}
+
+```
+
+```java [Test.java]
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+
+        Student[] stuArr = {
+            new Student("张三", 18), 
+            new Student("李四", 19), 
+            new Student("王五", 20),
+        };
+
+        System.out.println(Arrays.toString(stuArr));
+    }
+}
+```
+
+```txt [cmd 控制台]
+[Student{name='张三', age=18}, Student{name='李四', age=19}, Student{name='王五', age=20}]
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+
+        int[][] arr = {{11, 12, 13}, {21, 22, 23}, {31, 32, 33, 34}};
+
+        System.out.println(Arrays.deepToString(arr));
+    }
+}
+```
+
+```txt [cmd 控制台]
+[[11, 12, 13], [21, 22, 23], [31, 32, 33, 34]]
+```
+
+:::
+
+### 4.2.2 二分查找法
+
+* 通过二分查找法，査找指定的元素：
+
+```java
+public static int binarySearch(char[] a, char key) { ... }
+```
+
+```java
+public static int binarySearch(char[] a, int fromIndex, int toIndex,
+                                   char key) { ... }
+```
+
+```java
+public static int binarySearch(double[] a, double key) { ... }
+```
+
+```java
+public static int binarySearch(double[] a, int fromIndex, int toIndex,
+                                   double key) { ... }
+```
+
+```java
+public static int binarySearch(Object[] a, Object key) { ... }
+```
+
+```java
+public static int binarySearch(Object[] a, int fromIndex, int toIndex,
+                                   Object key) { ... }
+```
+
+```java
+public static <T> int binarySearch(T[] a, T key, Comparator<? super T> c) { ... }
+```
+
+```java
+ public static <T> int binarySearch(T[] a, int fromIndex, int toIndex,
+                                       T key, Comparator<? super T> c) { ... }
+```
+
+```java
+public static int binarySearch(long[] a, long key) { ... }
+```
+
+```java
+public static int binarySearch(long[] a, int fromIndex, int toIndex,
+                                   long key) { ... }
+```
+
+
+
+* 示例：
+
+```java
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5, 6, 7};
+
+        int index = Arrays.binarySearch(arr, 8);
+        System.out.println(index); // -8
+
+        index = Arrays.binarySearch(arr, 6);
+        System.out.println(index); // 5
+    }
+}
+```
+
+### 4.2.3 拷贝数组
+
+* 拷贝数组：
+
+```java
+/**
+* 会根据第二个参数创建新的数组
+* 如果新数组的长度 < 旧数组的长度，会部分拷贝
+* 如果新数组的长度 = 旧数组的长度，会完全拷贝
+* 如果新数组的长度 > 就数组的长度，在完全拷贝的同时，补上默认初始值
+*/
+public static boolean[] copyOf(boolean[] original, int newLength) { ... }
+```
+
+```java
+public static <T> T[] copyOf(T[] original, int newLength) { ... }        
+```
+
+```java
+public static long[] copyOf(long[] original, int newLength) { ... }
+```
+
+```java
+public static char[] copyOf(char[] original, int newLength) { ... }
+```
+
+```java
+public static double[] copyOf(double[] original, int newLength) { ... }
+```
+
+```java
+public static <T,U> T[] copyOf(U[] original, int newLength, Class<? extends T[]> newType) { ... }
+```
+
+* 拷贝数组（指定范围）：
+
+```java
+/**
+* 会老数组指定索引范围拷贝到新数组中。
+* [from,to) 包头不包尾，包左不包右
+*/
+public static boolean[] copyOfRange(boolean[] original, int from, int to) { ... }
+```
+
+```java
+public static <T> T[] copyOfRange(T[] original, int from, int to) { ... }
+```
+
+```java
+public static long[] copyOfRange(long[] original, int from, int to) { ... }
+```
+
+```java
+public static char[] copyOfRange(char[] original, int from, int to) { ... }
+```
+
+```java
+public static double[] copyOfRange(double[] original, int from, int to) { ... }
+```
+
+```java
+public static <T,U> T[] copyOfRange(U[] original, int from, int to, Class<? extends T[]> newType) { ... }
+```
+
+
+
+* 示例：
+
+```java
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+
+        int[] arr = {1, 2, 3, 4, 5};
+
+        int[] newArr = Arrays.copyOf(arr, 2);
+        System.out.println(Arrays.toString(newArr)); // [1, 2]
+
+        newArr = Arrays.copyOf(arr, arr.length);
+        System.out.println(Arrays.toString(newArr)); // [1, 2, 3, 4, 5]
+
+        newArr = Arrays.copyOf(arr, arr.length + 2);
+        System.out.println(Arrays.toString(newArr)); // [1, 2, 3, 4, 5, 0, 0]
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+
+        int[] arr = {1, 2, 3, 4, 5};
+
+        int[] newArr = Arrays.copyOfRange(arr, 1, arr.length);
+        System.out.println(Arrays.toString(newArr)); // [2, 3, 4, 5]
+    }
+}
+```
+
+### 4.2.4 填充数组
+
+* 将指定元素填充到数组中：
+
+```java
+public static void fill(long[] a, long val) { ... }
+```
+
+```java
+public static void fill(char[] a, char val) { ... }
+```
+
+```java
+public static void fill(double[] a, double val) { ... }
+```
+
+```java
+public static void fill(Object[] a, Object val) { ... }
+```
+
+* 将指定元素填充到数组中（指定范围）：
+
+```java
+public static void fill(long[] a, int fromIndex, int toIndex, long val) { ... }
+```
+
+```java
+public static void fill(char[] a, int fromIndex, int toIndex, char val) { ... }
+```
+
+```java
+public static void fill(double[] a, int fromIndex, int toIndex,double val) { ... }
+```
+
+```java
+public static void fill(Object[] a, int fromIndex, int toIndex, Object val) { ... }
+```
+
+
+
+* 示例：
+
+```java
+package com.github.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5};
+
+        // 填充数组
+        Arrays.fill(arr, 10);
+        System.out.println(Arrays.toString(arr)); // [10, 10, 10, 10, 10]
+
+        // 重新赋值
+        arr = new int[] {1, 2, 3, 4, 5};
+
+        // 填充数组（指定范围）
+        Arrays.fill(arr, 1, 3, 100);
+        System.out.println(Arrays.toString(arr)); // [1, 100, 100, 4, 5]
+    }
+}
+```
+
+### 4.2.5 数组排序
+
+* 按照默认方式进行数组排序：
+
+```java
+public static void sort(long[] a) { ... }
+public static void sort(short[] a, int fromIndex, int toIndex) { ... }
+```
+
+```java
+public static void sort(char[] a) { ... }
+public static void sort(char[] a, int fromIndex, int toIndex) { ... }
+```
+
+```java
+public static void sort(double[] a) { ... }
+public static void sort(double[] a, int fromIndex, int toIndex) { ... }
+```
+
+```java
+public static void sort(Object[] a) { ... }
+public static void sort(Object[] a, int fromIndex, int toIndex) { ... }
+```
+
+* 按照指定规则进行数组排序：
+
+```java
+public static <T> void sort(T[] a, Comparator<? super T> c) { ... }
+```
+
+```java
+public static <T> void parallelSort(T[] a, int fromIndex, int toIndex,
+                                        Comparator<? super T> cmp) { ... }
+```
+
+
+
+* 示例：按照默认方式进行数组排序，即：自然排序
+
+```java
+package com.github.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+        int[] arr = {2, 3, 5, 7, 9, 25, 30, 31, 32, 40, 11, 12, 15, 20, 45};
+
+        Arrays.sort(arr);
+
+        // [2, 3, 5, 7, 9, 11, 12, 15, 20, 25, 30, 31, 32, 40, 45]
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
+
+
+* 示例：按照指定规则进行数组排序
+
+```java 
+package com.github.arrays;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class Test {
+    public static void main(String[] args) {
+
+        // 包装类型数组，才可以使用自定义排序
+        Integer[] arr = {2, 3, 5, 7, 9, 25, 30, 31, 32, 40, 11, 12, 15, 20, 45};
+
+        Arrays.sort(arr, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return Integer.compare(o2, o1);
+            }
+        });
+
+        // [45, 40, 32, 31, 30, 25, 20, 15, 12, 11, 9, 7, 5, 3, 2]
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
+
+
+* 示例：按照默认方式进行数组排序，即：自然排序
+
+::: code-group
+
+```java [Student.java]
+package com.github.arrays;
+
+import java.util.Objects;
+
+public class Student implements Comparable<Student> { // [!code highlight]
+    private String name;
+
+    private Integer age;
+
+    public Student() {}
+
+    public Student(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return Objects.equals(name, student.name) 
+            && Objects.equals(age, student.age);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" + "name='" + name + '\'' + ", age=" + age + '}';
+    }
+
+    @Override
+    public int compareTo(Student o) { // [!code highlight:5]
+        // 先比较年龄，如果年龄不相等，则比较年龄；否则，就比较姓名
+        return this.age - o.age != 0
+            ? (this.age - o.age) : this.name.compareTo(o.name);
+    }
+}
+
+```
+
+```java [Test.java]
+package com.github.arrays;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class Test {
+    public static void main(String[] args) {
+
+        Student[] stuArr = {
+            new Student("张三", 50),
+            new Student("李四", 25),
+            new Student("王五", 9),
+            new Student("赵六", 18),
+            new Student("田七", 35),
+            new Student("王八", 46),
+            new Student("呵呵哒", 18),
+        };
+
+        // 自然排序
+        Arrays.sort(stuArr, new Comparator<>() {
+            @Override
+            public int compare(Student o1, Student o2) {
+                return Integer.compare(o2.getAge(), o1.getAge());
+            }
+        });
+
+        System.out.println(Arrays.toString(stuArr));
+    }
+}
+
+```
+
+```txt [cmd 控制台]
+[Student{name='张三', age=50}, Student{name='王八', age=46}, Student{name='田七', age=35}, Student{name='李四', age=25}, Student{name='赵六', age=18}, Student{name='呵呵哒', age=18}, Student{name='王五', age=9}]
+```
+
+:::
+
+
+
+* 示例：按照指定规则进行数组排序
+
+::: code-group
+
+```java [Student.java]
+package com.github.arrays;
+
+import java.util.Objects;
+
+public class Student implements Comparable<Student> { // [!code highlight]
+    private String name;
+
+    private Integer age;
+
+    public Student() {}
+
+    public Student(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return Objects.equals(name, student.name) 
+            && Objects.equals(age, student.age);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" + "name='" + name + '\'' + ", age=" + age + '}';
+    }
+
+    @Override
+    public int compareTo(Student o) { // [!code highlight:5]
+        // 先比较年龄，如果年龄不相等，则比较年龄；否则，就比较姓名
+        return this.age - o.age != 0
+            ? (this.age - o.age) : this.name.compareTo(o.name);
+    }
+}
+
+```
+
+```java [Test.java]
+package com.github.arrays;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class Test {
+    public static void main(String[] args) {
+
+        Student[] stuArr = {
+            new Student("张三", 50),
+            new Student("李四", 25),
+            new Student("王五", 9),
+            new Student("赵六", 18),
+            new Student("田七", 35),
+            new Student("王八", 46),
+            new Student("呵呵哒", 18),
+        };
+
+        // 自然排序
+        Arrays.sort(stuArr, new Comparator<>() {
+            @Override
+            public int compare(Student o1, Student o2) {
+                return Integer.compare(o2.getAge(), o1.getAge());
+            }
+        });
+
+        System.out.println(Arrays.toString(stuArr));
+    }
+}
+
+```
+
+```txt [cmd 控制台]
+[Student{name='张三', age=50}, Student{name='王八', age=46}, Student{name='田七', age=35}, Student{name='李四', age=25}, Student{name='赵六', age=18}, Student{name='呵呵哒', age=18}, Student{name='王五', age=9}]
+```
+
+:::
 
