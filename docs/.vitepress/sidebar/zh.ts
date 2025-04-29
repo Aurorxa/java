@@ -55,7 +55,7 @@ export const zhSidebar: DefaultTheme.Sidebar = [
           { text: 'Java 正则表达式', link: `/01_java-se/java-senior/01_${commonDirectoryName}/` },
           { text: 'Java 时间和包装类', link: `/01_java-se/java-senior/02_${commonDirectoryName}/` },
           { text: 'Java 算法', link: `/01_java-se/java-senior/03_${commonDirectoryName}/` },
-          { text: 'Java Lambda 表达式', link: `/01_java-se/java-senior/04_${commonDirectoryName}/` },
+          { text: 'Java 函数式编程', link: `/01_java-se/java-senior/04_${commonDirectoryName}/` },
           { text: 'Java 异常', link: `/01_java-se/java-senior/05_${commonDirectoryName}/` },
           { text: 'Java 集合和泛型（一）', link: `/01_java-se/java-senior/06_${commonDirectoryName}/` },
           { text: 'Java 集合和泛型（二）', link: `/01_java-se/java-senior/07_${commonDirectoryName}/` },
