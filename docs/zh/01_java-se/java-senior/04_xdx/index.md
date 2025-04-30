@@ -67,7 +67,7 @@
 
 > [!NOTE]
 >
-> * ① `相同的输入总是返回相同的输出`：无论什么时候调用这个函数，只要给定相同的输入，函数的输出一定的相同的，即：合格的函数（纯函数）不依赖于外部的状态或者可变的数据，函数的行为仅仅取决于其输入输出，如：`y = x * x`，只要 x = 2 ，y 就是 4 。
+> * ① `相同的输入总是返回相同的输出`：无论什么时候调用这个函数，只要给定相同的输入，函数的输出一定的相同的，即：合格的函数（纯函数）不依赖于外部的状态或者可变的数据（可以依赖外部不可变的数据），函数的行为仅仅取决于其输入输出，如：`y = x * x`，只要 x = 2 ，y 就是 4 。
 > * ② `没有副作用`： 副作用是指在函数执行过程中对外部世界的任何影响，如：修改全局变量、改变输入参数的值、进行输入输出操作（打印或文件写入）、修改文件或数据库状态等。合格的函数（纯函数）不能有这些副作用，它只能依赖输入并计算出结果，而不改变外部状态。
 
 > [!CAUTION]
@@ -228,11 +228,217 @@ public class PureFunctionTest4 {
 
 ### 1.2.3 有形的函数
 
+#### 1.2.3.1 其它语言中有形的函数
+
+* 在函数式编程中，`函数`是`头等公民`，即：`函数可以写到任意位置`，可以作为函数的形参、函数的返回值、赋值给某个变量甚至存储到数据结构（数组、Set、Map）中。
+
+> [!NOTE]
+>
+> JavaScript 是一门支持函数式编程的计算机语言，即：在 JavaScript 中，函数也是头等公民！！！
+
+* ① 函数可以被赋值给变量（函数表达式）
+
+```js
+let foo = function(){ // [!code highlight]
+    console.log('foo 函数被执行了');
+}
+
+foo();
+```
+
+* ② 函数可以在变量之间来回传递：
+
+```js
+let foo = function(){ 
+    console.log('foo 函数被执行了');
+}
+
+let bar = foo // [!code highlight]
+
+bar();
+```
+
+* ③ 函数可以作为其它函数的形参：
+
+```js
+let foo = function(){ 
+    console.log('foo 函数被执行了');
+}
+
+function biz(fn){ // [!code highlight]
+    fn();
+}
+
+biz(foo);
+```
+
+* ④ 函数可以作为其它函数的返回值：
+
+```js
+let foo = function(){
+    console.log('foo 函数被执行了');
+}
+
+function biz(){ 
+    return foo; // [!code highlight]
+}
+
+const bar = biz()
+bar();
+```
+
+* ⑤ 函数可以存储在其它数据结构中：
+
+```js
+let foo = function(){
+    console.log('foo 函数被执行了');
+}
+
+let bar = function(){
+    console.log('bar 函数被执行了');
+}
+
+let arr = [foo,bar] // [!code highlight]
+
+arr[0]();
+arr[1]();
+```
+
+* 其实，在 JavaScript 中，`函数`是一种特殊的`对象`，如下所示：
+
+![](./assets/4.svg)
 
 
 
+* 其内存图，如下所示：
 
+![add 持有函数对象在堆内存中的引用地址，所以在 JavaScript 中函数可以写到任意位置！！！](./assets/5.svg)
 
+> [!NOTE]
+>
+> 总结：函数的有形，就是让函数变为对象（持有对象的引用），这样函数就可以写到任意位置（让函数的规则传播）。
+
+#### 1.2.3.2 Java 语言中有形的函数
+
+* 在 JDK8 之前，Java 是一个纯粹的面向对象的编程语言。
+
+> [!NOTE]
+>
+> 所谓的面向对象，就是先找对象，然后让对象帮我们做事情。
+
+* 当调用一个方法的时候，如果方法的形参是一个接口，由于 Java 语法的限制，我们必须给这个方法传递这个接口的实现类对象或者匿名内部类（匿名内部类的对象）。
+* ① 没有使用匿名内部类：
+
+::: code-group
+
+```java [Swim.java]
+public interface Swim {
+
+    void swimming();
+}
+```
+
+```java [Student.java]
+public class Student implements Swim {
+
+    @Override
+    public void swimming() {
+        System.out.println("重写了 swimming 方法");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        goSwimming(new Student());
+    }
+    
+    // 定义一个方法,模拟请一些人去游泳
+    public static void goSwimming(Swim s) {
+        s.swimming();
+    }
+}
+```
+
+:::
+
+* ② 使用匿名内部类：
+
+::: code-group
+
+```java [Swim.java]
+public interface Swim {
+
+    void swimming();
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Swim swim = new Swim() {
+            @Override
+            public void swimming() {
+                System.out.println("重写了 swimming 方法");
+            }
+        }
+        
+        goSwimming(swim);
+    }
+    
+    // 定义一个方法,模拟请一些人去游泳
+    public static void goSwimming(Swim s) {
+        s.swimming();
+    }
+}
+```
+
+:::
+
+* 在 JDK8 之后，Java 引入了函数式编程的思想。
+
+> [!NOTE]
+>
+> 所谓的函数式编程，忽略面向对象的复杂语法，强调做什么（对行为的抽象），而不是谁去做。
+
+* 当调用一个方法的时候，如果方法的形参是一个接口，我们不再需要给这个方法传递这个接口的实现类对象或者匿名内部类（匿名内部类的对象），只需要传递`函数化对象`。
+
+::: code-group
+
+```java [Swim.java]
+@FunctionalInterface 
+public interface Swim {
+
+    void swimming();
+}
+```
+
+```java [Test.java]
+public class Test {
+
+    public static void main(String[] args) {
+
+        // 函数化对象
+        Swim swim = () -> System.out.println("重写了 swimming 方法");
+
+        goSwimming(swim);
+    }
+
+    // 定义一个方法,模拟请一些人去游泳
+    public static void goSwimming(Swim s) {
+        s.swimming();
+    }
+}
+```
+
+:::
+
+> [!NOTE]
+>
+> * ① 对于 JavaScript 而言，有形的函数，就是让函数变为对象（持有对象的引用），这样函数就可以写到任意位置（让函数的规则传播），即：JavaScript 从语法上就原生支持函数式编程。
+> * ② 对于 Java 而言，有形的函数，也是让函数变为对象；但是，本质上是`实现了函数式接口（只有一个抽象方法的接口）的对象`，即：Java 从语法上只能有限支持函数式编程（必须依托于函数式接口）。
+> * ③ 和 JavaScript 不同的是，在 Java 中，有形的函数必须依托于接口（函数式接口）而存在。
 
 ## 1.3 函数对象
 
