@@ -1116,3 +1116,147 @@ public class Test {
 
 :::
 
+
+
+# 第五章：综合练习
+
+## 5.1 练习一
+
+* 需求：定义数组并存储一些女朋友对象，请利用 Arrays 中的 sort 方法进行排序。
+
+> [!NOTE]
+>
+> 要求：
+>
+> * ① 属性有姓名、年龄和身高。
+> * ② 按照年龄的大小进行排序，如果年龄一样，按照身高排序；如果身高一样，则按照姓名进行排序。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [GirFriend.java]
+package com.github.test;
+
+import java.util.Objects;
+
+public class GirFriend {
+
+    private String name;
+
+    private Integer age;
+
+    private double height;
+
+    public GirFriend() {}
+
+    public GirFriend(String name, Integer age, double height) {
+        this.name = name;
+        this.age = age;
+        this.height = height;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        GirFriend girFriend = (GirFriend) o;
+        return Double.compare(getHeight(), girFriend.getHeight()) == 0
+                && Objects.equals(getName(), girFriend.getName())
+                && Objects.equals(getAge(), girFriend.getAge());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getAge(), getHeight());
+    }
+
+    @Override
+    public String toString() {
+        return "{" + "name='" + name + '\'' 
+            + ", age=" + age + ", height=" + height + '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.test;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建女朋友对象
+        GirFriend gf1 = new GirFriend("泷巧蕊", 18, 1.65);
+        GirFriend gf2 = new GirFriend("杨不悔", 19, 1.72);
+        GirFriend gf3 = new GirFriend("周芷若", 19, 1.78);
+        GirFriend gf4 = new GirFriend("公羊茜", 19, 1.63);
+        GirFriend gf5 = new GirFriend("咸含秀", 20, 1.55);
+        GirFriend gf6 = new GirFriend("桐合美", 20, 1.55);
+
+        // 创建数组
+        GirFriend[] arr = {gf1, gf2, gf3, gf4, gf5, gf6};
+
+        // 对数组中的元素进行排序
+        Arrays.sort(arr, (o1, o2) -> {
+            if (!o1.getAge().equals(o2.getAge())) {
+                return Integer.compare(o1.getAge(), o2.getAge());
+            }
+            if (Double.compare(o1.getHeight(), o2.getHeight()) != 0) {
+                return Double.compare(o1.getHeight(), o2.getHeight());
+            }
+            return o1.getName().compareTo(o2.getName());
+        });
+
+        // 打印数组
+        Arrays.stream(arr).forEach(System.out::println);
+    }
+}
+```
+
+```txt[cmd 控制台]
+{name='泷巧蕊', age=18, height=1.65}
+{name='公羊茜', age=19, height=1.63}
+{name='杨不悔', age=19, height=1.72}
+{name='周芷若', age=19, height=1.78}
+{name='咸含秀', age=20, height=1.55}
+{name='桐合美', age=20, height=1.55}
+```
+
+:::
+
+## 5.2 练习二
+
+* 需求：有一对兔子，从出生后第 3 个月开始起每个月能生一对兔子，小兔子长到第 3 个月后每个月又能生一对兔子，假设兔子都不死，问第 12 个月兔子的对数是多少？
+
+![](./assets/18.svg)
+
+
+
+* 示例：
+
