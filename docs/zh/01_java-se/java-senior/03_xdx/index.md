@@ -682,7 +682,7 @@ public static <T,U> T[] copyOf(U[] original, int newLength, Class<? extends T[]>
 
 ```java
 /**
-* 会老数组指定索引范围拷贝到新数组中。
+* 将老数组指定索引范围的元素拷贝到新数组中。
 * [from,to) 包头不包尾，包左不包右
 */
 public static boolean[] copyOfRange(boolean[] original, int from, int to) { ... }
@@ -856,7 +856,7 @@ public static <T> void parallelSort(T[] a, int fromIndex, int toIndex,
 
 
 
-* 示例：按照默认方式进行数组排序，即：自然排序
+* 示例：按照默认方式进行数组排序（自然排序）
 
 ```java
 package com.github.arrays;
@@ -877,7 +877,7 @@ public class Test {
 
 
 
-* 示例：按照指定规则进行数组排序
+* 示例：按照指定规则进行数组排序（自定义排序）
 
 ```java 
 package com.github.arrays;
@@ -906,7 +906,7 @@ public class Test {
 
 
 
-* 示例：按照默认方式进行数组排序，即：自然排序
+* 示例：按照默认方式进行数组排序（自然排序）
 
 ::: code-group
 
@@ -979,7 +979,7 @@ import java.util.Comparator;
 
 public class Test {
     public static void main(String[] args) {
-
+        // 定义数组
         Student[] stuArr = {
             new Student("张三", 50),
             new Student("李四", 25),
@@ -987,32 +987,33 @@ public class Test {
             new Student("赵六", 18),
             new Student("田七", 35),
             new Student("王八", 46),
-            new Student("呵呵哒", 18),
+            new Student("呵呵", 18),
         };
 
         // 自然排序
-        Arrays.sort(stuArr, new Comparator<>() {
-            @Override
-            public int compare(Student o1, Student o2) {
-                return Integer.compare(o2.getAge(), o1.getAge());
-            }
-        });
+        Arrays.sort(stuArr);
 
-        System.out.println(Arrays.toString(stuArr));
+        // 打印数组内容
+        Arrays.stream(stuArr).forEach(System.out::println);
     }
 }
-
 ```
 
 ```txt [cmd 控制台]
-[Student{name='张三', age=50}, Student{name='王八', age=46}, Student{name='田七', age=35}, Student{name='李四', age=25}, Student{name='赵六', age=18}, Student{name='呵呵哒', age=18}, Student{name='王五', age=9}]
+Student{name='王五', age=9}
+Student{name='呵呵', age=18}
+Student{name='赵六', age=18}
+Student{name='李四', age=25}
+Student{name='田七', age=35}
+Student{name='王八', age=46}
+Student{name='张三', age=50}
 ```
 
 :::
 
 
 
-* 示例：按照指定规则进行数组排序
+* 示例：按照指定规则进行数组排序（自定义排序）
 
 ::: code-group
 
@@ -1085,7 +1086,7 @@ import java.util.Comparator;
 
 public class Test {
     public static void main(String[] args) {
-
+        // 定义数组
         Student[] stuArr = {
             new Student("张三", 50),
             new Student("李四", 25),
@@ -1093,10 +1094,10 @@ public class Test {
             new Student("赵六", 18),
             new Student("田七", 35),
             new Student("王八", 46),
-            new Student("呵呵哒", 18),
+            new Student("呵呵", 18),
         };
 
-        // 自然排序
+        // 自定义排序
         Arrays.sort(stuArr, new Comparator<>() {
             @Override
             public int compare(Student o1, Student o2) {
@@ -1104,14 +1105,20 @@ public class Test {
             }
         });
 
-        System.out.println(Arrays.toString(stuArr));
+        // 打印数组内容
+        Arrays.stream(stuArr).forEach(System.out::println);
     }
 }
-
 ```
 
 ```txt [cmd 控制台]
-[Student{name='张三', age=50}, Student{name='王八', age=46}, Student{name='田七', age=35}, Student{name='李四', age=25}, Student{name='赵六', age=18}, Student{name='呵呵哒', age=18}, Student{name='王五', age=9}]
+Student{name='张三', age=50}
+Student{name='王八', age=46}
+Student{name='田七', age=35}
+Student{name='李四', age=25}
+Student{name='赵六', age=18}
+Student{name='呵呵', age=18}
+Student{name='王五', age=9}
 ```
 
 :::
