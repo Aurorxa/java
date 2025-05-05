@@ -13,7 +13,7 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
-    "@mdit/plugin-figure": "^0.17.0",
+    "@mdit/plugin-figure": "^0.18.0",
     "@nolebase/vitepress-plugin-enhanced-readabilities": "^2.17.0",
     "@nolebase/vitepress-plugin-git-changelog": "^2.17.0",
     "@nolebase/vitepress-plugin-highlight-targeted-heading": "^2.17.0",
@@ -30,7 +30,7 @@
     "vitepress-plugin-mermaid": "^2.0.17"
   },
   "dependencies": {
-    "@theojs/lumen": "^5.4.0",
+    "@theojs/lumen": "^5.4.1",
     "animejs": "^3.2.2",
     "dayjs": "^2.0.0-alpha.4",
     "dotenv": "^16.5.0",
