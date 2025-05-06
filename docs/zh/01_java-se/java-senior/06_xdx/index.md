@@ -261,7 +261,7 @@ Exception in thread "main" java.lang.NullPointerException: Cannot invoke "com.gi
 
 ![](./assets/6.gif)
 
-## 3.2 作用二
+## 3.3 作用二
 
 * 异常的作用：`异常可以作为方法内部的一种特殊返回值，以便通知调用者底层的执行情况`。
 
@@ -443,7 +443,7 @@ Exception in thread "main" java.lang.RuntimeException: 学生的年龄的范围�
 
 ![](./assets/9.gif)
 
-* 这正式我们最想要：`如果由于参数错误导致程序出错，请给出代码出错的位置`；至于之后如何处理，是调用者的事情。
+* 这正是我们最想要：`如果由于参数错误导致程序出错，请给出代码出错的位置`；至于之后如何处理，是调用者的事情。
 
 ![](./assets/10.svg)
 
