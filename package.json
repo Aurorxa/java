@@ -18,11 +18,11 @@
     "@nolebase/vitepress-plugin-git-changelog": "^2.17.0",
     "@nolebase/vitepress-plugin-highlight-targeted-heading": "^2.17.0",
     "@nolebase/vitepress-plugin-inline-link-preview": "^2.17.0",
-    "@shikijs/vitepress-twoslash": "^3.3.0",
+    "@shikijs/vitepress-twoslash": "^3.4.0",
     "@types/animejs": "^3.1.13",
     "@types/canvas-confetti": "^1.9.0",
     "@types/dom-view-transitions": "^1.0.6",
-    "@types/node": "^22.15.3",
+    "@types/node": "^22.15.16",
     "canvas-confetti": "^1.9.3",
     "markdown-it-mathjax3": "^4.3.2",
     "vitepress": "^1.6.3",
@@ -43,7 +43,7 @@
     "vitepress-plugin-announcement": "^0.1.4",
     "vitepress-plugin-comment-with-giscus": "^1.1.15",
     "vitepress-plugin-pagefind": "^0.4.13",
-    "xgplayer": "^3.0.21"
+    "xgplayer": "^3.0.22"
   },
   "include": [
     "**/.vitepress/**/*.ts",
