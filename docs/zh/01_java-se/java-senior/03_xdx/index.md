@@ -1263,7 +1263,48 @@ public class Test {
 
 ![](./assets/18.svg)
 
+> [!NOTE]
+>
+> * 我们可以试图对应的数学模型，如下所示：
+>   * ① f(1) = 1。
+>   * ② f(2) = 1。
+>   * ③ f(3) = 2 = f(2) + f(1)。
+>   * ④ f(4) = 3 = f(3) + f(2)。
+>   * ⑤ f(5) = 5 = f(3) + f(2)。
+>   * ⑥ f(6) = 8 = f(5) + f(4)。
+>   * ⑦ ....
+> * 综上所述，f(n) = f(n-1) + f(n-2)，如果 n == 1 || n ==2，f(n) = 1 。
+
 
 
 * 示例：
+
+```java
+package com.github.test;
+
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(rabbit(1)); // ·
+        System.out.println(rabbit(2)); // 2
+        System.out.println(rabbit(3)); // 3
+        System.out.println(rabbit(4)); // 4
+        System.out.println(rabbit(5)); // 5
+        System.out.println(rabbit(6)); // 8
+        System.out.println(rabbit(7)); // 11
+    }
+
+    /**
+     * 不死神兔
+     *
+     * @param num 次数
+     * @return 数量
+     */
+    public static int rabbit(int num) {
+        if (num == 1 || num == 2) {
+            return 1;
+        }
+        return rabbit(num - 1) + rabbit(num - 2);
+    }
+}
+```
 
