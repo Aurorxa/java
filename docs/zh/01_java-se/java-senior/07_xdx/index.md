@@ -662,7 +662,7 @@ classDiagram
 
 > [!CAUTION]
 >
-> Iterator 接口的对象，即：Iterator 对象称为迭代器。
+> 所谓的迭代器，就是实现 Iterator 接口的对象！！！
 
 * Collection 接口获取迭代器：
 
@@ -2019,11 +2019,11 @@ public class Test {
 
 #### 5.3.3.1 概述
 
-* 之前，通过 Collection 接口的 iterator() 方法可以实现从前向后依次遍历集合中的元素，如下所示：
+* 之前，通过 Collection 接口的 iterator() 方法可以实现从前向后依次遍历集合中的元素：
 
 ![](./assets/7.gif)
 
-* 但是，List 接口提供了 listIterator() 方法，可以实现从后向前依次遍历集合中的元素，如下所示：
+* 但是，List 接口提供了 listIterator() 方法，可以实现从后向前依次遍历集合中的元素：
 
 ![](./assets/8.gif)
 
