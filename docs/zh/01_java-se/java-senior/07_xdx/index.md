@@ -2353,9 +2353,42 @@ classDiagram
 
 ### 6.2.1 概述
 
+* ArrayList 基本 List 接口的特性：有序、重复、有索引。
+* ArrayList 集合底层的实现原理是数组，大小可变。 
+* ArrayList 的特点：查询速度快、增删慢。 
+* ArrayList 是线程不安全的集合，运行速度快。 
+
+### 6.2.2 底层原理
+
+* ① 利用空参创建的集合，其底层会创建一个默认长度为 0 的数组。
+
+```java
+List<String> list = new ArrayList<>();
+```
+
+![](./assets/33.svg)
 
 
 
+* ② 当添加第一个元素的时候，底层会创建一个新的长度为 10 的数组。
 
+```java
+list.add("a");
+list.add("b");
+...
+list.add("j");    
+```
 
+![](./assets/34.gif)
 
+* ③ 如果数组已经存满，即：`size = elementData.length` ，此时就需要将数组进行扩容，扩容为原先的 1.5 倍，即：新数组的长度是 15 。
+
+```java
+list.add("k");
+```
+
+![](./assets/35.gif)
+
+* ④ 如果一次添加多个元素，1.5 倍还放不下，则新创建数组的长度以实际为准。
+
+![](./assets/36.svg)
