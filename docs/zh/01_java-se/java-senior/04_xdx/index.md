@@ -67,7 +67,7 @@
 
 > [!NOTE]
 >
-> * ① `相同的输入总是返回相同的输出`：无论什么时候调用这个函数，只要给定相同的输入，函数的输出一定的相同的，即：合格的函数（纯函数）不依赖于外部的状态或者可变的数据（可以依赖外部不可变的数据），函数的行为仅仅取决于其输入输出，如：`y = x * x`，只要 x = 2 ，y 就是 4 。
+> * ① `相同的输入总是返回相同的输出`：无论什么时候调用这个函数，只要给定相同的输入，函数的输出一定的相同的，即：合格的函数（纯函数）不依赖于外部的状态或者可变的数据，即：可以依赖外部不可变的数据，函数的行为仅仅取决于其输入输出，如：`y = x * x`，只要 x = 2 ，y 就是 4 。
 > * ② `没有副作用`： 副作用是指在函数执行过程中对外部世界的任何影响，如：修改全局变量、改变输入参数的值、进行输入输出操作（打印或文件写入）、修改文件或数据库状态等。合格的函数（纯函数）不能有这些副作用，它只能依赖输入并计算出结果，而不改变外部状态。
 
 > [!CAUTION]
@@ -83,7 +83,6 @@ package com.github.lambda;
 
 public class Test {
     public static void main(String[] args) {
-
         System.out.println(square(4)); // 16
         System.out.println(square(4)); // 16
         System.out.println(square(4)); // 16
@@ -110,11 +109,13 @@ public class Test {
 
 * 示例：不合格的函数
 
-```java
+::: code-group
+
+```java [Test.java]
 package com.github.lambda;
 
 public class Test {
-    static final Buddha buddha = new Buddha("满天神佛");
+    public static final Buddha buddha = new Buddha("满天神佛");
 
     public static void main(String[] args) {
         System.out.println(pray("张三"));
@@ -129,11 +130,11 @@ public class Test {
      * @param person 输入
      * @return 输出
      */
-    static String pray(String person) { // [!code highlight:3]
+    public static String pray(String person) { // [!code highlight:3]
         return person + "向【" + buddha.name + "】祈祷";
     }
 
-    static class Buddha {
+    public static class Buddha {
 
         String name; // [!code highlight]
 
@@ -144,15 +145,26 @@ public class Test {
 }
 ```
 
+```txt [cmd 控制台]
+张三向【满天神佛】祈祷
+张三向【满天神佛】祈祷
+张三向【满天神佛】祈祷
+张三向【魔王】祈祷
+```
+
+:::
+
 
 
 * 示例：合格的函数（纯函数）
 
-```java {10}
+::: code-group
+
+```java {10} [Test.java]
 package com.github.lambda;
 
-public class PureFunctionTest3 {
-    static final Buddha buddha = new Buddha("满天神佛");
+public class Test {
+    public static final Buddha buddha = new Buddha("满天神佛");
 
     public static void main(String[] args) {
         System.out.println(pray("张三"));
@@ -168,11 +180,11 @@ public class PureFunctionTest3 {
      * @param person 输入
      * @return 输出
      */
-    static String pray(String person) { // [!code highlight:3]
+    public static String pray(String person) { // [!code highlight:3]
         return person + "向【" + buddha.name + "】祈祷";
     }
 
-    static class Buddha {
+    public static class Buddha {
 
         final String name; // [!code highlight]
 
@@ -183,15 +195,51 @@ public class PureFunctionTest3 {
 }
 ```
 
+```txt [cmd 控制台]
+张三向【满天神佛】祈祷
+张三向【满天神佛】祈祷
+张三向【满天神佛】祈祷
+张三向【满天神佛】祈祷
+```
+
+:::
 
 
-* 示例：合格的函数
 
-```java {7-8,11-12}
-package com.github.lambda;
+* 示例：合格的函数（成员方法）
 
-public class PureFunctionTest4 {
+::: code-group
 
+```java [Student.java]	
+package com.github.lambda.demo1;
+
+public class Student {
+    String name;
+
+    public Student() {
+    }
+
+    public Student(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 合格的函数（纯函数）
+     */
+    public String getName(Student this) { // [!code highlight:3]
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+```
+
+```java [Test.java]
+package com.github.lambda.demo1;
+
+public class Test {
     public static void main(String[] args) {
         Student s1 = new Student("张三");
         System.out.println(s1.getName()); // 底层会这么执行 getName(s1)
@@ -201,30 +249,11 @@ public class PureFunctionTest4 {
         System.out.println(s2.getName()); // 底层会这么执行 getName(s2)
         System.out.println(s2.getName()); // 底层会这么执行 getName(s2)
     }
-
-    static class Student {
-
-        String name;
-
-        public Student() {}
-
-        public Student(String name) {
-            this.name = name;
-        }
-
-        /**
-         * 合格的函数（纯函数）
-         */
-        public String getName(Student this) { // [!code highlight:3]
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-    }
+    
 }
 ```
+
+:::
 
 ### 1.2.3 有形的函数
 
@@ -326,7 +355,7 @@ arr[1]();
 >
 > 所谓的面向对象，就是先找对象，然后让对象帮我们做事情。
 
-* 当调用一个方法的时候，如果方法的形参是一个接口，由于 Java 语法的限制，我们必须给这个方法传递这个接口的实现类对象或者匿名内部类（匿名内部类的对象）。
+* 当调用一个方法的时候，如果方法的形参是一个接口，由于 Java 语法的限制，我们必须给这个方法传递该接口的实现类对象或者匿名内部类（匿名内部类的对象）。
 * ① 没有使用匿名内部类：
 
 ::: code-group
@@ -402,7 +431,7 @@ public class Test {
 >
 > 所谓的函数式编程，忽略面向对象的复杂语法，强调做什么（对行为的抽象），而不是谁去做。
 
-* 当调用一个方法的时候，如果方法的形参是一个接口，我们不再需要给这个方法传递这个接口的实现类对象或者匿名内部类（匿名内部类的对象），只需要传递`函数化对象`。
+* 当调用一个方法的时候，如果方法的形参是一个接口，我们不再需要给这个方法传递该接口的实现类对象或者匿名内部类（匿名内部类的对象），只需要传递`函数化对象`。
 
 ::: code-group
 
@@ -441,7 +470,611 @@ public class Test {
 
 ## 1.3 函数对象
 
+### 1.3.1 概述
 
+* 函数对象有如下的好处：
+  * 行为参数化。
+  * 延迟执行。
+
+### 1.3.2 行为参数化
+
+* 所谓的行为参数化，就是允许将不同的行为作为参数传入，提高方法的通用性和可重用性。
+
+> [!NOTE]
+>
+> 假设现在有多个学生，需要筛选出男性或 18 岁以下的学生：
+>
+> * ① 按照之前面向对象的思维，我们可能需要编写两个方法，即：一个方法用于筛选出男性学生，另一个方法用于筛选出 18 岁以下的学生。
+>
+> * ② 按照函数式编程的思想，我们可以将行为作为参数传递给方法，使得方法的行为可以在运行时动态决定。
+
+
+
+* 示例：传统写法
+
+::: code-group
+
+```java [Student.java]
+package com.github.lambda.demo2;
+
+public class Student {
+
+    private String name;
+
+    private Integer age;
+
+    private String gender;
+
+    public Student(String name, Integer age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", gender='" + gender + '\'' +
+                '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.lambda.demo2;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) {
+        // 构建集合
+        List<Student> studentList = List.of(
+                new Student("张无忌", 18, "男"),
+                new Student("杨不悔", 16, "女"),
+                new Student("周芷若", 19, "女"),
+                new Student("宋青书", 20, "男")
+        );
+
+        // 条件1：筛选出男性学生
+        List<Student> resultList = filter(studentList);
+        // 遍历集合
+        resultList.forEach(System.out::println);
+
+
+        System.out.println("-----------------------------------------");
+
+        // 条件2：筛选出 18 岁以下的学生
+        resultList = filter2(studentList);
+        // 遍历集合
+        resultList.forEach(System.out::println);
+    }
+
+    /**
+     * 筛选出男性学生
+     *
+     * @param studentList 集合
+     * @return 符合条件的集合
+     */
+    public static List<Student> filter(List<Student> studentList) { // [!code highlight]
+        // 确保 studentList 非空
+        studentList = Objects.requireNonNullElseGet(studentList, ArrayList::new);
+        // 筛选逻辑
+        List<Student> resultList = new ArrayList<>();
+        for (Student student : studentList) {
+            if ("男".equals(student.getGender())) { // [!code highlight]
+                resultList.add(student);
+            }
+        }
+        return resultList;
+    }
+
+    /**
+     * 筛选出 18 岁以下的学生
+     *
+     * @param studentList 集合
+     * @return 符合条件的集合
+     */
+    public static List<Student> filter2(List<Student> studentList) { // [!code highlight]
+        // 确保 studentList 非空
+        studentList = Objects.requireNonNullElseGet(studentList, ArrayList::new);
+        // 筛选逻辑
+        List<Student> resultList = new ArrayList<>();
+        for (Student student : studentList) {
+            if (student.getAge() < 18) { // [!code highlight]
+                resultList.add(student);
+            }
+        }
+        return resultList;
+    }
+}
+```
+
+```txt [cmd 控制台]
+Student{name='张无忌', age=18, gender='男'}
+Student{name='宋青书', age=20, gender='男'}
+-----------------------------------------
+Student{name='杨不悔', age=16, gender='女'}
+```
+
+:::
+
+
+
+* 示例：函数式写法
+
+::: code-group
+
+```java [Student.java]
+package com.github.lambda.demo2;
+
+public class Student {
+
+    private String name;
+
+    private Integer age;
+
+    private String gender;
+
+    public Student(String name, Integer age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", gender='" + gender + '\'' +
+                '}';
+    }
+}
+```
+
+```java {19,27,38,44} [Test.java]
+package com.github.lambda.demo2;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+
+public class Test {
+    public static void main(String[] args) {
+        // 构建集合
+        List<Student> studentList = List.of(
+                new Student("张无忌", 18, "男"), 
+                new Student("杨不悔", 16, "女"), 
+                new Student("周芷若", 19, "女"), 
+                new Student("宋青书", 20, "男")
+        );
+
+        // 条件1：筛选出男性学生
+        List<Student> resultList = filter(studentList, student -> "男".equals(student.getGender()));
+        // 遍历集合
+        resultList.forEach(System.out::println);
+
+
+        System.out.println("-----------------------------------------");
+
+        // 条件2：筛选出 18 岁以下的学生
+        resultList = filter(studentList, student -> student.getAge() <= 18);
+        // 遍历集合
+        resultList.forEach(System.out::println);
+    }
+
+    /**
+     * 筛选出学生
+     *
+     * @param studentList 集合
+     * @return 符合条件的集合
+     */
+    public static List<Student> filter(List<Student> studentList, Predicate<Student> predicate) {
+        // 确保 studentList 非空
+        studentList = Objects.requireNonNullElseGet(studentList, ArrayList::new);
+        // 筛选逻辑
+        List<Student> resultList = new ArrayList<>();
+        for (Student student : studentList) {
+            if (predicate.test(student)) {
+                resultList.add(student);
+            }
+        }
+        return resultList;
+    }
+
+}
+```
+
+```txt [cmd 控制台]
+Student{name='张无忌', age=18, gender='男'}
+Student{name='宋青书', age=20, gender='男'}
+-----------------------------------------
+Student{name='杨不悔', age=16, gender='女'}
+```
+
+:::
+
+### 1.3.3 延迟执行
+
+#### 1.3.3.1 概述
+
+* 所谓的延迟执行，就是代码在定义的时候不会立即执行，而是等到真正需要结果的时候才执行，可以提升性能，避免不必要的计算，适合处理大型数据流、懒加载等场景。
+
+> [!NOTE]
+>
+> * ① 通过日志来模拟延迟执行，需要使用 slf4j+ log4j2 日志组件，如果使用 Gradle 构建工具，需要配置如下的依赖：
+>
+> ```groovy
+> // SLF4J API
+> implementation 'org.slf4j:slf4j-api:2.0.12'
+> 
+> // Log4j2 核心库
+> implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+> 
+> // Log4j2 配置支持
+> implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
+> 
+> // 将 SLF4J 绑定到 Log4j2
+> implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0'
+> ```
+> *  ② 日志级别由低到高是：TRACE < DEBUG < INFO < WARN < ERROR < FATAL ，即：当设置日志级别为 INFO ，只会输出 WARN 、ERROR  以及 FATAL 级别的日志信息。
+
+#### 1.3.3.2 现象
+
+* 全局日志级别是 DEBUG，主方法中的日志级别为 DEBUG，expensive() 方法会执行。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.lambda.demo3;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
+import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+
+import static org.apache.logging.log4j.core.config.Configurator.initialize;
+
+public class Test {
+
+    // 全局日志级别
+    public static Logger logger = init(Level.DEBUG); // [!code highlight]
+
+    public static Logger init(Level level) {
+        ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory
+                .newConfigurationBuilder()
+                .setStatusLevel(Level.ERROR)
+                .setConfigurationName("BuilderTest");
+        AppenderComponentBuilder appender =
+                builder
+                        .newAppender("Stdout", "CONSOLE")
+                        .addAttribute("target", ConsoleAppender.Target.SYSTEM_OUT)
+                        .add(builder
+                                .newLayout("PatternLayout")
+                                .addAttribute("pattern", "%d [%t] %-5level: %msg%n%throwable"));
+        builder
+                .add(appender)
+                .add(builder
+                        .newRootLogger(level)
+                        .add(builder.newAppenderRef("Stdout")));
+        initialize(builder.build());
+        return LogManager.getLogger();
+
+    }
+
+    public static String expensive() {
+        System.out.println("执行耗时操作...");
+        return "日志";
+    }
+
+
+    public static void main(String[] args) {
+        // 当前日志级别
+        logger.debug("{}", expensive()); // [!code highlight]
+    }
+}
+```
+
+```txt [cmd 控制台]
+执行耗时操作...
+2025-05-10 21:31:29,212 [main] DEBUG: 日志
+```
+
+:::
+
+#### 1.3.3.3 问题
+
+* 全局日志级别是 INFO ，主方法中的日志级别为 DEBUG，expensive() 方法依然会执行。
+
+> [!NOTE]
+>
+> 其实这种情况下，我们想要的是 expensive() 不应该执行，如果执行的话，性能就很差。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.lambda.demo3;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
+import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+
+import static org.apache.logging.log4j.core.config.Configurator.initialize;
+
+public class Test {
+
+    // 全局日志级别
+    public static Logger logger = init(Level.INFO); // [!code highlight]
+
+    public static Logger init(Level level) {
+        ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory
+                .newConfigurationBuilder()
+                .setStatusLevel(Level.ERROR)
+                .setConfigurationName("BuilderTest");
+        AppenderComponentBuilder appender =
+                builder
+                        .newAppender("Stdout", "CONSOLE")
+                        .addAttribute("target", ConsoleAppender.Target.SYSTEM_OUT)
+                        .add(builder
+                                .newLayout("PatternLayout")
+                                .addAttribute("pattern", "%d [%t] %-5level: %msg%n%throwable"));
+        builder
+                .add(appender)
+                .add(builder
+                        .newRootLogger(level)
+                        .add(builder.newAppenderRef("Stdout")));
+        initialize(builder.build());
+        return LogManager.getLogger();
+
+    }
+
+    public static String expensive() {
+        System.out.println("执行耗时操作...");
+        return "日志";
+    }
+
+
+    public static void main(String[] args) {
+        // 当前日志级别
+        logger.debug("{}", expensive()); // [!code highlight]
+    }
+}
+```
+
+```txt [cmd 控制台]
+执行耗时操作...
+```
+
+:::
+
+#### 1.3.3.4 解决方案
+
+* Log4j2 提供了如下的方法，可以判断当前的日志级别是否是 DEBUG：
+
+```java
+boolean isDebugEnabled();
+```
+
+> [!NOTE]
+>
+> 我们可以利用该方法来解决：全局日志级别是 INFO ，主方法中的日志级别为 DEBUG，expensive() 方法会执行。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.lambda.demo3;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
+import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+
+import static org.apache.logging.log4j.core.config.Configurator.initialize;
+
+public class Test {
+
+    // 全局日志级别
+    public static Logger logger = init(Level.INFO); // [!code highlight]
+
+    public static Logger init(Level level) {
+        ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory
+                .newConfigurationBuilder()
+                .setStatusLevel(Level.ERROR)
+                .setConfigurationName("BuilderTest");
+        AppenderComponentBuilder appender =
+                builder
+                        .newAppender("Stdout", "CONSOLE")
+                        .addAttribute("target", ConsoleAppender.Target.SYSTEM_OUT)
+                        .add(builder
+                                .newLayout("PatternLayout")
+                                .addAttribute("pattern", "%d [%t] %-5level: %msg%n%throwable"));
+        builder
+                .add(appender)
+                .add(builder
+                        .newRootLogger(level)
+                        .add(builder.newAppenderRef("Stdout")));
+        initialize(builder.build());
+        return LogManager.getLogger();
+
+    }
+
+    public static String expensive() {
+        System.out.println("执行耗时操作...");
+        return "日志";
+    }
+
+
+    public static void main(String[] args) {
+        // 当前日志级别
+        if (logger.isDebugEnabled()) { // [!code highlight]
+            logger.debug("{}", expensive()); // [!code highlight]
+        }
+    }
+}
+```
+
+```txt [cmd 控制台]
+
+```
+
+:::
+
+#### 1.3.3.5 解决方案
+
+* 其实，Log4j2 还提供了 debug 重载的方法可以用来解决上述问题：
+
+```java
+void debug(String message, Supplier<?>... paramSuppliers)
+```
+
+> [!NOTE]
+>
+> * ① `logger.debug("{}",expensive());` 会立即执行  expensive() 方法。
+> * ② `logger.debug("{}", () -> expensive());`会延迟执行 expensive() 方法。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.lambda.demo3;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
+import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+
+import static org.apache.logging.log4j.core.config.Configurator.initialize;
+
+public class Test {
+
+    // 全局日志级别
+    public static Logger logger = init(Level.INFO); // [!code highlight]
+
+    public static Logger init(Level level) {
+        ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory
+                .newConfigurationBuilder()
+                .setStatusLevel(Level.ERROR)
+                .setConfigurationName("BuilderTest");
+        AppenderComponentBuilder appender =
+                builder
+                        .newAppender("Stdout", "CONSOLE")
+                        .addAttribute("target", ConsoleAppender.Target.SYSTEM_OUT)
+                        .add(builder
+                                .newLayout("PatternLayout")
+                                .addAttribute("pattern", "%d [%t] %-5level: %msg%n%throwable"));
+        builder
+                .add(appender)
+                .add(builder
+                        .newRootLogger(level)
+                        .add(builder.newAppenderRef("Stdout")));
+        initialize(builder.build());
+        return LogManager.getLogger();
+
+    }
+
+    public static String expensive() {
+        System.out.println("执行耗时操作...");
+        return "日志";
+    }
+
+
+    public static void main(String[] args) {
+        // 当前日志级别
+        logger.debug("{}", () -> expensive()); // [!code highlight]
+    }
+}
+```
+
+```txt [cmd 控制台]
+
+```
+
+:::
 
 
 
