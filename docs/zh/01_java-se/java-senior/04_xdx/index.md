@@ -999,7 +999,7 @@ public class Test {
 
 #### 1.3.3.5 解决方案
 
-* 其实，Log4j2 还提供了 debug 重载的方法可以用来解决上述问题：
+* 其实，Log4j2 提供了 debug 重载的方法，就可以用来解决上述问题：
 
 ```java
 void debug(String message, Supplier<?>... paramSuppliers)
@@ -1082,9 +1082,146 @@ public class Test {
 
 ## 2.1 概述
 
-* Lambda、方法引用、闭包、柯里化、高阶函数。
+* 本章将学习函数编程的语法，如下所示：
+  * ① 函数对象的表现形式。
+  * ② 函数接口。
+  * ③ 闭包和柯里化。
+  * ④ 高阶函数。
+
+* 其中，函数对象的表现形式：`Lambda 表达式`和`方法引用`。
+
+## 2.2 函数对象的表现形式
+
+### 2.2.1 概述
+
+* 在 Java 中，函数对象有两种表现形式：`Lambda 表达式`和`方法引用`。
+* 其中，Lambda 表达式的特点是：功能更全面。
+* 其中，方法引用的特点是：写法更简洁。
+
+### 2.2.2 Lambda 表达式
+
+* 语法：
+
+```java
+(形参列表) -> {Lambda体}
+```
+
+> [!NOTE]
+>
+> * ① Lambda 表达式是用来给 `函数式接口` 的变量或形参赋值使用的。 
+>
+> * ② 本质上，Lambda 表达式是用于实现 `函数式接口` 的 `抽象方法` 。
+>
+> * ③ 语法说明：
+>
+>   * `(形参列表)`：就是要赋值的函数式接口的抽象方法的 `(形参列表)` 。
+>   * `{Lambda体}`：就是实现这个抽象方法的方法体。
+>   * `->`：Lambda 操作符。
+>
+> * ④ 优化：
+>
+>   * 当 `{Lambda体}` 只有一条语句的时候，可以省略 `{}` 和 `{;}` 。
+>
+>   - 当 `{Lambda体}` 只有一条语句的时候，并且这个语句有 return 语句，return 也可以省略，但是如果 `{;}` 没有省略，那么 return 是不可以省略的。
+>
+>   - `(形参列表)` 的类型可以省略。
+>
+>   - 当 `(形参列表)` 的形参个数只有一个，那么可以将数据类型和 `()` 一起省略，但是形参名不能省略。
+>
+>   - 当 `(形参列表)` 是空参的时候，`()` 不能省略。
 
 
+
+* 示例：无参 Lambda 表达式
+
+```java
+package com.github.lambda.demo4;
+
+public class Test {
+    public static void main(String[] args) {
+        // 无参 Lambda 表达式：() -> {}
+        Runnable runnable = () -> System.out.println(Thread
+                .currentThread()
+                .getName());
+
+        new Thread(runnable).start();
+    }
+}
+```
+
+
+
+* 示例：单个参数的 Lambda 表达式
+
+```java
+package com.github.lambda.demo4;
+
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+        List<Integer> list = List.of(1, 2, 3, 4);
+        
+        // 单个参数 Lambda 表达式：(x) -> {...}
+        list.forEach( x -> {
+            System.out.println(x);
+        });
+    }
+}
+```
+
+
+
+* 示例：多个参数的 Lambda 表达式
+
+```java
+package com.github.lambda.demo4;
+
+import java.util.List;
+import java.util.function.BiFunction;
+
+public class Test {
+    public static void main(String[] args) {
+        // 多个参数 Lambda 表达式：(x1,x2) -> {...}
+        int result = calculate(1, 2, (a, b) -> a + b);
+        System.out.println(result);
+    }
+
+    /**
+     * 计算 a 和 b 的运算
+     *
+     * @param a          整数
+     * @param b          整数
+     * @param biFunction 函数式接口
+     * @return a 和 b 运算的结果
+     */
+    public static int calculate(int a, int b, BiFunction<Integer, Integer, Integer> biFunction) {
+        return biFunction.apply(a, b);
+    }
+}
+```
+
+
+
+* 示例：带方法体的 Lambda 表达式
+
+```java
+package com.github.lambda.demo4;
+
+import java.util.function.Function;
+
+public class Test {
+    public static void main(String[] args) {
+        // 带方法体的 Lambda 表达式：(x1,x2) -> { ... }
+        Function<Integer, Integer> square = (x) -> {
+            int result = x * x;
+            return result;
+        };
+        System.out.println(square.apply(4));  // 输出 16
+    }
+
+}
+```
 
 
 
