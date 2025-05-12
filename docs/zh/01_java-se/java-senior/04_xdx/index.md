@@ -468,6 +468,210 @@ public class Test {
 > * ① 对于 JavaScript 而言，有形的函数，就是让函数变为对象（持有对象的引用），这样函数就可以写到任意位置（让函数的规则传播），即：JavaScript 从语法上就原生支持函数式编程。
 > * ② 对于 Java 而言，有形的函数，也是让函数变为对象；但是，本质上是`实现了函数式接口（只有一个抽象方法的接口）的对象`，即：Java 从语法上只能有限支持函数式编程（必须依托于函数式接口）。
 
+#### 1.2.3.3 JavaScript VS Java
+
+* 对于 JavaScript 和 Java 而言，有形的函数：都是让函数变为对象；但是，二者内部的原理截然不同。
+* 在 JavaScript 中，函数就是对象，如下所示：
+
+```js
+function add(a,b){ 
+    return a+b;
+}
+
+// add 函数其实就是 Function 类的对象
+
+const result = add(1,2);
+console.log(result);
+```
+
+* 其内存动态图，如下所示：
+
+![](./assets/6.gif)
+
+* 正是 JavaScript 内部的这种原理，导致了 JavaScript 中的函数可以任意传递，这也是 JavaScript 中函数是头等公民，即：JavaScript 支持函数式编程的原因所在。
+
+```js
+let foo = function(){ // 函数可以被赋值给变量（函数表达式）
+    console.log('foo 函数被执行了');
+}
+
+foo();
+```
+
+```js
+let foo = function(){ 
+    console.log('foo 函数被执行了');
+}
+
+let bar = foo // 函数可以在变量之间来回传递
+
+bar();
+```
+
+```js
+let foo = function(){ 
+    console.log('foo 函数被执行了');
+}
+
+function biz(fn){  // 函数可以作为其它函数的形参
+    fn();
+}
+
+biz(foo);
+```
+
+```js
+let foo = function(){
+    console.log('foo 函数被执行了');
+}
+
+function biz(){ 
+    return foo; // 函数可以作为其它函数的返回值
+}
+
+const bar = biz()
+bar();
+```
+
+```js
+let foo = function(){
+    console.log('foo 函数被执行了');
+}
+
+let bar = function(){
+    console.log('bar 函数被执行了');
+}
+
+let arr = [foo,bar] // 函数可以存储在其它数据结构中
+
+arr[0]();
+arr[1]();
+```
+
+* 在 ES6 中，JavaScript  引入了箭头函数，也就是 Lambda 表达式（函数对象），并且由于 JavaScript 函数天生就是对象的特性，可以非常轻松地将函数转换为 Lambda 表达式：
+
+```js
+let foo = () => { // 函数可以被赋值给变量（函数表达式）
+    console.log('foo 函数被执行了');
+}
+
+foo();
+```
+
+```js
+let foo = () => { 
+    console.log('foo 函数被执行了');
+}
+
+let bar = foo // 函数可以在变量之间来回传递
+
+bar();
+```
+
+```js
+let foo = () => { 
+    console.log('foo 函数被执行了');
+}
+
+function biz(fn){  // 函数可以作为其它函数的形参
+    fn();
+}
+
+biz(foo);
+```
+
+```js
+let foo = () => {
+    console.log('foo 函数被执行了');
+}
+
+function biz(){ 
+    return foo; // 函数可以作为其它函数的返回值
+}
+
+const bar = biz()
+bar();
+```
+
+```js
+let foo = () => {
+    console.log('foo 函数被执行了');
+}
+
+let bar = () => {
+    console.log('bar 函数被执行了');
+}
+
+let arr = [foo,bar] // 函数可以存储在其它数据结构中
+
+arr[0]();
+arr[1]();
+```
+
+* 但是，Java 不一样，Java 中的方法不是对象，它仅仅表示一个栈帧而已，如下所示：
+
+> [!NOTE]
+>
+> * ① 方法调用的时候，压入栈中执行。
+> * ② 方法调用完毕后，从栈中弹出。
+
+```java
+public class Test {
+  public static void main(String[] args) {
+    int result = add(1,2);
+    
+    System.out.println(result);
+  }
+  
+  public static int add(int a,int b){
+    return a+b;
+  }
+}
+```
+
+* 其内存动态图，如下所示：
+
+![](./assets/7.gif)
+
+* 有形的函数都是让函数变为对象，Java 也不例外。但是，如果你仔细观察 JavaScript 中的函数，是可以直接运行的：
+
+```js
+let foo = function(){ // 函数可以被赋值给变量（函数表达式，匿名函数）
+    console.log('foo 函数被执行了');
+}
+
+foo();
+```
+
+```js
+let foo = () => { // 函数可以被赋值给变量（函数表达式，匿名函数）
+    console.log('foo 函数被执行了');
+}
+
+foo();
+```
+
+* 由于，Java 传统上是面向对象的编程语言，方法总是依附于类的实例（对象）或类本身的。Java 是无法像 JavaScript 那样无缝的将“函数”当做对象来进行转换的，原因就在于 Java 是静态类型语言，强类型系统要求在编译时确定函数的类型和签名。在 JDK8 之后，虽然 Java 支持了 Lambda 表达式，但是依然受到了面向对象语言的限制。
+
+> [!NOTE]
+>
+> * ① 在 Java 中，Lambda 表达式本质上是一个简化的匿名函数，用于实现接口（尤其是函数式接口）。
+> * ② 在 Java 中，Lambda 表达式它需要依附于接口的方法签名，并通过接口来实现。
+
+```java
+@FunctionalInterface
+interface MathOperation {
+    int operate(int a, int b);
+}
+
+public class Test {
+    public static void main(String[] args) {
+        MathOperation add = (a, b) -> a + b;  // Lambda 表达式
+        System.out.println(add.operate(5, 3));  // 输出 8
+    }
+}
+```
+
 ## 1.3 函数对象
 
 ### 1.3.1 概述
@@ -1078,7 +1282,7 @@ public class Test {
 
 
 
-# 第二章：函数编程语法
+# 第二章：函数编程语法（⭐）
 
 ## 2.1 概述
 
@@ -1087,20 +1291,462 @@ public class Test {
   * ② 函数接口。
   * ③ 闭包和柯里化。
   * ④ 高阶函数。
-
 * 其中，函数对象的表现形式：`Lambda 表达式`和`方法引用`。
 
-## 2.2 函数对象的表现形式
+> [!NOTE]
+>
+> * ① Lambda 表达式的特点是：功能更全面。
+>
+> * ② 方法引用的特点是：写法更简洁。
+
+## 2.2 函数式接口
 
 ### 2.2.1 概述
 
-* 在 Java 中，函数对象有两种表现形式：`Lambda 表达式`和`方法引用`。
-* 其中，Lambda 表达式的特点是：功能更全面。
-* 其中，方法引用的特点是：写法更简洁。
+* Lambda 表达式其实就是实现了 SAM（Single Abstract Method，即：接口中有且仅有一个抽象方法）接口的语法糖。
 
-### 2.2.2 Lambda 表达式
+> [!NOTE]
+>
+> SAM 中接口中有且仅有一个抽象方法，但是可以包含非抽象方法，如：静态方法和默认方法。
 
-* 语法：
+* 只要满足 SAM 特征的接口就是`函数式接口`。如果在声明函数式接口的时候，使用 `@FunctionalInterface` 注解来标注，编译器将会强制检查该接口是否有且仅有一个抽象方法，如果不是，将会报错。
+* JDK 8 之前的很多接口，满足 SAM 特性的接口有：Runnable、Comparator 、Callable 以及 FileFilter。
+* JDK 8 在`java.util.function`包中新增了很多函数式接口，主要分为：消费型、供给型、断言型（判断型）、和函数型（功能型）。
+
+> [!NOTE]
+>
+> * ① JDK 内置的函数是接口，基本满足我们的实际开发需求。
+> * ② 但是，为了满足实际的业务需求，我们也可以自定义函数式接口。
+
+### 2.2.2 语法
+
+* 函数式接口的语法：
+
+```java
+@FunctionalInterface
+修饰符 interface 接口名{
+    [public abstract] 返回值类型 方法名(形参列表);
+}
+```
+
+> [!NOTE]
+>
+> 接口中抽象方法可以省略`public abstract`关键字！！！
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Calculator.java]
+package com.github.lambda.demo3;
+
+@FunctionalInterface
+public interface Calculator {
+
+    int cal(int a, int b);
+
+}
+```
+
+```java [Test.java]
+package com.github.lambda.demo3;
+
+public class Test {
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 2;
+
+        System.out.println(calc(a, b, (x, y) -> x + y)); // 12
+        System.out.println(calc(a, b, (x, y) -> x - y)); // 8
+        System.out.println(calc(a, b, (x, y) -> x * y)); // 20
+        System.out.println(calc(a, b, (x, y) -> x / y)); // 5
+        System.out.println(calc(a, b, (x, y) -> x % y)); // 0
+    }
+
+    /**
+     * 计算 a 和 b 的四则运算
+     *
+     * @param a          整数
+     * @param b          整数
+     * @param calculator 函数式接口
+     * @return 结果
+     */
+    public static int calc(int a, int b, Calculator calculator) {
+        return calculator.cal(a, b);
+    }
+}
+```
+
+:::
+
+### 2.2.3 函数式接口的分类
+
+#### 2.2.3.1 概述
+
+* 除了我们可以自定义函数式接口，JDK 还给我们内置了一些函数式接口，大致分为：
+  * 消费型。
+  * 供给型。
+  * 断言型（判断型）。
+  * 函数型（功能型）。
+
+#### 2.2.3.2 消费型接口
+
+* 所谓的消费：就是只吃不拉，如下所示：
+
+![只吃不拉（消费），能不胖吗？](./assets/8.gif)
+
+* 消费型接口中抽象方法的特点是：有形参，但是无返回值，即：返回值类型是 void 。
+
+| 接口名                 | 抽象方法                          | 描述                                            |
+| ---------------------- | --------------------------------- | ----------------------------------------------- |
+| `Consumer<T>`          | `void accept(T t);`               | 接收一个参数（T 类型）用于完成功能              |
+| `BiConsumer<T, U>`     | `void accept(T t, U u);`          | 接收两个参数（T 类型、U 类型）用于完成功能      |
+| `IntConsumer`          | `void accept(int value);`         | 接收一个参数（int 类型）用于完成功能            |
+| `LongConsumer`         | `void accept(long value);`        | 接收一个参数（long 类型）用于完成功能           |
+| `ObjIntConsumer<T>`    | `void accept(T t, int value);`    | 接收两个参数（T 类型、int 类型）用于完成功能    |
+| `ObjLongConsumer<T>`   | `void accept(T t, long value);`   | 接收两个参数（T 类型、long 类型）用于完成功能   |
+| `ObjDoubleConsumer<T>` | `void accept(T t, double value);` | 接收两个参数（T 类型、double 类型）用于完成功能 |
+
+> [!NOTE]
+>
+> * ① 函数式接口的命名规律：
+>   * 带有 Unary 是一元的意思，即：表示一个参数。
+>   * 带有 Bi 或 Binary 是二元的意思，即：表示两个参数。
+>   * 带有 Ternary 是三元的意思，即：表示三个参数。
+>   * 带有 Quatenary 是四元的意思，即：表示四个参数。
+>
+> * ② 当我们调用`消费型接口`中的抽象方法的时候，相当于我们给其一个实参，却得不到任意返回值，即：有去无回，纯消费行为。
+> * ③ 应用场景：对传入的对象执行某个操作，如：打印、修改、保存等。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.lambda.demo4;
+
+import java.util.List;
+import java.util.function.Consumer;
+
+public class Test {
+    public static void main(String[] args) {
+
+        List<Integer> list = List.of(1, 2, 3, 4, 5, 6, 7);
+
+        consume(list, (i) -> {
+            i *= 2;
+            System.out.println("i = " + i);
+        });
+
+        System.out.println("---------------------------------");
+
+        consume(list, (i) -> {
+            i /= 2;
+            System.out.println("i = " + i);
+        });
+
+    }
+
+    /**
+     *
+     * @param list 集合
+     * @param con  消费型接口
+     */
+    public static void consume(List<Integer> list, Consumer<Integer> con) {
+        for (Integer i : list) {
+            con.accept(i);
+        }
+    }
+}
+```
+
+```txt [cmd 控制台]
+i = 2
+i = 4
+i = 6
+i = 8
+i = 10
+i = 12
+i = 14
+---------------------------------
+i = 0
+i = 1
+i = 1
+i = 2
+i = 2
+i = 3
+i = 3
+```
+
+:::
+
+
+
+* 示例：
+
+```java
+package com.github.lambda.demo4;
+
+import java.util.function.Consumer;
+
+public class Test {
+    public static void main(String[] args) {
+
+        Consumer<String> consumer = str -> {
+            String upperCase = str.toUpperCase();
+            // HELLO WORLD
+            System.out.println(upperCase);
+        };
+
+        consumer.accept("hello World");
+
+        System.out.println("--------------------");
+
+        consumer = str -> {
+            String lowerCase = str.toLowerCase();
+            // hello world
+            System.out.println(lowerCase);
+        };
+
+        consumer.accept("hello World");
+
+    }
+}
+```
+
+#### 2.2.3.3 供给型接口
+
+* 所谓的供给，就是只产出却没有输入，如下所示：
+
+![太阳每天提供阳光](./assets/9.gif)
+
+* 供给型接口中抽象方法的特点是：无形参，但是有返回值。
+
+| 接口名            | 抽象方法                  | 描述                      |
+| ----------------- | ------------------------- | ------------------------- |
+| `Supplier<T>`     | `T get();`                | 返回一个 T 类型的值       |
+| `BooleanSupplier` | `boolean getAsBoolean();` | 返回一个 boolean 类型的值 |
+| `DoubleSupplier`  | `double getAsDouble();`   | 返回一个 double 类型的值  |
+| `IntSupplier`     | `int getAsInt();`         | 返回一个 int 类型的值     |
+| `LongSupplier`    | `long getAsLong();`       | 返回一个 long 类型的值    |
+
+> [!NOTE]
+>
+> * ① 函数式接口的命名规律：
+>   * 带有 Unary 是一元的意思，即：表示一个参数。
+>   * 带有 Bi 或 Binary 是二元的意思，即：表示两个参数。
+>   * 带有 Ternary 是三元的意思，即：表示三个参数。
+>   * 带有 Quatenary 是四元的意思，即：表示四个参数。
+>
+> * ② 调用这些抽象方法的时候，相当于我们不给它们传递参数，却可以得到一个返回值，即：空手套白狼。
+> * ③ 应用场景：生产或提供一个值，无需输入参数，如：默认值生成、延迟加载、数据生成等。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.lambda.demo4;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
+
+public class Test {
+    public static void main(String[] args) {
+
+        int count = 10;
+
+        List<Integer> generate = generate(count, () -> ThreadLocalRandom
+                .current()
+                .nextInt(count));
+
+        generate.forEach(System.out::println);
+    }
+
+    public static List<Integer> generate(int count, Supplier<Integer> supplier) {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            list.add(supplier.get());
+        }
+        return list;
+    }
+}
+```
+
+```txt [cmd 控制台]
+1
+4
+6
+6
+6
+1
+9
+7
+2
+5
+```
+
+:::
+
+#### 2.2.3.4 断言型接口（判断型接口）
+
+* 所谓的断言（判断），就是判断参数是否满足条件，如下所示：
+
+![如果一个 160cm 的女性，体重超过 54 kg，就可以认为超重了](./assets/10.gif)
+
+* 断言型接口中抽象方法的特点是：有形参，但是返回值类型是 boolean。
+
+| 接口名              | 抽象方法                      | 描述                                                      |
+| ------------------- | ----------------------------- | --------------------------------------------------------- |
+| `Predicate<T>`      | `boolean test(T t);`          | 接收一个 T 类型的参数，返回一个 boolean 类型的值          |
+| `BiPredicate<T, U>` | `boolean test(T t, U u);`     | 接收两个参数（T 类型、U 类型），返回一个 boolean 类型的值 |
+| `DoublePredicate`   | `boolean test(double value);` | 接收一个 double 类型的参数，返回一个 boolean 类型的值     |
+| `IntPredicate`      | `boolean test(int value);`    | 接收一个 int 类型的参数，返回一个 boolean 类型的值        |
+| `LongPredicate`     | `boolean test(long value);`   | 接收一个 long 类型的参数，返回一个 boolean 类型的值       |
+
+> [!NOTE]
+>
+> * ① 函数式接口的命名规律：
+>   * 带有 Unary 是一元的意思，即：表示一个参数。
+>   * 带有 Bi 或 Binary 是二元的意思，即：表示两个参数。
+>   * 带有 Ternary 是三元的意思，即：表示三个参数。
+>   * 带有 Quatenary 是四元的意思，即：表示四个参数。
+>
+> * ② 调用这些抽象方法的时候，给告诉我们传入的参数是否满足指定的条件，如果满足，就返回 true；否则，返回 false。
+> * ③ 应用场景：用于测试某个条件或进行布尔判断，如：判断条件、过滤数据、复杂的逻辑组合等。
+
+
+
+* 示例：
+
+```java
+package com.github.lambda.demo4;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
+public class Test {
+    public static void main(String[] args) {
+
+        List<Integer> list = List.of(1, 2, 3, 4, 5, 6);
+
+        // 过滤集合中的偶数
+        List<Integer> resultList = filter(list, x -> x % 2 == 0);
+        resultList.forEach(System.out::println);
+
+        // 过滤集合中的奇数
+        resultList = filter(list, x -> x % 2 != 0);
+        resultList.forEach(System.out::println);
+
+    }
+
+    /**
+     * 根据指定的条件过滤集合中的元素
+     *
+     * @param list      集合
+     * @param predicate 断言型接口
+     * @return 过滤之后集合的元素
+     */
+    public static List<Integer> filter(List<Integer> list, Predicate<Integer> predicate) {
+        List<Integer> resultList = new ArrayList<>();
+        for (Integer i : list) {
+            if (predicate.test(i)) {
+                resultList.add(i);
+            }
+        }
+        return resultList;
+    }
+}
+```
+
+#### 2.2.3.5 函数型接口
+
+* 所谓的函数，就是有输入就有输出，如下所示：
+
+![工厂将原材料加工成产品](./assets/11.gif)
+
+* 函数型接口中抽象方法的特点是：有形参，但是有返回值。
+
+| 接口名                     | 抽象方法                            | 描述                                                      |
+| -------------------------- | ----------------------------------- | --------------------------------------------------------- |
+| `Function<T,R>`            | `R apply(T t);`                     | 接收一个参数（T 类型），返回一个 R 类型的值               |
+| `BiFunction<T, U, R>`      | `R apply(T t, U u);`                | 接收两个参数（T 类型和 U 类型），返回一个 R 类型的值      |
+| `DoubleFunction<R>`        | `R apply(double value);`            | 接收一个参数（double  类型），返回一个 R 类型的值         |
+| `DoubleToIntFunction`      | `int applyAsInt(double value);`     | 接收一个参数（double  类型），返回一个 int 类型的值       |
+| `DoubleToLongFunction`     | `long applyAsLong(double value);`   | 接收一个参数（double  类型），返回一个 long 类型的值      |
+| `IntToDoubleFunction`      | `double applyAsDouble(int value);`  | 接收一个参数（int 类型），返回一个 double 类型的值        |
+| `IntToLongFunction`        | `long applyAsLong(int value);`      | 接收一个参数（int 类型），返回一个 long 类型的值          |
+| `LongFunction<R>`          | `R apply(long value);`              | 接收一个参数（long  类型），返回一个 R 类型的值           |
+| `LongToDoubleFunction`     | `double applyAsDouble(long value);` | 接收一个参数（long  类型），返回一个 double 类型的值      |
+| `LongToIntFunction`        | `int applyAsInt(long value);`       | 接收一个参数（long  类型），返回一个 int 类型的值         |
+| `ToDoubleBiFunction<T, U>` | `double applyAsDouble(T t, U u);`   | 接收两个参数（T 类型和 U 类型），返回一个 double 类型的值 |
+| `ToDoubleFunction<T>`      | `double applyAsDouble(T value);`    | 接收一个参数（T 类型），返回一个 double 类型的值          |
+| `ToIntBiFunction<T, U>`    | `int applyAsInt(T t, U u);`         | 接收两个参数（T 类型和 U 类型），返回一个 int 类型的值    |
+| `ToIntFunction<T>`         | `int applyAsInt(T value);`          | 接收一个参数（T 类型），返回一个 int 类型的值             |
+| `ToLongBiFunction<T, U>`   | `long applyAsLong(T t, U u);`       | 接收两个参数（T 类型和 U 类型），返回一个 long 类型的值   |
+| `ToLongFunction<T>`        | `long applyAsLong(T value);`        | 接收一个参数（T 类型），返回一个 long 类型的值            |
+
+> [!NOTE]
+>
+> * ① 函数式接口的命名规律：
+>   * 带有 Unary 是一元的意思，即：表示一个参数。
+>   * 带有 Bi 或 Binary 是二元的意思，即：表示两个参数。
+>   * 带有 Ternary 是三元的意思，即：表示三个参数。
+>   * 带有 Quatenary 是四元的意思，即：表示四个参数。
+>
+> * ② 调用这些抽象方法的时候，相当于我们给它们一个或多个参数，同时也可以获取一个返回值，即：礼尚往来。
+> * ③ 应用场景：数据处理或数据转换。
+> * ④ 含有 Operator 名词的函数式接口也是函数型接口，只不过类型的类型和返回值的类型相同，如下所示：
+>
+> | 接口名              | 抽象方法            | 描述                                                 |
+> | ------------------- | ------------------- | ---------------------------------------------------- |
+> | `UnaryOperator<T>`  | `T apply(T t);`     | 接收一个参数（T 类型），返回一个 T 类型的值          |
+> | `BinaryOperator<T>` | `T apply(T t, T u)` | 接收两个参数（T 类型和 T 类型），返回一个 T 类型的值 |
+
+
+
+* 示例：
+
+```java
+package com.github.lambda.demo4;
+
+import java.util.function.BiFunction;
+
+public class Test {
+    public static void main(String[] args) {
+
+        int result1 = process(5, 3, (x, y) -> x + y);
+        int result2 = process(5, 3, (x, y) -> x * y);
+
+        System.out.println(result1); // 输出: 8
+        System.out.println(result2); // 输出: 15
+
+    }
+
+    public static int process(int a, int b, BiFunction<Integer, Integer, Integer> func) {
+        return func.apply(a, b);
+    }
+}
+```
+
+## 2.3 Lambda 表达式
+
+### 2.3.1 概述
+
+
+
+### 2.3.2 语法
+
+* Lambda 表达式语法：
 
 ```java
 (形参列表) -> {Lambda体}
@@ -1115,14 +1761,14 @@ public class Test {
 > * ③ 语法说明：
 >
 >   * `(形参列表)`：就是要赋值的函数式接口的抽象方法的 `(形参列表)` 。
+>   * `->`：Lambda 操作符，也可以称为“箭头符号”。
 >   * `{Lambda体}`：就是实现这个抽象方法的方法体。
->   * `->`：Lambda 操作符。
 >
 > * ④ 优化：
 >
 >   * 当 `{Lambda体}` 只有一条语句的时候，可以省略 `{}` 和 `{;}` 。
 >
->   - 当 `{Lambda体}` 只有一条语句的时候，并且这个语句有 return 语句，return 也可以省略，但是如果 `{;}` 没有省略，那么 return 是不可以省略的。
+>   - 当 `{Lambda体}` 只有一条语句的时候，并且这个语句是 return 语句，return 也可以省略，但是如果 `{;}` 没有省略，那么 return 是不可以省略的。
 >
 >   - `(形参列表)` 的类型可以省略。
 >
@@ -1223,17 +1869,27 @@ public class Test {
 }
 ```
 
+## 2.3 方法引用
 
 
 
 
-# 第三章：Stream API
 
 
 
 
 
-# 第四章：实际应用
+
+
+
+
+# 第三章：Stream API（⭐）
+
+
+
+
+
+# 第四章：实际应用（⭐）
 
 ## 4.1 概述
 
