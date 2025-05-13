@@ -2374,7 +2374,7 @@ public class Test {
 
 ### 2.4.1 概述
 
-* 方法引用是对 Lambda 表达式的一种简洁写法，本质上是对`已有方法`的引用，用来代替手写的 Lambda 表达式逻辑。
+* 方法引用是对 Lambda 表达式的一种简洁写法，本质上是对`已有方法`的引用，用来代替繁琐的 Lambda 表达式。
 
 > [!CAUTION]
 >
@@ -2384,7 +2384,7 @@ public class Test {
 
 ### 2.4.2 方法引用的规则
 
-* ① Lambda 体只有一条语句，并且通过调用一个类或对象的方法来完成。
+* ① Lambda 体只有一条语句，并且通过调用一个类或对象的方法来完成，形参和实参完全一致。
 
 ::: code-group
 
@@ -2416,34 +2416,42 @@ public class MethodReference {
 
 :::
 
-* ② Lambda 表达式的形参正好是该方法的实参。
+* ② Lambda 体只有一个语句，并且通过调用一个现有对象的方法来完成的，第一个参数是调用者，后面的参数是方法参数。
 
 ::: code-group
 
 ```java [Lambda.java]
-import java.util.function.Function;
-import java.util.stream.Stream;
+package com.github.lambda.method;
+
+import java.util.Comparator;
 
 public class Lambda {
     public static void main(String[] args) {
-        Function<Integer, Integer> fun = (x) -> Math.abs(x); // [!code highlight]
 
-        Integer apply = fun.apply(-1);
-        System.out.println("apply = " + apply);
+        Comparator<Integer> comparator = (o1, o2) -> o1.compareTo(o2); // [!code highlight]
+
+        int compare = comparator.compare(1, 2);
+
+        System.out.println("compare = " + compare);
+
     }
 }
 ```
 
 ```java [MethodReference.java]
-import java.util.function.Function;
-import java.util.stream.Stream;
+package com.github.lambda.method;
+
+import java.util.Comparator;
 
 public class MethodReference {
     public static void main(String[] args) {
-        Function<Integer, Integer> fun = Math::abs; // [!code highlight]
 
-        Integer apply = fun.apply(-1);
-        System.out.println("apply = " + apply);
+        Comparator<Integer> comparator = Integer::compareTo; // [!code highlight]
+
+        int compare = comparator.compare(1, 2);
+
+        System.out.println("compare = " + compare);
+
     }
 }
 ```
@@ -2456,14 +2464,59 @@ public class MethodReference {
 
 * 在 Java 中，方法引用有四种类型，如下所示：
 
-| 类型                     | 举例                        | 对应的 Lambda 表达式             |
-| ------------------------ | --------------------------- | -------------------------------- |
-| 静态方法引用             | `ClassName::staticMethod`   | `x -> ClassName.staticMethod(x)` |
-| 实例方法引用（特定对象） | `instance::method`          | `x -> instance.method(x)`        |
-| 实例方法引用（任意对象） | `ClassName::instanceMethod` | `(x, y) -> x.instanceMethod(y)`  |
-| 构造函数引用             | `ClassName::new`            | `() -> new ClassName()`          |
+| 类型                                        | 举例                        | 对应的 Lambda 表达式                                      |
+| ------------------------------------------- | --------------------------- | --------------------------------------------------------- |
+| 静态方法引用                                | `ClassName::staticMethod`   | `args -> ClassName.staticMethod(args)`                    |
+| 特定对象实例方法引用                        | `instance::instanceMethod`  | `args -> instance.instanceMethod(args)`                   |
+| 类的实例方法引用(Lambda 第一个参数是调用者) | `ClassName::instanceMethod` | `(obj, args) -> obj.instanceMethod(args)`                 |
+| 构造函数引用                                | `ClassName::new`            | `() -> new ClassName()`或 `(args) -> new ClassName(args)` |
 
-#### 2.4.3.2 静态方法引用
+#### 2.4.3.2 判断是否使用方法引用的步骤
+
+* ① Lambda 是否只调用一个已有方法？
+
+```java
+// ✅ Lambda 表达式：直接调用一个已有的方法
+list.forEach(s -> System.out.println(s)); 
+```
+
+```java
+//❌ Lambda 表达式：有额外的逻辑
+list.forEach(s -> { 
+    String upper = s.toUpperCase(); 
+    System.out.println(upper);
+});
+```
+
+* ② Lambda 表达式的参数和方法引用中方法的参数是否一一对应？
+
+```java
+// ✅ Lambda 表达式：参数直接传递
+list.forEach(s -> System.out.println(s));
+```
+
+```java
+// ❌ Lambda 表达式：参数转换
+list.forEach(s -> System.out.println(s.toUpperCase()));
+```
+
+* ③ Lambda 表达式是否在调用方法的过程中引入了额外的变量、逻辑判断、或者其他操作？
+
+```java
+// ✅ 只是调用现有方法，没有额外的逻辑
+list.forEach(s -> System.out.println(s));
+```
+
+```java
+// ❌ 包含条件判断和其他逻辑
+list.forEach(s -> {
+    if (s.length() > 5) {
+        System.out.println(s.toUpperCase());
+    }
+});
+```
+
+#### 2.4.3.3 静态方法引用
 
 * 语法：
 
@@ -2473,14 +2526,12 @@ public class MethodReference {
 
 > [!NOTE]
 >
-> * 静态方法引用转换为 Lambda 表达式，只需要把握两点：
+> * ① Lambda 体只有一个语句，这个语句是通过调用一个现有类的静态方法来完成的。
 >
->   * ① 逻辑（Lambda 表达式的实现）：执行此静态方法。
+> * ②在调用静态方法的时候，所使用的实参正好是 Lambda 表达式的形参，整个使用过程中，没有额外的数据出现。 
 >
->   * ② 参数（Lambda 表达式的形参列表）：静态方法的参数。
->
-> * `Math::abs` --> ` -> Math.abs(n)` --> `(n) -> Math.abs(n)`。
-> * `Math::max` --> ` -> Math.max(a,b)` --> `(a,b) -> Math.max(a,b)`。
+> * ③ `Math::abs` --> ` -> Math.abs(n)` --> `(n) -> Math.abs(n)`。
+>* ④`Math::max` --> ` -> Math.max(a,b)` --> `(a,b) -> Math.max(a,b)`。 
 
 
 
@@ -2712,7 +2763,7 @@ public class MethodReference {
 
 :::
 
-#### 2.4.3.3 
+#### 2.4.3.4 
 
 
 
