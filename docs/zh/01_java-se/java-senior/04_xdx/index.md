@@ -2716,7 +2716,7 @@ public class MethodReference {
 
 
 
-## 2.5 闭包（Clouse）
+## 2.5 闭包（Closure）
 
 
 
