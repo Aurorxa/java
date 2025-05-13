@@ -1906,7 +1906,7 @@ public class Test {
 
 ### 4.4.2 比较是否相等
 
-* 比较两个 BigInteger 对象是否相等：
+* 比较两个 BigDecimal 对象是否相等：
 
 ```java
 public boolean equals(Object x) {
