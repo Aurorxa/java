@@ -34,6 +34,7 @@
     "animejs": "^3.2.2",
     "dayjs": "^2.0.0-alpha.4",
     "dotenv": "^16.5.0",
+    "gsap": "^3.13.0",
     "markdown-it-task-checkbox": "^1.0.6",
     "medium-zoom": "^1.1.0",
     "nprogress-v2": "^1.1.10",
