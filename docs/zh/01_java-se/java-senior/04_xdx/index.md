@@ -2374,7 +2374,8 @@ public class Test {
 
 ### 2.4.1 概述
 
-* 方法引用是对 Lambda 表达式的一种简洁写法，本质上是对`已有方法`的引用，用来代替繁琐的 Lambda 表达式。
+* 在 Java 中，`方法引用`（Method Reference）是 Java 8 引入的一种语法糖，它可以更加简洁地表示 `Lambda 表达式`，用于引用已有的方法。
+* 方法引用的本质是：`当 Lambda 表达式只是调用一个已有的方法时，可以用方法引用来替代`，使代码更简洁、更易读。
 
 > [!CAUTION]
 >
@@ -2481,7 +2482,7 @@ list.forEach(s -> System.out.println(s));
 ```
 
 ```java
-//❌ Lambda 表达式：有额外的逻辑
+// ❌ Lambda 表达式：有额外的逻辑
 list.forEach(s -> { 
     String upper = s.toUpperCase(); 
     System.out.println(upper);
@@ -2531,7 +2532,7 @@ list.forEach(s -> {
 > * ②在调用静态方法的时候，所使用的实参正好是 Lambda 表达式的形参，整个使用过程中，没有额外的数据出现。 
 >
 > * ③ `Math::abs` --> ` -> Math.abs(n)` --> `(n) -> Math.abs(n)`。
->* ④`Math::max` --> ` -> Math.max(a,b)` --> `(a,b) -> Math.max(a,b)`。 
+>* ④ `Math::max` --> ` -> Math.max(a,b)` --> `(a,b) -> Math.max(a,b)`。 
 
 
 
@@ -2763,9 +2764,413 @@ public class MethodReference {
 
 :::
 
-#### 2.4.3.4 
+#### 2.4.3.4 类的实例方法引用（类的任意对象的实例方法引用）
+
+* 语法：
+
+```java
+类名::非静态方法
+```
+
+> [!NOTE]
+>
+> * ① Lambda 体只有一个语句，这个语句是通过调用一个现有对象的方法来完成的。
+> * ② 调用方法的对象是 Lambda 表达式的第一个形参，并且 Lambda 表达式剩下的形参，正好作为该方法的实参，整个使用过程中，没有额外的数据出现。
+> * ③ 该方法引用是引用`某个类的实例方法`，但是这个方法引用可以`应用于`任意类型的对象，而不是具体的某个对象，即：方法引用不依赖于某个具体实例，而是可以在该类的任意对象上调用。
+> * ④ `Student::getName` --> `-> stu.getName()` --> `(stu) -> stu.getName()`。
+> * ⑤ `Student::setName` --> `-> stu.setName(name)` --> `(stu,name) -> stu.getName(name)`。
 
 
+
+* 示例：
+
+::: code-group
+
+```java [Lambda.java]
+package com.github.lambda.method1;
+
+import java.util.Comparator;
+
+public class Lambda {
+    public static void main(String[] args) {
+
+        Comparator<String> comparator = (o1, o2) -> o1.compareTo(o2); // [!code highlight]
+
+        int compare = comparator.compare("bbb", "aaa");
+        System.out.println("compare = " + compare);
+    }
+}
+```
+
+```java [MethodReference.java]
+package com.github.lambda.method1;
+
+import java.util.Comparator;
+
+public class MethodReference {
+    public static void main(String[] args) {
+
+        Comparator<String> comparator = Comparator.naturalOrder(); // [!code highlight]
+
+        int compare = comparator.compare("bbb", "aaa");
+        System.out.println("compare = " + compare);
+    }
+}
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.lambda.method1;
+
+public class Student {
+
+    private Integer id;
+    private String name;
+    private Double salary;
+
+    public Student() {
+    }
+
+    public Student(Integer id, String name, Double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", salary=" + salary +
+                '}';
+    }
+}
+```
+
+```java [Lambda.java]
+package com.github.lambda.method1;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Lambda {
+    public static void main(String[] args) {
+        List<Student> studentList = List.of(
+                new Student(1, "张三", 5000.00),
+                new Student(2, "李四", 15000.00),
+                new Student(3, "王五", 75000.00),
+                new Student(4, "赵六", 7000.00),
+                new Student(5, "田七", 200.00)
+        );
+
+        List<Student> list = new ArrayList<>(studentList);
+
+        list.sort((s1, s2) -> s1.getSalary().compareTo(s2.getSalary())); // [!code highlight]
+
+        list.forEach(System.out::println);
+    }
+}
+```
+
+```java [MethodReference.java]
+package com.github.lambda.method1;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+public class MethodReference {
+    public static void main(String[] args) {
+        List<Student> studentList = List.of(
+                new Student(1, "张三", 5000.00),
+                new Student(2, "李四", 15000.00),
+                new Student(3, "王五", 75000.00),
+                new Student(4, "赵六", 7000.00),
+                new Student(5, "田七", 200.00)
+        );
+
+        List<Student> list = new ArrayList<>(studentList);
+
+        list.sort(Comparator.comparing(Student::getSalary)); // [!code highlight]
+
+        list.forEach(System.out::println);
+    }
+}
+```
+
+:::
+
+#### 2.4.3.5 特定对象实例方法引用
+
+* 语法：
+
+```java
+对象名::实例方法名
+```
+
+> [!NOTE]
+>
+> * ① Lambda 体只有一个语句，这个语句是通过调用一个现有对象的方法来完成的。
+> * ② Lambda 表达式的形参是对象调用方法的实参，整个使用过程中，没有额外的数据出现。
+> * ③ 该方法引用是引用`某个具体对象的实例方法`，方法会作用于该对象，并且对象是方法调用的调用者。
+> * ④ `"hello"::toUppercase` --> `-> "hello".toUppercase()` --> `() -> "hello".toUppercase()`。
+> * ⑤ `System.out::println` --> `-> System.out.println(x)` --> `(x) -> System.out.println(x)`。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Lambda.java]
+package com.github.lambda.method1;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Supplier;
+
+public class Lambda {
+    public static void main(String[] args) {
+
+        Supplier<String> supplier = () -> "hello".toUpperCase(); // [!code highlight]
+
+        String str = supplier.get();
+
+        System.out.println("str = " + str);
+
+    }
+}
+```
+
+```java [MethodReference.java]
+package com.github.lambda.method1;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Supplier;
+
+public class MethodReference {
+    public static void main(String[] args) {
+
+        Supplier<String> supplier = "hello"::toUpperCase; // [!code highlight]
+
+        String str = supplier.get();
+
+        System.out.println("str = " + str);
+
+    }
+}
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.lambda.method1;
+
+public class Student {
+
+    private Integer id;
+    private String name;
+    private Double salary;
+
+    public Student() {
+    }
+
+    public Student(Integer id, String name, Double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", salary=" + salary +
+                '}';
+    }
+}
+```
+
+```java [Lambda.java]
+package com.github.lambda.method1;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+public class Lambda {
+    public static void main(String[] args) {
+        List<Student> studentList = List.of(
+                new Student(1, "张三", 5000.00),
+                new Student(2, "李四", 15000.00),
+                new Student(3, "王五", 75000.00),
+                new Student(4, "赵六", 7000.00),
+                new Student(5, "田七", 200.00)
+        );
+
+        List<Student> list = new ArrayList<>(studentList);
+
+        list.sort(Comparator.comparing(Student::getSalary));
+
+        list.forEach(s-> System.out.println(s)); // [!code highlight]
+
+    }
+}
+```
+
+```java [MethodReference.java]
+package com.github.lambda.method1;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+public class MethodReference {
+    public static void main(String[] args) {
+        List<Student> studentList = List.of(
+                new Student(1, "张三", 5000.00),
+                new Student(2, "李四", 15000.00),
+                new Student(3, "王五", 75000.00),
+                new Student(4, "赵六", 7000.00),
+                new Student(5, "田七", 200.00)
+        );
+
+        List<Student> list = new ArrayList<>(studentList);
+
+        list.sort(Comparator.comparing(Student::getSalary)); 
+
+        list.forEach(System.out::println); // [!code highlight]
+    }
+}
+```
+
+:::
+
+#### 2.4.3.6 构造函数引用
+
+* 语法：
+
+```java
+类名::new
+```
+
+```java
+数组类型[]::new
+```
+
+> [!NOTE]
+>
+> * ① 当 Lambda 表达式是为了创建一个对象，并且满足 Lambda 表达式的形参，正好是创建对象构造器的实参列表。
+> * ② 当 Lambda 表达式是为了创建一个数组对象，并且满足 Lambda 表达式的形参，正好是创建数组对象的长度。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Lambda.java]
+package com.github.lambda.method1;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+public class Lambda {
+    public static void main(String[] args) {
+        Stream<Integer> stream = Stream.of(1, 2, 3, 4, 5);
+
+        Stream<int[]> stream2 = stream.map(x -> new int[x]); // [!code highlight]
+
+        stream2.forEach(ints -> System.out.println(ints.length));
+    }
+}
+
+```
+
+```java [MethodReference.java]
+package com.github.lambda.method1;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+public class MethodReference {
+    public static void main(String[] args) {
+        Stream<Integer> stream = Stream.of(1, 2, 3, 4, 5);
+
+        Stream<int[]> stream2 = stream.map(int[]::new); // [!code highlight]
+
+        stream2.forEach(ints -> System.out.println(ints.length));
+    }
+}
+```
+
+:::
 
 ## 2.5 闭包（Closure）
 
