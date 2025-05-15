@@ -3174,35 +3174,590 @@ public class MethodReference {
 
 ## 2.5 闭包（Closure）
 
+### 2.5.1 概述
+
+* 所谓的`闭包`就是`闭合`并`封装了外部作用域的变量`，形成了一个完整的执行环境。
+
+> [!NOTE]
+>
+> * ① `闭`指的是函数对象`捕获（或闭合）其定义时的作用域（词法环境）`，该作用域可能包含了函数体外部的局部变量，即：函数对象将这些变量`包`住了，不让它们随着外部函数结束而消失。
+> * ② `包`指的是将这些变量和函数对象一起封装（打包）起来，形成一个完整的执行单位，哪怕外部环境早已结束，它们依然可以一起存活。
+> * ③ `闭包`之所以叫“闭包”，是因为它“闭合”了定义时的作用域，把外部变量“打包”在自己的作用域里，即使外部函数早就结束，它仍然能访问这些变量。
+
+### 2.5.2 JavaScript 中的闭包
+
+* JavaScript 中函数是头等公民，且 JavaScript 支持函数式编程范式，所以 JavaScript 必然支持闭包。
+
+> [!NOTE]
+>
+> * ① 一个普通的函数，如果它可以访问外部作用域的自由变量，那么该函数和周围环境就形成了一个闭包。
+> * ② 从广义角度讲，JavaScript 中的函数都是闭包。
+> * ③ 从狭义角度讲，JavaScript 中的函数，只有访问了外部作用域的变量，才能称为闭包。
+
+* JavaScript 中普通函数形成的闭包，如下所示：
+
+> [!NOTE]
+>
+> JavaScript 中的函数都是 Function 类的实例（对象）！！！
+
+```js
+function outer(){
+    let name = "abc";
+    
+    // inner 函数访问了外部作用域的变量，所以 inner 和 name 就形成了闭包
+    function inner(){ 
+        console.log("inner：" + name); // [!code highlight]
+    }
+    
+    return inner;
+}
+
+// outer 执行完毕后，其内部的 name 并没有消失
+const inner = outer();
+
+inner();
+```
+
+* 其内存动态图，如下所示：
+
+![](./assets/14.gif)
+
+* JavaScript 中的函数可以无缝转换 Lambda 表达式，如下所示：
+
+> [!NOTE]
+>
+> JavaScript 中的函数都是 Function 类的实例（对象）！！！
+
+```js
+function outer() {
+  let name = "abc"
+
+  // inner 函数访问了外部作用域的变量，所以 inner 和 name 就形成了闭包
+  const inner = () => {
+    console.log("inner：" + name) // [!code highlight]
+  }
+
+  return inner
+}
+
+// outer 执行完毕后，其内部的 name 并没有消失
+const inner = outer()
+
+inner()
+```
+
+* 其内存动态图，如下所示：
+
+![](./assets/15.gif)
+
+> [!IMPORTANT]
+>
+> * ① 传统上，普通函数在执行结束后，它的局部变量就应该销毁。
+> * ② 但是，闭包函数打破了这一点，即：外部函数执行结束，变量依然存在。
+
+### 2.5.3 Java 中的闭包
+
+* 在 Java 中，闭包就是一个`Lambda 表达式`或`方法引用`（函数对象），它可以捕获并使用外部局部变量，即使这些变量不是在它的代码块中定义的。
+
+```java
+package com.github.lambda.method1;
+
+import java.util.function.Supplier;
+
+public class Test {
+
+    public static Supplier<String> outer() {
+        String name = "abc";
+
+        // Lambda 表达式捕获了外部变量 
+        return () -> {
+            System.out.println("inner：" + name); // [!code highlight]
+            return name;
+        };
+    }
+    
+    public static void main(String[] args) {
+        Supplier<String> inner = outer();
+        String str = inner.get();
+        System.out.println(str);
+    }   
+}
+```
+
+* 其内存动态图，如下所示：
+
+![](./assets/16.gif)
+
+### 2.5.4 JavaScript VS Java
+
+* 虽然两种语言都有闭包，但是底层实现机制和行为有着严重的区别：
+
+| 类别                       | Java                                                     | JavaScript                               |
+| -------------------------- | -------------------------------------------------------- | ---------------------------------------- |
+| 变量捕获方式               | 捕获变量的**值副本**（基本类型）或**引用值**（对象地址） | 捕获**变量的引用**                       |
+| 变量是否必须 final         | 是，必须 `final` 或 `effectively final`                  | 否，任何作用域变量都可捕获               |
+| 是否允许修改外部变量       | ❌ 不允许（编译时报错）                                   | ✅ 允许                                   |
+| 闭包可否持久保存作用域状态 | ✅ 是的，但通过限制机制实现                               | ✅ 是的，非常灵活                         |
+| 闭包与函数绑定方式         | 闭包通过生成**类结构**来模拟函数携带上下文               | 函数天然就是一等公民，闭包是语言内建机制 |
+
+* 在 JavaScript 中，闭包捕获的变量没有任何限制：
+
+```js
+function makeCounter() {
+    let count = 0;
+    return function() {
+        count++;
+        return count;
+    }
+}
+
+const counter = makeCounter();
+console.log(counter()); // 1
+console.log(counter()); // 2
+```
+
+* 其内存动态图，如下所示：
+
+![](./assets/17.gif)
+
+* 在 Java 中，闭包捕获的变量只能是 final 类型或者 effectively final 类型：
+
+```java
+package com.github.lambda.method1;
+
+import java.util.function.Supplier;
+
+public class Test {
+
+    public static Supplier<Integer> outer() {
+        // 闭包捕获的变量，即使不加 final ，JVM 底层也会帮你自动加上
+        int num = 0; 
+
+        return () -> {
+            System.out.println("inner：" + num);
+            return num;
+        };
+    }
+
+    public static void main(String[] args) {
+        Supplier<Integer> inner = outer();
+        Integer num = inner.get();
+        System.out.println(num);
+    }
+}
+```
+
+* 其内存动态图，如下所示：
+
+![](./assets/18.gif)
+
+* 在 Java 中，如果你和 JavaScript 那样，在闭包中对捕获的变量进行修改，Java 会编译失败：
+
+```java
+package com.github.lambda.method1;
+
+import java.util.function.Supplier;
+
+public class Test {
+
+    public static Supplier<Integer> outer() {
+        int num = 0;
+
+        return () -> {
+            // ❌ 编译错误：变量必须是 final 或 effectively final
+            System.out.println("inner：" + num++); // [!code error]
+            return num;
+        };
+    }
+
+    public static void main(String[] args) {
+        Supplier<Integer> inner = outer();
+        Integer num = inner.get();
+        System.out.println(num);
+    }
+
+}
+```
+
+* 在 IDEA 中，报错非常明显，如下所示：
+
+![](./assets/19.png)
+
+* 解决方案：我们可以使用引用类型来包裹状态：
+
+```java
+package com.github.lambda.method1;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+
+public class Test {
+    static final AtomicInteger count = new AtomicInteger(0); // [!code highlight]
+
+    public static Supplier<Integer> outer() {
+        return () -> {
+            System.out.println("inner：" + count.incrementAndGet());
+            return count.getAcquire();
+        };
+    }
+
+    public static void main(String[] args) {
+        Supplier<Integer> inner1 = outer();
+        Integer num1 = inner1.get();
+        System.out.println("num1 = " + num1);
+        Supplier<Integer> inner2 = outer();
+        Integer num2 = inner2.get();
+        System.out.println("num2 = " + num2);
+    }
+}
+```
+
+### 2.5.5 应用示例
+
+* 需求：使用多线程执行 10 个任务，但是每个任务都需要一个单独的编号。
 
 
 
+* 示例：
 
+::: code-group
 
+```java [Test.java]
+package com.github.lambda.method1;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+public class Test {
+    public static void main(String[] args) throws IOException {
+        List<Runnable> list = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            int no = i + 1;
+            Runnable task = () -> System.out.println(Thread
+                    .currentThread()
+                    .getName() + "：执行任务" + (no));
+            list.add(task);
+        }
+
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        for (Runnable runnable : list) {
+            executorService.submit(runnable);
+        }
+
+        System.in.read();
+
+    }
+}
+```
+
+```txt [cmd 控制台]
+pool-1-thread-8：执行任务8
+pool-1-thread-9：执行任务9
+pool-1-thread-10：执行任务10
+pool-1-thread-5：执行任务5
+pool-1-thread-2：执行任务2
+pool-1-thread-7：执行任务7
+pool-1-thread-1：执行任务1
+pool-1-thread-4：执行任务4
+pool-1-thread-3：执行任务3
+pool-1-thread-6：执行任务6
+```
+
+:::
 
 ## 2.6 高阶函数
 
+### 2.6.1 概述
+
+* 只要满足以下任一条件的函数，就是高阶函数：
+  * ① 接收一个或多个函数（对象）作为参数。
+  * ② 返回一个新的函数（对象）作为返回值。
+* 高阶函数不仅仅是函数（对象）的生产者，也是函数（对象）的使用者。
+
+### 2.6.2 JavaScript 中的高阶函数
+
+* JavaScript 中函数是头等公民，且 JavaScript 支持函数式编程范式，所以 JavaScript 必然支持高阶函数。
+* ① 如果一个函数，返回一个新的函数（对象），就是高阶函数。
+
+> [!NOTE]
+>
+> JavaScript 中的函数都是 Function 类的实例（对象）！！！
+
+```js
+function createGreeting() { 
+  return function (name) { // [!code highlight]
+    console.log(`Hello ${name}!`)
+  }
+}
+
+const sayHello = createGreeting()
+
+sayHello('World') 
+```
+
+```js
+function createGreeting() { 
+  return  (name) => { // [!code highlight]
+    console.log(`Hello ${name}!`)
+  }
+}
+
+const sayHello = createGreeting()
+
+sayHello('World') 
+```
+
+* ② 如果一个函数，接收一个或多个函数（对象）作为参数，就是高阶函数。
+
+> [!NOTE]
+>
+> JavaScript 中的函数都是 Function 类的实例（对象）！！！
+
+```js
+function calculate(a, b, callback) {  // [!code highlight]
+  return callback(a, b)
+}
+
+console.log(calculate(1, 2, (x1, x2) => x1 + x2))
+console.log(calculate(1, 2, (x1, x2) => x1 - x2))
+console.log(calculate(1, 2, (x1, x2) => x1 * x2))
+console.log(calculate(1, 2, (x1, x2) => x1 / x2))
+```
+
+* 在 JavaScript 中，高阶函数有许多应用场景，如：回调函数等。
+
+```js
+document.addEventListener('click', () => {
+  console.log('元素被点击');
+});
+```
+
+```js
+const compose = (f, g) => x => f(g(x));
+const add1 = x => x + 1;
+const double = x => x * 2;
+const add1ThenDouble = compose(double, add1);
+console.log(add1ThenDouble(2)); // 输出: 6
+```
+
+```js
+const multiply = a => b => a * b;
+const double = multiply(2);
+console.log(double(5)); // 输出: 10
+```
+
+### 2.6.3 Java 中的高阶函数
+
+* 在 Java 中，由于引入了`Lambda 表达式`等，也开始有限地支持高阶函数。
+* ① 如果一个函数，返回一个新的函数（对象），就是高阶函数。
+
+```java
+import java.util.function.Function;
+
+public class Test {
+    /**
+    * 高阶函数，返回一个函数对象
+    */
+    public static Function<Integer, Integer> createMultiplier(int factor) { 
+        return x -> x * factor; // [!code highlight]
+    }
+
+    public static void main(String[] args) {
+        Function<Integer, Integer> doubleIt = createMultiplier(2);
+        System.out.println(doubleIt.apply(5)); // 输出 10
+    }
+}
+```
+
+* ① 如果一个函数，接收一个或多个函数（对象）作为参数，就是高阶函数。
+
+```java
+import java.util.function.Function;
+
+public class Test {
+    /**
+    * 高阶函数，接收一个函数对象
+    */
+    public static int applyOperation(Function<Integer, Integer> func, int value) { // [!code highlight]
+        return func.apply(value);
+    }
+    
+    public static void main(String[] args) {
+        Function<Integer, Integer> square = x -> x * x;
+        System.out.println(applyOperation(square, 5)); // 输出 25
+    }
+}
+```
+
+* 在 Java 中，高阶函数有许多应用场景，如：Stream 操作集合等。
+
+```java
+List<String> names = Arrays.asList("Alice", "Bob", "Charlie");
+names.stream()
+     .filter(name -> name.startsWith("A"))
+     .map(String::toUpperCase)
+     .forEach(System.out::println); // 输出: ALICE
+```
+
+```java
+button.addActionListener(e -> System.out.println("按钮被点击"));
+```
+
+### 2.6.4 应用示例
+
+#### 2.6.4.1 概述
+
+* 在实际开发中，通常将`通用的`、`复杂的`逻辑隐藏在`高阶函数`内；而将`易变的`、`未定的`逻辑放在外部的`函数对象`中。
+
+#### 2.6.4.2 遍历集合
+
+* 需求：逆序遍历集合，只想负责元素的处理，不负责元素的遍历等逻辑。
+
+> [!NOTE]
+>
+> * ① 对于普通程序员来说：
+>   * 不想自己写遍历集合的代码。
+>   * 也不想关心怎么去遍历集合中元素。
+>   * 只会对集合元素进行读操作。
+> * ② 对于高级程序员来说，可以提供一个高阶函数，且需要调用方传递 List 集合以及 Lambda 表达式。
 
 
 
+* 示例：
+
+```java
+package com.github.lambda.method1;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.function.Consumer;
+
+public class Test {
+
+    /**
+     * 逆序遍历集合
+     *
+     * @param list 集合
+     */
+    public static <T> void reverseForEach(List<T> list, Consumer<T> consumer) {
+        ListIterator<T> listIterator = list.listIterator(list.size());
+        while (listIterator.hasPrevious()) {
+            T previous = listIterator.previous();
+            consumer.accept(previous);
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        List<Integer> list = List.of(1, 2, 3, 4, 5, 6, 7);
+
+        reverseForEach(list, (t) -> {
+            System.out.println(t);
+        });
+
+    }
+}
+```
+
+#### 2.6.4.3 简单流
+
+* 需求：模仿 Stream API ，实现自己的 SimpleStream，提供基本的高阶函数，如：map、filter 以及 forEach 。
+
+> [!NOTE]
+>
+> 模仿的代码，如下所示：
+>
+> ```java
+> Stream
+>         .of(1, 2, 3, 4, 5, 6, 7)
+>         .filter(x -> (x & 1) == 1)
+>         .map(x -> x * x)
+>         .forEach(System.out::println);
+> ```
 
 
 
-## 2.7 柯里化
+* 示例：
 
+```java
+package com.github.lambda.method1;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
+public class SimpleStream<T> {
 
+    private final Collection<T> collection;
 
+    private SimpleStream(Collection<T> collection) {
+        this.collection = collection;
+    }
 
+    public static void main(String[] args) throws IOException {
 
+        Integer[] array = List
+                .of(1, 2, 3, 4, 5, 6, 7)
+                .toArray(Integer[]::new);
 
+        System.out.println("---------------------");
 
-## 2.8 组合函数
+        Stream
+                .of(array)
+                .filter(x -> (x & 1) == 1)
+                .map(x -> x * x)
+                .forEach(System.out::println);
 
+        System.out.println("---------------------");
 
+        SimpleStream
+                .of(array)
+                .map(x -> x * x)
+                .filter(x -> (x & 1) == 1)
+                .forEach(System.out::println);
+    }
+
+    @SafeVarargs
+    public static <T> SimpleStream<T> of(T... values) {
+        return new SimpleStream<>(List.of(values));
+    }
+
+    public void forEach(Consumer<T> consumer) {
+        for (T t : collection) {
+            consumer.accept(t);
+        }
+    }
+
+    public SimpleStream<T> filter(Predicate<T> predicate) {
+        List<T> resultList = new ArrayList<>();
+
+        for (T t : collection) {
+            if (predicate.test(t)) {
+                resultList.add(t);
+            }
+        }
+        return new SimpleStream<>(resultList);
+    }
+
+    public <R> SimpleStream<R> map(Function<? super T, ? extends R> mapper) {
+        List<R> resultList = new ArrayList<>();
+        for (T t : collection) {
+            resultList.add(mapper.apply(t));
+        }
+        return new SimpleStream<>(resultList);
+    }
+
+}
+```
 
 
 
