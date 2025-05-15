@@ -11,10 +11,9 @@ import {
 import {
   InlineLinkPreviewElementTransform
 } from '@nolebase/vitepress-plugin-inline-link-preview/markdown-it'
-
-
+import { vitepressDemoPlugin } from 'vitepress-demo-plugin';
 import markdownItTaskCheckbox from 'markdown-it-task-checkbox'
-
+import path from 'path';
 const mode = process.env.NODE_ENV || 'development'
 const { VITE_BASE_URL } = loadEnv(mode, process.cwd())
 
@@ -154,6 +153,9 @@ export const sharedConfig = withMermaid(defineConfig({
       md.use(InlineLinkPreviewElementTransform)
       md.use(figure, { figcaption: 'alt', copyAttrs: '^class$', lazy: true })
       md.use(markdownItTaskCheckbox)
+      md.use(vitepressDemoPlugin, {
+        demoDir: path.resolve(__dirname, '../demos'),
+      });
     }
   },
   themeConfig: { // 主题设置

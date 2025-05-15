@@ -26,6 +26,7 @@
     "canvas-confetti": "^1.9.3",
     "markdown-it-mathjax3": "^4.3.2",
     "vitepress": "^1.6.3",
+    "vitepress-demo-plugin": "^1.4.1",
     "vitepress-plugin-group-icons": "^1.5.2",
     "vitepress-plugin-mermaid": "^2.0.17"
   },
