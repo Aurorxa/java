@@ -3760,3 +3760,548 @@ public class SimpleStream<T> {
 }
 ```
 
+## 2.7 柯里化
+
+### 2.7.1 概述
+
+* 柯里化是函数式编程中的重要概念，是一种关于函数的高阶技术，不仅可以用于 JavaScript ，还可以用于其它的编程语言。
+
+> [!NOTE]
+>
+> 维基百科：
+>
+> - 在计算机科学中，柯里化（英语：Currying），又译为卡瑞化或加里化。
+> - 是把`接收多个参数的函数`，变成`接收一个单一参数（最初函数的第一个参数）的函数`，并且`返回接受余下的参数`，而且`返回结果的新函数`的技术。
+> - 柯里化声称 `“如果你固定某些参数，你将得到接受余下参数的一个函数”`。
+
+* 柯里化就是`只传递给函数一部分参数来调用它`，让`它返回一个函数去处理剩余的参数`。
+* 柯里化是`一种函数的转换`，将一个函数从可调用的 `f(a, b, c)` 转换为可调用的 `f(a)(b)(c)`。
+* 柯里化不会调用函数。它只是对函数进行转换。
+
+### 2.7.2 JavaScript 中的柯里化
+
+* JavaScript 中函数是头等公民，且 JavaScript 支持函数式编程范式，所以 JavaScript 必然支持柯里化。
+
+```js
+// 普通函数
+function add(a, b, c) {
+  return a + b + c
+}
+
+console.log(add(1, 2, 3))
+
+// 柯里化函数
+function add2(a) {
+  return function (b) {
+    return function (c) {
+      return a + b + c
+    }
+  }
+}
+
+console.log(add2(1)(2)(3))
+
+// 柯里化函数（箭头函数）
+const add3 = (a) => (b) => (c) => a + b + c
+console.log(add3(1)(2)(3))
+```
+
+### 2.7.3 Java 中的柯里化
+
+* 在 Java 中，由于引入了`Lambda 表达式`等，也开始有限地支持柯里化。
+
+```java
+import java.util.function.Function;
+
+public class Test {
+    public static void main(String[] args) {
+        Function<Integer, Function<Integer, Integer>> curriedAdd = 
+            x -> y -> x + y;
+
+        int result = curriedAdd.apply(5).apply(10);
+        System.out.println(result);  // 输出 15
+    }
+}
+```
+
+## 2.8 组合函数
+
+### 2.8.1 概述
+
+* 在数学中，组合函数（Compose  Function，复合函数，合成函数）就是逐点地将一个函数作用于另一个函数的结果，所得到的第三个函数。
+
+> [!NOTE]
+>
+> * ① 通俗的理解：组合函数就是将多个函数组成一个新的函数，前一个函数的输出作为后一个函数的输入。
+> * ② 组合函数是一种重要的技术，它可以帮助我们将小的、可复用的函数组合成更复杂的功能。
+
+* 假设集合 X 到集合 Y 的映射关系，即：X -> Y ，记为函数 f；而集合 Y 到集合 Z 的映射关系，即：Y -> Z ，记为函数 g，如下所示：
+
+![](./assets/20.svg)
+
+* 我们可以得到集合 X 到集合 Z 的映射关系，即：X --> Z，记为函数 g(f(x))，如下所示：
+
+ ![](./assets/21.svg)
+
+### 2.8.2 JavaScript 中的组合函数
+
+* JavaScript 中的组合函数是通过高阶函数来实现的。
+
+> [!NOTE]
+>
+> 常见的组合函数有两种：compose 和 pipe。
+>
+> * ① compose 是从右到左依次执行函数，如：compose(f,g) --> f(g(x)) 。
+> * ② pipe 是从左到右依次执行函数，如：pipe(f,g) -> g(f(x)) 。
+
+* 自定义 compose 组合函数：
+
+::: code-group
+
+```js [function.js]
+function f(x) {
+  return x * 2
+}
+
+function g(x) {
+  return x * x
+}
+
+function compose(x) {
+  return f(g(x)) // [!code highlight]
+}
+
+console.log(f(g(2)) == compose(2))
+console.log(f(g(22)) == compose(22))
+console.log(f(g(99)) == compose(99))
+```
+
+```js [arrow-function.js]
+const f = x => x * 2
+
+const g = x => x * x
+
+const compose = x => f(g(x)) // [!code highlight]
+
+console.log(f(g(2)) == compose(2))
+console.log(f(g(22)) == compose(22))
+console.log(f(g(99)) == compose(99))
+```
+
+:::
+
+::: code-group
+
+```js [function.js]
+function f(x) {
+  return x * 2
+}
+
+function g(x) {
+  return x * x
+}
+
+function compose(f, g) { 
+  return function (x) { // [!code highlight]
+    return f(g(x))
+  }
+}
+
+console.log(compose(f, g)(2) === f(g(2))) 
+console.log(compose(f, g)(22) === f(g(22))) 
+console.log(compose(f, g)(99) === f(g(99))) 
+```
+
+```js [arrow-function.js]
+const f = x => x * 2
+
+const g = x => x * x
+
+const compose = (f, g) => x => f(g(x)) // [!code highlight]
+
+console.log(compose(f, g)(2) === f(g(2)))
+console.log(compose(f, g)(22) === f(g(22)))
+console.log(compose(f, g)(99) === f(g(99)))
+```
+
+:::
+
+* 自定义 pipe 组合函数：
+
+::: code-group
+
+```js [function.js]
+function f(x) {
+  return x * 2
+}
+
+function g(x) {
+  return x * x
+}
+
+function pipe(x) {
+  return g(f(x)) // [!code highlight]
+}
+
+console.log(g(f(2)) == pipe(2))
+console.log(g(f(22)) == pipe(22))
+console.log(g(f(99)) == pipe(99))
+```
+
+```js [arrow-function.js]
+const f = x => x * 2
+
+const g = x => x * x
+
+const pipe = x => g(f(x)) // [!code highlight]
+
+console.log(g(f(2)) == pipe(2))
+console.log(g(f(22)) == pipe(22))
+console.log(g(f(99)) == pipe(99))
+```
+
+:::
+
+::: code-group
+
+```js [function.js]
+function f(x) {
+  return x * 2
+}
+
+function g(x) {
+  return x * x
+}
+
+function pipe(f, g) {
+  return function (x) {  // [!code highlight]
+    return g(f(x))
+  }
+}
+
+console.log(pipe(f, g)(2) === g(f(2)))
+console.log(pipe(f, g)(22) === g(f(22)))
+console.log(pipe(f, g)(99) === g(f(99)))
+```
+
+```js [arrow-function.js]
+const f  = x => x * 2
+
+const g  = x => x * x
+
+const pipe = (f, g) => x => g(f(x)) // [!code highlight]
+
+console.log(pipe(f, g)(2) === g(f(2)))
+console.log(pipe(f, g)(22) === g(f(22)))
+console.log(pipe(f, g)(99) === g(f(99)))
+```
+
+:::
+
+### 2.8.3 Java 中的组合函数
+
+* 在 Java 中，由于引入了`Lambda 表达式`等，也开始有限地支持高阶函数。
+
+> [!NOTE]
+>
+> * ① 在 Java 中，可以通过 `Function<T,R>` 接口的 `compose()` 或 `andThen()` 方法进行函数组合。 
+>
+> ```java
+> default <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
+>     Objects.requireNonNull(before);
+>     return (V v) -> apply(before.apply(v));
+> }
+> ```
+>
+> ```java
+> default <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
+>     Objects.requireNonNull(after);
+>     return (T t) -> after.apply(apply(t));
+> }
+> ```
+>
+> * ② compose 是从右到左依次执行函数，如：compose(f,g) --> f(g(x)) ；pipe 是从左到右依次执行函数，如：pipe(f,g) -> g(f(x)) 。
+> * ③ Java 中的 `Function<T,R>` 接口的 compose() 是先算 before ，再算自己，就是 compose(f,g) --> f(g(x))。
+> * ④ Java 中的`Function<T,R>` 接口的 andThen() 是先算自己，再算 after，就是 pipe(f,g) -> g(f(x))。
+
+* 使用 Java 内置的`Function<T,R>` 接口来实现 compose 函数或 pipe 函数，如下所示：
+
+```java
+package com.github.lambda.method3;
+
+import java.util.function.Function;
+
+public class Test {
+    public static void main(String[] args) {
+
+        Function<Integer, Integer> add5 = n -> n + 5;
+        Function<Integer, Integer> multiplyBy2 = n -> n * 5;
+
+        Function<Integer, Integer> compose = add5.compose(multiplyBy2);
+        Integer apply = compose.apply(3); // (3 * 5) + 5
+        System.out.println(apply); // 20
+
+    }
+}
+```
+
+```java
+package com.github.lambda.method3;
+
+import java.util.function.Function;
+
+public class Test {
+    public static void main(String[] args) {
+
+        Function<Integer, Integer> add5 = n -> n + 5;
+        Function<Integer, Integer> multiplyBy2 = n -> n * 5;
+
+        Function<Integer, Integer> pipe = add5.andThen(multiplyBy2);
+        Integer apply = pipe.apply(3); // (3 + 5) * 5
+        System.out.println(apply); // 40
+
+    }
+}
+```
+
+### 2.8.4 Java 中内置的组合函数
+
+* 在 Java 中内置的很多函数式接口，自带了组合函数。
+
+| 接口名                | 方法签名                 | 描述                                | 是否支持组合函数                         |
+| --------------------- | ------------------------ | ----------------------------------- | ---------------------------------------- |
+| `Function<T, R>`      | `R apply(T t)`           | 接收一个参数，返回一个值            | ✅ `compose()`, `andThen()`, `identity()` |
+| `BiFunction<T, U, R>` | `R apply(T t, U u)`      | 接收两个参数，返回一个值            | ✅ `andThen()`                            |
+| `UnaryOperator<T>`    | `T apply(T t)`           | 特殊的 Function，输入输出类型相同   | ✅ 继承自 Function                        |
+| `BinaryOperator<T>`   | `T apply(T t1, T t2)`    | 特殊的 BiFunction，输入输出类型相同 | ✅ 继承自 BiFunction                      |
+| `Predicate<T>`        | `boolean test(T t)`      | 判断条件，返回 true/false           | ✅ `and()`, `or()`, `negate()`            |
+| `BiPredicate<T, U>`   | `boolean test(T t, U u)` | 两参数条件判断                      | ✅ `and()`, `or()`, `negate()`            |
+| `Consumer<T>`         | `void accept(T t)`       | 接收一个参数，无返回                | ✅ `andThen()`                            |
+| `BiConsumer<T, U>`    | `void accept(T t, U u)`  | 接收两个参数，无返回                | ✅ `andThen()`                            |
+| `Supplier<T>`         | `T get()`                | 无参，返回一个值                    | ❌ 无组合方法（因为无参数）               |
+| `Runnable`            | `void run()`             | 无参无返回                          | ❌ 非泛型函数式接口                       |
+
+* `Function<T,R>`接口中的组合函数，如下所示：
+
+```java
+/*
+* 先执行 before，再执行自己
+*/
+default <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
+    Objects.requireNonNull(before);
+    return (V v) -> apply(before.apply(v));
+}
+```
+
+```java
+/*
+* 先执行自己，再执行 after
+*/
+default <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
+    Objects.requireNonNull(after);
+    return (T t) -> after.apply(apply(t));
+}
+```
+
+```java
+/*
+* 返回本身
+*/
+static <T> Function<T, T> identity() {
+    return t -> t;
+}
+```
+
+* `BiFunction<T, U, R>`接口中的组合函数，如下所示：
+
+```java
+/*
+* 先执行自己，再执行 after
+*/
+default <V> BiFunction<T, U, V> andThen(Function<? super R, ? extends V> after) {
+    Objects.requireNonNull(after);
+    return (T t, U u) -> after.apply(apply(t, u));
+}
+```
+
+* `Predicate<T>`接口中的组合函数，如下所示：
+
+```java
+/*
+* 逻辑与
+*/
+default Predicate<T> and(Predicate<? super T> other) {
+    Objects.requireNonNull(other);
+    return (t) -> test(t) && other.test(t);
+}
+```
+
+```java
+/*
+* 逻辑非
+*/
+default Predicate<T> negate() {
+    return (t) -> !test(t);
+}
+```
+
+```java
+/*
+* 逻辑或
+*/
+default Predicate<T> or(Predicate<? super T> other) {
+    Objects.requireNonNull(other);
+    return (t) -> test(t) || other.test(t);
+}
+```
+
+* `Consumer<T>`接口中的组合函数，如下所示：
+
+```java
+/*
+* 先执行自己，再执行 after
+*/
+default Consumer<T> andThen(Consumer<? super T> after) {
+    Objects.requireNonNull(after);
+    return (T t) -> { accept(t); after.accept(t); };
+}
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.lambda.method3;
+
+public class Student {
+
+    private Integer id;
+    private String name;
+    private Double salary;
+    private String gender;
+
+    public Student() {}
+
+    public Student(Integer id, String name, String gender, Double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.gender = gender;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", salary=" + salary +
+                ", gender='" + gender + '\'' +
+                '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.lambda.method3;
+
+import java.util.List;
+import java.util.function.Predicate;
+
+public class Test {
+    public static void main(String[] args) {
+
+        List<Student> students = List.of(
+                new Student(1, "张三", "男", 5000.00),
+                new Student(2, "李四", "女", 15000.00),
+                new Student(3, "王五", "女", 75000.00),
+                new Student(4, "赵六", "女", 7000.00),
+                new Student(5, "田七", "男", 200.00),
+                new Student(5, "王八", "男", 200.00)
+        );
+
+        // 查询性别是女，并且工资大于 10000 的学生
+        students
+                .stream()
+                .filter(s -> s
+                        .getGender()
+                        .equals("女") && s.getSalary() > 10000)
+                .forEach(System.out::println);
+
+
+        System.out.println("----------------------------------------------");
+
+        // 查询性别是女，并且工资大于 10000 的学生
+        students
+                .stream()
+                .filter(s -> s
+                        .getGender()
+                        .equals("女"))
+                .filter(s -> s.getSalary() > 10000)
+                .forEach(System.out::println);
+
+        System.out.println("----------------------------------------------");
+
+        // 查询性别是女，并且工资大于 10000 的学生
+        Predicate<Student> girlPredicate = (s -> s
+                .getGender()
+                .equals("女"));
+
+        Predicate<Student> salaryPredicate = (s -> s
+                .getSalary() > 10000);
+        
+        students
+                .stream()
+                .filter(girlPredicate.and(salaryPredicate))
+                .forEach(System.out::println);
+
+    }
+}
+```
+
+```txt [cmd 控制台]
+{id=2, name='李四', salary=15000.0, gender='女'}
+{id=3, name='王五', salary=75000.0, gender='女'}
+----------------------------------------------
+{id=2, name='李四', salary=15000.0, gender='女'}
+{id=3, name='王五', salary=75000.0, gender='女'}
+----------------------------------------------
+{id=2, name='李四', salary=15000.0, gender='女'}
+{id=3, name='王五', salary=75000.0, gender='女'}
+```
+
+:::
