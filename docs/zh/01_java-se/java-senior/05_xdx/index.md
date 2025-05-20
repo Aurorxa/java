@@ -4804,6 +4804,11 @@ Collector<CharSequence, ?, String> collector = Collectors.joining();
 Collector<CharSequence, ?, String> collector = Collectors.joining(CharSequence delimiter);
 ```
 
+> [!NOTE]
+>
+> * ① 除了可以将流中的元素收集到可变的容器中，如：`Collector<T, ?, List<T>> collector = Collectors.toList()` 。
+> * ② 还可以将流总的元素收集到不可变的容器中，如：`Collector<T, ?, List<T>> collector = Collectors.toUnmodifiableList()`。
+
 
 
 * 示例：收集到 List 集合中
@@ -5627,17 +5632,17 @@ key = 男，value =Optional[{id=5, name='王八', salary=4000.0, department='运
 
 #### 2.5.7.1 概述
 
-* 所谓的基本类型流（基本流）：流中的数据类型是基本数据类型。
+* 所谓的基本类型流（基本流）就是流中元素的数据类型是基本数据类型；而之前学习的普通流中元素的数据类型是引用数据类型。
 * Java 内置了三种基本流，如下所示：
   * IntStream。
   * LongStream。
   * DoubleStream。
 
-* 和对应的包装流对比，其性能相对更高。
+* 和对应的包装类组成的普通流对比，其性能相对更高。
 
 #### 2.5.7.2 基本流
 
-* IntStream 等都提供了静态方法 of 来获取对应基本流：
+* IntStream 等基础流和普通流的使用没有什么区别：
 
 ```java
 IntStream stream = IntStream.of(1,2,...);
@@ -5684,15 +5689,162 @@ public class Test {
 
 #### 2.5.7.3 常用 API
 
+* 将基本流转为 Obj 流：
+
+```java
+Stream<U> stream = intStream.mapToObj(IntFunction<? extends U> mapper)
+```
+
+* 将基本流转换为对应的普通流（装箱）：
+
+```java
+Stream<Integer> stream = intStream.boxed();
+```
+
+* 求汇总统计数据，即：求最值（最大值和最小值）、求和、平均值、总数：
+
+```java
+IntSummaryStatistics summaryStatistics = intStream.summaryStatistics();
+```
+
+* 求和：
+
+```java
+int sum = intStream.sum();
+```
+
+* 求最大值：
+
+```java
+OptionalInt optionalInt = intStream.max();
+```
+
+* 求最小值：
+
+```java
+OptionalInt optionalInt = intStream.min();
+```
+
+* 求平均值：
+
+```java
+OptionalDouble optionalDouble = intStream.average();
+```
 
 
 
+* 示例：
 
-## 2.6 Stream 特性和总结
+```java
+package com.github.optinal;
+
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        IntStream intStream = IntStream.of(97, 98, 99);
+
+        Stream<String> stringStream = intStream.mapToObj(Character::toString);
+
+        stringStream.forEach(System.out::println);
+    }
+}
+```
 
 
 
+* 示例：
 
+```java
+package com.github.optinal;
+
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        IntStream intStream = "abc".chars();
+
+        Stream<String> stringStream = intStream.mapToObj(Character::toString);
+
+        stringStream.forEach(System.out::println);
+
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.optinal;
+
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+
+        IntStream intStream = IntStream.of(1, 2, 3);
+
+        Stream<Integer> stream = intStream.boxed();
+
+        stream.forEach(System.out::println);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.optinal;
+
+import java.util.IntSummaryStatistics;
+import java.util.stream.IntStream;
+
+public class Test {
+    public static void main(String[] args) {
+
+        IntStream intStream = IntStream.of(1, 2, 3);
+
+        IntSummaryStatistics summaryStatistics = intStream.summaryStatistics();
+
+        double average = summaryStatistics.getAverage();
+        System.out.println("平均值：" + average); // 平均值：2.0
+        long sum = summaryStatistics.getSum();
+        System.out.println("和：" + sum); // 和：6
+        long count = summaryStatistics.getCount();
+        System.out.println("总数：" + count); // 总数：3
+        int max = summaryStatistics.getMax();
+        System.out.println("最大值：" + max); // 最大值：3
+        int min = summaryStatistics.getMin();
+        System.out.println("最小值：" + min); // 最小值：1
+    }
+}
+
+```
+
+## 2.6 Stream 特性
+
+- ① Stream 自己不会存储元素。
+
+- ② Stream 不会改变源对象，每次处理读会返回一个持有结果的新的 Stream 。
+
+- ③ Stream 操作是延迟执行的，意味着会等到需要结果的时候才执行。
+
+## 2.7 Stream 总结
+
+<demo html="../demos/stream.html" />
+
+
+
+# 第三章：并行流（⭐）
+
+## 3.1 概述
 
 
 
