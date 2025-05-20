@@ -4752,6 +4752,14 @@ public class HashSetTest {
 
 * 其实，上面的逻辑都很固定和重复，Java 官方也意识到了这个问题，于是提供了如下的方法：
 
+> [!NOTE]
+>
+> 所谓的逻辑固定和重复指的是：
+>
+> * ① 第一个参数：告诉 collect 方法如何创建容器。
+> * ② 第二个参数：告诉 collect 方法如何将流中的元素添加到容器中。
+> * ③ 第三个参数：在并发流下，如何将两个容器中的元素合并到一起。
+
 ```java
 R r = stream.collect(Collector<? super T, A, R> collector);
 ```
@@ -4767,7 +4775,7 @@ public interface Collector<T, A, R> {
 > [!NOTE]
 >
 > * ① Collector 是一个接口，如果我们自己去实现 Collector 内部的逻辑实现是太麻烦了。
-> * ② 幸运的是，Java 官方已经写好了相关的逻辑了，即：Collectors 工具类，其可以简化将流中的元素收集到容器中。
+> * ② 幸运的是，Java 官方已经写好了相关的逻辑了，即：Collectors 工具类，提供了很多静态方法，帮助我们将流中元素收集到各种不同类型的容器中。
 
 #### 2.5.5.2 收集器
 
@@ -4921,6 +4929,771 @@ public class Test2 {
 ```
 
 ### 2.5.6 下游收集器
+
+#### 2.5.6.1  概述
+
+* 之前，我们通过将流中元素收到到 Map 中，如下所示：
+
+```java {13-17}
+package com.github.lambda.optinal;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Stream 对象
+        Stream<String> stream = Stream.of("apple", "banana", "cherry", "apple", "banana", "pear");
+
+        // 终结操作
+        Map<String, Integer> map = stream.collect(
+                Collectors.toMap(
+                        s -> s, 
+                        s -> s.length(), 
+                        (existing, replacement) -> existing));
+        System.out.println(map); // [banana, apple, cherry, pear]
+    }
+
+}
+```
+
+* 当出现 key 冲突的时候，我们是使用已存在的 key，如下所示：
+
+![](./assets/4.gif)
+
+* 如果我们希望名字长度一样的在一组，如下所示：
+
+```java
+// 4 --> new ArrayList(["pear"])
+// 5 --> new ArrayList(["apple","apple"])
+// 6 --> new ArrayList(["banana","cherry",banana"])
+Map<Integer,List<String> result = ....
+```
+
+* 上面的 `Collectors.toMap` 方法就无能为力了，只能使用 `Collectors.groupBy` 方法了，即：根据指定的条件将元素进行分组收集。
+
+#### 2.5.6.2 下游收集器
+
+* 根据指定的条件将元素进行分组收集：
+
+```java
+Collector<T, ?, Map<K, List<T>>> collector = Collectors.
+    groupingBy(Function<? super T, ? extends K> classifier)
+```
+
+```java
+Collector<T, ?, Map<K, D>> collector = Collectors.groupingBy(Function<? super T, ? extends K> classifier,
+                                          Collector<? super T, A, D> downstream)
+```
+
+> [!NOTE]
+>
+> * ① classifier：x -> k 表示从 x 中提取 k。
+> * ② downstream：下游收集器了，将提取的 k 保存到哪个容器中（如果没有参数，则默认收集到 List 容器中）。
+> * ③ Collectors 中的静态方法都可以应用于 downstream（下游收集器），如：Collectors.toList()、Collectors.toSet() 等。
+
+
+
+* 示例：
+
+```java
+package com.github.lambda.optinal;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Stream 对象
+        Stream<String> stream = Stream.of("apple", "banana", "cherry", "apple", "banana", "pear");
+
+        // 终结操作
+        Map<Integer, List<String>> map = stream.collect(
+                Collectors.groupingBy(String::length, Collectors.toList()));
+
+        System.out.println(map); // {4=[pear], 5=[apple, apple], 6=[banana, cherry, banana]}
+    }
+
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.lambda.optinal;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Stream 对象
+        Stream<String> stream = Stream.of("apple", "banana", "cherry", "apple", "banana", "pear");
+
+        // 终结操作
+        Map<Integer, String> map = stream.collect(
+                Collectors.groupingBy(String::length, Collectors.joining(",")));
+
+        System.out.println(map); // {4=pear, 5=apple,apple, 6=banana,cherry,banana}
+    }
+
+}
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.lambda.optinal;
+
+public class Student {
+
+    private Integer id;
+    private String name;
+    private Double salary;
+    private String department;
+    private String gender;
+    private Integer age;
+
+    public Student() {
+    }
+
+    public Student(Integer id, String name, String gender, String department, Double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.department = department;
+        this.gender = gender;
+    }
+
+    public Student(Integer id, String name, String gender, String department, Double salary, Integer age) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.department = department;
+        this.gender = gender;
+        this.age = age;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", salary=" + salary +
+                ", department='" + department + '\'' +
+                ", gender='" + gender + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.lambda.optinal;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Stream 对象
+        Stream<Student> stream = Stream.of(
+                new Student(1, "张三", "男", "开发部", 5000.00, 16),
+                new Student(2, "李四", "女", "测试部", 15000.00, 45),
+                new Student(3, "王五", "女", "测试部", 75000.00, 35),
+                new Student(4, "赵六", "女", "开发部", 7000.00, 40),
+                new Student(5, "田七", "男", "测试部", 6000.00, 25),
+                new Student(5, "王八", "男", "运营部", 4000.00, 20)
+        );
+
+        // 终结操作，根据性别分组
+        Map<String, List<Student>> map = stream.collect(Collectors.groupingBy(Student::getGender));
+        map.forEach((key, value) -> {
+            System.out.printf("key = %s ，", key);
+            String str = value
+                    .stream()
+                    .map(Student::getName)
+                    .collect(Collectors.joining(","));
+            System.out.printf("value = %s \n", str);
+        });
+    }
+}
+```
+
+```txt [cmd 控制台]
+key = 女 ，value = 李四,王五,赵六 
+key = 男 ，value = 张三,田七,王八 
+```
+
+:::
+
+#### 2.5.6.3 下游收集器
+
+* 专门和 groupingBy 配合的下游收集器，如下所示：
+
+| 下游收集器                    | 作用                                         |
+| ----------------------------- | -------------------------------------------- |
+| `mapping(x->y,dc)`            | 将 x 转换为 y，通过下游收集器 dc 收集        |
+| `flatMapping(x->substram,dc)` | 将 x 转换为 substram，通过下游收集器 dc 收集 |
+| `filtering(x -> boolean, dc)` | 过滤后，通过下游收集器 dc 收集               |
+| `counting()`                  | 求个数                                       |
+| `minBy((a, b) -> optional)`   | 求最小值                                     |
+| `maxBy((a, b) -> optional)`   | 求最大值                                     |
+| `summingInt(x -> int)`        | 转换 int 后求和                              |
+| `averagingInt(x -> int)`      | 转 int 后求平均                              |
+| `reducing(init, (p, x) -> r)` | 化简（归约）                                 |
+| `reduce((p, x) -> r)`         | 化简（归约）                                 |
+| `reduce(init, (p, x) -> r)`   | 化简（归约）                                 |
+
+> [!NOTE]
+>
+> * ① 除了 summingInt 之外，还有 summingDouble 以及 summingLong 。
+> * ② 除了 averagingInt 之前，还有 averagingDouble 以及 averagingLong 。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.lambda.optinal;
+
+public class Student {
+
+    private Integer id;
+    private String name;
+    private Double salary;
+    private String department;
+    private String gender;
+    private Integer age;
+
+    public Student() {
+    }
+
+    public Student(Integer id, String name, String gender, String department, Double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.department = department;
+        this.gender = gender;
+    }
+
+    public Student(Integer id, String name, String gender, String department, Double salary, Integer age) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.department = department;
+        this.gender = gender;
+        this.age = age;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", salary=" + salary +
+                ", department='" + department + '\'' +
+                ", gender='" + gender + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.lambda.optinal;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Stream 对象
+        Stream<Student> stream = Stream.of(
+                new Student(1, "张三", "男", "开发部", 5000.00, 16),
+                new Student(2, "李四", "女", "测试部", 15000.00, 45),
+                new Student(3, "王五", "女", "测试部", 75000.00, 35),
+                new Student(4, "赵六", "女", "开发部", 7000.00, 40),
+                new Student(5, "田七", "男", "测试部", 6000.00, 25),
+                new Student(5, "王八", "男", "运营部", 4000.00, 20)
+        );
+
+        // 终结操作，根据性别分组，但是分组后只保留姓名
+        Map<String, List<String>> map = stream.collect(
+                Collectors.groupingBy(Student::getGender,
+                        Collectors.mapping(Student::getName, Collectors.toList())));
+        map.forEach((k, v) -> System.out.println("key = " + k + "，value =" + v));
+    }
+}
+```
+
+```txt [cmd 控制台]
+key = 女，value =[李四, 王五, 赵六]
+key = 男，value =[张三, 田七, 王八]
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.lambda.optinal;
+
+public class Student {
+
+    private Integer id;
+    private String name;
+    private Double salary;
+    private String department;
+    private String gender;
+    private Integer age;
+
+    public Student() {
+    }
+
+    public Student(Integer id, String name, String gender, String department, Double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.department = department;
+        this.gender = gender;
+    }
+
+    public Student(Integer id, String name, String gender, String department, Double salary, Integer age) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.department = department;
+        this.gender = gender;
+        this.age = age;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", salary=" + salary +
+                ", department='" + department + '\'' +
+                ", gender='" + gender + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.lambda.optinal;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Stream 对象
+        Stream<Student> stream = Stream.of(
+                new Student(1, "张三", "男", "开发部", 5000.00, 16),
+                new Student(2, "李四", "女", "测试部", 15000.00, 45),
+                new Student(3, "王五", "女", "测试部", 75000.00, 35),
+                new Student(4, "赵六", "女", "开发部", 7000.00, 40),
+                new Student(5, "田七", "男", "测试部", 6000.00, 25),
+                new Student(5, "王八", "男", "运营部", 4000.00, 20)
+        );
+
+        // 终结操作，根据性别分组，但是过滤掉工资 < 10000 的人，并且只保留姓名
+        Map<String, List<String>> map = stream.collect(
+                Collectors.groupingBy(Student::getGender,
+                        Collectors.filtering(student -> student.getSalary() > 10_000, 
+                                Collectors.mapping(Student::getName, Collectors.toList()))));
+        map.forEach((k, v) -> System.out.println("key = " + k + "，value =" + v));
+    }
+}
+```
+
+```txt [cmd 控制台]
+key = 女，value =[李四, 王五]
+key = 男，value =[]
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.lambda.optinal;
+
+public class Student {
+
+    private Integer id;
+    private String name;
+    private Double salary;
+    private String department;
+    private String gender;
+    private Integer age;
+
+    public Student() {
+    }
+
+    public Student(Integer id, String name, String gender, String department, Double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.department = department;
+        this.gender = gender;
+    }
+
+    public Student(Integer id, String name, String gender, String department, Double salary, Integer age) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.department = department;
+        this.gender = gender;
+        this.age = age;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", salary=" + salary +
+                ", department='" + department + '\'' +
+                ", gender='" + gender + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.lambda.optinal;
+
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Stream 对象
+        Stream<Student> stream = Stream.of(
+                new Student(1, "张三", "男", "开发部", 5000.00, 16),
+                new Student(2, "李四", "女", "测试部", 15000.00, 45),
+                new Student(3, "王五", "女", "测试部", 75000.00, 35),
+                new Student(4, "赵六", "女", "开发部", 7000.00, 40),
+                new Student(5, "田七", "男", "测试部", 6000.00, 25),
+                new Student(5, "王八", "男", "运营部", 4000.00, 20)
+        );
+
+        // 终结操作，根据性别分组，分组后求每组工资最低的人
+        final Map<String, Optional<Student>> map = stream.collect(
+                Collectors.groupingBy(Student::getGender,
+                        Collectors.minBy(Comparator.comparingDouble(Student::getSalary))));
+        map.forEach((k, v) -> System.out.println("key = " + k + "，value =" + v));
+    }
+}
+```
+
+```txt [cmd 控制台]
+key = 女，value =Optional[{id=4, name='赵六', salary=7000.0, department='开发部', gender='女', age=40}]
+key = 男，value =Optional[{id=5, name='王八', salary=4000.0, department='运营部', gender='男', age=20}]
+```
+
+:::
+
+### 2.5.7 基本类型流
+
+#### 2.5.7.1 概述
+
+* 所谓的基本类型流（基本流）：流中的数据类型是基本数据类型。
+* Java 内置了三种基本流，如下所示：
+  * IntStream。
+  * LongStream。
+  * DoubleStream。
+
+* 和对应的包装流对比，其性能相对更高。
+
+#### 2.5.7.2 基本流
+
+* IntStream 等都提供了静态方法 of 来获取对应基本流：
+
+```java
+IntStream stream = IntStream.of(1,2,...);
+```
+
+```java
+LongStream stream = LongStream.of(1L,2L,...);
+```
+
+```java
+DoubleStream stream = DoubleStream.of(1.0,2.0,...);
+```
+
+
+
+* 示例：
+
+```java
+package com.github.lambda.optinal;
+
+import java.util.OptionalDouble;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Stream 对象
+        IntStream intStream = IntStream.of(1, 2, 3, 4);
+        LongStream longStream = LongStream.of(1L, 2L, 3L, 4L);
+        DoubleStream doubleStream = DoubleStream.of(1.0, 2.0, 3.0, 4.0);
+
+        // 终结操作
+        OptionalDouble optional = intStream.average();
+        optional.ifPresent(System.out::println); // 2.5
+        optional = longStream.average();
+        optional.ifPresent(System.out::println); // 2.5
+        optional = doubleStream.average();
+        optional.ifPresent(System.out::println); // 2.5
+    }
+
+}
+```
+
+#### 2.5.7.3 常用 API
+
+
+
+
+
+## 2.6 Stream 特性和总结
+
+
+
+
+
+
+
+
 
 
 
