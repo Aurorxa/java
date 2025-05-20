@@ -4971,7 +4971,10 @@ public class Test {
 Map<Integer,List<String> result = ....
 ```
 
-* 上面的 `Collectors.toMap` 方法就无能为力了，只能使用 `Collectors.groupBy` 方法了，即：根据指定的条件将元素进行分组收集。
+> [!NOTE]
+>
+> * ① 上面的`Collectors.toMap`方法没有办法实现需求。
+> * ② 只能使用`Collectors.groupBy`方法了，即：根据指定的条件将元素进行分组收集。
 
 #### 2.5.6.2 下游收集器
 
