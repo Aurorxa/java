@@ -5624,7 +5624,7 @@ key = 男，value =Optional[{id=5, name='王八', salary=4000.0, department='运
 
 :::
 
-### 2.5.7 基本类型流
+### 2.5.7 基本类型流（基本流）
 
 #### 2.5.7.1 概述
 
@@ -6396,7 +6396,7 @@ worker-2     [3].add(1)=>[3, 1, 2, 4]
 
 
 
-# 第四章：效率
+# 第四章：效率（⭐）
 
 ## 4.1 概述
 
@@ -6450,7 +6450,7 @@ import java.util.stream.IntStream;
 @Measurement(iterations = 5, time = 1)
 public class SumTest {
 
-    private static final int SIZE = 100;
+    private static final int SIZE = 100; // [!code highlight]
     private int[] numbers;
     private List<Integer> numberList;
 
@@ -6529,14 +6529,14 @@ public class SumTest {
 
 | Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
 | --------- | ---- | ---- | ------------- | ------------- | ----- |
-| primitive | avgt | 5    | 15.014        | ± 0.267       | ns/op |
-| intStream | avgt | 5    | 42.983        | ± 0.571       | ns/op |
-| boxed     | avgt | 5    | 37.064        | ± 1.110       | ns/op |
-| stream    | avgt | 5    | 323.862       | ± 10.192      | ns/op |
+| primitive | avgt | 15   | 17.599        | ± 5.869       | ns/op |
+| intStream | avgt | 15   | 49.676        | ± 7.809       | ns/op |
+| boxed     | avgt | 15   | 38.229        | ± 1.737       | ns/op |
+| stream    | avgt | 15   | 300.226       | ± 54.419      | ns/op |
 
 * 其柱状图，如下所示：
 
-
+![](./assets/8.png)
 
 ### 4.2.3 测试二
 
@@ -6544,14 +6544,14 @@ public class SumTest {
 
 | Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
 | --------- | ---- | ---- | ------------- | ------------- | ----- |
-| primitive | avgt | 5    | 25.424        | ± 0.782       | ns/op |
-| intStream | avgt | 5    | 47.482        | ± 1.145       | ns/op |
-| boxed     | avgt | 5    | 72.457        | ± 4.136       | ns/op |
-| stream    | avgt | 5    | 465.141       | ± 4.891       | ns/op |
+| primitive | avgt | 15   | 217.362       | ± 2.108       | ns/op |
+| intStream | avgt | 15   | 250.680       | ± 1.957       | ns/op |
+| boxed     | avgt | 15   | 300.912       | ± 7.355       | ns/op |
+| stream    | avgt | 15   | 2263.782      | ± 105.370     | ns/op |
 
 * 其柱状图，如下所示：
 
-
+![](./assets/9.png)
 
 ### 4.2.4 测试三
 
@@ -6559,14 +6559,207 @@ public class SumTest {
 
 | Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
 | --------- | ---- | ---- | ------------- | ------------- | ----- |
-| primitive | avgt | 5    | 25.424        | ± 0.782       | ns/op |
-| intStream | avgt | 5    | 47.482        | ± 1.145       | ns/op |
-| boxed     | avgt | 5    | 72.457        | ± 4.136       | ns/op |
-| stream    | avgt | 5    | 465.141       | ± 4.891       | ns/op |
+| primitive | avgt | 15   | 2291.159      | ± 24.103      | ns/op |
+| intStream | avgt | 15   | 2334.125      | ± 15.465      | ns/op |
+| boxed     | avgt | 15   | 3063.766      | ± 108.177     | ns/op |
+| stream    | avgt | 15   | 21543.497     | ± 464.988     | ns/op |
 
 * 其柱状图，如下所示：
 
-
+![](./assets/10.png)
 
 ### 4.2.5 总结
 
+* ① 做数值计算的时候，应该避免使用普通流（Stream），其性能和其它几种相比，慢了很多。
+* ② 做数值计算的时候，优先挑选基本流（IntStream 等），在数据量较大的时候，其性能已经接近普通的 for 循环。
+
+## 4.3 求最大值
+
+### 4.3.1 概述
+
+* 本次将采用四种方式来进行求和：
+
+  * ① 普通 for 循环对 int 数组求最大值，即：primitive() 方法。
+
+  * ② 串行流对 int 数组求最大值，即：sequence() 方法。
+
+  * ③ 并行流对 int 数组求最大值，即：parallel() 方法。
+
+  * ④ 自定义多线程对 int 数组求最大值，即：custom() 方法。
+
+* 测试的代码，如下所示：
+
+```java
+package com.github;
+
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.results.format.ResultFormatType;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.stream.IntStream;
+
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@State(Scope.Thread)
+@Fork(3)
+@Warmup(iterations = 2, time = 1)
+@Measurement(iterations = 5, time = 1)
+public class ParallelTest {
+
+    private static final int SIZE = 100; // [!code highlight]
+    private int[] numbers;
+
+    @Setup
+    public void setup() {
+        numbers = new int[SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            numbers[i] = ThreadLocalRandom
+                    .current()
+                    .nextInt(100_000);
+        }
+    }
+
+    /**
+     * 使用循环求最大值
+     */
+    @Benchmark
+    public int primitive() {
+        int max = 0;
+        for (int number : numbers) {
+            if (number > max) {
+                max = number;
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 使用并行流对求最大值
+     */
+    @Benchmark
+    public int parallel() {
+        return IntStream
+                .of(numbers)
+                .parallel()
+                .max()
+                .orElse(0);
+    }
+
+    /**
+     * 使用串行流求最大值
+     */
+    @Benchmark
+    public int sequence() {
+        return IntStream
+                .of(numbers)
+                .max()
+                .orElse(0);
+    }
+
+    /**
+     * 自定义多线程并行求最大值
+     */
+    @Benchmark
+    public int custom() throws ExecutionException, InterruptedException {
+        final int SIZE = numbers.length;
+        final int threadCount = Math.min(Runtime.getRuntime().availableProcessors() + 1, SIZE);
+        final int step = (int) Math.ceil((double) SIZE / threadCount);
+        ExecutorService service = Executors.newFixedThreadPool(threadCount);
+        List<Future<Integer>> futures = new ArrayList<>();
+
+        for (int j = 0; j < SIZE; j += step) {
+            final int start = j;
+            final int end = Math.min(j + step, SIZE);
+            futures.add(service.submit(() -> {
+                int localMax = Integer.MIN_VALUE;
+                for (int i = start; i < end; i++) {
+                    if (numbers[i] > localMax) {
+                        localMax = numbers[i];
+                    }
+                }
+                return localMax;
+            }));
+        }
+
+        int max = Integer.MIN_VALUE;
+        for (Future<Integer> future : futures) {
+            int partialMax = future.get();
+            if (partialMax > max) {
+                max = partialMax;
+            }
+        }
+
+        service.shutdown();
+
+        return max;
+    }
+
+    public static void main(String[] args) throws Exception {
+        Options opt = new OptionsBuilder()
+                .include(ParallelTest.class.getSimpleName())
+                .result("result.json")
+                .resultFormat(ResultFormatType.JSON)
+                .build();
+
+        new Runner(opt).run();
+    }
+
+}
+```
+
+### 4.3.2 测试一
+
+* 元素个数是 100 ，JMH 的测试结果，如下所示：
+
+| Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
+| --------- | ---- | ---- | ------------- | ------------- | ----- |
+| custom    | avgt | 15   | 1358614.871   | ± 58955.498   | ns/op |
+| parallel  | avgt | 15   | 24076.210     | ± 619.192     | ns/op |
+| primitive | avgt | 15   | 23.971        | ± 3.381       | ns/op |
+| sequence  | avgt | 15   | 93.493        | ± 5.640       | ns/op |
+
+* 其柱状图，如下所示：
+
+![](./assets/11.png)
+
+### 4.3.3 测试二
+
+* 元素个数是 1000 ，JMH 的测试结果，如下所示：
+
+| Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
+| --------- | ---- | ---- | ------------- | ------------- | ----- |
+| custom    | avgt | 15   | 1574375.323   | ± 77505.640   | ns/op |
+| parallel  | avgt | 15   | 24550.725     | ± 1365.748    | ns/op |
+| primitive | avgt | 15   | 170.369       | ± 4.797       | ns/op |
+| sequence  | avgt | 15   | 484.755       | ± 7.087       | ns/op |
+
+* 其柱状图，如下所示：
+
+![](./assets/12.png)
+
+### 4.3.4 测试三
+
+* 元素个数是 10000，JMH 的测试结果，如下所示：
+
+| Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
+| --------- | ---- | ---- | ------------- | ------------- | ----- |
+| custom    | avgt | 15   | 1526595.911   | ± 36834.923   | ns/op |
+| parallel  | avgt | 15   | 23055.42      | ± 447.008     | ns/op |
+| primitive | avgt | 15   | 1568.566      | ± 23.554      | ns/op |
+| sequence  | avgt | 15   | 4642.384      | ± 48.522      | ns/op |
+
+* 其柱状图，如下所示：
+
+![](./assets/13.png)
+
+### 4.3.5 总结
+
+* ① 并行流相对普通流（串行流）来说，是使用多线程实现分而治之，写法更简洁。
+* ② 并行流只有在数据量非常大的情况下，才能充分发力；如果数据量很小，还不如普通流（串行流）。
+
+## 4.4 并行收集

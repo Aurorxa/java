@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "docs:dev": "vitepress dev docs --mode development",
+    "docs:dev": "cross-env NODE_OPTIONS=--max-old-space-size=8192 vitepress dev docs --mode development",
     "docs:build": "vitepress build docs --mode production",
     "docs:preview": "vitepress preview docs"
   },
@@ -24,6 +24,7 @@
     "@types/dom-view-transitions": "^1.0.6",
     "@types/node": "^22.15.21",
     "canvas-confetti": "^1.9.3",
+    "cross-env": "^7.0.3",
     "markdown-it-mathjax3": "^4.3.2",
     "vitepress": "^1.6.3",
     "vitepress-demo-plugin": "^1.4.2",
