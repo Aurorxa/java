@@ -4540,10 +4540,6 @@ public class Test {
 * 将 Stream 中的元素收集到指定的容器中，如：ArrayList、HashSet：
 
 ```java
-/**
-* @param supplier ()-> c 用于提供创建容器，即：将集合中的元素添加到哪个容器
-* @param accumulator (c,e)-> c 累加器，即：将元素 e 添加到容器中，每种容器添加的
-*/
 R r = stream.collect(Supplier<R> supplier,
                   BiConsumer<R, ? super T> accumulator,
                   BiConsumer<R, R> combiner);
@@ -5846,13 +5842,731 @@ public class Test {
 
 ## 3.1 概述
 
+* 之前接触过的流都是`串行流`，即：使用流处理数据时，底层是使用`单线程`来处理流中的元素。
+
+```java
+package com.github.lambda.optinal;
+
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 串行流
+        Stream<Integer> stream = Stream.of(1, 2, 3, 4); // [!code highlight]
+
+        stream.forEach(System.out::println);
+    }
+
+}
+```
+
+* 但是，Java 中还提供了`并行流`，即：使用流处理数据时，底层是使用`多线程`来处理流中的元素。
+
+```java
+package com.github.lambda.optinal;
+
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 并行流
+        Stream<Integer> stream = Stream.of(1, 2, 3, 4).parallel();
+
+        stream.forEach(System.out::println);
+    }
+
+}
+```
+
+* 可以通过`stream.isParallel()`方法来判断一个流是串行流还是并行流：
+
+```java
+package com.github.lambda.optinal;
+
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 串行流
+        Stream<Integer> stream = Stream.of(1, 2, 3, 4);
+        boolean parallel = stream.isParallel();
+        System.out.println(parallel); // false
+
+        // 并行流
+        Stream<Integer> stream2 = Stream
+                .of(1, 2, 3, 4)
+                .parallel();
+        boolean parallel2 = stream2.isParallel();
+        System.out.println(parallel2); // true
+    }
+
+}
+```
+
+> [!NOTE]
+>
+> * ① 当数据量`小`的时候，使用`并行流`，无异于“杀鸡焉用牛刀”，反而降低了效率（并行流需要将任务拆分到多个线程中执行，最后再合并结果，中间会涉及到`线程的创建开销`、`任务的拆分和合并开销`以及`线程上下文切换`等）。
+> * ② 当数据量`大`的时候，使用`串行流`，无异于“杯水车薪”，不仅效率低下，还可能造成资源浪费与响应延迟。
+
+## 3.2 构建并行流
+
+* 使用`Stream 对象`调用 `parallel()` 方法可以将普通流转换为并行流：
+
+```java
+Stream<?> stream2 = stream.parallel()
+```
+
+* 使用`Collection 对象`调用`parallelStream()`方法直接创建并行流：
+
+```java
+Stream<?> stream2 = list.parallel()
+```
+
+> [!NOTE]
+>
+> 通过`stream.sequential()`可以将`并行流`转为`串行流`！！！
 
 
 
+* 示例：
+
+```java
+package com.github.lambda.optinal;
+
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+        // 串行流
+        Stream<Integer> stream = Stream.of(1, 2, 3, 4);
+        boolean parallel = stream.isParallel();
+        System.out.println(parallel); // false
+
+        // 并行流
+        Stream<Integer> stream2 = Stream
+                .of(1, 2, 3, 4)
+                .parallel();
+        boolean parallel2 = stream2.isParallel();
+        System.out.println(parallel2); // true
+    }
+
+}
+```
 
 
 
+* 示例：
+
+```java
+package com.github.lambda.optinal;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+public class Test2 {
+    public static void main(String[] args) {
+        List<Integer> list = List.of(1, 2, 3, 4, 5);
+
+        Stream<Integer> stream = list.parallelStream();
+        System.out.println(stream.isParallel()); // true
+    }
+
+}
+```
+
+## 3.3 证明并行流底层采用了多线程技术
+
+* 本人的台式机的 CPU 是 24 核，如下所示：
+
+> [!NOTE]
+>
+> 在不浪费电脑资源的情况下，为了达到最佳吞吐量，建议`线程数 = CPU核心数`，即：有 4 个工人（线程），要搬一堆砖（任务）：
+>
+> * ① 只安排 1 个人干活，效率低。
+> * ② 安排 4 个人同时干，就能最快完成。
+> * ③ 安排 8 个人，反而可能因为争抢工具而变慢。
+> * ④ ...
+
+![](./assets/5.png)
+
+* 研究并行流的一个好的切入点就是`收集`，如下所示：
+
+```java
+R r = stream.collect(Collector<? super T, A, R> collector);
+```
+
+* 之前，我们都是建议使用 JDK 内部实现的收集器。
+
+```java
+Collector<T, ?, List<T>> collector = Collectors.toList();
+Collector<T, ?, Set<T>> collector = Collectors.toSet();
+...
+```
+
+* 但是，JDK 内部实现的收集器，调试不方便，我们将采用`自定义收集器`，即：调用`Collector.of(x,x,x,x)`方法。
+
+```java
+public static<T, A, R> Collector<T, A, R> of(
+    Supplier<A> supplier,
+    BiConsumer<A, T> accumulator,
+    BinaryOperator<A> combiner,
+    Function<A, R> finisher,
+    Characteristics... characteristics) {
+    ...
+}
+
+enum Characteristics {
+
+    CONCURRENT,
+
+    UNORDERED,
+
+    IDENTITY_FINISH
+}
+```
+
+> [!NOTE]
+>
+> * ① supplier：如何创建容器。
+> * ② accumulator：累加器，即：如何将流中的元素添加到容器中。
+> * ③ combiner：合并器，即：如何将多个容器中的数据合并到一起。
+> * ④ finisher：收尾器，即：容器是否需要转换，如：List --> Set 等。
+> * ④ characteristics：特性，可以有 1 个、多个，也可以一个都没有。
+>   * CONCURRENT：收集器支持并发，即：容器是线程安全的。
+>   * IDENTITY_FINISH：收集器是否需要收尾。
+>   * UNORDERED：收集器不保证收集顺序。
+
+> [!NOTE]
+>
+> 如果不传递 characteristics，默认行为：
+>
+> * ① 容器不支持并发，即：在并行流中每次都会创建新的中间容器，而不是并发修改同一个容器。
+> * ② 收集器保证收集顺序。
+> * ③ 收集器需要收尾。
+
+* 那么自定义收集器的逻辑就是这样的，如下所示：
+
+```java
+package com.github.lambda.optinal;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+
+        List<Integer> collect = Stream
+                .of(1, 2, 3, 4, 5)
+                .parallel()
+                .collect(Collector.of(
+                        () -> new ArrayList<Integer>(), // 如何创建容器
+                        ArrayList::add, // 如何向容器中添加数据
+                        (list1, list2) -> { // 如何合并两个容器中的数据
+                            list1.addAll(list2);
+                            return list1;
+                        },
+                        list -> list // 收尾
+                ));
+
+        System.out.println(collect);
+
+    }
+
+}
+```
+
+* 此时，我们可以添加一些调试代码，如下所示：
+
+::: code-group
+
+```java [Test.java]
+package com.github.lambda.optinal;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+
+        List<Integer> collect = Stream
+                .of(1, 2, 3, 4)
+                .parallel()
+                .collect(Collector.of(
+                        () -> { // 如何创建容器
+                            System.out.printf("%-12s %s%n", simple(), "create");
+                            return new ArrayList<Integer>();
+                        },
+                        (list, x) -> { // 如何向容器中添加数据
+                            List<Integer> old = new ArrayList<>(list);
+                            list.add(x);
+                            System.out.printf("%-12s %s.add(%d)=>%s%n", simple(), old, x, list);
+
+                        },
+                        (list1, list2) -> { // 如何合并两个容器中的数据
+                            List<Integer> old = new ArrayList<>(list1);
+                            list1.addAll(list2);
+                            System.out.printf("%-12s %s.add(%s)=>%s%n", simple(), old, list2, list1);
+                            return list1;
+                        },
+                        list -> { // 收尾
+                            System.out.printf("%-12s finish:%s=>%s%n", simple(), list, list);
+                            return list;
+                        }
+                ));
+
+        System.out.println(collect);
+
+    }
+
+    private static String simple() {
+        String name = Thread
+                .currentThread()
+                .getName();
+        int idx = name.indexOf("worker");
+        if (idx > 0) {
+            return name.substring(idx);
+        }
+        return name;
+    }
+
+}
+```
+
+```txt [cmd 控制台]
+main         create
+worker-3     create
+worker-3     [].add(4)=>[4]
+worker-1     create
+worker-2     create
+worker-1     [].add(2)=>[2]
+main         [].add(3)=>[3]
+worker-2     [].add(1)=>[1]
+main         [3].add([4])=>[3, 4]
+worker-2     [1].add([2])=>[1, 2]
+worker-2     [1, 2].add([3, 4])=>[1, 2, 3, 4]
+main         finish:[1, 2, 3, 4]=>[1, 2, 3, 4]
+[1, 2, 3, 4]
+```
+
+:::
+
+* 其动态图，如下所示：
+
+![](./assets/6.svg)
+
+* 我们也可以将数据继续增加，看创建的容器数量是否等于线程数，如下所示：
+
+::: code-group
+
+```java [Test.java]
+package com.github.lambda.optinal;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+
+        List<Integer> collect = Stream
+                .of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25)
+                .parallel()
+                .collect(Collector.of(
+                        () -> { // 如何创建容器
+                            System.out.printf("%-12s %s%n", simple(), "create");
+                            return new ArrayList<Integer>();
+                        },
+                        (list, x) -> { // 如何向容器中添加数据
+                            List<Integer> old = new ArrayList<>(list);
+                            list.add(x);
+                            System.out.printf("%-12s %s.add(%d)=>%s%n", simple(), old, x, list);
+
+                        },
+                        (list1, list2) -> { // 如何合并两个容器中的数据
+                            List<Integer> old = new ArrayList<>(list1);
+                            list1.addAll(list2);
+                            System.out.printf("%-12s %s.add(%s)=>%s%n", simple(), old, list2, list1);
+                            return list1;
+                        },
+                        list -> { // 收尾
+                            System.out.printf("%-12s finish:%s=>%s%n", simple(), list, list);
+                            return list;
+                        }
+                ));
+
+        System.out.println(collect);
+
+    }
+
+    private static String simple() {
+        String name = Thread
+                .currentThread()
+                .getName();
+        int idx = name.indexOf("worker");
+        if (idx > 0) {
+            return name.substring(idx);
+        }
+        return name;
+    }
+
+}
+```
+
+```txt [cmd 控制台]
+main         create
+worker-20    create
+worker-22    create
+worker-19    create
+worker-21    create
+worker-21    [].add(15)=>[15]
+worker-18    create
+worker-14    create
+worker-13    create
+worker-16    create
+worker-16    [].add(12)=>[12]
+worker-17    create
+worker-9     create
+worker-9     [].add(22)=>[22]
+worker-15    create
+worker-11    create
+worker-12    create
+worker-8     create
+worker-8     [].add(7)=>[7]
+worker-10    create
+worker-7     create
+worker-7     [].add(11)=>[11]
+worker-5     create
+worker-4     create
+worker-3     create
+worker-3     [].add(23)=>[23]
+worker-6     create
+worker-6     [].add(19)=>[19]
+worker-2     create
+worker-2     [].add(4)=>[4]
+worker-1     create
+worker-3     [22].add([23])=>[22, 23]
+worker-4     [].add(14)=>[14]
+worker-5     [].add(20)=>[20]
+worker-7     [11].add([12])=>[11, 12]
+worker-10    [].add(18)=>[18]
+worker-12    [].add(9)=>[9]
+worker-11    [].add(25)=>[25]
+worker-15    [].add(2)=>[2]
+worker-17    [].add(10)=>[10]
+worker-13    [].add(13)=>[13]
+worker-14    [].add(21)=>[21]
+worker-18    [].add(24)=>[24]
+worker-21    create
+worker-19    [].add(1)=>[1]
+worker-22    [].add(6)=>[6]
+worker-20    [].add(3)=>[3]
+worker-23    create
+worker-23    [].add(5)=>[5]
+main         [].add(16)=>[16]
+worker-23    [5].add([6])=>[5, 6]
+worker-20    [2].add([3])=>[2, 3]
+worker-21    [].add(17)=>[17]
+worker-18    [24].add([25])=>[24, 25]
+worker-14    [20].add([21])=>[20, 21]
+worker-17    [10].add([11, 12])=>[10, 11, 12]
+worker-4     [14].add([15])=>[14, 15]
+worker-1     [].add(8)=>[8]
+worker-4     [13].add([14, 15])=>[13, 14, 15]
+worker-14    [19].add([20, 21])=>[19, 20, 21]
+worker-18    [22, 23].add([24, 25])=>[22, 23, 24, 25]
+worker-21    [17].add([18])=>[17, 18]
+worker-20    [1].add([2, 3])=>[1, 2, 3]
+worker-23    [4].add([5, 6])=>[4, 5, 6]
+worker-21    [16].add([17, 18])=>[16, 17, 18]
+worker-18    [19, 20, 21].add([22, 23, 24, 25])=>[19, 20, 21, 22, 23, 24, 25]
+worker-1     [8].add([9])=>[8, 9]
+worker-21    [13, 14, 15].add([16, 17, 18])=>[13, 14, 15, 16, 17, 18]
+worker-23    [1, 2, 3].add([4, 5, 6])=>[1, 2, 3, 4, 5, 6]
+worker-21    [13, 14, 15, 16, 17, 18].add([19, 20, 21, 22, 23, 24, 25])=>[13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+worker-1     [7].add([8, 9])=>[7, 8, 9]
+worker-1     [7, 8, 9].add([10, 11, 12])=>[7, 8, 9, 10, 11, 12]
+worker-1     [1, 2, 3, 4, 5, 6].add([7, 8, 9, 10, 11, 12])=>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+worker-1     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].add([13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25])=>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+main         finish:[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]=>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+```
+
+:::
+
+> [!CAUTION]
+>
+> * ① 不会有线程安全问题，因为每个线程都是操作自己的容器，即使该容器是线程不安全的。
+> * ② 线程安全问题的两个原因：在多线程环境下，多线程争抢同一资源。
+> * ③ 现在虽然也在多线程环境下，但是每个线程操作自己的容器（即使容器是线程不安全的），当然不会有线程安全问题。
+
+* 我们知道，如果默认情况下不传递 characteristics 参数，将会出现以下情况：
+  * ① 收集器是否需要收尾（需要收尾）。
+  * ② 收集器是否要保证顺序（默认保证）。
+  * ③ 收集器内部的容器是否支持并发（默认不支持）。
+* 现在，我们可以传递 characteristics 来改变其默认行为，但是如果传递 characteristics  是 CONCURRENT，那么容器就需要是并发容器了，如下所示：
+
+::: code-group
+
+```java [Test.java]
+package com.github.lambda.optinal;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
+
+public class Test {
+    public static void main(String[] args) {
+
+        List<Integer> collect = Stream
+                .of(1, 2, 3, 4)
+                .parallel()
+                .collect(Collector.of(
+                        () -> { // 如何创建容器
+                            System.out.printf("%-12s %s%n", simple(), "create");
+                            return new Vector<Integer>();
+                        },
+                        (list, x) -> { // 如何向容器中添加数据
+                            List<Integer> old = new ArrayList<>(list);
+                            list.add(x);
+                            System.out.printf("%-12s %s.add(%d)=>%s%n", simple(), old, x, list);
+
+                        },
+                        (list1, list2) -> { // 如何合并两个容器中的数据
+                            List<Integer> old = new ArrayList<>(list1);
+                            list1.addAll(list2);
+                            System.out.printf("%-12s %s.add(%s)=>%s%n", simple(), old, list2, list1);
+                            return list1;
+                        },
+                        list -> { // 收尾
+                            System.out.printf("%-12s finish:%s=>%s%n", simple(), list, list);
+                            return list;
+                        },
+                        Collector.Characteristics.IDENTITY_FINISH, // 不需要收尾
+                        Collector.Characteristics.UNORDERED, // 不保证顺序
+                        Collector.Characteristics.CONCURRENT // 容器需要支持并发
+                ));
+
+        System.out.println(collect);
+
+    }
+
+    private static String simple() {
+        String name = Thread
+                .currentThread()
+                .getName();
+        int idx = name.indexOf("worker");
+        if (idx > 0) {
+            return name.substring(idx);
+        }
+        return name;
+    }
+
+}
+
+```
+
+```txt [cmd 控制台]
+main         create
+main         [].add(3)=>[3, 1, 2, 4]
+worker-3     [3, 1, 2].add(4)=>[3, 1, 2, 4]
+worker-1     [3, 1].add(2)=>[3, 1, 2, 4]
+worker-2     [3].add(1)=>[3, 1, 2, 4]
+[3, 1, 2, 4]
+```
+
+:::
+
+> [!NOTE]
+>
+> 目前并发流支持两种方案：
+>
+> * ① 默认 + 线程不安全的容器：占用的内存多，没有并发冲突。
+> * ② Collector.Characteristics.CONCURRENT + Collector.Characteristics.UNORDERED + 线程安全的容器：占用的内存少，但是多个线程将数据向同一个容器中收集，在数据量大的时候，会产生很多并发冲突，从而可能会影响程序的性能。
+
+* 其实，在 JDK 底层的收集器中，也有采用线程安全的容器来收集流中元素的，如下所示：
+
+![](./assets/7.png)
 
 
 
+# 第四章：效率
+
+## 4.1 概述
+
+* 本次将采用 JMH 来进行基准测试，并使用 Maven 作为构建工具。
+
+```xml
+<dependency>
+  <groupId>org.openjdk.jmh</groupId>
+  <artifactId>jmh-core</artifactId>
+  <version>1.35</version>
+</dependency>
+<dependency>
+  <groupId>org.openjdk.jmh</groupId>
+  <artifactId>jmh-generator-annprocess</artifactId>
+  <version>1.35</version>
+  <scope>provided</scope>
+</dependency>
+```
+
+## 4.2 求和
+
+### 4.2.1 概述
+
+* 本次将采用四种方式来进行求和：
+  * ① 普通 for 循环对 int 进行求和，即：primitive() 方法。
+  * ② IntStream 对 int 进行求和，即：intStream() 方法。
+  * ③ 普通 for 循环对 Integer 进行求和，即：boxed() 方法。
+  * ④ Stream 对 Integer 进行求和，即：stream() 方法。
+
+* 测试的代码，如下所示：
+
+```java
+package com.github;
+
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.results.format.ResultFormatType;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
+
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@State(Scope.Thread)
+@Fork(3)
+@Warmup(iterations = 2, time = 1)
+@Measurement(iterations = 5, time = 1)
+public class SumTest {
+
+    private static final int SIZE = 100;
+    private int[] numbers;
+    private List<Integer> numberList;
+
+    @Setup
+    public void setup() {
+        numbers = new int[SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            numbers[i] = i;
+        }
+        numberList = new ArrayList<>(SIZE);
+        for (int i = 0; i < SIZE; i++) {
+            numberList.add(i);
+        }
+    }
+
+    /**
+     * 使用循环对 int 求和
+     */
+    @Benchmark
+    public int primitive() {
+        int sum = 0;
+        for (int number : numbers) {
+            sum += number;
+        }
+        return sum;
+    }
+
+    /**
+     * 使用循环对 Integer 求和
+     */
+    @Benchmark
+    public int boxed() {
+        int sum = 0;
+        for (Integer i : numberList) {
+            sum += i;
+        }
+        return sum;
+    }
+
+    /**
+     * 使用 Stream 对 Integer 求和
+     */
+    @Benchmark
+    public int stream() {
+        return numberList
+                .stream()
+                .reduce(0, Integer::sum);
+    }
+
+    /**
+     * 使用 IntStream 对 int 求和
+     */
+    @Benchmark
+    public int intStream() {
+        return IntStream
+                .of(numbers)
+                .sum();
+    }
+
+    public static void main(String[] args) throws Exception {
+        Options opt = new OptionsBuilder()
+                .include(SumTest.class.getSimpleName())
+                .result("result.json")
+                .resultFormat(ResultFormatType.JSON)
+                .build();
+
+        new Runner(opt).run();
+    }
+
+}
+```
+
+### 4.2.2 测试一
+
+* 元素个数是 100 ，JMH 的测试结果，如下所示：
+
+| Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
+| --------- | ---- | ---- | ------------- | ------------- | ----- |
+| primitive | avgt | 5    | 15.014        | ± 0.267       | ns/op |
+| intStream | avgt | 5    | 42.983        | ± 0.571       | ns/op |
+| boxed     | avgt | 5    | 37.064        | ± 1.110       | ns/op |
+| stream    | avgt | 5    | 323.862       | ± 10.192      | ns/op |
+
+* 其柱状图，如下所示：
+
+
+
+### 4.2.3 测试二
+
+* 元素个数是 1000，JMH 的测试结果，如下所示：
+
+| Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
+| --------- | ---- | ---- | ------------- | ------------- | ----- |
+| primitive | avgt | 5    | 25.424        | ± 0.782       | ns/op |
+| intStream | avgt | 5    | 47.482        | ± 1.145       | ns/op |
+| boxed     | avgt | 5    | 72.457        | ± 4.136       | ns/op |
+| stream    | avgt | 5    | 465.141       | ± 4.891       | ns/op |
+
+* 其柱状图，如下所示：
+
+
+
+### 4.2.4 测试三
+
+* 元素个数是 10000，JMH 的测试结果，如下所示：
+
+| Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
+| --------- | ---- | ---- | ------------- | ------------- | ----- |
+| primitive | avgt | 5    | 25.424        | ± 0.782       | ns/op |
+| intStream | avgt | 5    | 47.482        | ± 1.145       | ns/op |
+| boxed     | avgt | 5    | 72.457        | ± 4.136       | ns/op |
+| stream    | avgt | 5    | 465.141       | ± 4.891       | ns/op |
+
+* 其柱状图，如下所示：
+
+
+
+### 4.2.5 总结
 
