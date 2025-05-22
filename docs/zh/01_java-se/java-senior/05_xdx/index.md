@@ -6529,10 +6529,10 @@ public class SumTest {
 
 | Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
 | --------- | ---- | ---- | ------------- | ------------- | ----- |
-| primitive | avgt | 15   | 17.599        | ± 5.869       | ns/op |
-| intStream | avgt | 15   | 49.676        | ± 7.809       | ns/op |
-| boxed     | avgt | 15   | 38.229        | ± 1.737       | ns/op |
-| stream    | avgt | 15   | 300.226       | ± 54.419      | ns/op |
+| boxed     | avgt | 15   | 36.499        | ± 2.250       | ns/op |
+| intStream | avgt | 15   | 45.256        | ± 3.838       | ns/op |
+| primitive | avgt | 15   | 14.730        | ± 0.227       | ns/op |
+| stream    | avgt | 15   | 297.025       | ± 6.837       | ns/op |
 
 * 其柱状图，如下所示：
 
@@ -6540,14 +6540,14 @@ public class SumTest {
 
 ### 4.2.3 测试二
 
-* 元素个数是 1000，JMH 的测试结果，如下所示：
+* 元素个数是 10000，JMH 的测试结果，如下所示：
 
 | Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
 | --------- | ---- | ---- | ------------- | ------------- | ----- |
-| primitive | avgt | 15   | 217.362       | ± 2.108       | ns/op |
-| intStream | avgt | 15   | 250.680       | ± 1.957       | ns/op |
-| boxed     | avgt | 15   | 300.912       | ± 7.355       | ns/op |
-| stream    | avgt | 15   | 2263.782      | ± 105.370     | ns/op |
+| boxed     | avgt | 15   | 3168.356      | ± 44.983      | ns/op |
+| intStream | avgt | 15   | 2126.682      | ± 24.216      | ns/op |
+| primitive | avgt | 15   | 2098.360      | ± 37.273      | ns/op |
+| stream    | avgt | 15   | 26270.320     | ± 813.071     | ns/op |
 
 * 其柱状图，如下所示：
 
@@ -6555,14 +6555,14 @@ public class SumTest {
 
 ### 4.2.4 测试三
 
-* 元素个数是 10000，JMH 的测试结果，如下所示：
+* 元素个数是 1000000，JMH 的测试结果，如下所示：
 
 | Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
 | --------- | ---- | ---- | ------------- | ------------- | ----- |
-| primitive | avgt | 15   | 2291.159      | ± 24.103      | ns/op |
-| intStream | avgt | 15   | 2334.125      | ± 15.465      | ns/op |
-| boxed     | avgt | 15   | 3063.766      | ± 108.177     | ns/op |
-| stream    | avgt | 15   | 21543.497     | ± 464.988     | ns/op |
+| boxed     | avgt | 15   | 389805.446    | ± 21175.126   | ns/op |
+| intStream | avgt | 15   | 216711.061    | ± 2947.919    | ns/op |
+| primitive | avgt | 15   | 210447.980    | ± 4784.173    | ns/op |
+| stream    | avgt | 15   | 3564449.498   | ± 620627.379  | ns/op |
 
 * 其柱状图，如下所示：
 
@@ -6614,6 +6614,8 @@ public class ParallelTest {
     private static final int SIZE = 100; // [!code highlight]
     private int[] numbers;
 
+    private ExecutorService service;
+
     @Setup
     public void setup() {
         numbers = new int[SIZE];
@@ -6622,6 +6624,16 @@ public class ParallelTest {
                     .current()
                     .nextInt(100_000);
         }
+
+        service = Executors.newFixedThreadPool(
+                Math.max(1, Runtime
+                        .getRuntime()
+                        .availableProcessors()));
+    }
+
+    @TearDown
+    public void tearDown() {
+        service.shutdown();
     }
 
     /**
@@ -6666,36 +6678,27 @@ public class ParallelTest {
      */
     @Benchmark
     public int custom() throws ExecutionException, InterruptedException {
-        final int SIZE = numbers.length;
-        final int threadCount = Math.min(Runtime.getRuntime().availableProcessors() + 1, SIZE);
-        final int step = (int) Math.ceil((double) SIZE / threadCount);
-        ExecutorService service = Executors.newFixedThreadPool(threadCount);
-        List<Future<Integer>> futures = new ArrayList<>();
+        int SIZE = numbers.length;
+        int threadCount = Runtime.getRuntime().availableProcessors();
+        int chunk = (SIZE + threadCount - 1) / threadCount;
 
-        for (int j = 0; j < SIZE; j += step) {
-            final int start = j;
-            final int end = Math.min(j + step, SIZE);
+        List<Future<Integer>> futures = new ArrayList<>(threadCount);
+        for (int start = 0; start < SIZE; start += chunk) {
+            int end = Math.min(start + chunk, SIZE);
+            int finalStart = start;
             futures.add(service.submit(() -> {
-                int localMax = Integer.MIN_VALUE;
-                for (int i = start; i < end; i++) {
-                    if (numbers[i] > localMax) {
-                        localMax = numbers[i];
-                    }
+                int localMax = numbers[finalStart];
+                for (int i = finalStart + 1; i < end; i++) {
+                    if (numbers[i] > localMax) localMax = numbers[i];
                 }
                 return localMax;
             }));
         }
 
         int max = Integer.MIN_VALUE;
-        for (Future<Integer> future : futures) {
-            int partialMax = future.get();
-            if (partialMax > max) {
-                max = partialMax;
-            }
+        for (Future<Integer> f : futures) {
+            max = Math.max(max, f.get());
         }
-
-        service.shutdown();
-
         return max;
     }
 
@@ -6710,6 +6713,7 @@ public class ParallelTest {
     }
 
 }
+
 ```
 
 ### 4.3.2 测试一
@@ -6718,10 +6722,10 @@ public class ParallelTest {
 
 | Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
 | --------- | ---- | ---- | ------------- | ------------- | ----- |
-| custom    | avgt | 15   | 1358614.871   | ± 58955.498   | ns/op |
-| parallel  | avgt | 15   | 24076.210     | ± 619.192     | ns/op |
-| primitive | avgt | 15   | 23.971        | ± 3.381       | ns/op |
-| sequence  | avgt | 15   | 93.493        | ± 5.640       | ns/op |
+| custom    | avgt | 15   | 11260.155     | ± 234.584     | ns/op |
+| parallel  | avgt | 15   | 26443.196     | ± 222.938     | ns/op |
+| primitive | avgt | 15   | 19.235        | ± 2.833       | ns/op |
+| sequence  | avgt | 15   | 63.980        | ± 1.275       | ns/op |
 
 * 其柱状图，如下所示：
 
@@ -6729,14 +6733,14 @@ public class ParallelTest {
 
 ### 4.3.3 测试二
 
-* 元素个数是 1000 ，JMH 的测试结果，如下所示：
+* 元素个数是 10000，JMH 的测试结果，如下所示：
 
 | Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
 | --------- | ---- | ---- | ------------- | ------------- | ----- |
-| custom    | avgt | 15   | 1574375.323   | ± 77505.640   | ns/op |
-| parallel  | avgt | 15   | 24550.725     | ± 1365.748    | ns/op |
-| primitive | avgt | 15   | 170.369       | ± 4.797       | ns/op |
-| sequence  | avgt | 15   | 484.755       | ± 7.087       | ns/op |
+| custom    | avgt | 15   | 17472.194     | ± 544.914     | ns/op |
+| parallel  | avgt | 15   | 27993.134     | ± 347.412     | ns/op |
+| primitive | avgt | 15   | 1973.060      | ± 276.455     | ns/op |
+| sequence  | avgt | 15   | 4243.904      | ± 115.034     | ns/op |
 
 * 其柱状图，如下所示：
 
@@ -6744,14 +6748,14 @@ public class ParallelTest {
 
 ### 4.3.4 测试三
 
-* 元素个数是 10000，JMH 的测试结果，如下所示：
+* 元素个数是 1000000，JMH 的测试结果，如下所示：
 
 | Benchmark | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
 | --------- | ---- | ---- | ------------- | ------------- | ----- |
-| custom    | avgt | 15   | 1526595.911   | ± 36834.923   | ns/op |
-| parallel  | avgt | 15   | 23055.42      | ± 447.008     | ns/op |
-| primitive | avgt | 15   | 1568.566      | ± 23.554      | ns/op |
-| sequence  | avgt | 15   | 4642.384      | ± 48.522      | ns/op |
+| custom    | avgt | 15   | 78837.747     | ± 4017.790    | ns/op |
+| parallel  | avgt | 15   | 73449.199     | ± 965.975     | ns/op |
+| primitive | avgt | 15   | 166560.093    | ± 12344.487   | ns/op |
+| sequence  | avgt | 15   | 428516.639    | ± 4867.386    | ns/op |
 
 * 其柱状图，如下所示：
 
@@ -6763,3 +6767,288 @@ public class ParallelTest {
 * ② 并行流只有在数据量非常大的情况下，才能充分发力；如果数据量很小，还不如普通流（串行流）。
 
 ## 4.4 并行收集
+
+### 4.4.1 概述
+
+* 本次将采用五种方式来进行求和：
+  * ① 普通 for 循环 + Map.merge() 方法进行收集，即：loopMerge() 方法。
+  * ② 普通 for 循环 + Map.computeIfAbsent() 方法进行收集，即：loopComputeIfAbsent() 方法。
+  * ③ 单线程进行收集，即：sequence() 方法。
+  * ④ 多线程没有使用并发容器进行收集，即：parallelNoConcurrent() 方法。
+  * ⑤ 多线程使用了并发容器进行收集，即：parallelConcurrent() 方法。
+* 测试的代码，如下所示：
+
+```java
+package com.github;
+
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.results.format.ResultFormatType;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+
+import static java.util.stream.Collectors.*;
+
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@State(Scope.Thread)
+@Fork(3)
+@Warmup(iterations = 2, time = 1)
+@Measurement(iterations = 5, time = 1)
+public class ConcurrentTest {
+
+    private static final int SIZE = 100 ; // [!code highlight]
+    private int[] numbers;
+
+    @Setup
+    public void setup() {
+        numbers = new int[SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            numbers[i] = ThreadLocalRandom
+                    .current()
+                    .nextInt(100_000);
+        }
+    }
+
+    /**
+     * 不可变的思想，每次都产生新的值，然后将新的值覆盖旧的值
+     */
+    @Benchmark
+    public Map<Integer, Integer> loopMerge() {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int number : numbers) {
+            // 如果 Map 中没有该元素，则设置为 1
+            // 如果 Map 中已经有了该元素，则在上一次的基础上累加
+            map.merge(number, 1, Integer::sum);
+        }
+        return map;
+    }
+
+    /**
+     * 可变的思想，值始终都是同一个 AtomicInteger 对象，变化的是 AtomicInteger 对象内部维护的数据
+     */
+    @Benchmark
+    public Map<Integer, AtomicInteger> loopComputeIfAbsent() {
+        Map<Integer, AtomicInteger> map = new HashMap<>();
+        for (int number : numbers) {
+            // 如果 Map 中没有该元素，则设置 AtomicInteger 对象
+            // 如果 Map 中有该元素，则将 AtomicInteger 对象内部维护的数据 + 1 ，并设置新的 AtomicInteger 对象
+            map.computeIfAbsent(number, k -> new AtomicInteger()).getAndIncrement();
+        }
+        return map;
+    }
+
+    /**
+     * 单线程进行收集：数字相同的分到一组，然后计算总数
+     */
+    @Benchmark
+    public Map<Integer, Long> sequence() {
+
+        return Arrays.stream(numbers).boxed()
+                .collect(groupingBy(Function.identity(), counting()));
+    }
+
+    /**
+     * 多线程没有使用并发容器进行收集：数字相同的分到一组，然后计算总数
+     */
+    @Benchmark
+    public Map<Integer, Long> parallelNoConcurrent() {
+        return Arrays
+                .stream(numbers).boxed()
+                .parallel()
+                .collect(groupingBy(Function.identity(), counting()));
+    }
+
+    /**
+     * 多线程使用了并发容器进行收集：数字相同的分到一组，然后计算总数
+     */
+    @Benchmark
+    public ConcurrentMap<Integer, Long> parallelConcurrent() {
+        return Arrays.stream(numbers).boxed()
+                .parallel()
+                .collect(groupingByConcurrent(Function.identity(), counting()));
+    }
+
+    public static void main(String[] args) throws Exception {
+        Options opt = new OptionsBuilder()
+                .include(ConcurrentTest.class.getSimpleName())
+                .result("result.json")
+                .resultFormat(ResultFormatType.JSON)
+                .build();
+
+        new Runner(opt).run();
+    }
+
+}
+```
+
+### 4.4.2 测试一
+
+* 元素个数是 100 ，JMH 的测试结果，如下所示：
+
+| Benchmark            | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
+| -------------------- | ---- | ---- | ------------- | ------------- | ----- |
+| loopComputeIfAbsent  | avgt | 15   | 1393.343      | ± 16.304      | ns/op |
+| loopMerge            | avgt | 15   | 1309.615      | ± 23.220      | ns/op |
+| parallelConcurrent   | avgt | 15   | 43717.160     | ± 1222.181    | ns/op |
+| parallelNoConcurrent | avgt | 15   | 46849.073     | ± 1216.722    | ns/op |
+| sequence             | avgt | 15   | 1917.812      | ± 34.317      | ns/op |
+
+* 其柱状图，如下所示：
+
+![](./assets/14.png)
+
+### 4.4.3 测试二
+
+* 元素个数是 10000，JMH 的测试结果，如下所示：
+
+| Benchmark            | Mode | Cnt  | Score (ns/op) | Error (ns/op) | Units |
+| -------------------- | ---- | ---- | ------------- | ------------- | ----- |
+| loopComputeIfAbsent  | avgt | 15   | 248265.562    | ± 6261.323    | ns/op |
+| loopMerge            | avgt | 15   | 233238.904    | ± 4044.373    | ns/op |
+| parallelConcurrent   | avgt | 15   | 972907.475    | ± 38201.105   | ns/op |
+| parallelNoConcurrent | avgt | 15   | 900603.669    | ± 10417.127   | ns/op |
+| sequence             | avgt | 15   | 344180.702    | ± 3509.143    | ns/op |
+
+* 其柱状图，如下所示：
+
+![](./assets/15.png)
+
+### 4.4.4 测试三
+
+* 元素个数是 1000000，JMH 的测试结果，如下所示：
+
+| Benchmark            | Mode | Cnt  | Score (ns/op) | Error (ns/op)  | Units |
+| -------------------- | ---- | ---- | ------------- | -------------- | ----- |
+| loopComputeIfAbsent  | avgt | 15   | 22747731.784  | ± 1037569.797  | ns/op |
+| loopMerge            | avgt | 15   | 24046232.969  | ± 3344665.621  | ns/op |
+| parallelConcurrent   | avgt | 15   | 14564528.488  | ± 631837.077   | ns/op |
+| parallelNoConcurrent | avgt | 15   | 65273342.194  | ± 1445866.723  | ns/op |
+| sequence             | avgt | 15   | 47866137.524  | ± 17891085.447 | ns/op |
+
+* 其柱状图，如下所示：
+
+![](./assets/16.png)
+
+### 4.4.5 总结
+
+* ① sequence 是一个容器单线程收集，数据量少时性能占优。
+* ② parallelNoConcurrent 是多个容器多线程并行收集，时间花费在合并容器上，性能最差。
+* ③ parallelConcurrent 是一个容器多线程并发收集，在数据量大时性能较优。
+
+## 4.5 方法调用
+
+### 4.5.1 概述
+
+* 本次将进行`正常方法调用`、`反射`、`MethodHandle`、`Lambda` 的性能对比。
+
+### 4.5.2 性能测试
+
+* 测试的代码，如下所示：
+
+```java
+package com.github;
+
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.results.format.ResultFormatType;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
+
+@BenchmarkMode(Mode.Throughput)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@State(Scope.Thread)
+@Fork(3)
+@Warmup(iterations = 2, time = 1)
+@Measurement(iterations = 5, time = 1)
+public class MethodHandleTest {
+
+    static int add(int a, int b) {
+        return a + b;
+    }
+
+    @Benchmark
+    public int origin(){
+        return add(1,2);
+    }
+
+    static Method method;
+    static MethodHandle methodHandle;
+    static {
+        try {
+            method = MethodHandleTest.class.getDeclaredMethod("add", int.class, int.class);
+            methodHandle = MethodHandles
+                    .lookup().unreflect(method);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Benchmark
+    public Object reflection() throws InvocationTargetException, IllegalAccessException {
+        return method.invoke(null, 1, 2);
+    }
+
+    @Benchmark
+    public Object method() throws Throwable {
+        return methodHandle.invoke(1, 2);
+    }
+
+    @Benchmark
+    public int lambda() {
+        return test(Integer::sum, 1, 2);
+    }
+
+    static int test(BiFunction<Integer,Integer,Integer> function, int a, int b) {
+        return function.apply(a,b);
+    }
+
+    public static void main(String[] args) throws Exception {
+        Options opt = new OptionsBuilder()
+                .include(MethodHandleTest.class.getSimpleName())
+                .result("result.json")
+                .resultFormat(ResultFormatType.JSON)
+                .build();
+
+        new Runner(opt).run();
+    }
+
+}
+```
+
+* 测试结果，如下所示：
+
+| Benchmark  | Mode  | Cnt  | Score | Error   | Units |
+| ---------- | ----- | ---- | ----- | ------- | ----- |
+| lambda     | thrpt | 15   | 3.978 | ± 0.069 | ops/s |
+| method     | thrpt | 15   | 0.391 | ± 0.004 | ops/s |
+| origin     | thrpt | 15   | 3.891 | ± 0.082 | ops/s |
+| reflection | thrpt | 15   | 0.223 | ± 0.006 | ops/s |
+
+> [!NOTE]
+>
+> * ① `thrpt`：吞吐量模式（每单位时间能执行多少次操作），数值越高，性能越好。
+> * ② 在 Java 中，Lambda 表达式已经被高度优化，性能和`正常方法调用`差不多，即：**Lambda 几乎没有运行时开销，和直接调用一样高效。**
+> * ③ 在 Java 中，发射是最慢的，MethodHandle 虽然比反射快一点，但是依然低于`正常方法调用`以及`Lambda 表达式`。
+
+> [!TIP]
+>
+> * ① 如果写框架或者需要动态调用方法，优先选择使用 MethodHandle 而非发射。
+> * ② 如果做高性能关键路径调用，尽量使用`正常方法调用`或`Lambda 表达式`。
+
