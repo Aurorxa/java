@@ -7045,7 +7045,7 @@ public class MethodHandleTest {
 >
 > * ① `thrpt`：吞吐量模式（每单位时间能执行多少次操作），数值越高，性能越好。
 > * ② 在 Java 中，Lambda 表达式已经被高度优化，性能和`正常方法调用`差不多，即：**Lambda 几乎没有运行时开销，和直接调用一样高效。**
-> * ③ 在 Java 中，发射是最慢的，MethodHandle 虽然比反射快一点，但是依然低于`正常方法调用`以及`Lambda 表达式`。
+> * ③ 在 Java 中，反射是最慢的，`MethodHandle`虽然比反射快一点，但是依然低于`正常方法调用`以及`Lambda 表达式`。
 
 > [!TIP]
 >
