@@ -2400,3 +2400,36 @@ list.add("k");
 
 ### 6.2.3 源码分析
 
+* ① 在 ArrayList 中添加第 1 个元素：
+
+![](./assets/37.jpg)
+
+* ② 在 ArrayList 中添加第 11 个元素：
+
+![](./assets/38.jpg)
+
+* ③ 在 ArrayList 中一次批量增加很多元素：
+
+> [!NOTE]
+>
+> 分为两种情况：
+>
+> * ① 一次新增很多很多数据，如：
+>
+> ```java
+> List<String> list = new ArrayList<>();
+> list.addAll(Arrays.asList("aaa", "bbb","",...,"zzz"));
+> ```
+>
+> * ② 一次新增一个数据，但是突然新增很多很多数据，如：
+>
+> ```java
+> List<String> list = new ArrayList<>();
+> list.add("a");
+> list.add("b");
+> ...
+> list.addAll(Arrays.asList("aaa", "bbb","",...,"zzz"));
+> ```
+
+![](./assets/39.jpg)
+
