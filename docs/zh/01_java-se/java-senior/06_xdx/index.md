@@ -1335,7 +1335,7 @@ public class ExecutorTest {
 > [!NOTE]
 >
 > * ① 使用`线程池 + Callable + Future`配合使用，我们可以在将来可以获取异步任务结果。
-> * ② `Future`对象的`get()` 是阻塞方法，无法灵活处理多个异步任务。
+> * ② `Future`对象的`get()`是阻塞方法，无法灵活处理多个异步任务。
 
 ### 1.3.4 CompletableFuture（推荐）
 
