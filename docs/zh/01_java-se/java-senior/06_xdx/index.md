@@ -1317,7 +1317,6 @@ public class ExecutorTest {
     }
 
 }
-
 ```
 
 ```txt [cmd 控制台]
@@ -1337,9 +1336,165 @@ public class ExecutorTest {
 > * ① 使用`线程池 + Callable + Future`配合使用，我们可以在将来可以获取异步任务结果。
 > * ② `Future`对象的`get()`是阻塞方法，无法灵活处理多个异步任务。
 
-### 1.3.4 CompletableFuture（推荐）
+### 1.3.4 线程池
 
+* 我们也可以在之前的基础上进行改进，就是使 JDK8 的 Lmabda 表达式：
 
+> [!NOTE]
+>
+> * ①  `月度分析`的耗时操作方法不需要返回值，但是需要一个`Consumer<?> consumer`参数，用于将结果消费。
+> * ② `executorService.submit(()-> {xxx})`，也不再使用 Callable 接口，而是通过调用`monthAnalysis((map)-> xxx)`（`map-> {xxx}`可以称为回调对象）将`月度分析`的数据返回。
+
+::: code-group
+
+```java [ExecutorTest.java]
+package com.async;
+
+import com.github.domain.CsvReader;
+import lombok.extern.slf4j.Slf4j;
+
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
+import java.util.concurrent.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+@Slf4j
+public class ExecutorTest {
+
+    /**
+     * 月度分析（非常耗时）
+     */
+    public static void monthAnalysis(Consumer<Map<String, Long>> consumer) throws Exception { // [!code highlight]
+        Map<String, Long> map = CsvReader
+                .readCsvFile()
+                .collect(Collectors.groupingBy(
+                        (csv) -> {
+                            LocalDateTime eventTime = csv.getEventTime();
+                            return YearMonth
+                                    .from(eventTime)
+                                    .toString();
+                        },
+                        TreeMap::new,
+                        Collectors.counting()));
+
+        log.info("{}", map.size());
+
+        consumer.accept(map); // [!code highlight]
+    }
+
+    public static void main(String[] args) throws Exception {
+        ExecutorService executorService = null;
+        try {
+            executorService = Executors.newFixedThreadPool(3);
+            log.info("开始统计");
+            executorService.submit(() -> {
+                try {
+                    monthAnalysis(map -> { // [!code highlight]
+                        log.info("{}", map.size());
+                    });
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            executorService.submit(() -> {
+                try {
+                    monthAnalysis(map -> { // [!code highlight]
+                        log.info("{}", map.size());
+                    });
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            log.info("执行其它操作...");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (null != executorService) {
+                executorService.shutdown();
+            }
+            try {
+                if (!Objects
+                        .requireNonNull(executorService)
+                        .awaitTermination(5, TimeUnit.SECONDS)) {
+                    executorService.shutdownNow(); // 超时后强制关闭
+                }
+            } catch (InterruptedException ie) {
+                Objects
+                        .requireNonNull(executorService)
+                        .shutdownNow(); // 捕获中断异常后强制关闭
+                Thread
+                        .currentThread()
+                        .interrupt(); // 重新设置中断标志
+            }
+        }
+    }
+
+}
+```
+
+```txt [cmd 控制台]
+16:51:47.885 [main] INFO  com.async.ExecutorTest - 开始统计
+16:51:47.886 [main] INFO  com.async.ExecutorTest - 执行其它操作...
+16:51:49.554 [pool-1-thread-2] INFO  com.async.ExecutorTest - 12
+16:51:49.554 [pool-1-thread-1] INFO  com.async.ExecutorTest - 12
+16:51:49.555 [pool-1-thread-2] INFO  com.async.ExecutorTest - 12
+16:51:49.555 [pool-1-thread-1] INFO  com.async.ExecutorTest - 12
+```
+
+:::
+
+> [!NOTE]
+>
+> * ① 从结果来看，通过 Lambda 表达式并结合线程池，我们也实现了异步操作。
+> * ② 我们不再需要调用`Future`对象的`get()`阻塞方法，导致主线程会被阻塞。
+
+### 1.3.5 CompletableFuture（推荐）
+
+#### 1.3.5.1 概述
+
+* JDK8 之前，可以通过`线程池 + Callable + Future`配合使用，以便将来获取异步任务结果。但是，在使用 Future 获取异步任务结果的时候，只能这么干：
+  * ① 调用`Future`对象的`get()`方法，该方法是阻塞方法。
+  * ② 调用`Future`对象的`isDone()`方法，轮询判断返回值是否为 true，然后再调用`Future`对象的`get()`方法。
+
+> [!NOTE]
+>
+> 上述两种方案均不是最佳方法，因为主线程也会被阻塞（被迫等待）。
+
+> [!IMPORTANT]
+>
+> 就算我们使用 Lambda 表达式来改进，也会导致如下的问题：
+>
+> * ① 显示使用线程池，对新手不友好（新手可能对线程池不是很了解）。
+>
+> ```java
+> Executors.newFixedThreadPool(3); // 到底应该配置什么参数，如何配置
+> ```
+>
+> * ② 出现了函数嵌套地狱现象，可读性差，不利用于后续代码的维护。
+>
+> ```java
+> executorService.submit(() -> { // [!code highlight]
+>     try {  
+>         monthAnalysis(map -> { // [!code highlight]
+>             log.info("{}", map.size());
+>         });
+>     } catch (Exception e) {
+>         throw new RuntimeException(e);
+>     }
+> });
+> ```
+
+* JDK8 之后，引入了`CompletableFuture`，其针对`Future`进行了改进，可以传入回调对象，当异步任务完成或者发生异常的时候，自动调用回调对象中的回调方法。
+
+| 异步执行任务（常用 API）                                     | 应用场景           |
+| ------------------------------------------------------------ | ------------------ |
+| `CompletableFuture<Void> com = CompletableFuture.runAsync(Runnable runnable)` | 任务不需要返回结果 |
+|                                                              |                    |
+|                                                              |                    |
 
 
 
