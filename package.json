@@ -13,7 +13,7 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
-    "@mdit/plugin-figure": "^0.19.0",
+    "@mdit/plugin-figure": "^0.21.0",
     "@nolebase/vitepress-plugin-enhanced-readabilities": "^2.17.1",
     "@nolebase/vitepress-plugin-git-changelog": "^2.17.1",
     "@nolebase/vitepress-plugin-highlight-targeted-heading": "^2.17.1",
@@ -22,7 +22,7 @@
     "@types/animejs": "^3.1.13",
     "@types/canvas-confetti": "^1.9.0",
     "@types/dom-view-transitions": "^1.0.6",
-    "@types/node": "^22.15.21",
+    "@types/node": "^22.15.27",
     "canvas-confetti": "^1.9.3",
     "cross-env": "^7.0.3",
     "markdown-it-mathjax3": "^4.3.2",
@@ -32,7 +32,7 @@
     "vitepress-plugin-mermaid": "^2.0.17"
   },
   "dependencies": {
-    "@theojs/lumen": "^5.4.6",
+    "@theojs/lumen": "5.4.6",
     "animejs": "^3.2.2",
     "dayjs": "^2.0.0-alpha.4",
     "dotenv": "^16.5.0",
