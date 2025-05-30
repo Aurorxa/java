@@ -1,849 +1,491 @@
-# 第一章：环境变量（⭐）
+# 第一章：IDEA 介绍
 
 ## 1.1 概述
 
-* `环境变量`是操作系统用来配置和存储运行时环境信息的变量。
-* `环境变量`是一组键值对，能够影响操作系统和运行在操作系统之上应用程序的某些行为。
-* `环境变量`通常包含关于操作系统的配置信息，如：路径、系统设置以及程序设置等等。
-
-## 1.2 环境变量的作用
-
-* ① `路径管理`：环境变量常用于指定可执行文件的搜索路径，如：`PATH` 环境变量告诉操作系统在哪些目录中查找命令或可执行文件。
+* `IntelliJ IDEA` 是由 JetBrains 开发的一个强大的集成开发环境（IDE），主要用于 Java 开发，但也支持多种编程语言，如： Kotlin、Scala、Python、JavaScript 等。
 
 > [!NOTE]
 >
-> * ① 当我们在 cmd 窗口中输入某些命令的时候，操作系统首先会在当前目录中查找该命令：
->   * 如果找到了该命令，就立即执行。
->   * 如果没有找到，就会去 `PATH` 环境变量对应的路径中去查找：
->     * 如果找到了该命令，就立即执行。
->     * 如果没有找到该命令，将会报错，提示该命令不存在。
-> * ② 其对应的流程，如下所示：
->
-> ![](./assets/49.svg)
+> 官方对 `IntelliJ IDEA` 的评价是：“The IDE for Professional Development in Java and Kotlin”，即：适用于 Java 和 Kotlin 专业开发的 IDE 。
 
-* ② `配置文件和系统设置`：环境变量可以存储应用程序和操作系统的配置信息，应用程序可以读取这些变量来调整其行为。
+* `IntelliJ IDEA` 被许多开发者认为是最智能的 Java IDE，拥有丰富的功能和极佳的用户体验。
 
-> [!NOTE]
->
-> 前端项目构建工具 Vite 中，就有这方面的体现，如：
->
-> * ① 定义环境变量，在项目根目录中创建 .env 文件来定义环境变量，如下所示：
->
-> ::: code-group
->
-> ```properties [.env]
-> # 默认的环境设置，所有环境都会加载
-> VITE_APP_NAME=mall
-> ```
->
-> ```properties [.env.development]
-> # 开发环境的配置
-> VITE_API_URL=https://api.dev.com
-> ```
->
-> ```properties [.env.production]
-> # 生产环境的配置
-> VITE_API_URL=https://api.prod.com
-> ```
->
-> :::
->
-> * ② 在代码中使用环境变量，如下所示：
->
-> ```js
-> // main.js
-> console.log(import.meta.env.VITE_API_URL); 
-> console.log(import.meta.env.VITE_APP_NAME); 
-> ```
+![](./assets/1.png)
 
-* ③ ...
+## 1.2 为什么选择 IntelliJ IDEA？
 
-## 1.3 在 cmd 中启动 QQ
+* ① `智能的代码补全`：`IntelliJ IDEA` 提供强大的代码补全功能，可以自动完成代码、类名、方法名、变量名等。它会根据上下文提示相关的代码，使编程更加高效。
+* ② `高效的代码重构工具`：`IntelliJ IDEA` 提供一整套强大的代码重构工具，如：自动重命名、提取方法、引入变量等，能够帮助开发者更好地组织和优化代码。
+* ③ `智能的错误检查与提示`：`IntelliJ IDEA` 会在你编写代码的过程中实时分析代码并提供错误提示，甚至能够检测潜在的代码问题，如：空指针引用等。
+* ④ `多语言支持`： 除了 Java，`IntelliJ IDEA` 还支持 Kotlin、Scala、Groovy、Python、JavaScript、TypeScript、SQL 等多种语言，适合全栈开发者使用。
+* ⑤ `集成的调试工具`： 内置的调试器可以帮助开发者逐步跟踪程序的执行，查看变量值，分析调用栈，进行高效的错误排查。
+* ⑥ `版本控制支持`： `IntelliJ IDEA` 原生支持 Git、SVN、Mercurial 等版本控制工具，可以直接在 IDE 内进行代码的提交、合并、拉取等操作。
+* ⑦ `优秀的插件生态系统`： JetBrains 提供了丰富的插件市场，你可以根据需要安装插件来扩展 IDE 的功能，如：数据库管理、Docker 集成、Spring Boot 支持等。
+* ⑧ `易用的界面和丰富的配置选项`： 界面设计简洁而直观，功能也可高度自定义。无论是配色主题、键盘快捷键，还是 IDE 的各项设置，都可以根据个人习惯进行调整。
+* ⑨ `对大型项目的支持`： `IntelliJ IDEA` 在处理大型项目时表现优异，特别是对 Java 项目，能够很好的处理数千个类文件和依赖关系。
+* ⑩ `社区版与付费版`： `IntelliJ IDEA` 提供了一个免费的社区版（适用于基本的开发需求），以及功能更全的付费版（适合企业和更复杂的开发需求）。付费版包括对框架（Spring、Java EE）的支持，数据库工具，更多的调试工具等。
 
-* ① 在 cmd 中切换到 QQ 的安装目录：
 
-```cmd
-cd C:\Program Files (x86)\Tencent\QQ\Bin
-```
 
-![](./assets/50.gif)
+# 第二章：安装 IDEA（⭐）
 
-* ② 启动 QQ：
+## 2.1 前提条件
 
-```cmd
-qq.exe
-```
+* ① 在本地操作系统中安装了 `JDK` ：略。
+* ② 配置 `JAVA_HOME` 环境变量和 `PATH` 环境变量：略。
 
-![](./assets/51.gif)
+## 2.2 安装 IDEA
 
-## 1.4 在 cmd 中的任意目录启动 QQ
+### 2.2.1 手动版
 
-* ① 在 cmd 中的任意目录不能启动 QQ（每次都需要指定的安装目录，太麻烦）：
+* ① 鼠标双击，进行安装：
 
-```cmd
-qq.exe
-```
-
-![](./assets/52.gif)
-
-* ② 将 QQ 的安装目录配置到 PATH 环境变量中：
-
-```cmd
-PATH=C:\Program Files (x86)\Tencent\QQ\Bin;$PATH
-```
-
-![](./assets/53.gif)
-
-* ③ 在 cmd 中的任意目录启动 QQ：
-
-```cmd
-qq.exe
-```
-
-![](./assets/54.gif)
-
-
-
-# 第二章：Java 环境的搭建（⭐）
-
-## 2.1 C 语言 VS Java 语言
-
-* C 语言的软件设计思想 VS Java 语言的软件设计思想，如下所示：
-
-> [!NOTE]
->
-> - ① Java 语言编写的应用是直接运行在 JVM（Java 虚拟机）上，体现了`分层`的软件设计思想；并且，这种`分层`的软件设计思想给 Java 语言带来了`跨平台性`和`自动内存管理`等方面的功能。
-> - ② C 语言编写的应用是直接运行在操作系统之上，其设计哲学是：`简洁、高效、直接控制底层`。
-
-![C 语言 VS Java 语言](./assets/1.svg)
-
-* 虽然 C 语言和 Java 语言有很多相似之处，但在设计理念、运行环境、内存管理等方面有显著差异。
-
-> [!NOTE]
->
-> ::: details 点我查看 C 语言和 Java 语言之间的差异
->
-> | 对比角度     | C 语言                                                | Java 语言                                               |
-> | :----------- | :---------------------------------------------------- | :------------------------------------------------------ |
-> | 编译与解释   | 编译型语言，源代码编译为机器码直接执行，效率高。      | 解释与编译结合，源代码编译为字节码，通过 JVM 解释运行。 |
-> | 平台依赖性   | 与操作系统和硬件平台紧密结合，跨平台能力较弱。        | 通过 JVM 实现跨平台，"编写一次，到处运行"。             |
-> | 内存管理     | 手动管理内存，需显式分配与释放，容易出现内存泄漏。    | 自动垃圾回收，简化内存管理，降低内存泄漏风险。          |
-> | 指针         | 支持指针，能直接操作内存，但可能导致安全问题。        | 不支持指针操作，避免内存安全隐患。                      |
-> | 编程范式     | 过程化编程，主要通过函数调用组织程序。                | 完全的面向对象编程，一切皆为对象。                      |
-> | 异常处理     | 不支持异常处理，错误处理通过返回值或全局变量实现。    | 提供强大的异常处理机制，通过 try-catch-finally 块处理。 |
-> | 标准库与生态 | 标准库简洁，需大量使用第三方库开发复杂应用。          | 标准库丰富，拥有庞大生态系统和社区支持。                |
-> | 运行时性能   | 直接编译成机器码，性能高，适合高性能要求的场景。      | 运行在虚拟机上，性能稍低，但通过 JIT 等优化提升效率。   |
-> | 多线程支持   | 依赖操作系统 API（如：pthread），多线程编程较为复杂。 | 内置多线程支持，提供 Thread 类和并发工具类。            |
-> | 应用场景     | 系统级编程，如操作系统、嵌入式系统、驱动程序等。      | 企业级应用、Web 开发、Android 开发、大数据处理等。      |
->
-> :::
-
-> [!IMPORTANT]
->
-> 总结：
->
-> - ① C 语言适合底层编程、系统级开发，性能高、控制力强，但对程序员的要求也更高。
-> - ② Java 语言则更适合应用层开发，拥有丰富的库和工具支持，开发效率更高，并且由于自动内存管理和异常处理，编写的代码通常更加安全和健壮。
-> - ③ 两者各有优势，选择使用哪种语言应根据项目需求和开发环境来决定。
-
-## 2.2 JDK、JRE 和 JVM
-
-###  2.2.1 JDK
-
-* JDK（Java Development Kit，Java 开发工具包）是用于开发 Java 应用程序的。JDK 是由 JRE（Java Runtime Environment，Java 运行时环境）、编译器（javac）、解释器（java）、调试工具（jdb）以及内存分析工具（jhat）等组成。JDK 负责编译、调试和执行。JDK 和平台相关，应为每个平台都需要不同的 JDK。
-* JDK 的工作原理，如下所示：
-
-> [!NOTE]
->
-> * ① JDK 中包含了 Java 编译器（javac），该编译器负责将 Java 代码转换为字节码（class）。字节码是 Java 虚拟机（JVM）可以理解的中间码。
-> * ② Java 代码由 JVM 执行，JVM 是 JDK 的一部分。
-> * ③ 在实际开发中，可以使用 JDK 提供的工具调试 Java 代码中可能存在的错误或 bug 。
-
-![](./assets/2.png)
-
-* JDK 的架构，如下所示：
-
-![JDK、JRE、JVM](./assets/3.svg)
-
-### 2.2.2 JRE
-
-* JRE（Java Runtime Environment，Java 运行时环境）可以用来运行 Java 应用程序，它包含了 JVM 和核心类库以及一些其它的文件。
-* JRE 的架构，如下所示：
-
-![JDK、JRE、JVM](./assets/3.svg)
-
-* JRE 的组成，包括：JVM（Java 虚拟机）、部署技术、类加载器子系统、字节码验证器等。
-
-> [!IMPORTANT]
->
-> JDK9 之后取消了 JRE 的独立安装，原因如下：
->
-> * ① **模块化**：Java 9 引入了模块化系统，JDK 本身就包含了 JRE，开发者可以根据需要选择所需模块，不再需要单独安装 JRE。
-> * ② **简化管理**：过去，JDK 和 JRE 需要分别维护，取消单独的 JRE 可以简化版本管理和更新。
-> * ③ **统一工具**：JDK 包含开发工具和运行时环境，开发者和服务器管理员通常都需要完整的 JDK，减少了安装和配置的复杂性。
-> * ④ **现代应用需求**：随着云原生、容器化等技术的兴起，JDK 完全可以满足运行时需求，不再需要分开 JDK 和 JRE。
-
-### 2.2.3 JVM 
-
-* JVM（Java Virtual Machine，Java 虚拟机）是 JRE 的一部分。JVM 为 Java 应用程序提供运行时环境的规范。JRE 提供运行 Java 应用程序的资源和库，JVM 是其中负责执行字节码的核心组件。JVM 负责将字节码转换为特定于机器的代码。
-* JVM 的架构，如下所示：
-
-![JVM](./assets/4.jpg)
-
-* JVM 的工作流程：
-  * ① `加载（Loading）`：加载涉及将类的字节码引入内存，这是在 JVM 中执行的第一步。
-  * ② `链接（Linking）`：在这里，进行字节码验证。类文件由 JVM 解析，并分为方法、字段等基本元素。验证字节码以防止未经授权的访问并确保内存安全非常重要。
-    * `验证（Verification）`：它验证并确保字节码符合 JVM 安全性的结构规则。检查正确的数据类型处理和对对象的有效引用等规则。
-    * `准备（Preparation）`：将内存分配给静态字段，并使用默认值初始化它们。它确保可以使用类的静态数据。
-    * `解析（Resolution）`：它用于将符号引用解析为具体引用
-  * ③ `初始化（Initialization）`：在初始化期间，static 初始值设定项和 static 字段的执行顺序遵循它们在代码中定义的顺序。这是为了确保在投入使用之前正确初始化这些类。
-
-### 2.2.4 总结
-
-* JDK、JRE 和 JVM 之间的区别，如下所示：
-
-| 概念                            | 功能                                                         | 组成                                                         | 用途                                   |
-| ------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | -------------------------------------- |
-| JDK（Java Development Kit）     | 提供 Java 开发所需的完整工具包，包括开发、编译、调试等工具。 | 包含 JRE（Java 运行环境）和开发工具，如： `javac`（编译器）、`jdb`（调试器）。 | 用于 Java 程序的开发和调试。           |
-| JRE（Java Runtime Environment） | 提供运行 Java 程序所需的环境，不包括开发工具。               | 包含 JVM 和 Java 类库。                                      | 用于运行 Java 程序。                   |
-| JVM（Java Virtual Machine）     | 执行 Java 字节码的虚拟机，负责将字节码转换为本地机器码并执行。 | 内存管理、垃圾回收、字节码执行等功能。                       | 用于 Java 程序的执行，提供跨平台支持。 |
-
-## 2.3 JDK 的安装和配置
-
-### 2.3.1 手动版
-
-* ① 去 [Oracle](https://www.oracle.com/) 官网下载指定的 JDK 版本：
-
-![](./assets/5.png)
-
-![](./assets/6.png)
-
-![](./assets/7.png)
-
-![](./assets/8.png)
-
-![](./assets/9.png)
-
-![](./assets/10.png)
-
-* ② 下一步安装即可：
-
-![](./assets/11.png)
-
-![](./assets/12.png)
-
-![](./assets/13.png)
-
-![](./assets/14.png)
-
-> [!CAUTION]
->
-> 安装路径中不要包含`中文`、`空格`和`特殊符号`（`&`、`%` 、...），以防止出现一些莫名其妙的问题。
-
-![](./assets/15.png)
-
-![](./assets/16.png)
-
-![](./assets/17.png)
-
-* ③ 测试是否安装或配置成功：
-
-```cmd
-javac -version
-```
-
-![](./assets/18.gif)
-
-* ④ 去除默认配置的环境变量：
-
-> [!CAUTION]
->
-> * ① JDK 17 在默认安装的时候，会将 JDK 的部分开发工具配置到环境变量中；但是，这却并非我们所希望的。
-> * ② 我们希望将 JDK 的所有开发工具都配置到环境变量中；此时，就需要在环境变量中将 JDK 默认的配置删除。
-
-![](./assets/19.gif)
-
-* ⑤ 配置 `JAVA_HOME` 环境变量，对应的值是 `D:\develop\Java\jdk-17`：
-
-![](./assets/20.gif)
-
-* ⑥ 配置 `Path` 环境变量，对应的值是`%JAVA_HOME%\bin`：
-
-![](./assets/21.gif)
-
-* ⑦ 测试是否安装或配置成功：
-
-```cmd
-javac -version
-```
-
-![](./assets/22.gif)
-
-### 2.3.2 自动版
-
-* ① 创建安装的目录：
-
-```cmd
-mkdir d:\develop\java\jdk-17
-```
-
-![](./assets/23.gif)
-
-* ② 查询 JDK 的版本：
-
-```cmd
-winget search jdk
-```
-
-![](./assets/24.gif)
-
-* ③ 安装到指定的目录：
-
-```cmd
-winget install --id Oracle.JDK.17 -l d:\develop\java\jdk-17
-```
-
-![](./assets/25.gif)
-
-* ④ 查看本地是否安装成功：
-
-```cmd
-winget list jdk
-```
-
-![](./assets/26.gif)
-
-* ⑤ 去除默认配置的环境变量：
-
-> [!CAUTION]
->
-> * ① JDK 17 在默认安装的时候，会将 JDK 的部分开发工具配置到环境变量中；但是，这却并非我们所希望的。
-> * ② 我们希望将 JDK 的所有开发工具都配置到环境变量中；此时，就需要在环境变量中将 JDK 默认的配置删除。
-
-![](./assets/27.gif)
-
-* ⑤ 配置环境变量：
-
-::: code-group
-
-```cmd [cmd 设置用户环境变量]
-:: 设置 JAVA_HOME 环境变量为用户级别
-setx JAVA_HOME "D:\develop\java\jdk-17"
-:: 更新 PATH 环境变量，添加 JDK 的 bin 目录到 PATH 中（用户级别）
-setx Path ^%JAVA_HOME^%"\bin;%Path%"
-```
-
-```cmd [cmd 设置系统环境变量]
-:: 设置 JAVA_HOME 环境变量为系统级别
-setx JAVA_HOME "D:\develop\java\jdk-17" /M
-:: 更新 PATH 环境变量，添加 JDK 的 bin 目录到 PATH 中（系统级别）
-setx Path ^%JAVA_HOME^%"\bin;%Path%" /M
-```
-
-```powershell [powershell 设置用户环境变量]
-[System.Environment]::SetEnvironmentVariable('JAVA_HOME', 'D:\develop\java\jdk-17', [System.EnvironmentVariableTarget]::User)
-$env:Path += ";%JAVA_HOME%\bin"
-[System.Environment]::SetEnvironmentVariable('Path', $env:Path, [System.EnvironmentVariableTarget]::User)
-```
-
-```powershell [powershell 设置系统环境变量]
-[System.Environment]::SetEnvironmentVariable('JAVA_HOME', 'D:\develop\java\jdk-17', [System.EnvironmentVariableTarget]::Machine)
-$env:Path += ";%JAVA_HOME%\bin"
-[System.Environment]::SetEnvironmentVariable('Path', $env:Path, [System.EnvironmentVariableTarget]::Machine)
-```
-
-:::
-
-> [!CAUTION]
->
-> * ① 使用上述命令设置环境变量时，虽然会立即生效，但是仅对新的 cmd 或 powershell 生效，当前打开的 cmd 窗口或 powershell 窗口是不会立即看到更新的环境变量的。
-> * ② 请另开一个新的 cmd 窗口或 powershell 窗口去验证是否生效。
-
-![](./assets/28.gif)
-
-* ⑥ 测试是否安装或配置成功：
-
-```cmd
-javac -version
-```
-
-![](./assets/29.gif)
-
-## 2.4 JDK17 的目录结构说明
-
-* JDK 17 的目录结构基本上与之前的 JDK 版本类似，但随着模块化（JDK 9 引入）和一些组件的精简，目录内容可能有所调整。
-* 以下是 JDK 17 目录的常见结构及其作用：
-
-```txt
-├─📁 bin------------------------- # 二进制可执行文件目录
-│ ├─📄 jar.exe------------------- # Java 归档工具
-│ ├─📄 java.exe------------------ # 运行 Java 应用程序
-│ ├─📄 javac.exe----------------- # Java 编译器
-│ ├─📄 javadoc.exe--------------- # 生成文档
-│ └─📄 jdb.exe------------------- # 调试工具
-├─📁 conf------------------------ # JDK 相关的配置文件的目录
-│ ├─📁 management
-│ ├─📁 security
-│ ├─📄 logging.properties-------- # 网络配置
-│ ├─📄 net.properties
-│ └─📄 sound.properties
-├─📁 include--------------------- # JNI 相关的头文件的目录
-│ ├─📁 win32
-│ ├─📄 classfile_constants.h
-│ ├─📄 jawt.h
-│ ├─📄 jdwpTransport.h
-│ ├─📄 jni.h
-│ ├─📄 jvmti.h
-│ └─📄 jvmticmlr.h
-├─📁 jmods----------------------- # JDK 本身的模块，用于自定义 JDK 运行环境
-│ ├─📄 java.base.jmod 
-│ ├─📄 java.compiler.jmod
-│ ├─📄 java.datatransfer.jmod
-│ ├─📄 java.desktop.jmod
-│ ├─📄 java.instrument.jmod
-│ └─📄 java.logging.jmod
-├─📁 legal----------------------- # 所有 JDK 组件的许可证文件
-├─📁 lib------------------------- # 核心库，关键 JDK 运行库（不直接包含 rt.jar）
-│ ├─📁 jfr
-│ │ ├─📄 default.jfc
-│ │ └─📄 profile.jfc
-│ ├─📁 security------------------ # 安全相关
-│ ├─📄 classlist----------------- # 预加载类列表
-│ ├─📄 ct.sym
-│ ├─📄 jvm.lib
-│ ├─📄 modules------------------- # JVM 运行时的模块化 class 存储
-│ └─📄 psfont.properties.ja
-├─📄 LICENSE--------------------- # 开源许可证
-├─📄 README---------------------- # 说明文档
-└─📄 release--------------------- # 纯文本文件，包含 JDK 版本信息
-```
-
-
-
-# 第三章：Java 入门程序（⭐）
-
-## 3.1 开发 Java 程序的步骤
-
-* 开发 Java  程序的步骤，如下所示：
-
-![](./assets/30.png)
-
-* 其具体的步骤，如下所示：
-  * ① 编写源代码：将 Java 代码编写到扩展名为 `.java` 的文件中。
-  * ② 编译：通过 `javac` 命令对该 Java 源文件（`*.java`）进行编译，生成字节码文件（`*.class`）。
-  * ③ 运行：通过 `java` 命令运行生成的字节码文件（`*.class`）。
-
-## 3.2 安装 Notepad++
-
-### 3.2.1 手动版
-
-* ① 去 [Notepad++](https://notepad-plus-plus.org/) 官网下载安装包：
-
-![](./assets/31.png)
-
-![](./assets/32.png)
+![](./assets/2.gif)
 
 * ② 下一步安装：
 
+![](./assets/3.gif)
+
+* ③ 点击`否，我会在之后重新启动`：
+
+![](./assets/4.gif)
+
+### 2.2.2 自动版
+
+* ① 创建 IDEA 安装的目录：
+
+```cmd
+mkdir D:\develop\idea
+```
+
+![](./assets/5.gif)
+
+* ② 查询 IDEA ：
+
+```cmd
+winget search idea
+```
+
+![](./assets/6.gif)
+
+* ③ 安装 IDEA ：
+
+```cmd
+winget install --id JetBrains.IntelliJIDEA.Ultimate -l D:\develop\idea
+```
+
+![](./assets/7.gif)
+
+
+
+# 第三章：配置 IDEA（⭐）
+
+## 3.1 打开 IDEA
+
+* 手动版安装 IDEA 之后，鼠标双击，打开 IDEA：
+
+![](./assets/8.gif)
+
+* 自动版安装 IDEA ，需要在`开始 --> 全部`或 `开始（搜索）`中找到 IDEA，然后打开 IDEA ：
+
+> [!NOTE]
+>
+> 通过 winget 安装 IDEA，默认是不会在桌面帮助我们生成快捷方式！！！
+
+![](./assets/9.gif)
+
+## 3.2 配置文件编码
+
+* ① `自定义 --> 所有设置`：
+
+![](./assets/10.png)
+
+* ② `编辑器 --> 文件编码`：
+
+![](./assets/11.gif)
+
+## 3.3 配置外观
+
+### 3.3.1 配置外观字体（可选）
+
+* ① 下载[小米字体](https://hyperos.mi.com/font/zh/details/sc/)：
+
+![](./assets/12.png)
+
+* ② 解压并安装：
+
+![](./assets/13.gif)
+
+* ③ IDEA 配置外观字体：
+
+> [!NOTE]
+>
+> IDEA 需要退出，再重新打开，目的是让 IDEA 加载到刚才安装的小米字体。
+
+![](./assets/14.gif)
+
+### 3.3.2 配置外观（UI 选项）
+
+* ① `自定义 --> 所有设置`：
+
+![](./assets/15.png)
+
+* ② `外观 --> UI 选项`：
+
+> [!NOTE]
+>
+> 勾选`UI 选项`中的以下选项，其余默认：
+>
+> - [x] 紧凑模式。
+> - [x] 在单独的工具栏中显示主菜单。
+
+![](./assets/16.gif)
+
+### 3.3.3 配置外观（系统设置）
+
+* ① `自定义 --> 所有设置`：
+
+![](./assets/17.png)
+
+* ② `外观 --> 系统设置`：
+
+> [!NOTE]
+>
+> 勾选`系统设置`中的以下选项，其余默认：
+>
+> - [ ] 退出 IDE 之前确认。
+> - [ ] 启动时重新打开项目。
+> - [x] 如果 IDE 空闲则保存文件 15 秒。
+
+![](./assets/18.gif)
+
+## 3.4 配置编辑器（常规）
+
+### 3.4.1 配置编辑器（自动导入）
+
+* ① `自定义 --> 所有设置`：
+
+![](./assets/19.png)
+
+* ② `编辑器 --> 常规 --> 自动导入`：全勾选
+
+![](./assets/20.gif)
+
+### 3.4.2 配置编辑器（代码折叠）
+
+* ① `自定义 --> 所有设置`：
+
+![](./assets/21.png)
+
+* ② `编辑器 --> 常规 --> 代码折叠`：
+
+> [!NOTE]
+>
+> 勾选`代码折叠`中的以下选项，其余默认：
+>
+> - [ ] 一行方法
+
+![](./assets/22.gif)
+
+### 3.4.3 配置编辑器（代码补全）
+
+* ① `自定义 --> 所有设置`：
+
+![](./assets/23.png)
+
+* ② `编辑器 --> 常规 --> 代码补全`：
+
+> [!NOTE]
+>
+> 勾选`代码补全`中的以下选项，其余默认：
+>
+> - [ ] 区分大小写
+>
+> - [x] 以下时间后显示文档弹出窗口 500 毫秒
+
+![](./assets/24.gif)
+
+### 3.4.4 配置编辑器（代码补全）
+
+* ① `自定义 --> 所有设置`：
+
+![](./assets/25.png)
+
+* ② `编辑器 --> 常规 --> 代码补全`：
+
+> [!NOTE]
+>
+> 勾选`代码补全`中的以下选项，其余默认：
+>
+> 机器学习辅助补全
+>
+> - [x] 根据机器学习对补全建议进行排序
+>   - [x] Java
+>   - [x] JavaScript
+>   - [x] Kotlin
+>   - [x] SQL
+>   - [x] Shell 脚本
+>   - [x] TypeScript
+> - [x] 在补全弹出窗口中标记位置更改
+> - [x] 在补全弹出窗口中标记最相关的条目
+
+![](./assets/26.gif)
+
+### 3.4.5 配置编辑器（代码补全）
+
+* ① `自定义 --> 所有设置`：
+
+![](./assets/27.png)
+
+* ② `编辑器 --> 常规 --> 代码补全`：
+
+> [!NOTE]
+>
+> 勾选`代码补全`中的以下选项，其余默认：
+>
+> JavaScript
+>
+> - [ ] 仅基于类型补全
+> - [x] 为可 null 类型建议包含可选链接的条目
+> - [x] 在重写补全中展开方法体
+> - [x] 建议变量和形参名称
+> - [x] 为类字段建议名称
+> - [x] 为建议的形参名称添加类型注解
+
+![](./assets/28.gif)
+
+### 3.4.6 配置编辑器（代码补全）
+
+* ① `自定义 --> 所有设置`：
+
+![](./assets/29.png)
+
+* ② `编辑器 --> 常规 --> 代码补全`：
+
+> [!NOTE]
+>
+> 勾选`代码补全`中的以下选项，其余默认：
+>
+> 形参信息
+>
+> - [x] 补全时显示形参名称提示
+> - [x] 以下时间后显示形参信息弹出窗口 1000 毫秒
+> - [x] 显示完整的方法签名
+
+![](./assets/30.gif)
+
+### 3.4.7 配置编辑器（外观）
+
+* ① `自定义 --> 所有设置`：
+
+![](./assets/31.png)
+
+* ② `编辑器 --> 常规 --> 外观`：
+
+> [!NOTE]
+>
+> 勾选`外观`中的以下选项，其余默认：
+>
+> - [x] 显示方法分隔符
+
+![](./assets/32.gif)
+
+### 3.4.8 配置编辑器（编辑器标签页）
+
+* ① `自定义 --> 所有设置`：
+
 ![](./assets/33.png)
 
-![](./assets/34.png)
+* ② `编辑器 --> 常规 --> 编辑器标签页`：
+
+> [!NOTE]
+>
+> 勾选`编辑器标签页`中的以下选项，其余默认：
+>
+> - [x] 多行（在以下位置显示标签页）
+
+![](./assets/34.gif)
+
+## 3.5 配置编辑器（字体，可选）
+
+* ① `自定义 --> 所有设置`：
 
 ![](./assets/35.png)
 
-![](./assets/36.png)
+* ② `编辑器 --> 字体`：
+
+> [!NOTE]
+>
+> * ① 字体：`Fira Code`。
+>
+> * ② 主要粗细：`Bold`。
+> * ③ 加粗：`Bold`。
+> * ④ 回滚字体：`SimHei`。
+
+![](./assets/36.gif)
+
+## 3.6 配置编辑器（配色方案，可选）
+
+* ① `自定义 --> 所有设置`：
 
 ![](./assets/37.png)
 
-![](./assets/38.png)
+* ② `编辑器 --> 配色方案 --> 语言默认设置`：
 
-![](./assets/40.png)
+> [!NOTE]
+>
+> * ① 行注释：`FB7299`。
+> * ② 块注释：`FB7299`。
+> * ③ 文档注释：`3CB371`。
+
+![](./assets/38.gif)
+
+## 3.7 配置编辑器（嵌入提示，可选）
+
+* ① `自定义 --> 所有设置`：
+
+![](./assets/39.png)
+
+* ② `编辑器 --> 嵌入提示`：全部勾选
+
+![](./assets/40.gif)
+
+## 3.8 配置高级设置
+
+* ① `自定义 --> 所有设置`：
 
 ![](./assets/41.png)
 
-### 3.2.2 自动版
+* ② `高级设置 --> 工具窗口`：
 
-* ① 查询 Notepad++ ：
-
-```cmd
-winget search notepadplus
-```
+> [!NOTE]
+>
+> 勾选`工具窗口`中的以下选项，其余默认：
+>
+> - [x] 始终显示工具窗口标题图标
 
 ![](./assets/42.gif)
 
-* ② 安装 Notepad++ ：
 
-```cmd
-winget install --id Notepad++.Notepad++
-```
 
-![](./assets/43.gif)
+# 第四章：IDEA 项目结构（⭐）
 
-* ③ 查询本地是否安装成功：
+## 4.1 概述
 
-```cmd
-winget list notepadplus
-```
+* 在 IDEA 中，`项目`（project）、`模块`（module）以及`包`（project）是三个非常重要的概念，它们是构建和组织代码的基础。
+
+> [!NOTE]
+>
+> * ① 这三个概念，本质上就是为了对所创建的文件夹做出约定（约定大于配置），这样大家可以协同开发，减少沟通的成本。
+> * ② 现代化的软件开发，讲究的不是单枪作战，而是协同开发；所以，项目的目录结构划分很重要。
+>
+> ::: details 点我查看 Vue3 的项目结构
+>
+> ```shell
+> micro-vue/                   # 项目名
+> ├── node_modules/            # 项目依赖包
+> ├── public/                  # 静态资源文件夹
+> │   ├── index.html           # 入口 HTML 文件
+> │   └── favicon.ico          # 网站图标
+> ├── src/                     # 源代码文件夹
+> │   ├── assets/              # 静态资源，如图片、字体、样式等
+> │   ├── components/          # 可复用的 Vue 组件
+> │   ├── views/               # 页面级别的 Vue 组件
+> │   ├── router/              # Vue Router 配置
+> │   ├── store/               # Pinia 状态管理
+> │   │   └── useStore.js      # Pinia store 相关文件
+> │   ├── App.vue              # 根组件
+> │   ├── main.js              # 入口 JavaScript 文件
+> │   └── style/               # 全局样式（如 CSS 或 SCSS 文件）
+> ├── .gitignore               # Git 忽略文件
+> ├── package.json             # 项目描述文件，包含项目依赖、脚本命令等
+> ├── vite.config.js           # Vite 配置文件
+> └── package-lock.json        # 依赖锁文件
+> ```
+>
+> :::
+
+* 理解`项目`（project）、`模块`（module）以及`包`（project）将有助于高效地管理和开发项目；它们之间的关系，如下所示：
+
+![](./assets/43.svg)
+
+## 4.2 项目（Project）
+
+* `定义`：项目是在 IntelliJ IDEA 中创建的工作空间，是开发的顶层结构。一个项目包含了所有与开发相关的文件、资源和设置，它是开发的整体容器。
+* `功能`：
+  * 一个项目可以包含多个模块。
+  * 项目设置（如 SDK、依赖、构建工具）会影响项目中的所有模块。
+  * 项目可以包括代码、配置文件、资源文件、库等。
+* `项目中的内容`：项目一般包括源代码文件（ `.java` 文件）、资源文件、第三方库、配置文件（ `pom.xml` 或 `build.gradle`）等。
+* `举例`：一个 Web 应用程序的项目，可能包含前端和后端代码，并且会用到数据库配置和其他资源。
+
+
+
+* 示例：IDEA 创建项目（空项目）
 
 ![](./assets/44.gif)
 
-## 3.3 HelloWorld（入门程序）
+## 4.3 模块（Module）
 
-* ① 使用 `Notepad++` 新建 `HelloWorld.java`文件，并在该文件中编写入门程序：
+- `定义`：模块是 IntelliJ IDEA 中项目的子单元，它帮助你将大项目分成更小的、独立的部分。每个模块可以有自己的源代码、资源、配置文件等。模块是项目的逻辑组成部分，可以进行独立的构建和测试。
+- `功能`：
+  - 每个模块可以使用不同的 SDK，如： Java 8、Java 11、Kotlin 等。
+  - 可以设置模块的依赖，模块之间可以相互引用。
+  - 每个模块可以有自己的编译设置和输出目录。
+- `模块类型`：
+  - Java 模块：包含 Java 源代码和相关资源。
+  - Web 模块：用于开发 Web 应用程序的模块。
+  - Android 模块：用于开发 Android 应用的模块。
+  - 库模块：通常用于创建共享代码库，可以被其他模块引用。
+  - ...
+- `举例`：在一个电商系统的项目中，可能有多个模块：用户模块、商品模块、支付模块等。
 
-```java
-public class HelloWorld {
-	public static void main(String[] args){
-		System.out.println("Hello World!!!");
-	}
-}
-```
+
+
+* 示例：IDEA 创建模块（以 `day-xxx` 命名）
 
 ![](./assets/45.gif)
 
-* ② 使用 `javac` 命令编译 Java 源程序：
 
-```cmd
-javac HelloWorld.java
-```
+
+* 示例：IDEA 创建模块（以 `day-xxx` 命名）
 
 ![](./assets/46.gif)
 
-* ③ 使用 java 命令执行字节码文件：
+## 4.4 包（Package）
 
-```cmd
-java HelloWorld
-```
+- `定义`：包是 Java 中的一个命名空间，用于组织类和其他 Java 类型。包帮助开发者更好地组织代码，避免命名冲突。包是模块内的目录结构，用于存放 Java 类。
+- `功能`：
+  - 包提供了命名空间的功能，可以帮助分类和管理代码。
+  - 每个 Java 类文件都属于某个包，包名通常与文件夹的路径相对应。
+  - 包的结构可以是多级的，形成层次化的目录结构。
+- `包的使用`：包帮助你把相关的类组织在一起，便于代码管理和维护。
+- `举例`：如果有一个类 `UserService.java`，通常它会放在 `com.ecommerce.user` 包下，而类 `ProductService.java` 可能会放在 `com.ecommerce.product` 包中。
+
+
+
+* 示例：IDEA 创建包，并在包中写 Java 代码
 
 ![](./assets/47.gif)
 
-## 3.4 Java 中的注释
 
-### 3.4.1 概述
 
-* 在 Java 中，注释用于向代码添加说明或解释，它们不会被程序编译执行。
-* Java 提供了三种类型的注释：`单行注释`、`多行注释`和`文档注释`。
+# 第五章：IDEA 的初步使用（⭐）
 
-### 3.4.2 单行注释
+## 5.1 新建类
 
-* 语法：
+* 在指定的`包名`（package），通过`鼠标右键`，新建`类`文件：
 
-```java
-// 单行注释
-```
+![](./assets/48.gif)
 
-* 功能：单行注释用于注释掉一行代码，`//` 后面的所有内容都视为注释。
+## 5.2 新建 main 方法
 
+* 可以通过 `psvm` 或 `main` 快速编写 main 方法：
 
+![](./assets/49.gif)
 
-* 示例：
+## 5.3 执行 Java 程序
 
-```java {3-4}
-public class HelloWorld {
-	public static void main(String[] args){
-		// 这是一个单行注释
-		int a = 5; // 这是行尾注释
-	}
-}
-```
+* 在 main 方法处的▶️，通过`鼠标左键`，执行 main 方法：
 
-### 3.4.3 多行注释
-
-* 语法：
-
-```java
-/*
-	多行注释
-	多行注释
-	...
-*/
-```
-
-* 功能：多行注释用于注释掉多行代码。它的语法是使用 `/*` 开始，`*/` 结束，注释内容位于这两个符号之间。
-
-
-
-* 示例：
-
-```java {3-6}
-public class HelloWorld {
-	public static void main(String[] args){
-		/*
-		  这是一个多行注释
-		  可以注释多行内容
-		*/
-		int a = 5;
-	}
-}
-```
-
-### 3.4.4 文档注释
-
-* 语法：
-
-```java
-/**
- * ...
- * @param a ...
- * @param b ...
- * @return ...
- */
-```
-
-* 功能：文档注释用于生成 API 文档，通常用于类、方法或字段的注释。它的语法是使用 `/**` 开始，`*/` 结束，通常用于为方法或类提供详细描述。
-
-> [!NOTE]
->
-> * ① 文档注释通常与 `Javadoc` 工具一起使用。
-> * ② `Javadoc` 会自动解析这些文档注释并生成 HTML 格式的 API 文档。
-
-
-
-* 示例：
-
-```java {3-8}
-public class HelloWorld {
-	
-	/**
-	 * 这是一个方法，用于计算两个数的和。
-	 * @param a 第一个数
-	 * @param b 第二个数
-	 * @return 返回 a 和 b 的和
-	 */
-	public static int sum(int a, int b) {
-		return a + b;
-	}
-	
-	public static void main(String[] args){
-		int result = sum(1,2);
-		System.out.println(result);
-	}
-}
-```
-
-### 3.4.5 注意事项
-
-* ① 注释内容不会参与编译和运行，仅仅是对代码的解释说明，不要写和代码无关的注释内容。
-
-> [!NOTE]
->
-> ::: details 点我查看 正例和反例
->
-> * 正例：
->
-> ```java {1-3}
-> /**
-> * 要找出一个不为 0 的整数值为 1 的最低有效位
-> */
-> public int findLowestSetBit(int num) {
->     return num & -num; 
-> }
-> ```
->
-> * 反例：
->
-> ```java {4}
-> public void getOnlineInfo() {
->     HttpBrowserCapabilities bc = Request.Browser;
->     int hbcWidth = bc.ScreenPixelsWidth;
->     // 项目经理要求这里运行缓慢，好让客户给钱优化，并得到明显的速度提升
->     Thread.Sleep(2000); // [!code error]
->     HttpContext cont = System.Web.HttpContext.Current;
->     ...
-> }
-> ```
-> :::
-
-* ② 多行注释和文档注释不支持嵌套！！！
-
-> [!NOTE]
-> ::: details 点我查看 具体细节
->
-> * 多行注释不支持嵌套，如下所示：
->
-> ```java
-> /*
-> * /* 要找出一个不为 0 的整数值为 1 的最低有效位 */ // [!code error]
-> */ 
-> public int findLowestSetBit(int num) {
->     return num & -num; 
-> }
-> ```
->
-> * 文档注释不支持嵌套，如下所示：
->
-> ```java
-> /*
-> ** /** 要找出一个不为 0 的整数值为 1 的最低有效位 */ // [!code error]
-> */ 
-> public int findLowestSetBit(int num) {
->     return num & -num; 
-> }
-> ```
-> :::
-
-## 3.5 HelloWorld（入门程序）解析
-
-* 我们可以使用文档注释来对 HelloWorld （入门程序）进行解析。
-
-> [!CAUTION]
->
-> * ① 如果类是使用 public 修饰的，类名需要和 Java 源文件的名称保持一致。
-> * ② 程序中的标点符号必须是英文的。
-> * ③ 不要将 `main` 写成 `mian` ！！！
-> * ④ `System` 和 `String` 的首字母 `S` 都需要大写，因为其是类，通常类名遵循大驼峰规则。
-> * ⑤ 大括号都是成对出现的，缺一不可
-> * ⑥ Java 方法由一条条语句构成，每个语句以 `;` 结束。
-> * ⑦ Java 语言严格区分大小写。
-> * ⑧ 一个源文件中最多有一个 `public` 类，其它类的个数不限，如果源文件包含一个 `public` 类，则文件名必须按该类名命名。
-
-
-
-* 示例：
-
-```java
-/**
-* public class HelloWorld 是定义一个类
-* class：代表的就是类，类是 java 程序最基本的组成单元，所有代码都需要在类中写
-* class 后面跟的名字叫做类名，类名要和 java 文件名保持一致
-*/
-public class HelloWorld {
-	/**
-	* public static void main(String[] args) 程序的入口
-	* JVM 执行的时候，会从 main 方法开始执行
-	*/
-	public static void main(String[] args){
-		/* 输出语句，用于向控制台（终端）输出信息 */
-		System.out.println("Hello World!!!");
-	}
-}
-```
-
-## 3.6 源文件名（Java 文件名）和类名的一致性问题
-
-* ① 类名并非一定要和 Java 文件名（`*.java 文件`）一致。但是，如果类名使用 pubilc 修饰，类名必须和 java 文件名保持一致。
-
-```java [HelloWorld2.java]
-/**
-* public class HelloWorld 是定义一个类
-* class：代表的就是类，类是 java 程序最基本的组成单元，所有代码都需要在类中写
-* class 后面跟的名字叫做类名，类名要和 java 文件名保持一致
-*/
-class HelloWorld {
-	/**
-	* public static void main(String[] args) 程序的入口
-	* JVM 执行的时候，会从 main 方法开始执行
-	*/
-	public static void main(String[] args){
-		/* 输出语句，用于向控制台（终端）输出信息 */
-		System.out.println("Hello World!!!");
-	}
-}
-```
-
-* ② 一个源文件中是否可以有多个类；但是，一个源文件中有且只能有一个 pubilc 修饰的类。
-* ③ main 方法必须写在带 public 的类中。
-
-## 3.7 println 方法和 print 方法的异同点
-
-### 3.7.1 概述
-
-* 在 Java 中，`println()` 和 `print()` 都是 `System.out` 对象的方法，常用于输出信息到控制台。
-
-### 3.7.2 相同点
-
-* ① 输出内容：两者都可以输出任何类型的数据（字符串、数字、对象等）。它们会将指定的内容打印到控制台。
-* ② 都是 `System.out` 的方法：这两个方法都属于 `System.out`，`System.out` 是一个 `PrintStream` 对象，提供了多种输出方法。
-
-### 3.7.3 不同点
-
-* ① 换行行为：
-
-| 方法        | 特点                     | 说明                                                         |
-| ----------- | ------------------------ | ------------------------------------------------------------ |
-| `println()` | 会在输出内容后自动换行。 | 输出完成后光标会移动到下一行的开始位置。                     |
-| `print()`   | 不会自动换行。           | 输出内容后光标仍然停留在当前行的末尾，下一次输出会继续在当前行显示。 |
-
-* ② 应用场景：
-
-| 方法        | 应用场景                                                     |
-| ----------- | ------------------------------------------------------------ |
-| `println()` | 适用于希望输出后换行的场景，如：打印日志、显示结果时，每条信息之间需要分开显示。 |
-| `print()`   | 适用于输出时不希望换行的场景，如：在一行内打印多个信息或进度条等。 |
-
-> [!NOTE]
->
-> * ① 在实际开发中，其实 `println()` 并不会应用于打印日志，因为我们会使用日志框架，如：Log4j 等，并不会在系统中，直接使用 `println()` 。
-> * ② 并且，我们也会搭建日志平台，会通过日志框架将业务过程中产生的日志，定期同步到日志平台中，以便日后分析！！！
-
-
-
-* 示例：
-
-::: code-group
-
-```java [HelloWorld.java]
-public class HelloWorld {
-	public static void main(String[] args){
-		System.out.print("Hello, ");
-		System.out.print("World! ");
-		System.out.println("This is on a new line.");
-		System.out.println("This is the second line.");
-	}
-}
-```
-
-```txt [输出结果]
-Hello, World! This is on a new line.
-This is the second line.
-```
-
-:::
-
-# 第四章：作业
-
-## 1.1 单选题
-
-* ① 台式机，安卓手机，iPhone手机，他们其实都是计算机，计算机干的事情就是严格的执行人的指令，但是目前的科技条件下，电脑仍然有一个很大的短板，这个短板是？
-
-- [x] A：思考。
-- [ ] B：计算。
-
-> [!NOTE]
->
-> * ① 虽然台式机、安卓手机、iPhone 等设备都可以执行计算和处理指令，但它们并没有真正的思考能力。
-> * ② 计算机可以通过程序进行计算、分析、存储和展示信息，但它们并不具备自主的思维能力。
-> * ③ 计算机只能按照预定的规则执行任务，而无法像人类一样进行独立的思考、创造或判断。
-
-* ② 计算机不能思考，那它是如何工作的呢，下面的描述哪个是对的？
-
-- [ ] A：等待人工智能的进一步发展，计算机能自己思考。
-- [x] B：人类告诉计算机如何计算，规则是什么。
-
-> [!NOTE]
->
-> ① 计算机本身没有思考能力，它只能按照人类设计的程序和规则进行工作。
->
-> ② 人类编写程序并设定计算规则，然后计算机依照这些指令执行任务。
->
-> ③ 因此，计算机的工作是依赖于预先设定的程序和逻辑，而不是自主思考。
-
-## 1.2 多选题
-
-* 任何计算机能执行的东西都是程序，下面的内容哪些是程序？
-
-- [x] A：操作系统。
-- [x] B：Chrome 浏览器。
-- [x] C：安卓或苹果 app。
-- [x] D：电脑病毒。
-
-> [!NOTE]
->
-> * ① 这些都是程序，它们都由一系列指令组成，计算机根据这些指令执行不同的任务。
-> * ② 操作系统负责管理硬件资源，Chrome 浏览器提供网络浏览功能，安卓或苹果 app 提供各种功能，而电脑病毒则是恶意程序，可能用于破坏或篡改计算机的正常操作。
-
-## 1.3 操作题
-
-* ① 安装和配置 JDK：[略](./#_2-3-jdk-的安装和配置)。
-* ② 安装 Notepad++ ：[略](./#_3-2-安装-notepad)。
-* ③ 编写 HelloWorld 程序：[略](./#_3-3-helloworld-入门程序)。
+![](./assets/50.gif)

@@ -1,2498 +1,1585 @@
-# 第一章：抽象类（⭐）
+# 第一章：JDK 8 之前时间相关类
 
 ## 1.1 概述
 
-### 1.1.1 引入
-
-- 面向对象的三大特征：`封装`、`继承`和`多态`。之前，我们已经学习过了`封装`和`继承`以及`多态`。
-- 其实，`抽象类`也是属于面向对象中的知识点。
-- 所有的技术，都是为了解决问题而出现的，`抽象类`也不例外。
-- 下面，我们将一起推导一下，`抽象类`为什么出现？
-
-### 1.1.2 封装
-
-* `封装就是对象代表什么，就得封装对应的数据，并提供数据对应的行为`。
-* 有了封装之后，我们就可以将一些零散的数据以及对应的行为封装为一个整体，这个整体就是我们所说的对象，如下所示：
-
-![封装之后所形成的对象](./assets/1.svg)
-
-* 其代码实现，如下所示：
-
-::: code-group
-
-```java [Student.java]
-public class Student {
-    /**
-     * 姓名
-     */
-    private String name;
-    /**
-     * 年龄
-     */
-    private int age;
-    /**
-     * 性别
-     */
-    private String gender;
-
-    public Student() {}
-
-    public Student(String name, int age, String gender) {
-        this.name = name;
-        this.age = age;
-        this.gender = gender;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-    
-    /**
-     * 吃饭
-     */
-    public void eat() {
-        System.out.println(this.name + "正在吃饭~");
-    }
-
-    /**
-     * 睡觉
-     */
-    public void sleep() {
-        System.out.println(this.name + "正在睡觉~");
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" 
-            + "name='" + name + '\'' 
-            + ", age=" + age 
-            + ", gender='" + gender 
-            + '\'' + '}';
-    }
-}
-```
-
-```java {4-7} [StudentTest.java]
-public class StudentTest {
-    public static void main(String[] args) {
-
-        Student s1 = new Student("张三", 18, "男");
-        Student s2 = new Student("李四", 25, "女");
-        Student s3 = new Student("王五", 30, "男");
-        Student s4 = new Student("赵六", 35, "女");
-
-    }
-}
-```
-
-:::
-
-* 以后我们面向的就是这个对象的整体，而不是一些零散的数据，如下所示：
-
-![封装的好处](./assets/2.svg)
-
-* 其代码实现，如下所示：
-
-::: code-group
-
-```java [Student.java]
-public class Student {
-    /**
-     * 姓名
-     */
-    private String name;
-    /**
-     * 年龄
-     */
-    private int age;
-    /**
-     * 性别
-     */
-    private String gender;
-
-    public Student() {}
-
-    public Student(String name, int age, String gender) {
-        this.name = name;
-        this.age = age;
-        this.gender = gender;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-    
-    /**
-     * 吃饭
-     */
-    public void eat() {
-        System.out.println(this.name + "正在吃饭~");
-    }
-
-    /**
-     * 睡觉
-     */
-    public void sleep() {
-        System.out.println(this.name + "正在睡觉~");
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" 
-            + "name='" + name + '\'' 
-            + ", age=" + age 
-            + ", gender='" + gender 
-            + '\'' + '}';
-    }
-}
-```
-
-```java [StudentUtil.java]
-public class StudentUtil {
-
-    /**
-    * 打印学生的信息
-    */
-    public static void printInfo(Student stu){
-        // 通过 getter 方法获取属性
-        System.out.println(stu.getName());
-        System.out.println(stu.getAge());
-        System.out.println(stu.getGender());
-        // 也可以调用其他行为
-        stu.eat();
-        stu.sleep();
-    }
-}
-```
-
-:::
-
-### 1.1.3 继承
-
-- 如果类似的`JavaBean`也来越多，就会造成`代码膨胀`，如下所示：
-
-![代码膨胀](./assets/3.svg)
-
-* 其代码实现，如下所示：
-
-::: code-group
-
-```java [Student.java]
-public class Student {
-    /**
-     * 姓名
-     */
-    private String name;
-    /**
-     * 年龄
-     */
-    private int age;
-    /**
-     * 性别
-     */
-    private String gender;
-
-    public Student() {}
-
-    public Student(String name, int age, String gender) {
-        this.name = name;
-        this.age = age;
-        this.gender = gender;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    /**
-     * 吃饭
-     */
-    public void eat() {
-        System.out.println(this.name + "正在吃饭~");
-    }
-
-    /**
-     * 睡觉
-     */
-    public void sleep() {
-        System.out.println(this.name + "正在睡觉~");
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" 
-            + "name='" + name + '\'' 
-            + ", age=" + age 
-            + ", gender='" + gender + '\'' + '}';
-    }
-}
-```
-
-```java [Teacher.java]
-public class Teacher {
-    /**
-     * 姓名
-     */
-    private String name;
-    /**
-     * 年龄
-     */
-    private int age;
-    /**
-     * 性别
-     */
-    private String gender;
-
-    public Student() {}
-
-    public Student(String name, int age, String gender) {
-        this.name = name;
-        this.age = age;
-        this.gender = gender;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    /**
-     * 吃饭
-     */
-    public void eat() {
-        System.out.println(this.name + "正在吃饭~");
-    }
-
-    /**
-     * 睡觉
-     */
-    public void sleep() {
-        System.out.println(this.name + "正在睡觉~");
-    }
-
-    @Override
-    public String toString() {
-        return "Teacher{" 
-            + "name='" + name + '\'' 
-            + ", age=" + age 
-            + ", gender='" + gender + '\'' + '}';
-    }
-}
-```
-
-```java [PersonUtil.java]
-public class PersonUtil {
-
-    /**
-     * 打印学生的信息
-     * @param stu 学生对象
-     */
-    public static void printInfo(Student stu) {
-        System.out.println(stu.getName());
-        System.out.println(stu.getAge());
-        System.out.println(stu.getGender());
-    }
-
-    /**
-     * 打印老师的信息
-     * @param tea 老师对象
-     */
-    public static void printInfo(Teacher tea) {
-        System.out.println(tea.getName());
-        System.out.println(tea.getAge());
-        System.out.println(tea.getGender());
-    }
-}
-
-```
-
-:::
-
-* 此时，我们就可以将`相同的属性`和`相同的行为`抽取到一个`父类`中，`子类`只需要`继承`父类（子类可以有自己独有的属性和行为），如下所示：
-
-![继承](./assets/4.svg)
-
-* 其代码实现，如下所示：
-
-::: code-group
-
-```java [Person.java]
-public class Person {
-    /**
-     * 姓名
-     */
-    private String name;
-    /**
-     * 年龄
-     */
-    private int age;
-    /**
-     * 性别
-     */
-    private String gender;
-
-    public Person() {}
-
-    public Person(String name, int age, String gender) {
-        this.name = name;
-        this.age = age;
-        this.gender = gender;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public void eat() {
-        System.out.println(this.name + "正在吃饭~");
-    }
-
-    public void sleep() {
-        System.out.println(this.name + "正在睡觉~");
-    }
-}
-```
-
-```java [Student.java]
-public class Student extends Person { // [!code highlight]
-
-    private double score;
-
-    public Student() {}
-
-    public Student(String name, int age, String gender, double score) {
-        super(name, age, gender);
-        this.score = score;
-    }
-
-    public double getScore() {
-        return score;
-    }
-
-    public void setScore(double score) {
-        this.score = score;
-    }
-
-    @Override
-    public String toString() {
-        return "Student{} " + super.toString();
-    }
-}
-```
-
-```java [Teacher.java]
-public class Teacher extends Person { // [!code highlight]
-
-    private double salary;
-
-    public Teacher() {}
-
-    public Teacher(String name, int age, String gender, double salary) {
-        super(name, age, gender);
-        this.salary = salary;
-    }
-
-    public double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(double salary) {
-        this.salary = salary;
-    }
-
-    @Override
-    public String toString() {
-        return "Teacher{" + "salary=" + salary + "} " + super.toString();
-    }
-}
-```
-
-```java [PersonUtil.java]
-public class PersonUtil {
-
-    /**
-     * 打印人类的信息
-     * @param p 人类对象
-     */
-    public static void printInfo(Person p) {
-        System.out.println(p.getName());
-        System.out.println(p.getAge());
-        System.out.println(p.getGender());
-    }
-
-}
-```
-
-:::
-
-### 1.1.4 多态
-
-* 多态，从字面意思来看，就是指对象的多种形态，如下所示：
-
-```mermaid
-classDiagram
-     Person <|-- Student : extends
-     Person <|-- Teacher : extends
-```
-
-* 之前，我们创建对象是这样的，即：将 Student 对象赋值给 Student 类型的变量，如下所示：
-
-```java
-Student s = new Student(); // Student 对象是学生形态
-```
-
-* 有了多态之后，我们创建对象可以这样，即：将 Student 对象赋值给 Person 类型的变量，如下所示：
-
-```java
-Person p = new Student(); // Student 对象是人的形态
-```
-
-* 此时，学生对象就有了两种形态，如下所示：
-
-```java
-Student s = new Student(); // Student 对象是学生形态
-
-Person p = new Student(); // Student 对象是人的形态
-```
-
-### 1.1.5 抽象类
-
-* 如果在上述的继承体系中，学生和老师都有`work()`方法，那么我们就可以将该方法抽取到父类中，如下所示：
-
-![](./assets/5.svg)
-
-* 每个子类工作的内容是不一样的，如：`学生的工作是学习，老师的工作是教学`，当我们将`work()`方法抽取到父类中就不太好编写其方法体，难道写`学生的工作是学习`？
-
-![](./assets/6.svg)
-
-* 每个子类工作的内容是不一样的，如：`学生的工作是学习，老师的工作是教学`，当我们将`work()`方法抽取到父类中就不太好编写其方法体，难道写`老师的工作是教学`？
-
-![](./assets/7.svg)
+* 地球是有`经纬线`的，`经线`（子午线）是连接南北两极竖着的线，而`纬线`（平行线）是与地球赤道平行的环绕地球的假想线，如下所示：
 
 > [!NOTE]
 >
-> 其实，上述的方案是不行的：
+> * ① `经线`指示南北方向的位置，并用于测量**经度**，即：地球上某一点相对于本初子午线（0 度经线，通常通过英国格林威治天文台）的东西方向上的角度。所有的经线长度都**相等**，并在南北两极**汇聚**。经度分为**东经 (E)** 和 **西经 (W)**，各有 0° 到 180°。
 >
-> * ① 如果你在父类中的`work()`方法中写`学生的工作是学习`，那么老师会继承该方法，和实际需求不符合。
-> * ② 如果你在父类中的`work()`方法中写`老师的工作是教学`，那么学生会继承该方法，和实际需求不符合。
+> ::: details 点我查看 具体细节
+>
+> * `经`是`纵向`、`直的`、`贯穿`的意思，如：“经脉”指身体里纵向的主要通道。
+>
+> ![](./assets/2.jpeg)
+>
+> * `经线`是连接地球南北两极的，呈现纵向的形态，就像一根根“经”线贯穿地球的南北。因此，用“经”来形容这种纵向的线非常贴切。
+>
+> :::
+>
+> * ② `纬线`指示东西方向的位置，并用于测量**纬度**，即：地球上某一点相对于赤道的南北方向上的角度。所有的纬线都互相**平行**，但长度**不相等**，赤道最长，越靠近两极纬线越短，到两极缩成一个点。赤道是 0 度纬线。纬度分为**北纬 (N)** 和 **南纬 (S)**，各有 0°（赤道）到 90°（两极）。
+>
+> ::: details 点我查看 具体细节
+>
+> * `纬`是横向的、水平的、交织的意思，如：纬纱”指的是织布过程中横向的纱线。
+>
+> ![](./assets/3.jpg)
+>
+> *  `纬线`是与赤道平行的横向圆圈，环绕地球，与纵向的经线交织成网格。因此，用“纬”来形容这种横向的线非常形象。
+>
+> :::
 
-* 之前，我们是在父类中的`work()`方法写`工作`，然后让子类重写了`work()`方法，如下所示：
+![经线和纬线](./assets/1.png)
 
-![](./assets/8.svg)
+* 当地球围绕太阳旋转的时候，围绕太阳转一圈是一年（公转），地球自己转一圈是一天（自转），如下所示：
 
-* 但是，这样会产生一个弊端：我们并不能约束子类一定去重写这个方法，如：学生类中可以写`study()`方法，而老师类中可以写`working()`方法，如下所示：
+![公转和自转](./assets/4.gif)
 
-![](./assets/9.svg)
+* 在同一条`经线`上的时间是一样的，如下所示：
 
-* 此时，抽象类就出现了，即：抽象类就可以用来约束子类必须去实现抽象方法，如下所示：
+![图中红线标注的是经线，并且是正午 12 点](./assets/5.png)
+
+* 之前，我们都是以`零度经线`为标准，认为它是标准的世界时间，如下所示：
 
 > [!NOTE]
 >
-> * ① 如果一个方法抽取到父类中，不确定方法体，那么该方法就不需要写方法体，该方法可以使用`abstract`关键字修饰，即：抽象方法，如：`public abstract void work();`。
-> * ② 如果一个类中有抽象方法，那么该类必须是抽象类，使用`abstract`关键字修饰，如：`public abstract class Person{}`。
+> 零度经线（本初子午线），英国的格林威治正好坐落在零度经线上，所以之前的标准世界时间也被称为`格林威治时间`。
 
-![](./assets/10.svg)
+![零度经线（本初子午线）](./assets/6.png)
 
-## 1.2 抽象类和抽象方法
+* 全世界一共有 24 个时区，每个时区都是按照`标准世界时间`进行`加`或`减`，即：在本初子午线右侧的 12 个时区，称为`东部区域`；剩余的 12 个时区，称为`西部区域`，如下所示：
+
+> [!NOTE]
+>
+> 中国在东八区，所以中国的标准时间 = 标准世界时间 + 8 。
+
+![](./assets/7.png)
+
+> [!NOTE]
+>
+> 总结：
+>
+> * ① 全世界的时间，有一个统一的计算标准，在 1884 年，规定`零度经线`上的时间是`标准时间`，又因为英国的`格林威治`坐落在`零度经线`上，所以`世界标准时间`也被称为`格林威治时间`（Greenwich Mean Time），简称 `GMT`，其计算的核心是：地球自转一天是 24 小时，再将时间划分为 24 等份，太阳直射时是正午 12 点。
+> * ② 上述的计算方式并没有太大的问题，对于平时生活已经足够的；但是，随着时代的发展，人们发现地球自转的速度是不均匀的，使用`格林威治时间`作为`世界时间标准`和`实际真正的时间`是有误差的，历史统计，最大的误差曾达 16 分钟，现在`格林威治时间`已经不再作为`世界标准时间`去使用了。
+> * ③ 后来，人们为了彻底解决定义的时间的流逝不均匀的问题，到了 1972 年，开始使用`原子钟`（利用铯原子的震动频率计算出来的时间）定义`世界标准时间`，即：世界协调时间（法语：**T**emps **U**niversel **C**oordonné，简称为`UTC`），所以目前的`世界标准时间`是`世界协调时间`（UTC）。
+> * ④ 中国位于东八区，中国标准时间 = 世界标准时间（UTC）+ 8 。
+
+## 1.2 Date
 
 ### 1.2.1 概述
 
-* `抽象方法`：将`共性`的`行为`（方法）抽取到父类之后，由于灭个子类执行的内容是不一样的；所以，在父类中是不能确定`具体的方法体`，该方法就可以定义为抽象方法。
-* `抽象类`：如果一个`类中存在抽象方法`，那么该类就`必须声明为抽象类`。
+* `Date`类用来描述时间，精确到毫秒，这个类的对象表示某个时间点的对象。
 
-### 1.2.2 抽象方法
+### 1.2.2 构造方法
 
-* 语法：
+* 使用空参构造方法创建的对象，表示系统当前时间：
 
 ```java
-权限访问修饰符 abstract 返回值类型 方法名(形参列表);
+public Date() { // [!code focus]
+    this(System.currentTimeMillis());
+} // [!code focus]
 ```
 
-> [!NOTE]
->
-> 使用`abstract` 关键字修饰方法，该方法就成了抽象方法，抽象方法只包含一个方法名，而没有方法体。
+* 使用有参构造方法创建的对象，表示指定的时间：
+
+```java
+public Date(long date) { // [!code focus]
+    fastTime = date;
+} // [!code focus]
+```
 
 
 
 * 示例：
 
 ```java
-public abstract class Person {
-    
-    public abstract void work(); // [!code highlight]
-    
+package com.github.date;
+
+import java.util.Date;
+
+public class Test {
+    public static void main(String[] args) {
+        // 当前系统时间
+        Date date = new Date();
+        // date = Tue Apr 22 11:03:51 CST 2025
+        System.out.println("date = " + date); 
+    }
 }
 ```
 
-### 1.2.3 抽象类
 
-* 语法：
+
+* 示例：
 
 ```java
-public abstract class 类名字 { 
-  
+package com.github.date;
+
+import java.util.Date;
+
+public class Test {
+    public static void main(String[] args) {
+        // 指定时间
+        Date date = new Date(System.currentTimeMillis() + 10);
+        // date = Tue Apr 22 11:05:19 CST 2025
+        System.out.println("date = " + date);
+    }
 }
+```
+
+### 1.2.3 常用 API
+
+#### 1.2.3.1 将 Date 对象转换为时间戳
+
+* 获取时间对象的毫秒值：
+
+```java
+public long getTime() { // [!code focus]
+    return getTimeImpl();
+} // [!code focus]
+
+private final long getTimeImpl() {
+    if (cdate != null && !cdate.isNormalized()) {
+        normalize();
+    }
+    return fastTime;
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.date;
+
+import java.util.Date;
+
+public class Test {
+    public static void main(String[] args) {
+        // 当前系统时间
+        Date date = new Date();
+        // date = Tue Apr 22 11:03:51 CST 2025
+        System.out.println("date = " + date);
+
+        long time = date.getTime(); // [!code highlight]
+        // time = 1745291495789
+        System.out.println("time = " + time);
+    }
+}
+```
+
+#### 1.2.3.2 将毫秒值转换为 Date 对象
+
+* 设置或修改毫秒值：
+
+```java
+public void setTime(long time) { // [!code focus]
+    fastTime = time;
+    cdate = null;
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.date;
+
+import java.util.Date;
+
+public class Test {
+    public static void main(String[] args) {
+        // 指定时间
+        Date date = new Date(System.currentTimeMillis() + 1000);
+        // date = Tue Apr 22 11:13:44 CST 2025
+        System.out.println("date = " + date);
+        // 设置或修改毫秒值
+        date.setTime(System.currentTimeMillis()); // [!code highlight]
+        // date = Tue Apr 22 11:13:43 CST 2025
+        System.out.println("date = " + date);
+    }
+}
+```
+
+#### 1.2.3.3 判断当前时间是否晚于指定时间
+
+* 判断当前时间是否晚于指定时间：
+
+```java
+public boolean after(Date when) { // [!code focus]
+    return getMillisOf(this) > getMillisOf(when);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.date;
+
+import java.util.Date;
+
+public class Test {
+    public static void main(String[] args) {
+        Date d1 = new Date();
+
+        Date d2 = new Date(d1.getTime() + 100000);
+
+        System.out.println(d1.after(d2)); // false
+    }
+}
+```
+
+#### 1.2.3.4 判断当前时间是否早于指定时间
+
+* 判断当前时间是否早于指定时间：
+
+```java
+public boolean before(Date when) { // [!code focus]
+    return getMillisOf(this) < getMillisOf(when);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.date;
+
+import java.util.Date;
+
+public class Test {
+    public static void main(String[] args) {
+        Date d1 = new Date();
+
+        Date d2 = new Date(d1.getTime() + 100000);
+
+        System.out.println(d1.before(d2)); // true
+    }
+}
+```
+
+## 1.3 SimpleDateFormat
+
+### 1.3.1 概述
+
+* `SimpleDateFormat`是格式化时间的类，有如下的作用：
+  * ① `格式化`：可以将`Date 对象`格式化我们喜欢的格式，如：`2025-04-22`、`2025/04/22`、`2025年04月22日`等。
+  * ② `解析`：可以将`字符串表示的时间`变为`Date 对象`。
+
+### 1.3.2 构造方法
+
+* 使用默认格式，创建一个 SimpleDateFormat 对象：
+
+```java
+public SimpleDateFormat() { // [!code focus]
+    this("", Locale.getDefault(Locale.Category.FORMAT));
+    applyPatternImpl(LocaleProviderAdapter.getResourceBundleBased().getLocaleResources(locale)
+                     .getDateTimePattern(SHORT, SHORT, calendar));
+} // [!code focus]
+```
+
+* 使用指定格式，创建一个 SimpleDateFormat 对象（推荐）：
+
+```java
+public SimpleDateFormat(String pattern) { // [!code focus]
+    this(pattern, Locale.getDefault(Locale.Category.FORMAT));
+} // [!code focus]
 ```
 
 > [!NOTE]
 >
-> * ① 如果一个类包含抽象方法，那么该类必须是抽象类。
-> * ② 抽象类不一定有抽象方法，但是有抽象方法的类必须定义成抽象类。
+> ::: details 点我查看 pattern 的具体含义
+>
+> ![日期格式化规则](./assets/8.webp)
+>
+> :::
+
+
+
+* 示例：
+
+```java
+package com.github.simple;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class Test {
+    public static void main(String[] args) {
+        SimpleDateFormat format = new SimpleDateFormat();
+
+        String str = format.format(new Date());
+
+        // str = 2025/4/22 下午1:33
+        System.out.println("str = " + str);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.simple;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class Test {
+    public static void main(String[] args) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        String str = format.format(new Date());
+
+        // str = 2025-04-22 13:33:55
+        System.out.println("str = " + str);
+    }
+}
+```
+
+### 1.3.3 常用 API
+
+#### 1.3.3.1 将日期对象格式化为字符串
+
+* 格式化（日期对象 --> 字符串）：
+
+```java
+public final String format(Date date){ // [!code focus]
+    return format(date, new StringBuffer(),
+                  DontCareFieldPosition.INSTANCE).toString();
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.simple;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class Test {
+    public static void main(String[] args) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        String str = format.format(new Date()); // [!code highlight]
+
+        // str = 2025-04-22 13:33:55
+        System.out.println("str = " + str);
+    }
+}
+```
+
+#### 1.3.3.2 将字符串解析为日期对象
+
+* 解析（字符串 --> 日期对象）：
+
+```java
+public Date parse(String source) throws ParseException {  // [!code focus]
+    ParsePosition pos = new ParsePosition(0);
+    Date result = parse(source, pos);
+    if (pos.index == 0)
+        throw new ParseException("Unparseable date: \"" + source + "\"" ,
+            pos.errorIndex);
+    return result;
+}  // [!code focus]
+```
 
 > [!CAUTION]
 >
-> 【Java 规范】抽象类命名通常使用`Abstract`或`Base`开头；异常类命名使用`Exception`结尾，测试类命名以它要测试的类的名称开始，以`Test`结尾。
+> 如果给定的字符串内容和 SimpleDateFormat 对象中传递的 pattern 参数不匹配，将会报错！！！
 
 
 
 * 示例：
 
 ```java
-public abstract class Person { // [!code highlight]
-    
-    public void eat(){
-        System.out.println("吃饭");
+package com.github.simple;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class Test {
+    public static void main(String[] args) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Date parse = format.parse("2012-12-12 12:12:12"); // [!code highlight]
+
+        // parse = Wed Dec 12 12:12:12 CST 2012
+        System.out.println("parse = " + parse);
     }
-    
 }
 ```
+
+### 1.3.4 应用示例
+
+* 需求：假设初恋的出生日期是`2000-11-11`，请用字符串表示这个数据，并将其转换为`2000年11月11日`。
 
 
 
 * 示例：
 
 ```java
-public abstract class Person { // [!code highlight]
-    
-    public void eat(){
-        System.out.println("吃饭");
+package com.github.simple;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class Test {
+    public static void main(String[] args) throws ParseException {
+        String str = "2000-11-11";
+        // 解析
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = sdf1.parse(str);
+        // 格式化
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日");
+        String str2 = sdf2.format(date);
+        System.out.println(str2); // 2000年11月11日
     }
-    public abstract void work(); 
-    
 }
 ```
 
-### 1.2.4 抽象类的使用
+### 1.3.5 应用示例
 
-* 继承抽象类的子类`必须重写父类所有的抽象方法`；否则，该子类也必须声明为抽象类。
+* 需求：秒杀活动。
+
+> [!NOTE]
+>
+> 用代码判断下面两位同学能否参与这次秒杀活动？
+>
+> * ① 小贾下单并付款的时间是：`2023年11月11日 0:01:00`。
+> * ② 小皮下单并付款的时间是：`2023年11月11日 0:11:00`。
+
+![](./assets/9.png)
 
 
 
 * 示例：
 
 ::: code-group
-
-```java [Person.java]
-package com.github;
-
-public abstract class Person {
-
-    private String name;
-
-    private int age;
-
-    public Person() {}
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-
-    public void eat() {
-        System.out.println("吃饭");
-    }
-
-    public void sleep() {
-        System.out.println("睡觉");
-    }
-
-    // 抽象方法
-    public abstract void work();
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-```
-
-```java [Student.java]
-package com.github;
-
-public class Student extends Person{
-
-    public Student() {}
-
-    public Student(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void work() {
-        System.out.println("学生的工作是学习");
-    }
-}
-```
-
-```java [Teacher.java]
-package com.github;
-
-public class Teacher extends Person{
-
-    public Teacher() {}
-
-    public Teacher(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void work() {
-        System.out.println("老师的工作是教学");
-    }
-}
-```
 
 ```java [Test.java]
-package com.github;
+package com.github.simple;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Test {
-    public static void main(String[] args) {
-        Person p1 = new Student("张三", 18);
-        p1.work();
-        p1.eat();
-        p1.sleep();
-        System.out.println("p1 = " + p1);
-
-        System.out.println("-------------------");
-
-        Person p2 = new Teacher("李四", 28);
-        p2.work();
-        p2.eat();
-        p2.sleep();
-        System.out.println("p2 = " + p2);
-
-    }
-}
-```
-
-```txt [cmd 控制台]
-学生的工作是学习
-吃饭
-睡觉
-p1 = Person{name='张三', age=18}
--------------------
-老师的工作是教学
-吃饭
-睡觉
-p2 = Person{name='李四', age=28}
-```
-
-:::
-
-## 1.3 抽象类和抽象方法的注意事项
-
-* ① 抽象类不能实例化，即：抽象类不能创建对象。
-
-> [!NOTE]
->
-> 理解：假设创建了抽象类的对象，调用抽象的方法，而抽象方法没有具体的方法体，没有意义。
-
-* ② 抽象类中不一定有抽象方法，有抽象方法的类一定是抽象类。
-
-> [!NOTE]
->
-> 理解：未包含抽象方法的抽象类，目的就是不想让调用者创建该类对象，通常用于某些特殊的类结构设计。
-
-* ③ 抽象类可以有构造方法、实例方法和静态方法。
-
-> [!NOTE]
->
-> 理解：子类的构造方法中，有默认的 super()，需要访问父类构造方法。
-
-* ④ 抽象类的子类，要么重写抽象类中的所有抽象方法，要么本身也是抽象类。
-
-> [!NOTE]
->
-> 理解：假设不重写所有抽象方法，则类中可能包含抽象方法。那么创建对象后，调用抽象的方法，没有意义。
-
-* ⑤ 抽象类存在的意义是为了被子类继承。
-
-> [!NOTE]
->
-> 理解：抽象类中已经实现的是模板中确定的成员，抽象类不确定如何实现的定义成抽象方法，交给具体的子类去实现。
-
-## 1.4 应用示例
-
-* 需求：编写带有抽象类的标准 JavaBean 类。
-
-| 动物       | 属性       | 行为         |
-| ---------- | ---------- | ------------ |
-| 青蛙 Frog  | 名字、年龄 | 吃虫子、喝水 |
-| 狗 Dog     | 名字、年龄 | 吃骨头、喝水 |
-| 山羊 Sheep | 名字、年龄 | 吃草、喝水   |
-
-```mermaid
----
-title: 类继承体系结构设计
----
-classDiagram
-	 note for Animal "动物"
-	 Animal <|-- Frog : extends
-	 note for Frog "青蛙"
-	 Animal <|-- Dog : extends
-	 note for Dog "狗"
-	 Animal <|-- Sheep : extends
-	 note for Sheep "山羊"
-     <<Abstract>> Animal
-     class Animal {
-        - String name
-        - int age
-
-        + drink() void
-        + eat() void*
-     }
-     class Frog {
-     	+ eat() void
-     }
-     class Dog {
-     	+ eat() void
-     }
-     class Sheep {
-     	+ eat() void
-     }
-```
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Animal.java]
-package com.github.demo2;
-
-public abstract class Animal {
-
-    private String name;
-
-    private int age;
-
-
-    public Animal() {}
-
-    public Animal(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-
-    public void drink(){
-        System.out.println("喝水");
-    }
-
-
-    public abstract void eat();
-
-    @Override
-    public String toString() {
-        return "Animal{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-```
-
-```java [Frog.java]
-package com.github.demo2;
-
-public class Frog extends Animal{
-
-    public Frog() {}
-
-    public Frog(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void eat() {
-        System.out.println("吃虫子");
-    }
-}
-```
-
-```java [Dog.java]
-package com.github.demo2;
-
-public class Dog extends Animal {
-
-    public Dog() {}
-
-    public Dog(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void eat() {
-        System.out.println("吃骨头");
-    }
-}
-```
-
-```java [Sheep.java]
-package com.github.demo2;
-
-public class Sheep extends Animal{
-
-    public Sheep() {}
-
-    public Sheep(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void eat() {
-        System.out.println("吃草");
-    }
-}
-```
-
-```java [Test.java]
-package com.github.demo2;
-
-public class Test {
-    public static void main(String[] args) {
-        Animal animal = new Frog("青蛙--呱呱", 2);
-        animal.eat();
-        animal.drink();
-        System.out.println("animal = " + animal);
-
-        System.out.println("------------------");
-
-        Animal animal2 = new Dog("小狗--汪汪", 5);
-        animal2.eat();
-        animal2.drink();
-        System.out.println("animal2 = " + animal2);
-
-        System.out.println("------------------");
-
-        Animal animal3 = new Sheep("山羊--洋洋", 9);
-        animal3.eat();
-        animal3.drink();
-        System.out.println("animal3 = " + animal3);
-    }
-}
-```
-
-```txt [cmd 控制台]
-吃虫子
-喝水
-animal = Animal{name='青蛙--呱呱', age=2}
-------------------
-吃骨头
-喝水
-animal2 = Animal{name='小狗--汪汪', age=5}
-------------------
-吃草
-喝水
-animal3 = Animal{name='山羊--洋洋', age=9}
-```
-
-:::
-
-## 1.5 抽象类在实际开发中的意义
-
-### 1.5.1 概述
-
-* 抽象类存在的意义是为了被子类继承，否则抽象类将毫无意义。
-* 抽象类可以强制让子类，一定要按照规定的格式进行重写。
-
-### 1.5.2 疑惑？
-
-* 将子类中共性的内容抽取到父类之后，由于方法体不确定，需要定义为抽象，子类必须重写抽象类中的所有抽象方法。
-* 如果不将方法抽取到父类，直接在子类中写岂不是可以节约代码？
-
-![](./assets/11.svg)
-
-
-
-* 示例：
-
-::: code-group
-
-```java
-package com.github.demo1;
-
-public class Person {
-
-    private String name;
-
-    private int age;
-
-    public Person() {
-    }
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-
-    public void eat() {
-        System.out.println("吃饭");
-    }
-
-    public void sleep() {
-        System.out.println("睡觉");
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-```
-
-```java [Student.java]
-package com.github.demo1;
-
-public class Student extends Person {
-
-    public Student() {
-    }
-
-    public Student(String name, int age) {
-        super(name, age);
-    }
-
-    public void work() {
-        System.out.println("学生的工作是学习");
-    }
-}
-```
-
-```java [Teacher.java]
-package com.github.demo1;
-
-public class Teacher extends Person {
-
-    public Teacher() {
-    }
-
-    public Teacher(String name, int age) {
-        super(name, age);
-    }
-
-    public void work() {
-        System.out.println("老师的工作是教学");
-    }
-}
-```
-
-```java [Test.java]
-package com.github.demo1;
-
-public class Test {
-    public static void main(String[] args) {
-        Student p1 = new Student("张三", 18);
-        p1.work();
-        p1.eat();
-        p1.sleep();
-        System.out.println("p1 = " + p1);
-
-        System.out.println("-------------------");
-
-        Teacher p2 = new Teacher("李四", 28);
-        p2.work();
-        p2.eat();
-        p2.sleep();
-        System.out.println("p2 = " + p2);
-
-    }
-}
-```
-
-:::
-
-### 1.5.3 问题
-
-* 不将方法抽取到父类，直接在子类中写虽然看似可以节约代码；但是，会造成调用者在调用的时候，无法确定方法名（需要强制类型转换，非常麻烦）。
-
-![](./assets/12.svg)
-
-
-
-* 示例：
-
-::: code-group
-
-```java
-package com.github.demo1;
-
-public class Person {
-
-    private String name;
-
-    private int age;
-
-    public Person() {
-    }
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-
-    public void eat() {
-        System.out.println("吃饭");
-    }
-
-    public void sleep() {
-        System.out.println("睡觉");
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-```
-
-```java [Student.java]
-package com.github.demo1;
-
-public class Student extends Person {
-
-    public Student() {
-    }
-
-    public Student(String name, int age) {
-        super(name, age);
-    }
-
-    public void study() {
-        System.out.println("学生的工作是学习");
-    }
-}
-```
-
-```java [Teacher.java]
-package com.github.demo1;
-
-public class Teacher extends Person {
-
-    public Teacher() {
-    }
-
-    public Teacher(String name, int age) {
-        super(name, age);
-    }
-
-    public void working() {
-        System.out.println("老师的工作是教学");
-    }
-}
-```
-
-```java {9-16} [Test.java]
-package com.github.demo1;
-
-public class Test {
-    public static void main(String[] args) {        
-        show(new Student("张三", 18));
-        show(new Teacher("李四", 28));
-    }
-    
-    public static void show(Person p){
-        System.out.println(p.getName() + "---" + p.getAge());
-        if(p instanceof Student stu){
-            stu.study();
-        }else if(p instanceof Teacher tea){
-            tea.working();
+    public static void main(String[] args) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+        Date skillStartDate = sdf.parse("2023年11月11日 00:00:00");
+        Date skillEndDate = sdf.parse("2023年11月11日 00:10:00");
+
+        Date xiaoJiaDate = sdf.parse("2023年11月11日 00:01:00");
+        Date xiaoPiDate = sdf.parse("2023年11月11日 00:11:00");
+
+        if (xiaoJiaDate.after(skillStartDate) 
+            && xiaoJiaDate.before(skillEndDate)) {
+            System.out.println("小贾可以参与此次秒杀活动");
+        } else {
+            System.out.println("小贾不能参与此次秒杀活动");
+        }
+
+        if (xiaoPiDate.after(skillStartDate) 
+            && xiaoPiDate.before(skillEndDate)) {
+            System.out.println("小皮可以参与此次秒杀活动");
+        } else {
+            System.out.println("小皮不能参与此次秒杀活动");
         }
     }
 }
 ```
 
+```txt [cmd 控制台]
+小贾可以参与此次秒杀活动
+小皮不能参与此次秒杀活动
+```
+
 :::
 
-### 1.5.4 解决
+## 1.4 Calendar
 
-* 抽象类可以强制让子类，一定要按照规定的格式进行重写。
+### 1.4.1 概述
 
-![](./assets/13.svg)
+* Calendar 代表了系统当前时间的日历对象，可以单独修改、获取时间中的年、月、日等。
+
+> [!CAUTION]
+>
+> Calendar 是一个抽象类，不能直接创建对象；但是，其提供一个静态方法返回 Calendar 实例。
+
+### 1.4.2 静态方法
+
+* 静态方法获取 Calendar 实例：
+
+```java
+public static Calendar getInstance(){ // [!code focus]
+    Locale aLocale = Locale.getDefault(Locale.Category.FORMAT);
+    return createCalendar(defaultTimeZone(aLocale), aLocale);
+} // [!code focus]
+```
 
 
 
 * 示例：
 
-::: code-group
+```java
+package com.github.calendar;
 
-```java [Person.java]
-package com.github;
+import java.util.Calendar;
 
-public abstract class Person {
-
-    private String name;
-
-    private int age;
-
-    public Person() {}
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-
-    public void eat() {
-        System.out.println("吃饭");
-    }
-
-    public void sleep() {
-        System.out.println("睡觉");
-    }
-
-    // 抽象方法
-    public abstract void work();
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
+public class Test {
+    public static void main(String[] args){
+        Calendar calendar = Calendar.getInstance();
+        System.out.println("calendar = " + calendar);
     }
 }
 ```
 
-```java [Student.java]
-package com.github;
+### 1.4.3 常用 API
 
-public class Student extends Person{
+#### 1.4.3.1 获取日期对象
 
-    public Student() {}
+* 将 Calendar 实例转换为日期对象：
 
-    public Student(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void work() {
-        System.out.println("学生的工作是学习");
-    }
-}
+```java
+public final Date getTime() { // [!code focus]
+    return new Date(getTimeInMillis());
+} // [!code focus]
 ```
 
-```java [Teacher.java]
-package com.github;
 
-public class Teacher extends Person{
 
-    public Teacher() {}
+* 示例：
 
-    public Teacher(String name, int age) {
-        super(name, age);
-    }
+```java
+package com.github.calendar;
 
-    @Override
-    public void work() {
-        System.out.println("老师的工作是教学");
-    }
-}
-```
-
-```java {9-12} [Test.java]
-package com.github.demo1;
+import java.util.Calendar;
+import java.util.Date;
 
 public class Test {
     public static void main(String[] args) {
-        show(new Student("张三", 18));
-        show(new Teacher("李四", 28));
-    }
-
-    public static void show(Person p){
-        System.out.println(p.getName() + "---" + p.getAge());
-        p.work();
+        Calendar calendar = Calendar.getInstance();
+        Date date = calendar.getTime();
+        // date = Tue Apr 22 14:58:13 CST 2025
+        System.out.println("date = " + date);
     }
 }
 ```
 
-:::
+#### 1.4.3.2 给日历设置日期对象
 
-# 第二章：接口（⭐）
+* 将日期对象转换为 Calendar 实例：
+
+```java
+public final void setTime(Date date) { // [!code focus]
+    Objects.requireNonNull(date, "date must not be null");
+    setTimeInMillis(date.getTime());
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.calendar;
+
+import java.util.Calendar;
+import java.util.Date;
+
+public class CalendarTest3 {
+    public static void main(String[] args) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        System.out.println("calendar = " + calendar);
+    }
+}
+```
+
+#### 1.4.3.3 获取毫秒值
+
+* 将 Calendar 实例转换为毫秒值：
+
+```java
+public long getTimeInMillis() { // [!code focus]
+    if (!isTimeSet) {
+        updateTime();
+    }
+    return time;
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.calendar;
+
+import java.util.Calendar;
+
+public class Test {
+    public static void main(String[] args) {
+        Calendar calendar = Calendar.getInstance();
+        long time = calendar.getTimeInMillis();
+        // time = 1745305350908
+        System.out.println("time = " + time);
+    }
+}
+```
+
+#### 1.4.3.4 给日历设置毫秒值
+
+* 将毫秒值转换为 Calendar 实例：
+
+```java
+public void setTimeInMillis(long millis) { // [!code focus]
+    // If we don't need to recalculate the calendar field values,
+    // do nothing.
+    if (time == millis && isTimeSet && areFieldsSet && areAllFieldsSet
+        && (zone instanceof ZoneInfo) && !((ZoneInfo)zone).isDirty()) {
+        return;
+    }
+    time = millis;
+    isTimeSet = true;
+    areFieldsSet = false;
+    computeFields();
+    areAllFieldsSet = areFieldsSet = true;
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.calendar;
+
+import java.util.Calendar;
+
+public class Test {
+    public static void main(String[] args) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        System.out.println("calendar = " + calendar);
+    }
+}
+```
+
+#### 1.4.3.5 获取日历中某个字段信息
+
+* 获取日历中某个字段信息：
+
+```java
+public int get(int field) { // [!code focus]
+    complete();
+    return internalGet(field);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.calendar;
+
+import java.util.Calendar;
+
+public class Test {
+    public static void main(String[] args) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        System.out.println("year = " + year); // year = 2025
+        int month = calendar.get(Calendar.MONTH) + 1;
+        System.out.println("month = " + month); // month = 4
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        System.out.println("day = " + day); // day = 22
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        System.out.println("hour = " + hour); // hour = 14
+        int minute = calendar.get(Calendar.MINUTE);
+        System.out.println("minute = " + minute); // minute = 53
+        int second = calendar.get(Calendar.SECOND);
+        System.out.println("second = " + second); // second = 48
+        int milliSecond = calendar.get(Calendar.MILLISECOND);
+        System.out.println("milliSecond = " + milliSecond); // milliSecond = 658
+
+    }
+}
+```
+
+#### 1.4.3.6 修改日历中某个字段信息
+
+* 修改日历中某个字段信息：
+
+```java
+public void set(int field, int value) { // [!code focus]
+    // If the fields are partially normalized, calculate all the
+    // fields before changing any fields.
+    if (areFieldsSet && !areAllFieldsSet) {
+        computeFields();
+    }
+    internalSet(field, value);
+    isTimeSet = false;
+    areFieldsSet = false;
+    isSet[field] = true;
+    stamp[field] = nextStamp++;
+    if (nextStamp == Integer.MAX_VALUE) {
+        adjustStamp();
+    }
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.calendar;
+
+import java.util.Calendar;
+
+public class Test {
+    public static void main(String[] args) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR,2005);
+        // calendar = 2005
+        System.out.println("calendar = " + calendar.get(Calendar.YEAR));
+    }
+}
+```
+
+#### 1.4.3.7 为某个字段增加或减少指定的值
+
+* 设置日历字段的偏移量：
+
+```java
+public abstract void add(int field, int amount);
+```
+
+> [!NOTE]
+>
+> 如果是增加，amount 是正数；如果是减少，amount 是负数。
+
+
+
+* 示例：
+
+```java
+package com.github.calendar;
+
+import java.util.Calendar;
+
+public class Test {
+    public static void main(String[] args) {
+        Calendar calendar = Calendar.getInstance();
+        // 日历向后移动 180 天
+        calendar.add(Calendar.DAY_OF_MONTH, 180);
+        int year = calendar.get(Calendar.YEAR);
+        System.out.println("year = " + year); // year = 2025
+        int month = calendar.get(Calendar.MONTH) + 1;
+        System.out.println("month = " + month); // month = 10
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        System.out.println("day = " + day); // day = 19
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        System.out.println("hour = " + hour); // hour = 15
+        int minute = calendar.get(Calendar.MINUTE);
+        System.out.println("minute = " + minute); // minute = 8
+        int second = calendar.get(Calendar.SECOND);
+        System.out.println("second = " + second); // second = 55
+        int milliSecond = calendar.get(Calendar.MILLISECOND);
+        System.out.println("milliSecond = " + milliSecond); // milliSecond = 136
+    }
+}
+```
+
+
+
+# 第二章：JDK 8 新增时间相关类（⭐）
 
 ## 2.1 概述
 
-* 假设有如下的继承体系：
+* Java 1.0 中包含了一个 Date 类，但是它的大多数方法已经在 Java 1.1 中引入 Calendar 类的时候被废弃了。
+* 但是，Calendar 并不比 Date 类好多少，它们有如下的问题：
+  * ① 可变性：像日期和时间这样的类对象应该是不可变的。Calendar 类可以使用三种方法更改日历字段：`set()` 、`add()` 和 `roll()` 。
+  - ② 偏移性：Date 和 Calendar 中的月份是从 0 开始的。
+  - ③ 格式化：格式化只对 Date 有效，Calendar 则不行。
+  - ④ 它们不是线程安全的，不能处理闰秒等。
+* 在 JDK8 之前，对日期和时间的操作一直是 Java 程序员最为痛苦的地方，没有之一。第三方库 joda-time 在 JDK8 出现之前的很长时间备受 Java 程序员欢迎。JDK8 吸收了 joda-time 的精华，以一个新的开始，为 Java 程序员提供优秀的时间日期 API 。
+  * ① `java.time` – 包含值对象的基础包。
+  - ② `java.time.chrono` – 提供对不同的日历系统的访问。
+  - ③ `java.time.format` – 格式化和解析时间和日期。
+  - ④ `java.time.temporal` – 包括底层框架和扩展特性。
+  - ⑤ `java.time.zone` – 包含时区支持的类。
+  
+* JDK7 和 JDK8 的对比，如下所示：
 
-![](./assets/14.svg)
+| 代码层面                                                | 安全层面                                                     |
+| ------------------------------------------------------- | ------------------------------------------------------------ |
+| JDK7 编码麻烦，日期对象 <--> 毫秒值。                   | JDK7 在多线程环境下会导致数据安全问题。                      |
+| JDK8 编码简单，提供了判断的方法以及计算时间间隔的方法。 | JDK8 的时间日期对象都是不可变对象，一举解决了之前在多线程下导致数据安全的问题。 |
 
-* 我们可以将`共性`的部分抽取到父类中，如下所示：
+## 2.2 JDK8 新增的时间相关类
 
-![](./assets/15.svg)
+* JDK8 新增的时间相关类非常多，如下所示：
 
-* 现在，我们需要增加`游泳`的行为，难道也添加到父类中，如下所示：
+| JDK8 新增的时间相关类 | 描述                   |
+| --------------------- | ---------------------- |
+| ZoneId                | 时区                   |
+| Instant               | 时间戳                 |
+| ZoneDateTime          | 带时区的时间           |
+| DateTimeFormatter     | 用于时间的格式化和解析 |
+| LocalDate             | 年、月、日             |
+| LocalTime             | 时、分、秒             |
+| LocalDateTime         | 年、月、日、时、分、秒 |
+| Duration              | 时间间隔（秒，纳秒）   |
+| Period                | 时间间隔（年、月、日） |
+| ChronoUnit            | 时间间隔（所有单位）   |
 
-![](./assets/16.svg)
+* 我们可以对比 JDK8 之前的 API 来学习，如下所示：
 
-* 其实，这是非常不合理的，因为只有`青蛙`才会游泳，而`兔子`和`狗`是不会游泳的。难道将`游泳`写在青蛙类中，如下所示：
+![](./assets/10.svg)
 
-![](./assets/17.svg)
+## 2.2 时区（ZoneId）
 
+### 2.2.1 概述
 
+* 全世界一共分为 24 个时区，每个时区都是按照`标准世界时间`进行`加`或`减`，中国处于东八区，如下所示：
 
-* 如果此时，增加了`鱼`，并且`鱼`也有`游泳`的功能，难道也将`游泳`写在`鱼`类中，如下所示：
+![](./assets/11.png)
 
-![](./assets/18.svg)
+* Java 在定义时区的时候，并不是采取`东一区`、`东二区`、... ，而是采取`洲名/城市名`或`国家名/城市名`，如下所示：
 
-* 但是，这样会有一个弊端：我们无法限制子类中方法的书写格式，如下所示：
-
-![](./assets/19.svg)
-
-* 此时，接口就出现了，即：接口就可以用来约束实现类必须去实现抽象方法，如下所示：
-
-![](./assets/20.svg)
-
-* 但是，并不意味着所有的方法都需要抽取到接口中，比如：青蛙可以跳跃，而鱼不可以，我们只需要抽取共性的规则，如下所示：
-
-![](./assets/21.svg)
-
-> [!NOTE]
+> [!CAUTION]
 >
-> 综上所述：当我们需要给多个类同时去定义规则的时候，就需要用到接口，即：接口就是一种规则。
+> * ① Java 在定义时区的时候是没有北京的，如：`Asia/Beijing`。
+> * ② 在实际开发中，我们通常会使用`Asia/Shanghai`来表示中国的时区。
 
-## 2.2 抽象类 VS 接口
+![](./assets/12.png)
 
-* 抽象类更多的是用来父类中，在抽象共性方法的时候，当方法体不一样，就可以写成抽象方法，而抽象方法所在的类就是抽象类。
+### 2.2.2 常用 API
 
-> [!NOTE]
->
-> 在下面的继承体系中，Animal 动物，我们就可以将其定义为抽象类，此时的抽象类就表示一类事物，即：表示动物这一类事物。
-
-![](./assets/22.svg)
-
-* 而接口不是表示一类事物，接口就是一种规则，它侧重于行为的抽象。
-
-> [!NOTE]
->
-> 青蛙可以有游泳的行为，鱼也可以有游泳的行为，而学生和老师也可以有游泳的行为。
-
-![](./assets/23.svg)
-
-## 2.3 接口
-
-* 语法：
+* 获取 Java 中支持的所有时区：
 
 ```java
-public interface 接口名 {
-    // ① 静态常量
-    // ② 抽象方法
-    // ③ 默认方法
-    // ④ 静态方法
-    // ⑤ 私有方法
-}
+public static Set<String> getAvailableZoneIds() { // [!code focus]
+    return new HashSet<String>(ZoneRulesProvider.getAvailableZoneIds());
+} // [!code focus]
 ```
 
-> [!NOTE]
+* 获取系统默认的时区：
+
+```java
+public static ZoneId systemDefault() { // [!code focus]
+    return TimeZone.getDefault().toZoneId();
+} // [!code focus]
+```
+
+* 获取指定的时区：
+
+```java
+public static ZoneId of(String zoneId) { // [!code focus]
+    return of(zoneId, true);
+} // [!code focus]
+```
+
+> [!CAUTION]
 >
-> * ① 接口和抽象类一样，不能实例化。
-> * ② 接口和类之间是实现关系，使用`implements`关键字表示，如：`public class Frog implements Run {}`。
-> * ③ 接口的子类（实现类），要么重写接口中的所有抽象方法，要么自身是抽象类。
-> * ④ 接口和接口之间是继承的关系，如：`public interface A extends B {}` 。
+> Java 提供的时区太多了，我们并不需要记住，只需要使用上面的 API 就可以获取对应的时区！！！
 
 
 
 * 示例：
 
-::: code-group
+```java
+package com.github.jdk8;
 
-```java [Fly.java]
-public interface Fly {
+import java.time.ZoneId;
+import java.util.Set;
 
-    void fly();
-}
-```
+public class Test {
 
-```java [Bird.java]
-public class Bird implements Fly {
-    @Override
-    public void fly() {
-        System.out.println("小鸟在飞");
+    public static void main(String[] args) throws InterruptedException {
+        Set<String> availableZoneIds = ZoneId.getAvailableZoneIds();
+        System.out.println("availableZoneIds = " + availableZoneIds);
+        ZoneId zoneId = ZoneId.systemDefault();
+        System.out.println("zoneId = " + zoneId);
+        ZoneId zoneId2 = ZoneId.of("Asia/Chongqing");
+        System.out.println("zoneId2 = " + zoneId2);
     }
 }
 ```
 
-```java [SuperMan.java]
-public class SuperMan implements Fly {
-    @Override
-    public void fly() {
-        System.out.println("超人在飞");
-    }
-}
+## 2.3 时间戳（Instant）
+
+### 2.3.1 概述
+
+* Instant 类在 Java 中表示的是时间线上的一个瞬时点（时间戳），它并不直接关联任何特定的时区。 
+* Instant 对象本质上是以 UTC（世界协调时间）为基准的时间戳，记录自 1970 年 1 月 1 日 00:00:00（UTC）以来的秒数和纳秒数。 
+
+### 2.3.2 常用 API
+
+#### 2.3.2.1 获取 Instant 对象
+
+* 获取当前时间的 Instant 对象（标准时间 UTC）：
+
+```java
+public static Instant now() { // [!code focus]
+    return Clock.currentInstant();
+} // [!code focus]
 ```
 
-```java [Test.java]
+* 根据秒、毫秒、纳秒获取 Instant 对象（标准时间 UTC）：
+
+```java
+// 根据秒获取 Instant 对象
+public static Instant ofEpochSecond(long epochSecond) { // [!code focus]
+    return create(epochSecond, 0);
+} // [!code focus]
+```
+
+```java
+// 根据毫秒获取 Instant 对象
+public static Instant ofEpochMilli(long epochMilli) { // [!code focus]
+    long secs = Math.floorDiv(epochMilli, 1000);
+    int mos = Math.floorMod(epochMilli, 1000);
+    return create(secs, mos * 1000_000);
+} // [!code focus]
+```
+
+```java
+// 根据秒和纳秒获取 Instant 对象
+public static Instant ofEpochSecond(long epochSecond, long nanoAdjustment) { // [!code focus]
+    long secs = Math.addExact(epochSecond, Math.floorDiv(nanoAdjustment, NANOS_PER_SECOND));
+    int nos = (int)Math.floorMod(nanoAdjustment, NANOS_PER_SECOND);
+    return create(secs, nos);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+
 public class Test {
     public static void main(String[] args) {
-        Fly bird = new Bird();
-        bird.fly();
-
-        System.out.println("-----------------");
-
-        Fly superman = new SuperMan();
-        superman.fly();
+        Instant now = Instant.now();
+        // now = 2025-04-23T01:02:02.398288Z
+        System.out.println("now = " + now);
     }
 }
 ```
 
-:::
 
-## 2.4 JDK 8 之前接口中的成员
+
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+
+public class Test {
+    public static void main(String[] args) {
+
+        Instant instant1 = Instant.ofEpochSecond(1);
+        // instant1 = 1970-01-01T00:00:01Z
+        System.out.println("instant1 = " + instant1);
+
+        Instant instant2 = Instant.ofEpochMilli(1000);
+        // instant2 = 1970-01-01T00:00:01Z
+        System.out.println("instant2 = " + instant2);
+
+        Instant instant3 = Instant.ofEpochSecond(0, (long) Math.pow(10, 9));
+        // instant3 = 1970-01-01T00:00:01Z
+        System.out.println("instant3 = " + instant3);
+    }
+}
+```
+
+#### 2.3.2.2 转换时区
+
+* 将 UTC 表示的时间戳转换为指定时区的时间：
+
+```java
+public ZonedDateTime atZone(ZoneId zone) { // [!code focus]
+    return ZonedDateTime.ofInstant(this, zone);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+public class Test {
+    public static void main(String[] args) {
+        Instant now = Instant.now();
+
+        // UTC = 2025-04-23T01:09:18.513139200Z
+        System.out.println("UTC = " + now);
+
+        ZonedDateTime zonedDateTime = now.atZone(ZoneId.of("Asia/Shanghai"));
+
+        // 2025-04-23T09:09:18.513139200+08:00[Asia/Shanghai]
+        System.out.println("zonedDateTime = " + zonedDateTime);
+    }
+}
+```
+
+#### 2.3.2.3 判断系列方法
+
+* 判断`当前时间戳（时刻）`是否在`指定时间戳（时刻）`之前：
+
+```java
+public boolean isBefore(Instant otherInstant) { // [!code focus]
+    return compareTo(otherInstant) < 0;
+} // [!code focus]
+```
+
+* 判断`当前时间戳（时刻）`是否在`指定时间戳（时刻）`之后：
+
+```java
+public boolean isAfter(Instant otherInstant) { // [!code focus]
+    return compareTo(otherInstant) > 0;
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+
+public class Test {
+    public static void main(String[] args) {
+        Instant instant = Instant.ofEpochSecond(0);
+        Instant now = Instant.now();
+
+        System.out.println(instant.isBefore(now)); // true
+        System.out.println(instant.isAfter(now)); // false
+    }
+}
+```
+
+#### 2.3.2.4 增加时间系列方法
+
+* 在`当前时间戳（时刻）`基础上增加`秒`：
+
+```java
+public Instant plusSeconds(long secondsToAdd) { // [!code focus]
+    return plus(secondsToAdd, 0);
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上增加`毫秒`：
+
+```java
+public Instant plusMillis(long millisToAdd) { // [!code focus]
+    return plus(millisToAdd / 1000, (millisToAdd % 1000) * 1000_000);
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上增加`纳秒`：
+
+```java
+public Instant plusNanos(long nanosToAdd) { // [!code focus]
+    return plus(0, nanosToAdd);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+
+public class Test {
+    public static void main(String[] args) {
+        Instant instant = Instant.ofEpochSecond(0);
+        // instant = 1970-01-01T00:00:00Z
+        System.out.println("instant = " + instant);
+        Instant instant2 = instant.plusSeconds(7);
+        // instant2 = 1970-01-01T00:00:07Z
+        System.out.println("instant2 = " + instant2);
+        Instant instant3 = instant.plusMillis(1000);
+        // instant3 = 1970-01-01T00:00:01Z
+        System.out.println("instant3 = " + instant3);
+        Instant instant4 = instant.plusNanos((long) Math.pow(10, 9));
+        // instant4 = 1970-01-01T00:00:01Z
+        System.out.println("instant4 = " + instant4);
+    }
+}
+```
+
+#### 2.3.2.5 减少时间系列方法
+
+* 在`当前时间戳（时刻）`基础上减少`秒`：
+
+```java
+public Instant minusSeconds(long secondsToSubtract) { // [!code focus]
+    if (secondsToSubtract == Long.MIN_VALUE) {
+        return plusSeconds(Long.MAX_VALUE).plusSeconds(1);
+    }
+    return plusSeconds(-secondsToSubtract);
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上减少`毫秒`：
+
+```java
+public Instant minusMillis(long millisToSubtract) { // [!code focus]
+    if (millisToSubtract == Long.MIN_VALUE) {
+        return plusMillis(Long.MAX_VALUE).plusMillis(1);
+    }
+    return plusMillis(-millisToSubtract);
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上减少`纳秒`：
+
+```java
+public Instant minusNanos(long nanosToSubtract) { // [!code focus]
+    if (nanosToSubtract == Long.MIN_VALUE) {
+        return plusNanos(Long.MAX_VALUE).plusNanos(1);
+    }
+    return plusNanos(-nanosToSubtract);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.instant;
+
+import java.time.Instant;
+
+public class Test {
+    public static void main(String[] args) {
+        Instant instant = Instant.now();
+        // instant = 2025-04-23T01:37:22.990790600Z
+        System.out.println("instant = " + instant);
+        Instant instant2 = instant.minusSeconds(7);
+        // instant2 = 2025-04-23T01:37:15.990790600Z
+        System.out.println("instant2 = " + instant2);
+        Instant instant3 = instant.minusMillis(1000);
+        // instant3 = 2025-04-23T01:37:21.990790600Z
+        System.out.println("instant3 = " + instant3);
+        Instant instant4 = instant.minusNanos((long) Math.pow(10, 9));
+        // instant4 = 2025-04-23T01:37:21.990790600Z
+        System.out.println("instant4 = " + instant4);
+    }
+}
+```
+
+## 2.4 带时区的时间（ZoneDateTime）
 
 ### 2.4.1 概述
 
-* JDK 8 之前接口中只允许出现：成员变量和成员方法，没有构造方法。
-* 其中，`成员变量`是`公共的静态常量`，默认修饰符是：`public static final`。
-* 其中，`成员方法`是`公共的抽象方法`，默认修饰符是：`public abstract`。
+* ZoneDateTime 用于表示带有时区信息的日期和时间。
 
-### 2.4.2 IDEA 验证
+### 2.4.2 常用 API
 
-* 我们可以在 IDEA 中，通过`JclassLib`插件来验证`接口`中的`公共静态常量`，如下所示：
+#### 2.4.2.1 获取 ZoneDateTime 对象
 
-![接口中的公共静态常量](./assets/24.png)
+* 获取当前时间的 ZoneDateTime 对象（带有时区）：
 
-* 我们可以在 IDEA 中，通过`JclassLib`插件来验证`接口`中的`公共抽象方法`，如下所示：
+```java
+public static ZonedDateTime now() { // [!code focus]
+    return now(Clock.systemDefaultZone());
+} // [!code focus]
+```
 
-![接口中的公共抽象方法](./assets/25.png)
+* 年、月、日、时、分、秒、纳秒方式获取 ZoneDateTime 对象（带有时区）：
 
-### 2.4.3 接口中成员的思考？
+```java
+public static ZonedDateTime of( // [!code focus]
+        int year, int month, int dayOfMonth,  // [!code focus]
+        int hour, int minute, int second, int nanoOfSecond, ZoneId zone) { // [!code focus]
+    LocalDateTime dt = LocalDateTime.of(year, month, dayOfMonth, 
+                                        hour, minute, second, nanoOfSecond);
+    return ofLocal(dt, zone, null);
+} // [!code focus]
+```
 
-* 【问】为什么接口中只能声明公共的静态常量？
-* 【答】因为接口是标准规范，那么在规范中需要声明一些底线边界值，当实现者在实现这些规范的时候，不能随意的去修改和触碰这些底线边界值，否则就有 `危险` ，如：USB 1.0 规范中规定最大传输速率是 1.5 Mbps ，最大输出电流是 5V/500 mA 。 USB 3.0 规范中规定最大传输速率是5Gbps (500MB/s) ，最大输出电流是 5V/900 mA 。 
+* Instant + 时区方式获取 ZoneDateTime 对象（带有时区）：
 
-
-
-* 【问】为什么 JDK 8 之前，只允许出现公共的默认方法？
-* 【答】因为接口是代表行为标准，它只规定方法的 `签名` ，方法 = 方法头 + 方法体；其中，方法头又称为方法签名，方法签名 = `修饰符 返回值类型 方法名(形参列表);` ，而方法体是 `{ // 执行逻辑 }`；换言之，方法签名已经提供了功能的描述信息，调用者无需关注具体的方法实现细节。
-
-## 2.5 应用示例
-
-* 需求：编写带有接口和抽象类的标准 JavaBean 类。
-
-| 动物        | 属性       | 行为         |
-| ----------- | ---------- | ------------ |
-| 青蛙 Frog   | 名字、年龄 | 吃虫子、蛙泳 |
-| 狗 Dog      | 名字、年龄 | 吃骨头、狗刨 |
-| 兔子 Rabbit | 名字、年龄 | 吃胡萝卜     |
-
-```mermaid
----
-title: 类继承体系结构设计
----
-classDiagram
-	 note for Animal "动物"
-	 Animal <|-- Frog : extends
-	 Swim   <|-- Frog : implements
-	 note for Frog "青蛙"
-	 Animal <|-- Dog : extends
-	 Swim   <|-- Dog : implements
-	 note for Dog "狗"
-	 Animal <|-- Rabbit : extends
-	 note for Rabbit "兔子"
-     <<Abstract>> Animal
-     class Animal {
-        - String name
-        - int age
-
-        + eat() void*
-     }
-     note for Swim "游泳"
-     class Swim {
-        <<interface>>
-     	+ swimming() void
-     }
-     class Frog {
-     	+ eat() void
-     }
-     class Dog {
-     	+ eat() void
-     }
-     class Rabbit {
-     	+ eat() void
-     }
+```java
+public static ZonedDateTime ofInstant(Instant instant, ZoneId zone) { // [!code focus]
+    Objects.requireNonNull(instant, "instant");
+    Objects.requireNonNull(zone, "zone");
+    return create(instant.getEpochSecond(), instant.getNano(), zone);
+} // [!code focus]
 ```
 
 
 
 * 示例：
 
-::: code-group
+```java
+package com.github.jdk8.zonedatetime;
 
-```java [Animal.java]
-package com.github.demo3;
-
-public abstract class Animal {
-
-    private String name;
-
-    private int age;
-
-
-    public Animal() {}
-
-    public Animal(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public abstract void eat();
-
-    @Override
-    public String toString() {
-        return "Animal{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-```
-
-```java [Swim.java]
-package com.github.demo3;
-
-public interface Swim {
-
-    void swimming();
-
-}
-```
-
-:::
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Frog.java]
-package com.github.demo3;
-
-public class Frog extends Animal implements Swim{
-
-    public Frog() {}
-
-    public Frog(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void eat() {
-        System.out.println("吃虫子");
-    }
-
-    @Override
-    public void swimming() {
-        System.out.println("蛙泳");
-    }
-}
-```
-
-```java [Dog.java]
-package com.github.demo3;
-
-public class Dog extends Animal implements Swim{
-
-    public Dog() {}
-
-    public Dog(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void eat() {
-        System.out.println("吃骨头");
-    }
-
-    @Override
-    public void swimming() {
-        System.out.println("狗刨");
-    }
-}
-```
-
-```java [Rabbit.java]
-package com.github.demo3;
-
-public class Rabbit extends Animal {
-
-    public Rabbit() {}
-
-    public Rabbit(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void eat() {
-        System.out.println("吃胡萝卜");
-    }
-}
-```
-
-```java [Test.java]
-package com.github.demo3;
+import java.time.ZonedDateTime;
 
 public class Test {
     public static void main(String[] args) {
-        Frog frog = new Frog("青蛙--呱呱", 2);
-        frog.eat();
-        frog.swimming();
-        System.out.println("frog = " + frog);
-
-        System.out.println("------------------");
-
-        Dog dog = new Dog("小狗--汪汪", 5);
-        dog.eat();
-        dog.swimming();
-        System.out.println("dog = " + dog);
-
-        System.out.println("------------------");
-
-        Rabbit rabbit = new Rabbit("兔子--兔兔", 9);
-        rabbit.eat();
-        System.out.println("rabbit = " + rabbit);
+        ZonedDateTime now = ZonedDateTime.now();
+        // now = 2025-04-23T09:50:51.743019300+08:00[Asia/Shanghai]
+        System.out.println("now = " + now);
     }
 }
 ```
 
-```txt [cmd 控制台]
-吃虫子
-蛙泳
-frog = Animal{name='青蛙--呱呱', age=2}
-------------------
-吃骨头
-狗刨
-dog = Animal{name='小狗--汪汪', age=5}
-------------------
-吃胡萝卜
-rabbit = Animal{name='兔子--兔兔', age=9}
-```
-
-:::
-
-## 2.6 接口和类之间的关系
-
-### 2.6.1 类和类之间的关系
-
-* 类和类之间，是`继承`的关系，可以是单继承，不能多继承，但是可以多层继承。
 
 
-
-* 示例：类和类之间，可以是单继承
-
-::: code-group
-
-```java [Animal.java]
-public class Animal {}
-```
-
-```java [Dog.java]
-public class Dog extends Animal {} // [!code highlight]
-```
-
-:::
-
-
-
-* 示例：类和类之间，可以是多层继承
-
-::: code-group
-
-```java [Animal.java]
-public class Animal {}
-```
-
-```java [Dog.java]
-public class Dog extends Animal {} // [!code highlight]
-```
-
-```java [Husky.java]
-public class Husky extends Dog {} // [!code highlight]
-```
-
-:::
-
-### 2.6.2 类和接口之间的关系
-
-* 类和接口之间是`实现`的关系，可以是单实现，也可以是多实现，甚至可以在继承一个类的同时实现多个接口。
-
-
-
-* 示例：类和接口之间，可以是单实现
-
-::: code-group
-
-```java [Fly.java]
-public interface Fly {
-
-    void fly();
-}
-```
-
-```java [Bird.java]
-public class Bird implements Fly { // [!code highlight]
-    @Override
-    public void fly() {
-        System.out.println("小鸟在飞");
-    }
-}
-```
-
-:::
-
-
-
-* 示例：类和接口之间，可以是多实现
-
-::: code-group
-
-```java [Fly.java]
-public interface Fly {
-
-    void fly();
-}
-```
-
-```java [Jump.java]
-public interface Jump {
-
-    void jump();
-}
-```
-
-```java [Bird.java]
-public class Bird implements Fly,Jump { // [!code highlight]
-    @Override
-    public void jump() {
-        System.out.println("小鸟在跳");
-    }
-    
-    @Override
-    public void fly() {
-        System.out.println("小鸟在飞");
-    }
-}
-```
-
-:::
-
-
-
-* 示例：实现类可以继承一个类的同时，实现多个接口
-
-::: code-group
-
-```java [Animal.java]
-public abstract class Animal {
-    
-    // 吃饭
-    public abstract void eat();
-}
-```
-
-```java [Fly.java]
-public interface Fly {
-
-    void fly();
-}
-```
-
-```java [Jump.java]
-public interface Jump {
-
-    void jump();
-}
-```
-
-```java [Bird.java]
-public class Bird extends Animal implements Fly,Jump { // [!code highlight]
-    @Override
-    public void eat() {
-        System.out.println("小鸟吃虫子");
-    }
-    
-    @Override
-    public void jump() {
-        System.out.println("小鸟在跳");
-    }
-    
-    @Override
-    public void fly() {
-        System.out.println("小鸟在飞");
-    }
-}
-```
-
-:::
-
-### 2.6.3 接口和接口之间的关系
-
-* 接口和接口之间是继承关系，可以是单继承，也可以是多继承。
-
-
-
-* 示例：接口和接口之间，可以是单继承
-
-::: code-group
+* 示例：
 
 ```java
-public interface Printable {
-    void print();
-}
-```
+package com.github.jdk8.zonedatetime;
 
-```java
-public interface Displayable extends Printable { // [!code highlight]
-    void display();
-}
-```
-
-```java [Printer.java]
-public class Printer implements Displayable {
-    @Override
-    public void print() {
-        System.out.println("Printing...");
-    }
-
-    @Override
-    public void display() {
-        System.out.println("Displaying...");
-    }
-}
-```
-
-:::
-
-
-
-* 示例：接口和接口之间，可以是多继承
-
-::: code-group
-
-```java
-public interface Printable {
-    void print();
-}
-```
-
-```java [Showable.java]
-public interface Showable {
-    void show();
-}
-```
-
-```java [Displayable.java]
-public interface Displayable extends Printable,Showable { // [!code highlight]
-    void display();
-}
-```
-
-```java [Printer.java]
-
-public class Printer implements Displayable {
-    @Override
-    public void print() {
-        System.out.println("Printing...");
-    }
-    
-    @Override
-    public void show() {
-        System.out.println("Showing...");
-    }
-    
-    @Override
-    public void display() {
-        System.out.println("Displaying...");
-    }
-}
-```
-
-:::
-
-## 2.8 应用示例
-
-* 需求：编写带有接口和抽象类的标准 JavaBean 类。
-
-| 动物                           | 属性       | 行为               |
-| ------------------------------ | ---------- | ------------------ |
-| 乒乓球运动员（PingPongPlayer） | 名字、年龄 | 学打乒乓球、说英语 |
-| 篮球运动员（BasketballPlayer） | 名字、年龄 | 学打篮球           |
-| 乒乓球教练（PingPongCoach）    | 名字、年龄 | 教打乒乓球、说英语 |
-| 篮球教练（BasketballCoach）    | 名字、年龄 | 教打篮球           |
-
-```mermaid
----
-title: 类继承体系结构设计
----
-classDiagram
-	 note for Person "人"
-	 Person <|-- Player : extends
-	 note for Player "运行员"
-	 Player <|-- PingPongPlayer : extends
-	 note for PingPongPlayer "乒乓球运动员"
-	 Player <|-- BasketballPlayer : extends
-	 note for BasketballPlayer "篮球运动员"
-	 Person <|-- Coach : extends
-	 note for Coach "教练"
-	 Coach <|-- PingPongCoach : extends
-	 note for PingPongCoach "乒乓球教练"
-	 Coach <|-- BasketballCoach : extends
-	 note for BasketballCoach "篮球教练"
-	 Say   <|-- PingPongPlayer : implements
-	 Say   <|-- PingPongCoach : implements
-	 note for Say "说英语"
-     class Say {
-        <<interface>>
-     	+ sayEnglish() void*
-     }
-     <<Abstract>> Person
-     class Person {
-        - String name
-        - int age
-     }
-     <<Abstract>> Player
-     class Player {
-        + study() void*
-     }
-     class PingPongPlayer {
-     	 + study() void
-     	 + sayEnglish() void
-     }
-     class BasketballPlayer {
-     	 + study() void
-     }
-     <<Abstract>> Coach
-     class Coach {
-        + teach() void*
-     }
-     class PingPongCoach {
-     	 + teach() void
-     	 + sayEnglish() void
-     }
-     class BasketballCoach {
-     	 + teach() void
-     }
-     
-```
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Person.java]
-package com.github.demo4;
-
-public abstract class Person {
-
-    private String name;
-
-    private int age;
-
-    public Person() {
-    }
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "name='" + name + '\'' +
-                ", age=" + age +
-                '}';
-    }
-}
-```
-
-```java [Player.java]
-package com.github.demo4;
-
-public abstract class Player extends Person{
-
-    public Player() {}
-
-    public Player(String name, int age) {
-        super(name, age);
-    }
-
-    public abstract void study();
-}
-```
-
-```java [Coach.java]
-package com.github.demo4;
-
-public abstract class Coach extends Person{
-
-    public Coach() {}
-
-    public Coach(String name, int age) {
-        super(name, age);
-    }
-
-    public abstract void teach();
-}
-```
-
-```java [Say.java]
-package com.github.demo4;
-
-public interface Say {
-    
-    void sayEnglish();
-}
-```
-
-:::
-
-
-
-* 示例：
-
-::: code-group
-
-```java [PingPongPlayer.java]
-package com.github.demo4;
-
-public class PingPongPlayer extends Player implements Say{
-
-    public PingPongPlayer() {}
-
-    public PingPongPlayer(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void study() {
-        System.out.println("学打乒乓球");
-    }
-
-    @Override
-    public void sayEnglish() {
-        System.out.println("说英语");
-    }
-}
-```
-
-```java [PingPongCoach.java]
-package com.github.demo4;
-
-public class PingPongCoach extends Coach implements Say{
-
-    public PingPongCoach() {}
-
-    public PingPongCoach(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void teach() {
-        System.out.println("教打乒乓球");
-    }
-
-    @Override
-    public void sayEnglish() {
-        System.out.println("说英语");
-    }
-}
-```
-
-:::
-
-
-
-* 示例：
-
-::: code-group
-
-```java [BasketballPlayer.java]
-package com.github.demo4;
-
-public class BasketballPlayer extends Player{
-
-    public BasketballPlayer() {}
-
-    public BasketballPlayer(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void study() {
-        System.out.println("学打篮球");
-    }
-}
-```
-
-```java [BasketballCoach.java]
-package com.github.demo4;
-
-public class BasketballCoach extends Coach{
-
-    public BasketballCoach() {}
-
-    public BasketballCoach(String name, int age) {
-        super(name, age);
-    }
-
-    @Override
-    public void teach() {
-        System.out.println("教打篮球");
-    }
-}
-```
-
-:::
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Test.java]
-package com.github.demo4;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class Test {
     public static void main(String[] args) {
-        PingPongPlayer pingPongPlayer = new PingPongPlayer("张三", 18);
-        pingPongPlayer.sayEnglish();
-        pingPongPlayer.study();
-        System.out.println("pingPongPlayer = " + pingPongPlayer);
 
-        System.out.println("-------------------");
-
-        PingPongCoach pingPongCoach = new PingPongCoach("李四", 19);
-        pingPongCoach.sayEnglish();
-        pingPongCoach.teach();
-        System.out.println("pingPongCoach = " + pingPongCoach);
-
-        System.out.println("-------------------");
-
-        BasketballPlayer basketballPlayer = new BasketballPlayer("王五", 20);
-        basketballPlayer.study();
-        System.out.println("basketballPlayer = " + basketballPlayer);
-
-        System.out.println("-------------------");
-
-        BasketballCoach basketballCoach = new BasketballCoach("赵六", 24);
-        basketballCoach.teach();
-        System.out.println("basketballCoach = " + basketballCoach);
-
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(2025, 4, 3,
+                11, 11, 11,
+                11, ZoneId.of("Asia/Shanghai"));
+        // zonedDateTime = 2025-04-03T11:11:11.000000011+08:00[Asia/Shanghai]
+        System.out.println("zonedDateTime = " + zonedDateTime);
     }
 }
 ```
 
-```txt [cmd 控制台]
-说英语
-学打乒乓球
-pingPongPlayer = Person{name='张三', age=18}
--------------------
-说英语
-教打乒乓球
-pingPongCoach = Person{name='李四', age=19}
--------------------
-学打篮球
-basketballPlayer = Person{name='王五', age=20}
--------------------
-教打篮球
-basketballCoach = Person{name='赵六', age=24}
+
+
+* 示例：
+
+```java
+package com.github.jdk8.zonedatetime;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+public class Test {
+    public static void main(String[] args) {
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(
+            Instant.now(), ZoneId.of("Asia/Shanghai"));
+        // zonedDateTime = 2025-04-23T09:57:52.336562200+08:00[Asia/Shanghai]
+        System.out.println("zonedDateTime = " + zonedDateTime);
+    }
+}
 ```
 
-:::
+#### 2.4.2.2 修改时间系列方法
 
-## 2.9 JDK 8 接口中的成员
+* 修改年：
 
-### 2.9.1 概述
+```java
+public ZonedDateTime withYear(int year) { // [!code focus]
+    return resolveLocal(dateTime.withYear(year));
+} // [!code focus]
+```
 
-* JDK 8 的新特性：接口中可以定义有方法体的方法，即：默认方法和静态方法。
-* JDK 9 的新特性：接口中可以定义私有方法。
+* 修改秒：
 
-### 2.9.2 解释为什么 JDK8 中出现默认方法？
+```java
+public ZonedDateTime withSecond(int second) { // [!code focus]
+    return resolveLocal(dateTime.withSecond(second));
+} // [!code focus]
+```
 
-* 项目刚开始创建的时候，`架构师`创建了一个接口并在接口中创建了一个抽象方法，让子类去实现该接口并重写抽象方法，如下所示：
+* 修改纳秒：
 
-![](./assets/26.svg)
+```java
+public ZonedDateTime withNano(int nanoOfSecond) { // [!code focus]
+    return resolveLocal(dateTime.withNano(nanoOfSecond));
+} // [!code focus]
+```
 
-* 随着项目的开发，V1.0 成功上线了。此时，V2.0 的需求随之而来，为了实现需求，架构师一口气（不喘气）地在接口中增加 10 个抽象方法，按照 JDK8 之前的用法，所有的子类都必须重写接口中的所有抽象方法，如下所示：
+* 修改任意时间（年、月、日、时、分、秒、毫秒、纳秒）：
 
-![](./assets/27.svg)
+```java
+public ZonedDateTime with(TemporalField field, long newValue) { // [!code focus]
+    if (field instanceof ChronoField chronoField) {
+        switch (chronoField) {
+            case INSTANT_SECONDS:
+                return create(newValue, getNano(), zone);
+            case OFFSET_SECONDS:
+                ZoneOffset offset = 
+                    ZoneOffset.ofTotalSeconds(
+                    chronoField.checkValidIntValue(newValue));
+                return resolveOffset(offset);
+        }
+        return resolveLocal(dateTime.with(field, newValue));
+    }
+    return field.adjustInto(this, newValue);
+} // [!code focus]
+```
 
-* 但是，此时`实习生小A` 和`实现生小B` 说了：“老大，你这些抽象方法也太多了吧，都不一定要使用到，我们改起来，太痛苦，我们拒绝”，如下所示：
-
-![](./assets/28.svg)
-
-* 此时，`架构师`想到了一个设计模式：适配器模式，于是就和实习生说：“你们现在不要实现我这个接口了，你们是继承我的抽象类，你们根据需要重写对应的方法就可以了”，如下所示：
-
-![](./assets/29.svg)
-
-* 随着项目的开发，V2.0 成功上线了。突然，有一天，`实习生小A`突然对`架构师`说：“老大，我们的 JDK 版本都 17 了，JDK8 中的方法早就有方法体了（默认方法），我们可以不用适配器模式了，直接采用 JDK8 中的默认方法，岂不很优雅”，如下所示：
-
-![](./assets/30.svg)
 
 
+* 示例：
+
+```java
+package com.github.jdk8.zonedatetime;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+
+public class Test {
+    public static void main(String[] args) {
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.now();
+        System.out.println("zonedDateTime = " + zonedDateTime);
+        // 修改年
+        ZonedDateTime zonedDateTime1 = zonedDateTime.withYear(2024);
+        System.out.println("zonedDateTime1 = " + zonedDateTime1);
+        // 修改月
+        ZonedDateTime zonedDateTime2 = zonedDateTime.withMonth(1);
+        System.out.println("zonedDateTime2 = " + zonedDateTime2);
+        // 修改日
+        ZonedDateTime zonedDateTime3 = zonedDateTime.withDayOfMonth(20);
+        System.out.println("zonedDateTime3 = " + zonedDateTime3);
+        // 修改小时
+        ZonedDateTime zonedDateTime4 = zonedDateTime.withHour(1);
+        System.out.println("zonedDateTime4 = " + zonedDateTime4);
+        // 修改分钟
+        ZonedDateTime zonedDateTime5 = zonedDateTime.withMinute(1);
+        System.out.println("zonedDateTime5 = " + zonedDateTime5);
+        // 修改秒
+        ZonedDateTime zonedDateTime6 = zonedDateTime.withSecond(1);
+        System.out.println("zonedDateTime6 = " + zonedDateTime6);
+        // 修改毫秒
+        ZonedDateTime zonedDateTime7 = zonedDateTime.with(ChronoField.MILLI_OF_SECOND, 1);
+        System.out.println("zonedDateTime7 = " + zonedDateTime7);
+        // 修改纳秒
+        ZonedDateTime zonedDateTime8 = zonedDateTime.withNano(1);
+        System.out.println("zonedDateTime8 = " + zonedDateTime8);
+    }
+}
+```
+
+#### 2.4.2.3 增加时间系列方法
+
+* 在`当前时间戳（时刻）`基础上增加`年`：
+
+```java
+public ZonedDateTime plusYears(long years) { // [!code focus]
+    return resolveLocal(dateTime.plusYears(years));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上增加`秒`：
+
+```java
+public ZonedDateTime plusSeconds(long seconds) { // [!code focus]
+    return resolveInstant(dateTime.plusSeconds(seconds));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上增加`纳秒`：
+
+```java
+public ZonedDateTime plusNanos(long nanos) { // [!code focus]
+    return resolveInstant(dateTime.plusNanos(nanos));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上增加`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
+
+```java
+public ZonedDateTime plus(long amountToAdd, TemporalUnit unit) { // [!code focus]
+    if (unit instanceof ChronoUnit) {
+        if (unit.isDateBased()) {
+            return resolveLocal(dateTime.plus(amountToAdd, unit));
+        } else {
+            return resolveInstant(dateTime.plus(amountToAdd, unit));
+        }
+    }
+    return unit.addTo(this, amountToAdd);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.zonedatetime;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class Test {
+    public static void main(String[] args) {
+        ZonedDateTime zonedDateTime = ZonedDateTime.now();
+        System.out.println("zonedDateTime = " + zonedDateTime);
+        // 增加年
+        ZonedDateTime zonedDateTime1 = zonedDateTime.plusYears(2024);
+        System.out.println("zonedDateTime1 = " + zonedDateTime1);
+        // 增加月
+        ZonedDateTime zonedDateTime2 = zonedDateTime.plusMonths(1);
+        System.out.println("zonedDateTime2 = " + zonedDateTime2);
+        // 增加日
+        ZonedDateTime zonedDateTime3 = zonedDateTime.plusDays(20);
+        System.out.println("zonedDateTime3 = " + zonedDateTime3);
+        // 增加小时
+        ZonedDateTime zonedDateTime4 = zonedDateTime.plusHours(1);
+        System.out.println("zonedDateTime4 = " + zonedDateTime4);
+        // 增加分钟
+        ZonedDateTime zonedDateTime5 = zonedDateTime.plusMinutes(1);
+        System.out.println("zonedDateTime5 = " + zonedDateTime5);
+        // 增加秒
+        ZonedDateTime zonedDateTime6 = zonedDateTime.plusSeconds(1);
+        System.out.println("zonedDateTime6 = " + zonedDateTime6);
+        // 增加毫秒
+        ZonedDateTime zonedDateTime7 = zonedDateTime.plus(1L, ChronoUnit.MILLIS);
+        System.out.println("zonedDateTime7 = " + zonedDateTime7);
+        // 增加纳秒
+        ZonedDateTime zonedDateTime8 = zonedDateTime.plusNanos(1);
+        System.out.println("zonedDateTime8 = " + zonedDateTime8);
+    }
+}
+```
+
+#### 2.4.2.4 减少时间系列方法
+
+* 在`当前时间戳（时刻）`基础上减少`年`：
+
+```java
+public ZonedDateTime minusYears(long years) { // [!code focus]
+    return (years == Long.MIN_VALUE ? 
+            plusYears(Long.MAX_VALUE).plusYears(1) : plusYears(-years));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上减少`秒`：
+
+```java
+public ZonedDateTime minusSeconds(long seconds) { // [!code focus]
+    return (seconds == Long.MIN_VALUE ? 
+            plusSeconds(Long.MAX_VALUE).plusSeconds(1) : 
+            plusSeconds(-seconds));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上减少`纳秒`：
+
+```java
+public ZonedDateTime minusNanos(long nanos) { // [!code focus]
+    return (nanos == Long.MIN_VALUE ? 
+            plusNanos(Long.MAX_VALUE).plusNanos(1) : 
+            plusNanos(-nanos));
+} // [!code focus]
+```
+
+* 在`当前时间戳（时刻）`基础上减少`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
+
+```java
+public ZonedDateTime minus(long amountToSubtract, TemporalUnit unit) { // [!code focus]
+    return (amountToSubtract == Long.MIN_VALUE ? 
+            plus(Long.MAX_VALUE, unit).plus(1, unit) : 
+            plus(-amountToSubtract, unit));
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.zonedatetime;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class Test {
+    public static void main(String[] args) {
+        ZonedDateTime zonedDateTime = ZonedDateTime.now();
+        System.out.println("zonedDateTime = " + zonedDateTime);
+        // 减少年
+        ZonedDateTime zonedDateTime1 = zonedDateTime.minusYears(2024);
+        System.out.println("zonedDateTime1 = " + zonedDateTime1);
+        // 减少月
+        ZonedDateTime zonedDateTime2 = zonedDateTime.minusMonths(1);
+        System.out.println("zonedDateTime2 = " + zonedDateTime2);
+        // 减少日
+        ZonedDateTime zonedDateTime3 = zonedDateTime.minusDays(20);
+        System.out.println("zonedDateTime3 = " + zonedDateTime3);
+        // 减少小时
+        ZonedDateTime zonedDateTime4 = zonedDateTime.minusHours(1);
+        System.out.println("zonedDateTime4 = " + zonedDateTime4);
+        // 减少分钟
+        ZonedDateTime zonedDateTime5 = zonedDateTime.minusMinutes(1);
+        System.out.println("zonedDateTime5 = " + zonedDateTime5);
+        // 减少秒
+        ZonedDateTime zonedDateTime6 = zonedDateTime.minusSeconds(1);
+        System.out.println("zonedDateTime6 = " + zonedDateTime6);
+        // 减少毫秒
+        ZonedDateTime zonedDateTime7 = zonedDateTime.minus(1L, ChronoUnit.MILLIS);
+        System.out.println("zonedDateTime7 = " + zonedDateTime7);
+        // 减少纳秒
+        ZonedDateTime zonedDateTime8 = zonedDateTime.minusNanos(1);
+        System.out.println("zonedDateTime8 = " + zonedDateTime8);
+    }
+}
+```
+
+## 2.5 格式化（DateTimeFormatter）
+
+### 2.5.1 概述
+
+* `DateTimeFormatter` 和 `SimpleDateFormat` 类似，是 JDK8 新增的用于格式化时间的类。
+
+### 2.5.2 静态方法
+
+* 使用静态方法，获取一个 DateTimeFormatter 对象：
+
+```java
+public static DateTimeFormatter ofPattern(String pattern) { // [!code focus]
+    return new DateTimeFormatterBuilder().appendPattern(pattern).toFormatter();
+} // [!code focus]
+```
 
 > [!NOTE]
 >
-> 综上所述：JDK8 中之所以允许定义默认方法，就是为了解决接口升级的问题，即：为了兼容 JDK8 之前的代码。
-
-> [!IMPORTANT]
+> ::: details 点我查看 pattern 的具体含义
 >
-> * ① 在 JDK 设计者开发 JDK8 的时候，如果直接在 JDK 中的接口中添加抽象方法，按照 JDK 原先的设计，就需要在这些接口的实现类都重写抽象方法（工作量太大），为了保持和旧版本代码的兼容，只能在接口中添加默认方法，如：JDK8 中对 Collection 、List 、Comparator 等接口都提供了丰富的默认方法。
-> * ② 如果在多个实现类中发现重写接口的抽象方法的逻辑都是类似的，此时就应该将该抽象方法设计为默认方法更为合适，这样实现类可以根据需求选择是否去重写默认方法。
-
-### 2.9.3 默认方法
-
-* 语法：
-
-```java
-public interface 接口名 {
-    
-    default 返回值类型 方法名(参数列表){
-        ...
-    }
-}
-```
-
-> [!CAUTION]
->
-> * ① 默认方法的权限修饰符是`public`；换言之，即使你不写，Java 也会帮你写上。
-> * ② 默认方法不是抽象方法，不会强制子类必须重写默认方法；但是，如果子类重写默认方法，在重写的时候，需要去掉`default`关键字。
-> * ③ 默认方法中的`public`可以省略；但是，`default`不可以省略。
-> * ④ 如果实现了多个接口，多个接口中存在相同名字的默认方法，子类必须对该方法进行重写。
-> * ⑤ 对于接口中的抽象方法、默认方法，只能通过实现类对象才可以调用。
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Fly.java]
-package com.github.demo5;
-
-public interface Fly {
-
-    void fly();
-
-    default void addOil(){ // [!code highlight]
-        System.out.println("加油");
-    }
-
-}
-```
-
-```java [Bird.java]
-package com.github.demo5;
-
-public class Bird implements Fly {
-    @Override
-    public void fly() {
-        System.out.println("小鸟在飞");
-    }
-}
-```
-
-```java [Plane.java]
-package com.github.demo5;
-
-public class Plane implements Fly {
-    @Override
-    public void fly() {
-        System.out.println("飞机在飞");
-    }
-
-    @Override
-    public void addOil() { // [!code highlight]
-        System.out.println("飞机加航空煤油");
-    }
-}
-```
-
-```java [Test.java]
-package com.github.demo5;
-
-public class Test {
-    public static void main(String[] args) {
-        Fly bird = new Bird();
-        bird.fly();
-
-        System.out.println("-----------------");
-
-        Fly plane = new Plane();
-        plane.fly();
-        plane.addOil();
-    }
-}
-```
-
-```txt [cmd 控制台]
-小鸟在飞
------------------
-飞机在飞
-飞机加航空煤油
-```
-
-:::
-
-### 2.9.4 默认方法冲突问题
-
-#### 2.9.4.1 亲爹原则
-
-* 如果一个类，既继承了一个父类，又实现了若干个接口，并且父类中的成员方法和接口中的默认方法重名，子类将采用`就近原则`执行父类中的成员方法。
-
-> [!NOTE]
->
-> ::: details 点我查看 具体细节
->
-> * ① `当子类遇到方法签名冲突时，优先级顺序是`：
->   * **子类自身定义的方法:** 如果子类自己定义了与父类或接口相同签名的方法，那么子类方法优先级最高，会覆盖父类和接口的方法。
->   * **父类方法:** 如果子类没有定义，并且父类存在与接口方法相同签名的方法，那么 **父类的方法会优先于接口的默认方法**，即所谓的"就近原则"。
->   * **接口默认方法 (如果只有一个接口提供该方法):** 如果父类没有该方法，但只有一个接口提供了同名默认方法，那么子类会继承并使用该接口的默认方法。
->   * **接口默认方法冲突 (如果有多个接口提供同名默认方法):** 如果多个接口提供了同名默认方法，并且父类没有该方法，子类必须**显式地覆盖**该方法，并指明要调用哪个接口的默认方法，否则会产生编译错误。
-> * ② `“就近原则”在这里实际上体现的是继承体系的优先级`：
->   * **类继承** 的优先级高于 **接口实现**。
->   * **类继承体系中，越靠近子类的祖先类，优先级越高。**
-> * ③ `之所以这么设计，主要为了解决菱形继承(Diamond Problem) 的潜在问题，并保持类继承体系的清晰性和可预测性`：
->   * **避免菱形继承的歧义：** 如果允许接口的默认方法优先于父类的方法，可能会导致菱形继承场景下方法调用的歧义性，难以确定最终执行哪个实现。
->   * **保持类继承体系的中心地位：** 类继承通常被视为更重要的 "is-a" 关系，父类定义了子类的基本行为和状态。优先选择父类的方法，保持了类继承体系的权威性和一致性。
->   * **接口主要用于定义契约：** 接口更多地是用于定义一组规范和契约，而不是提供核心实现。默认方法的引入是为了在不破坏现有接口兼容性的前提下，为接口增加一些通用功能。因此，默认方法的优先级相对较低。
+> ![日期格式化规则](./assets/8.webp)
 >
 > :::
 
@@ -2500,584 +1587,1286 @@ public class Test {
 
 * 示例：
 
-::: code-group
+```java
+package com.github.jdk8.format;
 
-```java [A.java]
-package com.github.demo6;
-
-public interface A {
-
-    default void method(){
-        System.out.println("A 接口中的 method 方法");
-    }
-}
-```
-
-```java [B.java]
-package com.github.demo6;
-
-public class B {
-
-    public void method() {
-        System.out.println("B 类中的 method 方法");
-    }
-}
-```
-
-```java [C.java]
-package com.github.demo6;
-
-public class C extends B implements A {
-
-}
-```
-
-```java [Test.java]
-package com.github.demo6;
+import java.time.format.DateTimeFormatter;
 
 public class Test {
     public static void main(String[] args) {
-        C c = new C();
-        c.method();
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        System.out.println("df = " + df);
     }
 }
 ```
 
-```txt [cmd 控制台]
-B 类中的 method 方法
+### 2.5.3 常用 API
+
+#### 2.5.3.1 将日期对象格式化为字符串
+
+* 格式化（日期对象 --> 字符串）：
+
+```java
+public String format(TemporalAccessor temporal) { // [!code focus]
+    StringBuilder buf = new StringBuilder(32);
+    formatTo(temporal, buf);
+    return buf.toString();
+} // [!code focus]
 ```
-
-:::
-
-#### 2.9.4.2 必须选择
-
-* 当一个类同时实现多个接口，而多个接口中包含方法签名相同的默认方法时，必须进行重写，否则编译报错。
-* 在重写的方法中，可以选择使用 `接口名.super.方法名` 的方法选择保留哪个接口中的默认方法，也可以选择完全自己重写。
-
-> [!NOTE]
->
-> ::: details 点我查看 具体细节
->
-> `接口名.super.方法名()` 这种语法是为了`明确地指定要调用哪个接口的默认方法实现`。
->
-> * ① `super` 关键字的传统含义 (类继承中)：在传统的类继承中，`super` 关键字用于调用 **父类** 的成员 (方法或属性)。  `super.methodName()`  意味着 "调用父类中定义的 `methodName()` 方法"。  它指向的是**直接父类**。
-> * ② 接口的默认方法和多接口实现带来的新问题：当一个类实现多个接口，并且这些接口中存在同名默认方法时，传统的 `super` 关键字就变得 **不明确** 了。  `super.methodName()`  在这种情况下，编译器无法知道你想调用哪个接口的默认方法，因为：
->   * **接口之间没有像类那样的 "父子" 关系。** 接口是平级的，都是类实现的契约。
->   * **`super` 本身默认指向父类，但在接口上下文中，没有直接的 "接口父类" 的概念。**
-> * ③ `接口名.super.方法名()`  语法被引入，正是为了 **解决在多接口实现场景下 `super` 关键字的歧义性**。
->   * **显式指定接口:** `接口名` 部分明确地告诉编译器，你要调用的默认方法是来自哪个接口的。
->   * **仍然使用 `super` 的概念:** `super` 关键字在这里仍然保留了 "调用父类 (或者说，接口作为父类契约) 的实现" 的含义，但被限定在了指定的 `接口名` 的上下文中。
->   * **消除歧义:** 通过 `接口名.super.方法名()`，你可以清晰地选择要调用 `InterfaceA` 的默认方法，还是 `InterfaceB` 的默认方法，从而避免了编译错误和运行时困惑。
-> * ④ 我们可以把 `接口名.super` 理解为一种 **限定作用域** 的方式，用于在接口的 "命名空间" 中访问 `super`。 就像在访问静态成员时，你需要使用类名或接口名来限定作用域一样。  `接口名.super`  将 `super` 的作用域限定在了指定的接口内部，让你能够访问该接口提供的默认实现。
->
-> :::
 
 
 
 * 示例：
 
-::: code-group
+```java
+package com.github.jdk8.format;
 
-```java [A.java]
-package com.github.demo6;
-
-public interface A {
-
-    default void method() {
-        System.out.println("今天晚上陪我吃饭");
-    }
-}
-```
-
-```java [B.java]
-package com.github.demo6;
-
-public interface B {
-
-    default void method() {
-        System.out.println("今天晚上陪我逛街");
-    }
-}
-```
-
-```java [C.java]
-package com.github.demo6;
-
-public class C implements A, B {
-    @Override
-    public void method() {
-        // 选择保留其中一个，通过“接口名.super.方法名"的方法选择保留哪个接口的默认方法。
-        A.super.method();
-    }
-}
-```
-
-```java [D.java]
-package com.github.demo6;
-
-public class D implements A, B {
-    @Override
-    public void method() {
-        System.out.println("滚，写代码，它不香吗？");
-    }
-}
-```
-
-```java [Test.java]
-package com.github.demo6;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Test {
     public static void main(String[] args) {
-        C c = new C();
-        c.method(); // 今天晚上陪我吃饭
-
-        System.out.println("----------");
-
-        D d = new D();
-        d.method(); // 滚，写代码，它不香吗？
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        // 格式化
+        String format = df.format(ZonedDateTime.now());
+        // format = 2025-04-23 10:36:35
+        System.out.println("format = " + format);
     }
 }
 ```
 
-```txt [cmd 控制台]
-今天晚上陪我吃饭
-----------
-滚，写代码，它不香吗？
-```
+#### 2.5.3.2 将字符串解析为日期对象
 
-:::
-
-### 2.9.5 静态方法
-
-* 语法：
+* 解析（字符串 --> 日期对象）：
 
 ```java
-public interface 接口名 {
-    
-    static 返回值类型 方法名(参数列表){
-        ...
+public TemporalAccessor parse(CharSequence text) { // [!code focus]
+    Objects.requireNonNull(text, "text");
+    try {
+        return parseResolved0(text, null);
+    } catch (DateTimeParseException ex) {
+        throw ex;
+    } catch (RuntimeException ex) {
+        throw createError(text, ex);
     }
-}
+} // [!code focus]
 ```
 
 > [!CAUTION]
 >
-> * ① 静态方法的权限修饰符是`public`；换言之，即使你不写，Java 也会帮你写上。
-> * ②  静态方法只能通过`接口名`调用，不能通过`实现类类名`或`实现类对象`调用。
-> * ③ 静态方法中的`public`可以省略；但是，`static`不可以省略。
+> 如果给定的字符串内容和 DateTimeFormatter 对象中传递的 pattern 参数不匹配，将会报错！！！
 
 
 
 * 示例：
 
-::: code-group
+```java
+package com.github.jdk8.format;
 
-```java [LiveAble.java]
-package com.github.demo7;
-
-public interface LiveAble {
-
-    /**
-     * 喝水
-     */
-    static void drink() {
-        System.out.println("喝水");
-    }
-
-    /**
-     * 呼吸
-     */
-    void breathe();
-
-    /**
-     * 吃饭
-     */
-    void eat();
-
-    /**
-     * 睡觉
-     */
-    default void sleep() {
-        System.out.println("静止不动");
-    }
-}
-```
-
-```java [Animal.java]
-package com.github.demo7;
-
-public class Animal implements LiveAble {
-    @Override
-    public void breathe() {
-        System.out.println("吸入氧气呼出二氧化碳");
-    }
-
-    @Override
-    public void eat() {
-        System.out.println("吃东西");
-    }
-
-    @Override
-    public void sleep() {
-        System.out.println("闭上眼睛睡觉");
-    }
-}
-```
-
-```java [Plant.java]
-package com.github.demo7;
-
-public class Plant implements LiveAble {
-    @Override
-    public void breathe() {
-        System.out.println("吸入二氧化碳呼出氧气");
-    }
-
-    @Override
-    public void eat() {
-        System.out.println("吸收营养");
-    }
-}
-```
-
-```java [Test.java]
-package com.github.demo7;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 
 public class Test {
     public static void main(String[] args) {
-        LiveAble.drink();
-
-        System.out.println("-------------------");
-
-        Animal animal = new Animal();
-        animal.breathe();
-        animal.eat();
-        animal.sleep();
-
-        System.out.println("-------------------");
-
-        Plant plant = new Plant();
-        plant.breathe();
-        plant.sleep();
-        plant.eat();
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        // 格式化
+        String format = df.format(ZonedDateTime.now());
+        // format = 2025-04-23 10:36:35
+        System.out.println("format = " + format);
+        // 解析
+        TemporalAccessor parse = df.parse("2025-05-05 11:11:11");
+        LocalDateTime localDateTime = LocalDateTime.from(parse);
+        // localDateTime = 2025-05-05T11:11:11
+        System.out.println("localDateTime = " + localDateTime);
     }
 }
 ```
 
-```txt [cmd 控制台]
-喝水
--------------------
-吸入氧气呼出二氧化碳
-吃东西
-闭上眼睛睡觉
--------------------
-吸入二氧化碳呼出氧气
-静止不动
-吸收营养
-```
+## 2.6 日历类
 
-:::
+### 2.6.1 概述
 
-### 2.9.6 解释为什么 JDK8 中出现静态方法？
+* 在 JDK 7 中，我们可以使用 Calendar 来对年、月、日、时、分、秒等进行操作（翻日历），也可以获取年、月、日、时、分、秒等。
+* 在 JDK 8 中新增了 LocalDate、LocalTime 和 LocalDateTime 就是对标 JDK7 中的 Calendar 。
 
-* 在 JDK8 之前的类库设计中，有很多`Collection/Collections` 、`Path/Paths`这样成对的接口和类，如下所示：
-
-> [!NOTE]
+> [!CAUTION]
 >
-> 像`Collections`和`Paths`类中的方法都是静态方法，而这样的静态方法都是为了前面的接口服务的，和之前我们自定义的 Java 工具类的作用是类似的，早期 SUN 工程师就是推荐这么设计。
+> * ① LocalDate 只有`年、月、日`。
+> * ② LocalTime 只有`时、分、秒`。
+> * ③ LocalDateTime = LocalDate  + LocalTime ，既有`年、月、日`，也有`时、分、秒`。
 
-::: code-group
+### 2.6.2 静态方法
 
-```java [Collection.java]
-package java.util;
-
-import java.util.*;
-/**
-* @since 1.2
-*/
-public interface Collection<E> extends Iterable<E> { 
-
-	int size();
-    
-    boolean isEmpty();
-    
-    default <T> T[] toArray(IntFunction<T[]> generator) {
-        return toArray(generator.apply(0));
-    }
-    
-    // 其余略
-}
-```
-
-```java [Collections.java]
-package java.util;
-
-import java.io.*;
-import java.util.*;
-
-/**
-* @since 1.2
-*/
-public class Collections {
-    
-    private Collections() {}
-    
-    public static <T extends Comparable<? super T>> void sort(List<T> list) {
-        list.sort(null);
-    }
-    
-    // 其余略
-    
-}    
-```
-
-```java [Path.java]
-package java.nio.file;
-
-import java.io.*;
-import java.nio.*;
-import java.util.*;
-
-/**
-* @since 1.7
-*/
-public interface Path
-    extends Comparable<Path>, Iterable<Path>, Watchable {
-
-	int size();
-    
-    boolean isEmpty();
-    
-    FileSystem getFileSystem();
-    
-    // 其余略
-}
-```
-
-```java [Paths.java]
-package java.nio.file;
-
-import java.nio.file.spi.FileSystemProvider;
-import java.net.URI;
-
-/**
-* @since 1.7
-*/
-public final class Paths {
-    private Paths() { }
-    
-    private Collections() {}
-    
-    public static Path get(String first, String... more) {
-        return Path.of(first, more);
-    }
-    
-    // 其余略
-    
-}    
-```
-
-:::
-
-* 但是，到了 JDK8 的时候，Oracle 工程师觉得这样实在太繁琐，会造成 JDK 内部的工具类膨胀，所以将静态方法也加入接口，这样接口从单纯的`规范`变为了`规范+辅助工具`，如下所示：
+* 静态方法获取`当前`日期、时间或日期时间的对象：
 
 ```java
-package java.nio.file;
-
-import java.io.*;
-import java.nio.*;
-import java.util.*;
-
-/**
-* @since 1.7
-*/
-public interface Path
-    extends Comparable<Path>, Iterable<Path>, Watchable {
-    
-    private Collections() {}
-    
-    /**
-    * @since 11
-    */
-    public static Path of(String first, String... more) {
-        ...
-    }
-    
-    /**
-    * @since 11
-    */
-    public static Path of(URI uri) {
-        ...
-    }
-    
-    // 其余略
-    
-}    
+public static LocalDate now() { // [!code focus]
+    return now(Clock.systemDefaultZone());
+} // [!code focus]
 ```
 
-## 2.10 JDK 9 接口中的成员
-
-### 2.10.1 概述
-
-* JDK8 中的默认方法和静态方法有了具体的方法体，那么就有可能出现多个默认方法或多个静态方法中有相同的代码，为了复用这些代码，JDK9 就在接口中提供了私有方法。
-
-> [!NOTE]
->
-> 这些相同的代码只对接口提供服务，并不需要让实现类访问！！！
-
-![](./assets/31.svg)
-
-### 2.10.2 私有方法
-
-* 接口默认方法中的相同代码，可以抽取到私有方法中：
-
 ```java
-private 返回值类型 方法名(参数列表) {}
+public static LocalTime now() { // [!code focus]
+    return now(Clock.systemDefaultZone());
+} // [!code focus]
 ```
 
-* 接口静态方法中的相同代码，可以抽取到静态私有方法中：
+```java
+public static LocalDateTime now() { // [!code focus]
+    return now(Clock.systemDefaultZone());
+} // [!code focus]
+```
+
+* 静态方法获取`指定`日期、时间或日期时间的对象：
 
 ```java
-private static void 方法名(参数列表) {}
+public static LocalDate of(int year, int month, int dayOfMonth) { // [!code focus]
+    YEAR.checkValidValue(year);
+    MONTH_OF_YEAR.checkValidValue(month);
+    DAY_OF_MONTH.checkValidValue(dayOfMonth);
+    return create(year, month, dayOfMonth);
+} // [!code focus]
+```
+
+```java
+public static LocalTime of(int hour, int minute, int second) { // [!code focus]
+    HOUR_OF_DAY.checkValidValue(hour);
+    if ((minute | second) == 0) {
+        return HOURS[hour];  // for performance
+    }
+    MINUTE_OF_HOUR.checkValidValue(minute);
+    SECOND_OF_MINUTE.checkValidValue(second);
+    return new LocalTime(hour, minute, second, 0);
+} // [!code focus]
+```
+
+```java
+public static LocalDateTime of(int year, int month, int dayOfMonth, int hour, int minute) { // [!code focus]
+    LocalDate date = LocalDate.of(year, month, dayOfMonth);
+    LocalTime time = LocalTime.of(hour, minute);
+    return new LocalDateTime(date, time);
+} // [!code focus]
 ```
 
 
 
 * 示例：
 
-::: code-group
+```java
+package com.github.jdk8.calendar;
 
-```java [LiveAble.java]
-package com.github.demo7;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
-public interface LiveAble {
-
-    /**
-     * 喝水
-     */
-    static void drink() {
-        System.out.println("喝水");
-    }
-
-    /**
-     * 呼吸
-     */
-    void breathe();
-
-    /**
-     * 吃饭
-     */
-    void eat();
-
-    /**
-     * 睡觉
-     */
-    default void sleep() {
-        System.out.println("静止不动");
-    }
-
-    /**
-     * 开始
-     */
-    static void start(){
-        System.out.println("start");
-        log(); // [!code highlight]
-    }
-
-    private static void log() { // [!code highlight]
-        System.out.println("log ...");
-    }
-
-    /**
-     * 开始
-     */
-    static void end(){ 
-        System.out.println("end");
-        log(); // [!code highlight]
-    }
-
-}
-```
-
-```java [Animal.java]
-package com.github.demo7;
-
-public class Animal implements LiveAble {
-    @Override
-    public void breathe() {
-        System.out.println("吸入氧气呼出二氧化碳");
-    }
-
-    @Override
-    public void eat() {
-        System.out.println("吃东西");
-    }
-
-    @Override
-    public void sleep() {
-        System.out.println("闭上眼睛睡觉");
+public class Test {
+    public static void main(String[] args){
+        LocalDate now1 = LocalDate.now();
+        LocalTime now2 = LocalTime.now();
+        LocalDateTime now3 = LocalDateTime.now();
+        // now1 = 2025-04-23
+        System.out.println("now1 = " + now1); 
+        // now2 = 11:12:41.556228200
+        System.out.println("now2 = " + now2); 
+        // now3 = 2025-04-23T11:12:41.556228200
+        System.out.println("now3 = " + now3); 
     }
 }
 ```
 
-```java [Plant.java]
-package com.github.demo7;
 
-public class Plant implements LiveAble {
-    @Override
-    public void breathe() {
-        System.out.println("吸入二氧化碳呼出氧气");
-    }
 
-    @Override
-    public void eat() {
-        System.out.println("吸收营养");
-    }
-}
-```
+* 示例：
 
-```java [Test.java]
-package com.github.demo7;
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class Test {
     public static void main(String[] args) {
-        LiveAble.drink();
-        LiveAble.start();
-        LiveAble.end();
-
-        System.out.println("-------------------");
-
-        Animal animal = new Animal();
-        animal.breathe();
-        animal.eat();
-        animal.sleep();
-
-        System.out.println("-------------------");
-
-        Plant plant = new Plant();
-        plant.breathe();
-        plant.sleep();
-        plant.eat();
+        LocalDate now1 = LocalDate.of(2012, 12, 12);
+        LocalTime now2 = LocalTime.of(3, 5, 6);
+        LocalDateTime now3 = LocalDateTime.of(2012, 12, 12, 11, 11);
+        System.out.println("now1 = " + now1); // now1 = 2012-12-12
+        System.out.println("now2 = " + now2); // now2 = 03:05:06
+        System.out.println("now3 = " + now3); // now3 = 2012-12-12T11:11
     }
 }
 ```
 
-```txt [cmd 控制台]
-喝水
-start
-log ...
-end
-log ...
--------------------
-吸入氧气呼出二氧化碳
-吃东西
-闭上眼睛睡觉
--------------------
-吸入二氧化碳呼出氧气
-静止不动
-吸收营养
+### 2.6.3 常用 API
+
+#### 2.6.3.1 获取日历中的某个字段信息
+
+* 获取年：
+
+```java
+public int getYear() { // [!code focus]
+    return date.getYear();
+} // [!code focus]
 ```
 
-:::
+* 获取秒：
 
+```java
+public int getSecond() { // [!code focus]
+    return time.getSecond();
+} // [!code focus]
+```
+
+* 获取任意时间（年、月、日、时、分、秒、毫秒、纳秒）：
+
+```java
+public int get(TemporalField field) { // [!code focus]
+    if (field instanceof ChronoField chronoField) {
+        return (chronoField.isTimeBased() ? time.get(field) : date.get(field));
+    }
+    return ChronoLocalDateTime.super.get(field);
+} // [!code focus]
+```
+
+> [!CAUTION]
+>
+> * ① LocalDate 只能获取`年、月、日`。
+> * ② LocalTime 只能获取`时、分、秒`。
+> * ③ LocalDateTime = LocalDate  + LocalTime ，既能获取`年、月、日`，也能获取`时、分、秒`。
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+
+public class Demo3 {
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        // 获取年
+        int year = now.getYear();
+        System.out.println("year = " + year);
+        // 获取月
+        int monthValue = now.getMonthValue();
+        System.out.println("monthValue = " + monthValue);
+        // 获取一个月的第几天
+        int dayOfMonth = now.getDayOfMonth();
+        System.out.println("dayOfMonth = " + dayOfMonth);
+        // 获取一年中的第几天
+        int dayOfYear = now.getDayOfYear();
+        System.out.println("dayOfYear = " + dayOfYear);
+        // 获取一周中的第几天
+        int dayOfWeek = now.getDayOfWeek().getValue();
+        System.out.println("dayOfWeek = " + dayOfWeek);
+        // 获取时
+        int hour = now.getHour();
+        System.out.println("hour = " + hour);
+        // 获取分钟
+        int minute = now.getMinute();
+        System.out.println("minute = " + minute);
+        // 获取秒
+        int second = now.getSecond();
+        System.out.println("second = " + second);
+        // 获取毫秒
+        int milliOfSecond = now.get(ChronoField.MILLI_OF_SECOND);
+        System.out.println("milliOfSecond = " + milliOfSecond);
+        // 获取纳秒
+        int nano = now.getNano();
+        System.out.println("nano = " + nano);
+    }
+}
+```
+
+#### 2.6.3.2 判断系列方法
+
+* 判断`当前时间`是否在`指定时间`之前：
+
+```java
+public boolean isBefore(ChronoLocalDateTime<?> other) { // [!code focus]
+    if (other instanceof LocalDateTime) {
+        return compareTo0((LocalDateTime) other) < 0;
+    }
+    return ChronoLocalDateTime.super.isBefore(other);
+} // [!code focus]
+```
+
+* 判断`当前时间`是否在`指定时间`之后：
+
+```java
+public boolean isAfter(ChronoLocalDateTime<?> other) { // [!code focus]
+    if (other instanceof LocalDateTime) {
+        return compareTo0((LocalDateTime) other) > 0;
+    }
+    return ChronoLocalDateTime.super.isAfter(other);
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime newLocalDateTime = LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault());
+
+        System.out.println(now.isBefore(newLocalDateTime)); // false
+        System.out.println(now.isAfter(newLocalDateTime)); // true
+    }
+}
+```
+
+#### 2.6.3.3 修改时间系列方法
+
+* 修改年：
+
+```java
+public LocalDateTime withYear(int year) { // [!code focus] 
+    return with(date.withYear(year), time);
+} // [!code focus]
+```
+
+* 修改秒：
+
+```java
+public LocalDateTime withSecond(int second) {  // [!code focus] 
+    LocalTime newTime = time.withSecond(second);
+    return with(date, newTime);
+}  // [!code focus] 
+```
+
+* 修改纳秒：
+
+```java
+public LocalDateTime withNano(int nanoOfSecond) { // [!code focus] 
+    LocalTime newTime = time.withNano(nanoOfSecond);
+    return with(date, newTime);
+} // [!code focus] 
+```
+
+* 修改任意时间（年、月、日、时、分、秒、毫秒、纳秒）：
+
+```java
+public LocalDateTime with(TemporalField field, long newValue) { // [!code focus] 
+    if (field instanceof ChronoField chronoField) {
+        if (chronoField.isTimeBased()) {
+            return with(date, time.with(field, newValue));
+        } else {
+            return with(date.with(field, newValue), time);
+        }
+    }
+    return field.adjustInto(this, newValue);
+} // [!code focus] 
+```
+
+> [!CAUTION]
+>
+> * ① LocalDate 只能修改`年、月、日`。
+> * ② LocalTime 只能修改`时、分、秒`。
+> * ③ LocalDateTime = LocalDate  + LocalTime ，既能修改`年、月、日`，也能修改`时、分、秒`。
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        // 修改年
+        LocalDateTime localDateTime1 = now.withYear(2012);
+        System.out.println("localDateTime1 = " + localDateTime1);
+        // 修改月
+        LocalDateTime localDateTime2 = now.withMonth(1);
+        System.out.println("localDateTime2 = " + localDateTime2);
+        // 修改一个月的第几天
+        LocalDateTime localDateTime3 = now.withDayOfMonth(1);
+        System.out.println("localDateTime3 = " + localDateTime3);
+        // 修改一年中的第几天
+        LocalDateTime localDateTime4 = now.withDayOfYear(5);
+        System.out.println("localDateTime4 = " + localDateTime4);
+        // 修改一周中的第几天
+        LocalDateTime localDateTime5 = now.with(ChronoField.DAY_OF_WEEK, 2);
+        System.out.println("localDateTime5 = " + localDateTime5);
+        // 修改时
+        LocalDateTime localDateTime6 = now.withHour(5);
+        System.out.println("localDateTime6 = " + localDateTime6);
+        // 修改分钟
+        LocalDateTime localDateTime7 = now.withMinute(10);
+        System.out.println("localDateTime7 = " + localDateTime7);
+        // 修改秒
+        LocalDateTime localDateTime8 = now.withSecond(10);
+        System.out.println("localDateTime8 = " + localDateTime8);
+        // 修改毫秒
+        LocalDateTime localDateTime9 = now.with(ChronoField.MILLI_OF_SECOND, 2);
+        System.out.println("localDateTime9 = " + localDateTime9);
+        // 修改纳秒
+        LocalDateTime localDateTime10 = now.withNano(10);
+        System.out.println("localDateTime10 = " + localDateTime10);
+    }
+}
+
+```
+
+#### 2.6.3.4 增加时间系列方法
+
+* 在`当前时间`基础上增加`年`：
+
+```java
+public LocalDateTime plusYears(long years) { // [!code focus]
+    LocalDate newDate = date.plusYears(years);
+    return with(newDate, time);
+} // [!code focus]
+```
+
+* 在`当前时间`基础上增加`秒`：
+
+```java
+public LocalDateTime plusSeconds(long seconds) { // [!code focus]
+    return plusWithOverflow(date, 0, 0, seconds, 0, 1);
+} // [!code focus]
+```
+
+* 在`当前时间`基础上增加`纳秒`：
+
+```java
+public LocalDateTime plusNanos(long nanos) { // [!code focus]
+    return plusWithOverflow(date, 0, 0, 0, nanos, 1);
+} // [!code focus]
+```
+
+* 在`当前时间`基础上增加`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
+
+```java
+public LocalDateTime plus(long amountToAdd, TemporalUnit unit) { // [!code focus]
+    if (unit instanceof ChronoUnit chronoUnit) {
+        switch (chronoUnit) {
+            case NANOS: return plusNanos(amountToAdd);
+            case MICROS: return plusDays(amountToAdd / MICROS_PER_DAY).plusNanos((amountToAdd % MICROS_PER_DAY) * 1000);
+            case MILLIS: return plusDays(amountToAdd / MILLIS_PER_DAY).plusNanos((amountToAdd % MILLIS_PER_DAY) * 1000_000);
+            case SECONDS: return plusSeconds(amountToAdd);
+            case MINUTES: return plusMinutes(amountToAdd);
+            case HOURS: return plusHours(amountToAdd);
+            case HALF_DAYS: return plusDays(amountToAdd / 256).plusHours((amountToAdd % 256) * 12);  // no overflow (256 is multiple of 2)
+        }
+        return with(date.plus(amountToAdd, unit), time);
+    }
+    return unit.addTo(this, amountToAdd);
+} // [!code focus]
+```
+
+> [!CAUTION]
+>
+> * ① LocalDate 只能增加`年、月、日`。
+> * ② LocalTime 只能增加`时、分、秒`。
+> * ③ LocalDateTime = LocalDate  + LocalTime ，既能增加`年、月、日`，也能增加`时、分、秒`。
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        // 增加年
+        LocalDateTime localDateTime1 = now.plusYears(2012);
+        System.out.println("localDateTime1 = " + localDateTime1);
+        // 增加月
+        LocalDateTime localDateTime2 = now.plusMonths(1);
+        System.out.println("localDateTime2 = " + localDateTime2);
+        // 增加几天
+        LocalDateTime localDateTime3 = now.plusDays(1);
+        System.out.println("localDateTime3 = " + localDateTime3);
+        // 增加时
+        LocalDateTime localDateTime6 = now.plusHours(5);
+        System.out.println("localDateTime6 = " + localDateTime6);
+        // 增加分钟
+        LocalDateTime localDateTime7 = now.plusMinutes(10);
+        System.out.println("localDateTime7 = " + localDateTime7);
+        // 增加秒
+        LocalDateTime localDateTime8 = now.plusSeconds(10);
+        System.out.println("localDateTime8 = " + localDateTime8);
+        // 增加毫秒
+        LocalDateTime localDateTime9 = now.plus(2, ChronoUnit.MILLIS);
+        System.out.println("localDateTime9 = " + localDateTime9);
+        // 增加纳秒
+        LocalDateTime localDateTime10 = now.plusNanos(10);
+        System.out.println("localDateTime10 = " + localDateTime10);
+    }
+}
+
+```
+
+#### 2.6.3.5 减少时间系列方法
+
+* 在`当前时间`基础上减少`年`：
+
+```java
+public LocalDateTime minusYears(long years) { // [!code focus]
+    return (years == Long.MIN_VALUE 
+            ? plusYears(Long.MAX_VALUE).plusYears(1) 
+            : plusYears(-years));
+} // [!code focus]
+```
+
+* 在`当前时间`基础上减少`秒`：
+
+```java
+public LocalDateTime minusSeconds(long seconds) { // [!code focus]
+    return plusWithOverflow(date, 0, 0, seconds, 0, -1);
+} // [!code focus]
+```
+
+* 在`当前时间`基础上减少`纳秒`：
+
+```java
+public LocalDateTime minusNanos(long nanos) { // [!code focus]
+    return plusWithOverflow(date, 0, 0, 0, nanos, -1);
+} // [!code focus]
+```
+
+* 在`当前时间`基础上减少`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
+
+```java
+public LocalDateTime minus(long amountToSubtract, TemporalUnit unit) { // [!code focus]
+    return (amountToSubtract == Long.MIN_VALUE 
+            ? plus(Long.MAX_VALUE, unit).plus(1, unit) 
+            : plus(-amountToSubtract, unit));
+} // [!code focus]
+```
+
+> [!CAUTION]
+>
+> * ① LocalDate 只能减少`年、月、日`。
+> * ② LocalTime 只能减少`时、分、秒`。
+> * ③ LocalDateTime = LocalDate  + LocalTime ，既能减少`年、月、日`，也能减少`时、分、秒`。
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDateTime now = LocalDateTime.now();
+        // 减少年
+        LocalDateTime localDateTime1 = now.minusYears(2012);
+        System.out.println("localDateTime1 = " + localDateTime1);
+        // 减少月
+        LocalDateTime localDateTime2 = now.minusMonths(1);
+        System.out.println("localDateTime2 = " + localDateTime2);
+        // 减少几天
+        LocalDateTime localDateTime3 = now.minusDays(1);
+        System.out.println("localDateTime3 = " + localDateTime3);
+        // 减少时
+        LocalDateTime localDateTime6 = now.minusHours(5);
+        System.out.println("localDateTime6 = " + localDateTime6);
+        // 减少分钟
+        LocalDateTime localDateTime7 = now.minusMinutes(10);
+        System.out.println("localDateTime7 = " + localDateTime7);
+        // 减少秒
+        LocalDateTime localDateTime8 = now.minusSeconds(10);
+        System.out.println("localDateTime8 = " + localDateTime8);
+        // 减少毫秒
+        LocalDateTime localDateTime9 = now.minus(2, ChronoUnit.MILLIS);
+        System.out.println("localDateTime9 = " + localDateTime9);
+        // 减少纳秒
+        LocalDateTime localDateTime10 = now.minusNanos(10);
+        System.out.println("localDateTime10 = " + localDateTime10);
+    }
+}
+```
+
+### 2.6.4 应用示例
+
+* 需求：判断今天是否是生日？
+
+> [!NOTE]
+>
+> * ① 获取生日的 LocalDate 对象。
+> * ② 获取当前日期的 LocalDate 对象。
+> * ③ 将`生日的 LocalDate 对象`和`当前日期的 LocalDate 对象`都转换为 MonthDay 对象，然后再比较。
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.calendar;
+
+import java.time.LocalDate;
+import java.time.MonthDay;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDate birthDate = LocalDate.of(1999, 10, 1);
+        LocalDate now = LocalDate.now();
+
+        // MonthDay 只包含月和日
+        MonthDay birthMonthDay = MonthDay.of(birthDate.getMonth(), 
+                                             birthDate.getDayOfMonth());
+        MonthDay nowMonthDay = MonthDay.from(now);
+
+        if (birthMonthDay.equals(nowMonthDay)) {
+            System.out.println("今天是生日o(*￣︶￣*)o");
+        } else {
+            System.out.println("今天不是生日o(╥﹏╥)o");
+        }
+    }
+}
+```
+
+## 2.7 工具类
+
+### 2.7.1 Period 
+
+#### 2.7.1.1 概述
+
+* Period 侧重于计算`日期`的间隔，如：年、月、日。
+
+#### 2.7.1.2 常用 API
+
+* 静态方法获取 Period 对象：
+
+```java
+public static Period between(LocalDate startDateInclusive, LocalDate endDateExclusive) { // [!code focus]
+    return startDateInclusive.until(endDateExclusive);
+} // [!code focus]
+```
+
+* 获取区间相差的年份：
+
+```java
+public int getYears() { // [!code focus]
+    return years;
+} // [!code focus]
+```
+
+* 获取区间相差的月份：
+
+```java
+public int getMonths() { // [!code focus]
+    return months;
+} // [!code focus]
+```
+
+* 获取区间相差的天数：
+
+```java
+public int getDays() { // [!code focus]
+    return days;
+} // [!code focus]
+```
+
+* 获取区间相差总的月份：
+
+```java
+public long toTotalMonths() { // [!code focus]
+    return years * 12L + months;  // no overflow
+} // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.utils;
+
+import java.time.LocalDate;
+import java.time.Period;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDate start = LocalDate.of(2000, 8, 10);
+        LocalDate end = LocalDate.now();
+
+        Period period = Period.between(start, end);
+
+        // 获取日期间隔 -- 年
+        int years = period.getYears();
+        // years = 24 即：（end 的 years）-（start 的 years）
+        System.out.println("years = " + years);
+
+        // 获取日期间隔 -- 月
+        int months = period.getMonths();
+        // months = 8 即：（end 的 months）-（start 的 months）
+        System.out.println("months = " + months);
+
+        // 获取日期间隔 -- 日
+        int days = period.getDays();
+        // days = 13 即：（end 的 days）-（start 的 days）
+        System.out.println("days = " + days);
+
+        // 获取日期间隔 -- 总月数
+        long totalMonths = period.toTotalMonths();
+        // totalMonths = 296 实际相差的月份
+        System.out.println("totalMonths = " + totalMonths);
+    }
+}
+```
+
+### 2.7.2 Duration 
+
+#### 2.7.2.1 概述
+
+* Duration 侧重于计算`时间`的间隔，如：时、分、秒等。此类以`秒`和`纳秒`为单位模拟时间量或时间量。
+
+#### 2.7.2.2 常用 API
+
+* 静态方法获取 Duration 对象：
+
+```java
+public static Duration between(Temporal startInclusive, Temporal endExclusive) { // [!code focus]
+    try {
+        return ofNanos(startInclusive.until(endExclusive, NANOS));
+    } catch (DateTimeException | ArithmeticException ex) {
+        long secs = startInclusive.until(endExclusive, SECONDS);
+        long nanos;
+        try {
+            nanos = endExclusive.getLong(NANO_OF_SECOND) 
+                - startInclusive.getLong(NANO_OF_SECOND);
+            if (secs > 0 && nanos < 0) {
+                secs++;
+            } else if (secs < 0 && nanos > 0) {
+                secs--;
+            }
+        } catch (DateTimeException ex2) {
+            nanos = 0;
+        }
+        return ofSeconds(secs, nanos);
+    }
+} // [!code focus]
+```
+
+* 获取相差的天数：
+
+```java
+public long toDays() { // [!code focus]
+    return seconds / SECONDS_PER_DAY;
+} // [!code focus]
+```
+
+* 获取相差的小时：
+
+```java
+public long toHours() { // [!code focus]
+    return seconds / SECONDS_PER_HOUR;
+} // [!code focus]
+```
+
+* 获取相差的分钟：
+
+```java
+public long toMinutes() { // [!code focus]
+    return seconds / SECONDS_PER_MINUTE;
+} // [!code focus]
+```
+
+* 获取相差的秒：
+
+```java
+public long toSeconds() { // [!code focus]
+    return seconds;
+} // [!code focus]
+```
+
+* 获取相差的毫秒：
+
+```java
+public long toMillis() { // [!code focus]
+    long tempSeconds = seconds;
+    long tempNanos = nanos;
+    if (tempSeconds < 0) {
+        // change the seconds and nano value to
+        // handle Long.MIN_VALUE case
+        tempSeconds = tempSeconds + 1;
+        tempNanos = tempNanos - NANOS_PER_SECOND;
+    }
+    long millis = Math.multiplyExact(tempSeconds, 1000);
+    millis = Math.addExact(millis, tempNanos / NANOS_PER_MILLI);
+    return millis;
+} // [!code focus]
+```
+
+* 获取相差的纳秒：
+
+```java
+public long toNanos() {  // [!code focus]
+    long tempSeconds = seconds;
+    long tempNanos = nanos;
+    if (tempSeconds < 0) {
+        // change the seconds and nano value to
+        // handle Long.MIN_VALUE case
+        tempSeconds = tempSeconds + 1;
+        tempNanos = tempNanos - NANOS_PER_SECOND;
+    }
+    long totalNanos = Math.multiplyExact(tempSeconds, NANOS_PER_SECOND);
+    totalNanos = Math.addExact(totalNanos, tempNanos);
+    return totalNanos;
+}  // [!code focus]
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.utils;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+public class Test {
+    public static void main(String[] args) {
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.now()
+                .plusYears(1)
+                .plusMonths(1)
+                .plusDays(1)
+                .plusHours(1)
+                .plusMonths(1)
+                .plusSeconds(1)
+                .plusNanos(1);
+
+        Duration period = Duration.between(start, end);
+
+        // 获取相差的天数
+        long days = period.toDays();
+        System.out.println("days = " + days);
+
+        // 获取相差的小时
+        long hours = period.toHours();
+        System.out.println("hours = " + hours);
+
+        // 获取相差的分钟
+        long minutes = period.toMinutes();
+        System.out.println("minutes = " + minutes);
+
+        // 获取相差的秒
+        long seconds = period.toSeconds();
+        System.out.println("seconds = " + seconds);
+
+        // 获取相差的毫秒
+        long millis = period.toMillis();
+        System.out.println("millis = " + millis);
+
+        // 获取相差的纳秒
+        long nanos = period.toNanos();
+        System.out.println("nanos = " + nanos);
+    }
+}
+```
+
+### 2.7.3 ChronoUnit（推荐）
+
+#### 2.7.3.1 概述
+
+* ChronoUnit 侧重于计算`日期时间`（所有时间单位）的间隔，如：年、月、日、时、分、秒等。
+
+#### 2.7.3.2 常用 API
+
+* 获取相差的年数：
+
+```java
+long num = ChronoUnit.YEARS.between(start, end);
+```
+
+* 获取相差的天数：
+
+```java
+long num = ChronoUnit.DAYS.between(start, end);
+```
+
+
+
+* 示例：
+
+```java
+package com.github.jdk8.utils;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class Demo3 {
+    public static void main(String[] args) {
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end = LocalDateTime.now()
+                .plusYears(1)
+                .plusMonths(1)
+                .plusDays(1)
+                .plusHours(1)
+                .plusMonths(1)
+                .plusSeconds(1)
+                .plusNanos(1);
+
+        System.out.println("相差的年数：" + ChronoUnit.YEARS.between(start, end));
+        System.out.println("相差的月数：" + ChronoUnit.MONTHS.between(start, end));
+        System.out.println("相差的周数：" + ChronoUnit.WEEKS.between(start, end));
+        System.out.println("相差的天数：" + ChronoUnit.DAYS.between(start, end));
+        System.out.println("相差的时数：" + ChronoUnit.HOURS.between(start, end));
+        System.out.println("相差的分数：" + ChronoUnit.MINUTES.between(start, end));
+        System.out.println("相差的秒数：" + ChronoUnit.SECONDS.between(start, end));
+        System.out.println("相差的毫秒数：" + ChronoUnit.MILLIS.between(start, end));
+        System.out.println("相差的微妙数：" + ChronoUnit.MICROS.between(start, end));
+        System.out.println("相差的纳秒数：" + ChronoUnit.NANOS.between(start, end));
+        System.out.println("相差的半天数：" + ChronoUnit.HALF_DAYS.between(start, end));
+        System.out.println("相差的十年数：" + ChronoUnit.DECADES.between(start, end));
+        System.out.println("相差的世纪（百年）数：" + ChronoUnit.CENTURIES.between(start, end));
+        System.out.println("相差的千年数：" + ChronoUnit.MILLENNIA.between(start, end));
+        System.out.println("相差的纪元数：" + ChronoUnit.ERAS.between(start, end));
+    }
+}
+```
+
+
+
+# 第三章：包装类（⭐）
+
+## 3.1 概述
+
+* 在 Java 中，`包装类`就是`基本数据类型`对应的`引用数据类型`的`对象`。
+
+> [!NOTE]
+>
+> 所谓的`包装类`就是将`基本数据类型`的`数据`变为一个`对象`！！！
+
+* Java 中的基本数据类型和包装类的对比表，如下所示：
+
+| 基本数据类型 | 包装类（java.lang 包） |
+| ------------ | ---------------------- |
+| byte         | Byte                   |
+| short        | Short                  |
+| `int`        | `Integer`              |
+| long         | Long                   |
+| float        | Float                  |
+| double       | Double                 |
+| `char`       | `Character`            |
+| boolean      | Boolean                |
+| void         | Void                   |
+
+> [!NOTE]
+>
+> * ① Byte 、Short 、Integer 、Long 、Float 、Double 的父类是 Number 。
+> * ② 在实际开发中，最常用的包装类是 Integer 类，下面将以此类作为例子讲解！！！
+
+## 3.2 如何理解包装类？
+
+* 所谓的基本数据类型，在变量中记录的是真实的数据值，如下所示：
+
+```java
+public class Test {
+    public static void main(String[] args){
+        int num = 10; // [!code focus]
+        
+        System.out.println(num);
+    }
+}
+```
+
+* 其对应的内存图，如下所示：
+
+![基本数据类型的变量记录的是真实的数据值](./assets/13.png)
+
+* 基本数据类型 int 对应的包装类是 Integer，如下所示：
+
+```java
+public final class Integer extends Number
+        implements Comparable<Integer>, Constable, ConstantDesc {
+	
+    private final int value;
+    
+    // 其余略
+    ...
+    
+}
+```
+
+* 所谓的包装类（引用数据类型），在变量中记录的是对象的地址值，如下所示：
+
+```java
+public class Test {
+    public static void main(String[] args){
+        Integer i = new Integer(10); // [!code focus]
+        
+        System.out.println(i);
+    }
+}
+```
+
+* 其对应的内存图，如下所示：
+
+![引用数据类型（包装类）的变量记录的是对象的地址值](./assets/14.png)
+
+> [!NOTE]
+>
+> 综上所述：包装类就是用一个`对象`将`基本数据类型`的`变量`（真实的数据值）包起来！！！
+
+## 3.3 为什么要学习包装类？
+
+* ① Java 是一个纯面向对象的编程语言，即：Java 中万物皆对象（可以将所有的东西都看做对象）。由于多态的存在，所有的对象都可以使用 Object 类表示，如：`Object o = new Student();`，如果此时我们设计如下的通用方法，假设没有包装类的存在，当我们调用方法的时候，传入基本数据类型的变量，程序就会报错：
+
+```java
+public class Test {
+    public static void main(String[] args){
+        
+        int num = 10;
+        
+        // ❌ 错误：Object o != num 
+        method(num); // [!code error]
+    }
+    
+    public static void method(Object o){
+        ...
+    }
+}
+```
+
+* ② 在集合中，是不能存储基本数据类型的，只能存储对象，即：当我们向集合中存储基本数据类型的变量的时候，也需要使用包装类，如下所示：
+
+```java
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args){
+        
+        List<Integer> list = new ArrayList<>();
+        
+        list.add(new Integer(10)); // [!code focus]
+    }
+
+}
+```
+
+## 3.4 装箱和拆箱
+
+### 3.4.1 装箱（获取 Integer 对象，了解）
+
+* ~~根据传递的整数创建一个 Integer 对象（构造方法，JDK9 之后过时）：~~
+
+```java
+@Deprecated(since="9", forRemoval = true)
+public Integer(int value) { // [!code focus]
+    this.value = value;
+} // [!code focus]
+```
+
+* ~~根据传递的字符串创建一个 Integer 对象（构造方法，JDK9 之后过时）：~~
+
+```java
+@Deprecated(since="9", forRemoval = true)
+public Integer(String s) throws NumberFormatException { // [!code focus]
+    this.value = parseInt(s, 10);
+} // [!code focus]
+```
+
+* 根据传递的`整数`创建一个 Integer 对象（静态方法）：
+
+```java
+public static Integer valueOf(int i) {  // [!code focus]
+    if (i >= IntegerCache.low && i <= IntegerCache.high)
+        return IntegerCache.cache[i + (-IntegerCache.low)];
+    return new Integer(i);
+} // [!code focus]
+```
+
+* 根据传递的`字符串`创建一个 Integer 对象（静态方法）：
+
+```java
+public static Integer valueOf(String s) throws NumberFormatException { // [!code focus]
+    return Integer.valueOf(parseInt(s, 10));
+} // [!code focus]
+```
+
+* 根据传递的`字符串`和`进制`创建一个 Integer 对象（静态方法，不常用）：
+
+```java
+public static Integer valueOf(String s, int radix) throws NumberFormatException { // [!code focus]
+    return Integer.valueOf(parseInt(s,radix));
+} // [!code focus]
+```
+
+> [!NOTE]
+>
+> * 装箱的定义：将`基本数据类型`的`变量`转换为`包装类对象`。
+> * 装箱的目的：就是为了使用专门为对象设计的 API 和特性。
+
+
+
+* 示例：
+
+```java
+package com.github.wrapper;
+
+public class Test {
+    public static void main(String[] args) {
+        Integer i1 = Integer.valueOf(10);
+        System.out.println("i1 = " + i1); // i1 = 10
+
+        Integer i2 = Integer.valueOf("10");
+        System.out.println("i2 = " + i2); // i2 = 10
+    }
+}
+```
+
+### 3.4.2 拆箱（将 Integer 对象转换为基本数据类型，了解）
+
+* 将 Integer 对象转换为基本数据类型的变量：
+
+```java
+public int intValue() { // [!code focus]
+    return value;
+} // [!code focus]
+```
+
+> [!NOTE]
+>
+> * 拆箱的定义：将`包装类对象`转换为`基本数据类型`的`变量`。
+> * 拆箱的目的：一般是因为需要运算，Java 中的大多数的运算符都是为基本数据类型而设计的，比如：比较、算术等。
+
+
+
+* 示例：
+
+```java
+package com.github.wrapper;
+
+public class Test {
+    public static void main(String[] args) {
+        // 因为对象之间不能直接进行计算，所以需要拆箱
+        Integer i1 = Integer.valueOf(1);
+        Integer i2 = Integer.valueOf(2);
+
+        // 将对象进行拆箱
+        int num1 = i1.intValue();
+        int num2 = i2.intValue();
+
+        // 基本数据类型之间可以进行计算
+        int sum = num1 + num2;
+
+        // 将得到的结果再次进行装箱
+        Integer result = Integer.valueOf(sum);
+        System.out.println("result = " + result);
+    }
+}
+```
+
+### 3.4.3 自动装箱和拆箱
+
+* 在 JDK 5 之后，Java 提供一种机制：自动装箱和自动拆箱：
+  * 自动装箱：将`基本数据类型的变量`自动变为其对应的`包装类对象`。
+  * 自动拆箱：将`包装类对象`自动变为对应的`基本数据类型的变量`。
+
+> [!CAUTION]
+>
+> * ① Java 是一种强类型语言，每种数据都有自己的数据类型。
+> * ② 在计算的时候，如果不是同一种数据类型，是无法直接计算的。
+> * ③ 基本数据类型的变量和自己对应的包装类之间才可以实现自动装箱和自动拆箱。
+
+
+
+* 示例：
+
+```java
+package com.github.wrapper;
+
+public class Test {
+    public static void main(String[] args) {
+        // 自动装箱，即：直接将基本类型的数据赋值给包装类类型
+        // 在底层依然会调用 Integer.valueof(xxx)得到一个 Integer 对象
+        // 对程序员是透明的，换言之，程序员无需关心
+        Integer i = 10;
+
+        System.out.println("i = " + i);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.wrapper;
+
+public class Test {
+    public static void main(String[] args) {
+        
+        Integer i = Integer.valueOf(10);
+        
+        // 自动拆箱，即：将包装类对象直接赋值给基本数据类型
+        // 在底层依然会调用 int.intvalue() 得到一个 int 变量
+        // 对程序员是透明的，换言之，程序员无需关心
+        int num = i;
+        
+        System.out.println("num = " + num);
+    }
+}
+```
+
+## 3.5 基本数据类型和 String 之间的转换
+
+* ① 基本数据类型 --> String ：
+  * 使用 `+ ` 拼接`""`，如：`String str = 5 + "";`。
+  * 使用 String 的静态方法`valueOf()`，如：`String str = String.valueOf(5)`。
+* ② String --> 基本数据类型：
+  * 通过包装类（除了 Character 类）的静态方法`parseXxx()`，如：`int i = Integer.parsetInt("12");`。
+  * 通过包装类的静态方法`valueOf()`，如：`int i = Integer.valueOf("12");`。
+
+
+> [!CAUTION]
+>
+> 在 String 转换为基本数据类型的时候，如果字符串参数的内容无法正确的转换为对应的基本数据类型，将会抛出`java.lang.NumberFormatException` 异常。
+
+
+
+* 示例：
+
+```java
+package com.wrapper.demo3;
+
+public class Test {
+    public static void main(String[] args) {
+        String str = "12";
+
+        int num = Integer.parseInt(str);
+
+        System.out.println("num = " + num);
+
+        num = Integer.valueOf(str);
+        
+        System.out.println("num = " + num);
+    }
+}
+```
 

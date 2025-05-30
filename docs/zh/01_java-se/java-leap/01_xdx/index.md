@@ -1,2133 +1,3987 @@
-# 第一章：数组的概念
+# 第一章：static（⭐）
 
-## 1.1 为什么需要数组？
+## 1.1 概述
 
-### 1.1.1 需求分析 1
+* 假设一个班的学生正在上课，如下所示：
 
-* 需要统计某公司 50 个员工的工资情况，例如：计算平均工资、最高工资等。如果使用之前的知识，我们需要声明 50 个变量来分别记录每位员工的工资，即：
+![一个班的学生正在上课](./assets/1.png)
 
-```java
-package com.github.study;
 
-import java.util.Scanner;
 
-public class ArrayDemo1 {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.print("请输入第 1 个员工的工资："); // [!code focus]
-        double salary1 = scanner.nextDouble(); // [!code focus]
-
-        System.out.print("请输入第 2 个员工的工资："); // [!code focus]
-        double salary2 = scanner.nextDouble(); // [!code focus]
-
-        System.out.print("请输入第 3 个员工的工资："); // [!code focus]
-        double salary3 = scanner.nextDouble(); // [!code focus]
-
-		...   
-            
-        scanner.close();
-    }
-}
-```
-
-* 这样会感觉特别机械和麻烦（全是复制（Ctrl + c）和粘贴（Ctrl + v），CV 大法）；此时，我们就可以将所有的`数据`全部存储到一个`容器（数组）`中进行统一管理，并进行其它的操作，如：求最值、求平均值等，如下所示：
-
-```java {13-16}
-package com.github.study;
-
-import java.util.Scanner;
-
-public class ArrayDemo2 {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        // 定义数组
-        double[] arr = new double[50];
-
-        // 使用 for 循环向数组中添加每个员工的工资
-        for (int i = 0; i < arr.length; i++) {  
-            System.out.print("请输入第 " + (i + 1) + " 个员工的工资："); 
-            arr[i] = scanner.nextDouble(); 
-        }
-
-        // 其余的业务处理，如：求最值、求平均值等。
-		...
-            
-        scanner.close();
-    }
-}
-```
-
-### 1.1.2 需求分析 2
-
-* 在现实生活中，我们会使用很多 APP 或微信小程序等，即：
-
-![APP 或微信小程序上的数组](./assets/1.png)
-
-* 同样的道理，如果我们使用变量来存储每个商品信息，那么就需要非常多的变量；但是，如果我们将这些`商品信息`都存储到一个`容器（数组）`中，进行统一管理；那么，之后的数据处理将会非常方便。
-
-### 1.1.3 容器的概念
-
-* `生活中的容器`：水杯（装水、饮料的容器）、衣柜（装衣服等物品的容器）、集装箱（装货物等物品的容器）。
-
-![生活中的容器](./assets/22.jpg)
-
-* `程序中的容器`：将多个数据存储到一起，并且每个数据称为该容器中的元素。
-
-![程序中的容器](./assets/23.jpg)
-
-## 1.2 什么是数组？
-
-* 数组（Array）是将多个`相同数据类型`的`数据`按照一定的顺序排序的`集合`，并使用一个`标识符`命名，以及通过`编号（索引，亦称为下标）`的方式对这些数据进行统一管理。
-
-![数组](./assets/2.png)
-
-* 上述的`定义`描述了`数组`的`核心特性`：
-  * ① `聚合数据类型`（构造类型）：数组能够存储多个元素，它是一种聚合数据类型。
-  * ② `数据类型一致性`：数组中的所有元素都必须具有相同的数据类型。
-  * ③ `有序存储`：每个元素在数组中都有唯一的编号，这个编号的最小值是 0 ，最大值是数组长度 - 1 。这些编号也被称为数组的索引或下标。
-
-> [!CAUTION]
->
-> * ① 数组是一种特殊的聚合变量，它可以存储多个同类型的元素，而这些元素可以通过索引或下标进行访问。
-> * ② 数组本身是一个容器，而数组中的每个元素可以是`基本数据类型变量`或`引用数据类型变量`。
-> * ③ 数组既可以存储基本数据类型的元素，如：int、float ；也可以存储引用数据类型的元素，如：数组、枚举。
-
-## 1.3 数组的相关概念
-
-* `数组名`：本质上是一个标识符常量，命名需要符合标识符规则和规范。
-* `元素`：同一个数组中的元素必须是相同的数据类型。
-* `索引（下标）`：从 0 开始的连续数字。
-* `数组的长度`：就是元素的个数。
-
-## 1.4 数组的数据结构和优缺点
-
-### 1.4.1 线性表和数组
-
-* 可能很多人没有学习过《数据结构和算法》，那么我们需要先明确《数据结构和算法》中的两个核心概念：
+* 针对上述的场景，现在需要实现这样的需求：`要求写一个 JavaBean 类去描述这个班级的学生`。
 
 > [!NOTE]
 >
-> * ① `逻辑结构`：描述数据元素之间的`逻辑关系`。
->   
->   ::: details 点我查看 常见的逻辑结构
->   
->   * 线性表：元素之间是一对一的关系。
->   * 树形结构：一个层次结构的节点集合，其中 n （n ≥ 0）个节点有明确的上下级关系。
->   
->   :::
-> * ② `物理结构`：描述数据元素是如何在存储介质（如：硬盘、内存等）上的物理存储。
->
->   ::: details 点我查看 常见的物理结构
->
->   * 数组：线性表的一种常见的物理实现，要求元素在内存中连续存储。
->   * 链表：线性表的另外一种常见的物理实现，元素在内存中可以不连续；但是，要求每个元素指向一个元素，形成链式结构。
->
->   :::
-
-* 基于上述的背景知识，数组需要一块连续的内存空间来存储元素（假设是 int 类型的数组），如下所示：
-
-![数组在内存中的表现](./assets/2.png)
-
-### 1.4.2 随机访问和非随机访问
-
-#### 1.4.2.1 概述
-
-* `随机访问`和`非随机访问`，通常用于描述计算机存储系统的访问方式，尤其是在内存和存储设备（硬盘等）中。
-
-#### 1.4.2.2 随机访问（Random Access）
-
-* `随机访问`指的是在存储设备中可以`直接访问`任何存储位置，而不必按照顺序访问。
-* 它的关键特点就在于：访问存储器中的任意数据所花费的时间是恒定的，与数据的位置无关。其主要应用于随机存取存储器（RAM），如：内存（DRAM）和寄存器（SRAM）。
-
-> [!NOTE]
->
-> * ① 之所以称为“随机访问”，是因为系统可以在存储单元中“随机”选择并直接访问任何位置的数据，而不需要依次扫描。
-> * ② 相对于“非随机访问”，随机访问大大提升了效率，尤其是在需要频繁获取特定数据的场景中。
-> * ③ 随机访问的时间复杂度是 `O(1)`，而非随机访问的时间复杂度是 `O(n)`。
-
-* 随机访问的特点，如下所示：
-  * ① 访问速度快，能在相同的时间内访问任意位置。
-  * ② 支持高效的读取和写入操作。
-  * ③ 常用于内存（如：RAM），需要频繁读取和写入数据。
-
-#### 1.4.2.3 非随机访问（顺序访问，Sequential Access）
-
-* `非随机访问`指的是只能按照数据的存储顺序`依次`访问某些存储设备。它意味着访问某一特定位置的数据之前，必须首先访问存储在前面的数据。
-
-> [!NOTE]
->
-> * ① `磁带`就是一个典型的非随机访问设备。如果你想读取位于中间的数据，你必须从头开始读，直到到达所需的位置。
-> * ② `光盘存储设备`，如：CD、DVD 等，尽管某些情况下可以随机访问，但其读取数据的方式更接近顺序访问，特别是在读取大块连续数据时表现更佳。
-> * ③ `机械硬盘（HDD）`虽然支持随机访问，但由于其机械特性（磁头移动和磁盘旋转），顺序读取的效率更高。
-
-* 非随机访问的特点，如下所示：
-  * ① 访问速度较慢，因为需要按照顺序依次读取数据。
-  * ② 适合数据量大、连续读取的场景。
-  * ③ 常用于磁带存储或其他大容量存储设备。
-
-### 1.4.3 数组的优点
-
-* 数组的优点就在于可以实现随机访问，而其关键就在于`数据结构的连续内存分配`以及`固定的元素大小`：
-  * `连续的内存分配`：当声明一个数组的时候，如：`int[] arr = new int[10];`，在程序运行的时候，操作系统会为该数组分配 `10` 个连续存储 int 的空间。因为，我们将有一块连续的空间，每个 int 元素都紧密地排列在一起。
-  * `固定的元素大小`：数组中的每个元素都具有相同的大小，如：`int[] arr = new int[10];`中的每个 `int` 元素都占用 `4` 个字节的内存空间。
-
-> [!NOTE]
->
-> 上述两点，意味着数组中元素的内存地址，是均匀并可以连续计算的，这是实现随机访问必不可少的前提。
-
-* 在了解上述的前提下，我们还需要了解两个概念：`基地址`和`偏移量`。我们想要随机访问数组中的某个元素，就需要知道目标元素的地址，其公式是：`[目标元素的地址] = 数组基地址 + 偏移量`。
-
-> [!NOTE]
->
-> * ① 数组基地址：就是数组首元素的地址，也是数组变量的地址（数组名在内存中就代表该数组的基地址）。
-> * ② 偏移量：指的是目标元素地址和首元素地址的字节差值（字节差值 = 目标元素的下标(index) × 每个元素在内存中占用的字节大小(sizeof(element))）。
-
-* 那么，目标元素地址的`寻址公式`就是这样的（假设基地址是 base_address，目标元素的地址 address ），如下所示：
-
-```
-address(arr[i]) = base_address(arr[0]) + index * sizeof(element);
-```
-
-* 那么，我们就可以通过该`寻址公式`，计算数组中任意元素的地址，如下所示：
-
-![通过`寻址公式`，计算数组中任意元素的地址](./assets/2.svg)
-
-* 所以，当我们使用 `arr[3]` 这样的语法访问数组中的元素的时候，程序会直接访问 `0x7fffffffd4fc`这个内存地址，来获取对应的内存空间中存储的值或向该内存地址所代表的内存空间设置值，而不需要再查找或遍历，效率非常高。
-
-### 1.4.4 数组的缺点
-
-* 数组通过基地址和下标，使用简单的寻址公式，实现了高效的随机访问。为了维持这种高效访问方式，数组在其结构和存储元素上都有明确的要求：
-
-> [!NOTE]
->
-> * ① `连续内存存储`：为确保可以直接计算每个元素的地址，数组必须占据一段连续的内存空间。
-> * ② `统一的元素数据类型`：数组中的所有元素必须具有相同的数据类型，以保证每个元素的内存大小是固定的，从而保证了固定的地址偏移。
-
-* 所以，我们可以推导出数组的缺点：
-
-> [!NOTE]
->
-> * ① `高内存要求`：数组需要一段连续的内存空间，这意味为了分配数组，系统必须找到足够大的单一连续内存块。尤其对于大型数组而言，这可能导致内存不足分配失败等问题。
-> * ② `固定大小`：一旦创建了一个数组，它的大小就是固定的、不可改变的。这意味着数组不能动态地调整长度，使得其灵活性受到限制，这是数组最主要的缺点之一。
-> * ③ `单一数据类型限制`：所有存储在数组中的元素都必须是同一数据类型，限制了它能存储的数据种类。
-
-### 1.4.5 数组元素下标为什么从 0 开始？
-
-* 虽然 C 语言并非首个采用从 0 开始的数组下标设计的语言，但由于其广泛的影响，许多后续的编程语言（Java 等）基本沿用了这一设计。
-* 采取这样的设计，主要原因是为了`简化偏移量的计算，从而提高数组的效率`，即：
-  * 如果从 0 开始作为数组的下标，那么下标值可以直接用于计算偏移量。反之，如果从 1 开始，那么每次寻址都需要额外执行一个减法操作（即数组下标减 1）。
-  
-  ```txt
-  address(arr[i]) = base_address(arr[0]) + (index - 1) * sizeof(element);
-  ```
-  
-  * 简而言之，以 0 为数组下标的起始值，可以避免额外的减法运算，从而提高数组元素访问的效率。
-
-> [!NOTE]
->
-> * ① `数组`的这种设计和`计算机补码`的思想是差不多的，就是为了减少减法操作。
-> * ② 数组元素的下标从 0 开始，就是为了减少一次减法操作，大大提高了数组元素访问的效率。
-
-
-
-# 第二章：数组的操作（⭐）
-
-## 2.1 数组的定义
-
-### 2.1.1 声明
-
-* 语法：
-
-```java
-数据类型[] 数组名; // 推荐用法
-```
-
-```java
-数据类型 数组名[]; // 类似于 C 语言的语法，在 Java 中不太推荐
-```
-
-> [!CAUTION]
->
-> * ① `数据类型`：表示数组中每个元素的数据类型，即：规定了数组能存储什么类型的元素（数据）。
-> * ② `数组名`：必须符合标识符规则和规范。
-> * ③ `方括号`：表示定义的是一个数组，而不是普通的变量或类等。
+> * ① 学生的属性：姓名、年龄和性别。
+> * ② 学生的行为：学习。
 
 
 
 * 示例：
 
-```java
-package com.github.study;
+::: code-group
 
-public class ArrayDemo4 {
-    public static void main(String[] args) {
+```java [Student.java]
+package com.github.demo1;
 
-        // 声明一个 int 类型的数组
-        int[] arr;
+public class Student {
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
 
-        // 声明一个 double 类型的数组
-        double[] arr2;
+    public Student() {}
 
-        // 声明一个 char 类型的数组
-        char[] arr3;
+    public Student(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
 
-        // 声明一个 String 类型的数组
-        String[] arr4;
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    /**
+     * 学习
+     */
+    public void study() {
+        System.out.println(this.name + "正在学习~");
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" + "name='" 
+                + name + '\'' + ", age=" 
+                + age + ", gender='" 
+                + gender + '\'' + '}';
     }
 }
 ```
 
-### 2.1.2 数组的静态初始化
+```java [StudentTest.java]
+package com.github.demo1;
 
-#### 2.1.2.1 完整格式
-
-* 语法：
-
-```java
-数据类型[] 数组名;
-数组名 = new 数据类型[]{元素1,元素2,...};
-```
-
-```java
-数据类型[] 数组名 = new 数据类型[]{元素1,元素2,...};
-```
-
-> [!CAUTION]
->
-> * ① `new` 就是给数组在堆内存中开辟了一片空间。
-> * ② 前后的数据类型需要保持一致，如：`int[] arr = new int[]{1,2,3}`。
-> * ③ `大括号{}` 中保存的是数组初始化的元素，并且多个元素之间使用`逗号,`隔开。
-> * ④ 数组一旦创建之后，其长度就不能发生改变。
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo5 {
+public class StudentTest {
     public static void main(String[] args) {
+        // 创建第一个对象
+        Student s1 = new Student("张三", 18, "男");
+        s1.study();
+        System.out.println("s1 = " + s1);
 
-        /*
-        * 声明一个 int 类型的数组，并将其初始化。
-        * 其中数组中的元素是 1、2、3
-        */
-        int[] arr = new int[]{1, 2, 3};
-
-        /*
-         * 声明一个 double 类型的数组，并将其初始化。
-         * 其中数组中的元素是 1.1、1.2、1.3
-         */
-        double[] arr2 = new double[]{1.1, 2.2, 3.3};
-
-        /*
-         * 声明一个 char 类型的数组，并将其初始化。
-         * 其中数组中的元素是 a、b、c
-         */
-        char[] arr3 = new char[]{'a', 'b', 'c'};
-
-        /*
-         * 声明一个 String 类型的数组，并将其初始化。
-         * 其中数组中的元素是 hello、world
-         */
-        String[] arr4 = new String[]{"hello", "world"};
-
+        // 创建第二个对象
+        Student s2 = new Student("李四", 20, "女");
+        s2.study();
+        System.out.println("s2 = " + s2);
     }
 }
 ```
 
-#### 2.1.2.2 简化格式
-
-* 语法：
-
-```java
-数据类型[] 数组名 = {元素1,元素2,...};
+```txt [cmd 控制台]
+张三正在学习~
+s1 = Student{name='张三', age=18, gender='男'}
+李四正在学习~
+s2 = Student{name='李四', age=20, gender='女'}
 ```
 
-> [!CAUTION]
->
-> * ① 必须在一个语句中完成，不能分开两个语句写！！！
-> * ② `数组静态初始化简化格式`只是`数组静态初始化完整格式`的语法糖而已，背后的原理是一样的！！！
+:::
 
 
 
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo6 {
-    public static void main(String[] args) {
-
-        /*
-         * 声明一个 int 类型的数组，并将其初始化。
-         * 其中数组中的元素是 1、2、3
-         */
-        int[] arr = {1, 2, 3};
-
-        /*
-         * 声明一个 double 类型的数组，并将其初始化。
-         * 其中数组中的元素是 1.1、1.2、1.3
-         */
-        double[] arr2 = {1.1, 2.2, 3.3};
-
-        /*
-         * 声明一个 char 类型的数组，并将其初始化。
-         * 其中数组中的元素是 a、b、c
-         */
-        char[] arr3 = {'a', 'b', 'c'};
-
-        /*
-         * 声明一个 String 类型的数组，并将其初始化。
-         * 其中数组中的元素是 hello、world
-         */
-        String[] arr4 = {"hello", "world"};
-
-    }
-}
-```
-
-#### 2.1.2.3 应用示例
-
-* 需求：定义一个数组，要求存储 5 个学生的年龄。
+* 但是，上述的代码实现并不知道学生的老师到底是谁？此时的需求：`要求写一个 JavaBean 类去描述这个班级的学生，并知道学生的老师是谁？`。
 
 > [!NOTE]
 >
-> 思路分析：
->
-> * ① 数组中的元素是什么类型？`int` 类型。
-> * ② 可以使用`数组的静态初始化语法`创建数组并初始化。
+> * ① 学生的属性：姓名、年龄、性别、老师。
+> * ② 学生的行为：学习。
 
 
 
 * 示例：
 
-```java
-package com.github.test;
+::: code-group
 
-/**
- * 定义一个数组，要求存储 5 个学生的年龄。
- */
-public class ArrayTest2 {
-    public static void main(String[] args) {
-        
-        // 数组静态初始化的完整格式
-        // 编译器会根据数组初始化元素的个数确定数组的长度
-        int[] ageArr = new int[]{18,19,20,21,22}; // [!code highlight]
-        
+```java {54-56,58-60} [Student.java]
+package com.github.demo1;
+
+public class Student {
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
+
+    /**
+     * 老师姓名
+     */
+    public String teacherName; // [!code highlight]
+
+    public Student() {}
+
+    public Student(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
+    }
+
+    /**
+     * 学习
+     */
+    public void study() {
+        System.out.println(this.name + "正在学习~");
+    }
+
+    @Override
+    public String toString() {
+        return "Student{"
+                + "name='" + name
+                + '\'' + ", age=" + age
+                + ", gender='" + gender
+                + '\'' + ", teacherName='" + teacherName // [!code highlight]
+                + '\'' + '}';
     }
 }
 ```
 
+```java [StudentTest.java]
+package com.github.demo1;
+
+public class StudentTest {
+    public static void main(String[] args) {
+        // 创建第一个对象
+        Student s1 = new Student("张三", 18, "男");
+        s1.study();
+        s1.setTeacherName("苍老师"); // [!code highlight]
+        System.out.println("s1 = " + s1);
+
+        // 创建第二个对象
+        Student s2 = new Student("李四", 20, "女");
+        s2.study();
+        s2.setTeacherName("苍老师"); // [!code highlight]
+        System.out.println("s2 = " + s2);
+    }
+}
+```
+
+```txt [cmd 控制台]
+张三正在学习~
+s1 = Student{name='张三', age=18, gender='男', teacherName='苍老师'}
+李四正在学习~
+s2 = Student{name='李四', age=20, gender='女', teacherName='苍老师'}
+```
+
+:::
+
+
+
+* 上述的代码虽然实现了需求；但是，我们会发现，我们需要给每个学生都设置一个老师，这样貌似有点不合理？
+
+> [!NOTE]
+>
+> 一个班学生的老师应该是共享的，即：只需要设置一次，所有的学生就可以共享这个老师！！！
+
 
 
 * 示例：
 
-```java
-package com.github.test;
+::: code-group
 
-/**
- * 定义一个数组，要求存储 5 个学生的年龄。
- */
-public class ArrayTest2 {
+```java {53-55,57-59} [Student.java]
+package com.github.demo1;
+
+public class Student {
+    /**
+     * 老师姓名
+     */
+    public static String teacherName; // [!code highlight]
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
+
+    public Student() {}
+
+    public Student(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        Student.teacherName = teacherName;
+    }
+
+    /**
+     * 学习
+     */
+    public void study() {
+        System.out.println(this.name + "正在学习~");
+    }
+
+    @Override
+    public String toString() {
+        return "Student{"
+                + "name='" + name
+                + '\'' + ", age=" + age
+                + ", gender='" + gender
+                + '\'' + ", teacherName='" + teacherName // [!code highlight]
+                + '\'' + '}';
+    }
+}
+
+```
+
+```java [StudentTest.java]
+package com.github.demo1;
+
+public class StudentTest {
     public static void main(String[] args) {
-        
-        // 数组静态初始化的简化格式
-        // 编译器会根据数组初始化元素的个数确定数组的长度
-        int[] ageArr = {18,19,20,21,22}; // [!code highlight]
+        // 创建第一个对象
+        Student s1 = new Student("张三", 18, "男");
+        s1.study();
+        s1.setTeacherName("苍老师"); // [!code highlight]
+        System.out.println("s1 = " + s1);
+
+        // 创建第二个对象
+        Student s2 = new Student("李四", 20, "女");
+        s2.study();
+        System.out.println("s2 = " + s2);
+    }
+}
+```
+
+```txt [cmd 控制台]
+张三正在学习~
+s1 = Student{name='张三', age=18, gender='男', teacherName='苍老师'}
+李四正在学习~
+s2 = Student{name='李四', age=20, gender='女', teacherName='苍老师'}
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```java {53-55,57-59} [Student.java]
+package com.github.demo1;
+
+public class Student {
+    /**
+     * 老师姓名
+     */
+    public static String teacherName; // [!code highlight]
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
+
+    public Student() {}
+
+    public Student(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        Student.teacherName = teacherName;
+    }
+
+    /**
+     * 学习
+     */
+    public void study() {
+        System.out.println(this.name + "正在学习~");
+    }
+
+    @Override
+    public String toString() {
+        return "Student{"
+                + "name='" + name
+                + '\'' + ", age=" + age
+                + ", gender='" + gender
+                + '\'' + ", teacherName='" + teacherName // [!code highlight]
+                + '\'' + '}';
+    }
+}
+
+```
+
+```java {10} [StudentTest.java]
+package com.github.demo1;
+
+public class StudentTest {
+    public static void main(String[] args) {
+        Student.teacherName = "苍老师"; // [!code highlight]
+
+        // 创建第一个对象
+        Student s1 = new Student("张三", 18, "男");
+        s1.study();
+        // s1.setTeacherName("苍老师"); 
+        System.out.println("s1 = " + s1);
+
+        // 创建第二个对象
+        Student s2 = new Student("李四", 20, "女");
+        s2.study();
+        System.out.println("s2 = " + s2);
+    }
+}
+```
+
+```txt [cmd 控制台]
+张三正在学习~
+s1 = Student{name='张三', age=18, gender='男', teacherName='苍老师'}
+李四正在学习~
+s2 = Student{name='李四', age=20, gender='女', teacherName='苍老师'}
+```
+
+:::
+
+## 1.2 static 关键字
+
+* `static`表示`静态`，是`Java`中的一个`关键字`，可以修饰`成员变量`、`成员方法`、`方法块`和`内部类`。
+
+> [!NOTE]
+>
+> `方法块`和`内部类`，暂且不表，后续讲解！！！
+
+* `静态变量`：被`static`修饰的`成员变量`。
+
+> [!NOTE]
+>
+> 特点：
+>
+> * ① `被该类所有对象共享`。
+> * ② `不属于对象，而是属于类`。
+> * ③ `随着类的加载而加载，优先于对象存在`。
+>
+> 调用方式：
+>
+> * ① `类名调用（推荐）`。
+> * ② 对象名调用。
+
+* `静态方法`：被`static`修饰的`成员方法`。
+
+> [!NOTE]
+>
+> 特点：
+>
+> * ① 通常用在`测试类`和`工具类`中。
+> * ② JavaBean 类中很少使用，除非涉及到一些设计模式。
+>
+> 调用方式：
+>
+> * ① `类名调用（推荐）`。
+> * ② 对象名调用。
+
+## 1.3 静态变量
+
+### 1.3.1 内存图
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+    String name;
+    int age;
+    static String teacherName;
     
+    public void show() {
+        System.out.println("Student{"
+                + "name='" + name
+                + '\'' + ", age=" + age
+                + '\'' + ", teacherName='" + teacherName 
+                + '\'' + '}');
     }
 }
 ```
 
-#### 2.1.2.4 应用示例
+```java [StudentTest.java]
+public class StudentTest {
+    public static void main(String[] args) {
+        Student.teacherName = "苍老师"; // [!code highlight]
 
-* 需求：定义一个数组，要求存储 5 个学生的姓名。
+        // 创建第一个对象
+        Student s1 = new Student();
+        s1.name = "张三";
+        s1.age = 18;
+        s1.show();
+
+        // 创建第二个对象
+        Student s2 = new Student();
+        s2.name = "李四";
+        s2.age = 20;
+        s2.show();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![静态变量的内存动态图](./assets/2.gif)
+
+* 其完整内存动态图，如下所示：
+
+![静态变量的完整内存动态图](./assets/3.gif)
+
+### 1.3.2 应用示例
+
+* 需求：请说出以下属性（学生的属性）是否可以被定义为静态。
+
+- [ ] 学生的姓名：`name`。
+- [ ] 学生的年龄：`age`。
+- [x] 学生的老师：`teacherName`。
+- [ ] 学生的水杯：`cup`。
+- [ ] 学生的女朋友：`GirlFirendName`。
 
 > [!NOTE]
 >
-> 思路分析：
+> * ① 核心思路：只需要抓住是否可以`共享`就可以了。
 >
-> * ① 数组中的元素是什么类型？`String` 类型。
-> * ② 可以使用`数组的静态初始化语法`创建数组并初始化。
+> * ② 解析思路：具体分析具体分析，如果属性可以共享，就可以使用 static 修饰；否则，不可以使用 static 修饰。
 
 
 
-* 示例：
+* 示例：一个班的学生老师
 
 ```java
-package com.github.test;
+public class Student {
+    /**
+     * 一个班的学生老师姓名
+     */
+    public static String teacherName; // [!code highlight]
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
 
-/**
- * 定义一个数组，要求存储 5 个学生的姓名。
- */
-public class ArrayTest3 {
-    public static void main(String[] args) {
-        
-        // 数组静态初始化的完整格式
-        // 编译器会根据数组初始化元素的个数确定数组的长度
-        String[] names = new String[]{"张三","李四","王五","赵六","孙七"}; // [!code highlight]
+    /**
+     * 水杯
+     */
+    private String cup;
 
-    }
-}
+    /**
+     * 女朋友
+     */
+    private String girlFriendName;
+	
+    // 其余略
+}    
 ```
 
 
 
-* 示例：
+* 示例：私人家教老师
 
 ```java
-package com.github.test;
+public class Student {
+    /**
+     * 私人家教老师姓名
+     */
+    private String teacherName; // [!code highlight]
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
 
-/**
- * 定义一个数组，要求存储 5 个学生的姓名。
- */
-public class ArrayTest4 {
-    public static void main(String[] args) {
+    /**
+     * 水杯
+     */
+    private String cup;
 
-        // 数组静态初始化的简化格式
-        // 编译器会根据数组初始化元素的个数确定数组的长度
-        String[] names = {"张三","李四","王五","赵六","孙七"}; // [!code highlight]
+    /**
+     * 女朋友
+     */
+    private String girlFriendName;
+	
+    // 其余略
+}    
+```
 
-    }
+## 1.4 静态方法（工具类）
+
+### 1.4.1 概述
+
+* 工具类就是帮助我们做一些事情，但是不描述任何事物的类。
+* `JavaBean  类`、`测试类`和`工具类`的区别，如下所示：
+
+| 类型         | 描述                                                         | 举例                                                     |
+| ------------ | ------------------------------------------------------------ | -------------------------------------------------------- |
+| JavaBean  类 | 用来描述一类事物的类。                                       | Student<br/>Teacher<br/>Dog<br/>Cat<br/>                 |
+| 测试类       | 用来检查其他类是否书写正确，带有 main 方法的类，是程序的入口。 | StudentTest<br/>TeacherTest<br/>DogTest<br/>CatTest<br/> |
+| 工具类       | 不是用来描述一类事物的，而是帮助我们做一些事情的类。         | Math<br/>Arrays<br/>                                     |
+
+### 1.4.2 工具类编写规则
+
+* ① 类名需要见名知意。
+
+::: code-group
+
+```java [Math.java]
+public class Math {
+    
 }
 ```
 
-#### 2.1.2.5 应用示例
+```java [ArrayUtil.java]
+public class ArrayUtil {
+    
+}
+```
 
-* 需求：定义一个数组，要求存储 5 个学生的身高。
+:::
+
+* ② 私有化构造方法。
+
+```java
+public class ArrayUtil {
+    
+    private ArrayUtil(){} // [!code highlight]
+
+}
+```
+
+* ③ 方法定义为静态，即：对外提供静态方法：
+
+```java
+public class ArrayUtil {
+    
+    private ArrayUtil(){} 
+    
+    public static int getMax(...) {} // [!code highlight]
+    
+    public static int getMin(...) {} // [!code highlight]
+    
+    public static int getSum(...) {} // [!code highlight]
+    
+    public static int getAvg(...) {} // [!code highlight]
+
+}
+```
+
+### 1.4.3 应用示例
+
+* 需求：按照要求编写一个数组的工具类 ArrayUtil。
 
 > [!NOTE]
 >
-> 思路分析：
->
-> * ① 数组中的元素是什么类型？`double` 类型。
-> * ② 可以使用`数组的静态初始化语法`创建数组并初始化。
+> * ① 提供一个工具类方法 `String toString(int[] arr)` ，用于返回整数数组的内容（字符串格式类似 [10，20，50，34，100]（只考虑整数数组，且只考虑一维数组））。
+> * ② 提供这样一个工具方法 `double getAvg(int[] arr)`，用于返回平均分（只考虑浮点型数组，且只考虑一维数组）。
+> * ③ 定义一个测试类 `ArrayUtilTest` ，调用该工具类的工具方法，并返回结果。
 
 
 
 * 示例：
 
-```java
+::: code-group
+
+```java [ArrayUtil.java]
 package com.github.test;
 
-/**
- * 定义一个数组，要求存储 5 个学生的身高。
- */
-public class ArrayTest5 {
-    public static void main(String[] args) {
+import java.util.StringJoiner;
 
-        // 数组静态初始化的完整格式
-        // 编译器会根据数组初始化元素的个数确定数组的长度
-        double[] names = new double[]{1.70,1.68,1.75,1.69,1.80}; // [!code highlight]
+public class ArrayUtil {
 
-    }
-}
-```
+    private ArrayUtil() {}
 
-
-
-* 示例：
-
-```java
-package com.github.test;
-
-/**
- * 定义一个数组，要求存储 5 个学生的身高。
- */
-public class ArrayTest6 {
-    public static void main(String[] args) {
-
-        // 数组静态初始化的简化格式
-        // 编译器会根据数组初始化元素的个数确定数组的长度
-        double[] names = {1.71, 1.68, 1.75, 1.69, 1.80}; // [!code highlight]
-
-    }
-}
-```
-
-### 2.1.3 数组的动态初始化
-
-* 语法：
-
-```java
-数据类型[] 数组名;
-数组名 = new 数据类型[数组的长度];
-```
-
-```java
-数据类型[] 数组名 = new 数据类型[数组的长度]; // 推荐写法
-```
-
-> [!NOTE]
->
-> * ① `数组的长度`：表示数组中最多只能存储多少个元素，如：int[] arr = new int[3] 表示数组最多只能存储 3 个元素。
-> * ② `数组动态初始化的时候，会给数组中的元素赋值`，其规则如下：
->
-> | 数据类型 | 默认初始化值 |
-> | -------- | ------------ |
-> | 整数类型 | 0            |
-> | 小数类型 | 0.0          |
-> | 布尔类型 | false        |
-> | 字符类型 | '\u0000'     |
-> | 引用类型 | null         |
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo7 {
-    public static void main(String[] args) {
-
-        /*
-         * 定义一个长度为 5 的 int 类型的数组
-         */
-        int[] arr = new int[5];
-
-        /*
-         * 定义一个长度为 10 的 double 类型的数组
-         */
-        double[] arr2 = new double[10];
-
-        /*
-         * 定义一个长度为 8 的 char 类型的数组
-         */
-        char[] arr3 = new char[8];
-
-        /*
-         * 定义一个长度为 2 的 String 类型的数组
-         */
-        String[] arr4 = new String[2];
-
-    }
-}
-```
-
-### 2.1.4 数组变量的三要素
-
-* 假设一个数组的定义，如下所示：
-
-```java
-int[] arr = new int[5];
-```
-
-* 那么，数组变量的三要素，如下所示：
-
-> [!NOTE]
->
-> - ① 变量名：`arr` ，数组变量的标识符，用于在代码中引用数组。。
-> - ② 数据类型：`int []`，数组中元素的数据类型。
->
-> ::: details 点我查看 数据类型的作用
->
-> - ① 限定变量的取值范围：
->   - 对于`基本数据类型`，如：int 等，是通过`编码`和`内存大小`。
->   - 对于`数组`，如：int[] arr = new int[5] 等，是通过`内存布局`和`内存大小`。
-> - ② 限定变量能够执行的操作：
->   - 普通数据类型的变量，可以进行`赋值操作`、`算术运算`、`关系运算`、`逻辑运算`、`位运算`、`自增自减运算`。
->   - 引用数据类型的变量，可以进行`赋值操作`、`方法调用`、`关系运算`。
->   - 数组类型的变量，可以进行`声明数组操作`、`初始化数组`、`访问数组元素`、`修改数组元素`、`数组遍历`、`多维数组（二维数组）`等。
->
-> :::
->
-> - ③ 值：方法体内部中数组中元素的值（局部变量数组）。
-
-### 2.1.5 数组两种初始化方式的区别
-
-#### 2.1.5.1 概述
-
-* `数组静态初始化`就是在定义数组的时候，直接给出数组中具体的元素（系统会根据数组中具体元素的个数，推断出数组的长度），如下所示：
-
-```java
-int[] arr = new int[]{1,2,3,4,5};
-```
-
-* `数组动态初始化`就是在定义数组的时候，没有直接给出数组中具体的元素，而是只指定了数组的长度（由系统给出默认初始化值），如下所示：
-
-```java
-int[] arr = new int[5]; // int 类型数组的默认初始化值是 0 
-```
-
-#### 2.1.5.2 应用场景
-
-* ① 如果已经明确了元素的个数，但是不明确具体的数据，推荐使用`数组动态初始化`，如下所示：
-
-```java
-package com.github.study;
-
-import java.util.Scanner;
-
-// 使用数组来存储 50 个员工的工资
-public class ArrayDemo2 {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        // 定义数组
-        double[] arr = new double[50]; // [!code highlight]
-
-        // 使用 for 循环向数组中添加每个员工的工资
+    /**
+     * 打印数组中的元素
+     * @param arr 数组
+     */
+    public static String toString(int[] arr) {
+        StringJoiner stringJoiner = new StringJoiner(", ", "[", "]");
         for (int i = 0; i < arr.length; i++) {
-            System.out.print("请输入第 " + (i + 1) + " 个员工的工资：");
-            arr[i] = scanner.nextDouble();
+            stringJoiner.add(String.valueOf(arr[i]));
         }
-
-        // 其余的业务处理，如：求最值、求平均值等。
-		...
-            
-        scanner.close();
+        return stringJoiner.toString();
     }
-}
-```
 
-* ② 如果已经明确了要操作的数据，推荐使用`数组静态初始化`，如下所示：
-
-```java
-package com.github.study;
-
-// 将全班的学生成绩存储到数组中，已知学生的成绩是 66,77,88,99,100
-public class ArrayDemo2 {
-    public static void main(String[] args) {
-       
-       // 定义数组
-       int[] arr = {66,77,88,99,100};  // [!code highlight]
-
-    }
-}
-```
-
-## 2.2 数组元素赋值
-
-* 语法：
-
-```java
-数组名[索引|下标] = 值;
-```
-
-> [!NOTE]
->
-> * ① `索引(下标)` ：每一个存储到数组的元素，都会自动的拥有一个编号，从 0 开始，这个自动编码就称为数组的索引（ index ），可以通过数组的索引访问到数组中的元素。
-> * ② `索引的取值范围是`：`[0,arr.lenght-1]`。
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo10 {
-    public static void main(String[] args) {
-
-        int[] arr = new int[5];
-
-        // 给数组中的元素赋值
-        arr[0] = 10;
-        arr[1] = 20;
-        arr[2] = 30;
-        arr[3] = 40;
-        arr[4] = 50;
-
-    }
-}
-```
-
-## 2.3 访问数组元素
-
-* 语法：
-
-```java
-数组名[索引|下标];
-```
-
-> [!NOTE]
->
-> * ① `索引(下标)` ：每一个存储到数组的元素，都会自动的拥有一个编号，从 0 开始，这个自动编码就称为数组的索引（ index ），可以通过数组的索引访问到数组中的元素。
-> * ② `索引的取值范围是`：`[0,arr.lenght-1]`。
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo7 {
-    public static void main(String[] args) {
-
-        int[] arr = new int[5];
-
-        // 直接打印输出数组中的元素，即：访问数组元素
-        System.out.println("arr[0] = " + arr[0]); // arr[0] = 0
-        System.out.println("arr[1] = " + arr[1]); // arr[1] = 0
-        System.out.println("arr[2] = " + arr[2]); // arr[2] = 0
-        System.out.println("arr[3] = " + arr[3]); // arr[3] = 0
-        System.out.println("arr[4] = " + arr[4]); // arr[4] = 0
-
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo9 {
-    public static void main(String[] args) {
-
-        int[] arr = new int[5];
-
-        // 使用变量接收数组中的元素，即：访问数组元素
-        int arr0 = arr[0];
-        int arr1 = arr[1];
-        int arr2 = arr[2];
-        int arr3 = arr[3];
-        int arr4 = arr[4];
-
-        // 打印输出变量中的值
-        System.out.println("arr[0] = " + arr0); // arr[0] = 0
-        System.out.println("arr[1] = " + arr1); // arr[1] = 0
-        System.out.println("arr[2] = " + arr2); // arr[2] = 0
-        System.out.println("arr[3] = " + arr3); // arr[3] = 0
-        System.out.println("arr[4] = " + arr4); // arr[4] = 0
-
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo10 {
-    public static void main(String[] args) {
-
-        int[] arr = new int[5];
-
-        // 给数组中的元素赋值
-        arr[0] = 10;
-        arr[1] = 20;
-        arr[2] = 30;
-        arr[3] = 40;
-        arr[4] = 50;
-
-        // 使用变量接收数组中的元素，即：访问数组元素
-        int arr0 = arr[0];
-        int arr1 = arr[1];
-        int arr2 = arr[2];
-        int arr3 = arr[3];
-        int arr4 = arr[4];
-        
-         // 打印输出变量中的值
-        System.out.println("arr[0] = " + arr0); // arr[0] = 10
-        System.out.println("arr[1] = " + arr1); // arr[1] = 20
-        System.out.println("arr[2] = " + arr2); // arr[2] = 30
-        System.out.println("arr[3] = " + arr3); // arr[3] = 40
-        System.out.println("arr[4] = " + arr4); // arr[4] = 50
-
-    }
-}
-```
-
-## 2.4 数组常见问题
-
-### 2.4.1 数组索引越界异常
-
-* 数组索引越界异常（ArrayIndexOutOfBoundsException）：数组下标必须在指定范围内使用，超出范围视为越界。
-
-![数组越界](./assets/5.png)
-
-> [!NOTE]
->
-> * ① C 语言是不会做数组下标越界的检查，并且编译器也不会报错；但是，编译器不报错，并不意味着程序就是正确！
-> * ② 在其它高级编程语言，如：Java、JavaScript、Rust 等，如果出现数组越界访问，在代码运行的时候，编译器是会直接报错或抛出异常！！！
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo11 {
-    public static void main(String[] args) {
-
-        int[] arr = new int[5];
-
-        // 给数组中的元素赋值
-        arr[0] = 10;
-        arr[1] = 20;
-        arr[2] = 30;
-        arr[3] = 40;
-        arr[4] = 50;
-        // ❌ 错误：数组越界 
-        // java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5
-        arr[5] = 60; // [!code error]
-
-        System.out.println("arr[0] = " + arr[0]); // arr[0] = 10
-        System.out.println("arr[1] = " + arr[1]); // arr[1] = 20
-        System.out.println("arr[2] = " + arr[2]); // arr[2] = 30
-        System.out.println("arr[3] = " + arr[3]); // arr[3] = 40
-        System.out.println("arr[4] = " + arr[4]); // arr[4] = 50
-
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo11 {
-    public static void main(String[] args) {
-
-        int[] arr = new int[5];
-
-        // 给数组中的元素赋值
-        arr[0] = 10;
-        arr[1] = 20;
-        arr[2] = 30;
-        arr[3] = 40;
-        arr[4] = 50;
-
-        System.out.println("arr[0] = " + arr[0]); // arr[0] = 10
-        System.out.println("arr[1] = " + arr[1]); // arr[1] = 20
-        System.out.println("arr[2] = " + arr[2]); // arr[2] = 30
-        System.out.println("arr[3] = " + arr[3]); // arr[3] = 40
-        System.out.println("arr[4] = " + arr[4]); // arr[4] = 50
-        // ❌ 错误：数组越界 
-        // java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5
-        System.out.println("arr[4] = " + arr[5]); // [!code error]
-
-    }
-}
-```
-
-### 2.4.2 空指针异常
-
-* 空指针异常（NullPointerException）：数组没有在堆上开辟内存空间，我们却试图访问堆内存空间中的值。
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayTest11 {
-    public static void main(String[] args) {
-        int[] arr = null;
-        // ❌ 错误：Exception in thread "main" java.lang.NullPointerException
-        System.out.println(arr[0]); // [!code error]
-    }
-}
-```
-
-## 2.5 计算数组的长度
-
-* 在 Java 中，对于数组的长度，有一个内置属性 length ，如下所示：
-
-```java
-arr.length; // 数组的长度
-```
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo11 {
-    public static void main(String[] args) {
-
-        int[] arr = new int[5];
-
-        int len = arr.length;
-
-        System.out.println("len = " + len); // len = 5
-
-    }
-}
-```
-
-## 2.6 遍历数组
-
-* 遍历数组是指按顺序逐个访问数组中的每个元素，并对每个元素执行特定操作的过程。
-* `遍历数组`的目的是`访问数组中的每个元素`，以便进行`读取`、`修改`或`其他`操作，并不仅仅是打印数组中的元素。
-
-> [!NOTE]
->
-> 在实际开发中，通常会使用`循环结构（for、while、do...while）`来遍历数组。
-
-
-
-* 示例：
-
-```java {12-14}
-package com.github.study;
-
-public class ArrayDemo11 {
-    public static void main(String[] args) {
-
-        int[] arr = {1, 2, 3, 4, 5};
-
-        // 数组的长度
-        int len = arr.length;
-
-        // 遍历数组
-        for (int i = 0; i < len; i++) {
-            System.out.println(arr[i]);
-        }
-
-    }
-}
-```
-
-## 2.7 数组应用案例
-
-### 2.7.1 应用示例
-
-* 需求：计算数组中所有元素的和以及平均数。
-
-
-
-* 示例：
-
-```java
-package com.github.test;
-
-/**
- * 计算数组中所有元素的和以及平均数。
- */
-public class ArrayTest5 {
-    public static void main(String[] args) {
-
-        int[] arr = {12, 2, 31, 24, 15, 36, 67, 108, 29, 51};
-
+    /**
+     * 求平均值
+     * @param arr 数组
+     * @return 平均值
+     */
+    public static double getAvg(int[] arr) {
         int sum = 0;
-
         for (int i = 0; i < arr.length; i++) {
             sum += arr[i];
         }
-
-        double avg = (double) sum / arr.length;
-
-        // 数组中所有元素的和为：375
-        System.out.println("数组中所有元素的和为：" + sum);
-        // 数组中所有元素的平均数为：37.5
-        System.out.println("数组中所有元素的平均数为：" + avg);
-
+        return (double) sum / arr.length;
     }
 }
 ```
 
-### 2.7.2 应用示例
+```java [ArrayUtilTest.java]
+package com.github.test;
 
-* 需求：计算数组的最值（最大值和最小值）。
+public class ArrayUtilTest {
+   public static void main(String[] args){
+       int[] arr = {10,20,50,34,100};
+
+       ArrayUtil.printArr(arr);
+
+       double avg = ArrayUtil.getAvg(arr);
+       System.out.println("avg = " + avg);
+   }
+}
+```
+
+:::
+
+### 1.4.4 应用示例
+
+* 需求：定义一个工具类，用于获取集合中最大学生的年龄。
 
 > [!NOTE]
 >
-> * ① 假设数组中的第 0 个元素是最大值或最小值，并使用变量 max 或 min 保存。
->* ② 遍历数组中的每个元素：
->   * 如果有元素比最大值还要大，就让变量 max 保存最大值。
->   * 如果有元素比最小值还要小，就让变量 min 保存最小值。
+> 学生属性：name、age 和 gender。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.test2;
+
+public class Student {
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
+
+    public Student() {}
+
+    public Student(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" 
+                + "name='" + name + '\'' 
+                + ", age=" + age 
+                + ", gender='" 
+                + gender + '\'' + '}';
+    }
+}
+```
+
+```java [StudentUtil.java]
+package com.github.test2;
+
+import java.util.List;
+import java.util.Objects;
+
+public class StudentUtil {
+
+    private StudentUtil() {}
+
+    /**
+     * 获取集合中学生年龄的最大值
+     * @param studentList 学生集合
+     * @return 年龄的最大值
+     */
+    public static int getMaxAge(List<Student> studentList) {
+
+        Objects.requireNonNull(studentList, "studentList 不能为空");
+
+        int maxAge = studentList.get(0).getAge();
+
+        for (Student student : studentList) {
+            int age = student.getAge();
+            if (maxAge < age) {
+                maxAge = age;
+            }
+        }
+
+        return maxAge;
+    }
+}
+```
+
+```java [StudentTest.java]
+package com.github.test2;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class StudentTest {
+    public static void main(String[] args) {
+        List<Student> studentList = new ArrayList<>();
+
+        Student s1 = new Student("张三", 18, "男");
+        Student s2 = new Student("李四", 25, "女");
+        Student s3 = new Student("王五", 30, "男");
+        Student s4 = new Student("赵六", 35, "女");
+
+        studentList.add(s1);
+        studentList.add(s2);
+        studentList.add(s3);
+        studentList.add(s4);
+
+        int maxAge = StudentUtil.getMaxAge(studentList);
+        System.out.println("maxAge = " + maxAge);
+    }
+}
+```
+
+```txt [cmd 控制台]
+maxAge = 35
+```
+
+:::
+
+## 1.5 注意事项
+
+### 1.5.1 静态方法中不能出现 this 关键字
+
+#### 1.5.1.1 概述
+
+* 静态方法中`不能`出现 this 关键字。换言之，非静态方法中`可以`出现 this 关键字。
+
+#### 1.5.1.2 应用示例
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    // 静态方法
+    public static void method() {
+        System.out.println(teacherName);
+    }
+	
+    // 非静态方法，实例方法
+    public void show() {
+        System.out.println(name + " " + teacherName);
+    }
+}
+```
+
+```java [StudentTest.java]
+public class StudentTest {
+
+    public static void main(String[] args) {
+        Student.teacherName = "许大仙";
+
+        Student s1 = new Student();
+        s1.name = "张三";
+        s1.show();
+
+        Student s2 = new Student();
+        s2.name = "李四";
+        s2.show();
+    }
+}
+```
+
+:::
+
+#### 1.5.1.3 执行过程
+
+* 当`实例对象调用实例方法`的时候，如下所示：
+
+```java
+public class StudentTest {
+
+    public static void main(String[] args) {
+        Student.teacherName = "许大仙";
+
+        Student s1 = new Student();
+        System.out.println("s1 = " + s1);
+        s1.name = "张三";
+        s1.show(); // [!code highlight]
+
+        Student s2 = new Student();
+        System.out.println("s2 = " + s2);
+        s2.name = "李四";
+        s2.show(); // [!code highlight]
+    }
+}
+```
+
+* 其实，JVM 会自动地隐式将`Student this`作为`参数`传递给实例方法`show()`，如下所示：
+
+```java
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    public static void method() {
+        System.out.println(teacherName);
+    }
+
+    // ✅ 以下代码是正确的
+    // JVM 会隐式的传递 Student this 到非静态方法中
+    // this 表示方法调用者的地址
+    public void show(Student this) {  // [!code highlight]
+        System.out.println("this = " + this);
+        System.out.println(name + " " + teacherName);
+    }
+}
+```
+
+* 我们可以在 IDEA 中进行查看，如下所示：
+
+![IDEA 中查看 JVM 对实例方法的隐式参数传递](./assets/13.png)
+
+* 但是，JVM 不会自动地隐式将`Student this`作为`参数`传递给静态方法`method()`，如下所示：
+
+```java
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    // ❌ 以下代码是错误的
+    public static void method(Student this) { // [!code error]
+        System.out.println(teacherName);
+    }
+
+    // JVM 会隐式的传递 Student this 到非静态方法中
+    // this 表示方法调用者的地址
+    public void show(Student this) {
+        System.out.println("this = " + this);
+        System.out.println(name + " " + teacherName);
+    }
+}
+```
+
+* 我们可以在 IDEA 中进行查看，如下所示：
+
+![IDEA 中查看 JVM 对静态方法的隐式参数传递](./assets/14.png)
+
+### 1.5.2 静态方法，只能访问静态
+
+#### 1.5.2.1 概述
+
+* 静态方法`只能`访问静态变量和静态方法，`不可以`访问非静态成员变量和非静态成员方法。
+
+#### 1.5.2.2 静态方法不能访问非静态成员变量
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    // 静态方法
+    public static void method() {
+        // ❌ 以下代码是错误的
+        System.out.println(name + " " + teacherName); // [!code error]
+    }
+	
+    // 非静态方法，实例方法
+    public void show() {
+        System.out.println(name + " " + teacherName);
+    }
+}
+```
+
+```java [StudentTest.java]
+public class StudentTest {
+
+    public static void main(String[] args) {
+        Student.teacherName = "许大仙";
+        Student.method();
+    }
+}
+```
+
+:::
+
+* 其内存的动态图，如下所示：
+
+![静态方法不能访问非静态成员变量](./assets/9.gif)
+
+#### 1.5.2.3 静态方法不能访问非静态成员方法
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    // 静态方法
+    public static void method() {
+        // ❌ 以下代码是错误的
+        show(); // [!code error]
+    }
+	
+    // 非静态方法，实例方法
+    public void show() {
+        System.out.println(name + " " + teacherName);
+    }
+}
+```
+
+```java [StudentTest.java]
+public class StudentTest {
+
+    public static void main(String[] args) {
+        Student.teacherName = "许大仙";
+        Student.method();
+    }
+}
+```
+
+:::
+
+* 其内存的动态图，如下所示：
+
+![静态方法不能访问非静态成员方法](./assets/10.gif)
+
+### 1.5.3 非静态方法，可以访问所有
+
+#### 1.5.3.1 概述
+
+* 非静态方法`可以`访问静态变量和静态方法，`也可以`访问非静态成员变量和非静态成员方法。
+
+#### 1.5.3.2 非静态方法，可以访问所有
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    static String teacherName;
+    String name;
+
+    // 静态方法
+    public static void method() {
+        System.out.println("method静态方法");
+    }
+	
+    // 非静态方法，实例方法
+    public void show() {
+        System.out.println(name + " " + teacherName);
+        method();
+    }
+}
+```
+
+```java [StudentTest.java]
+public class StudentTest {
+
+    public static void main(String[] args) {
+        Student s1 = new Student();
+        s1.name = "张三";
+        s1.show();
+    }
+}
+```
+
+:::
+
+* 其动态内存图，如下所示：
+
+![非静态方法，可以访问所有](./assets/11.gif)
+
+## 1.6 重新认识 main 方法
+
+* 很早之前，我们就接触到了 main 方法，如下所示：
+
+```java
+public class Helloworld {
+    public static void main(String[] args) { // [!code highlight]
+		System.out.println("HelloWorld");
+    }
+}
+```
+
+* 其中，`public` 表示权限，由于 main 方法被 JVM 调用，所以访问权限必须足够大。
+* 其中，`static` 表示 main 方法被 JVM 调用，不需要创建对象，直接类名访问。
+
+> [!NOTE]
+>
+> * ① 因为 main 方法是 static 的，所以在 main 方法中调用其他方法也必须是 static 的。
+> * ② 因为 main 方法是 static 的，如果在 main 方法中调用实例方法，必须通过 `new 对象.实例方法()` 。
+
+* 其中，`void` 表示 main 方法被 JVM 调用的时候，不需要给 JVM 返回值。
+* 其中，`main` 是一个通用的名称，虽然不是关键字，但是被 JVM 识别。
+
+* 其中，`String[] args` 是以前用于接收键盘录入数据的；但是，现在已经很少使用了。
+
+
+
+# 第二章：继承（⭐）
+
+##  2.1 概述
+
+### 2.1.1 引入
+
+* 面向对象的三大特征：`封装`、`继承`和`多态`。之前，我们已经学习过了`封装`，本次将学习`继承`。
+* 所有的技术，都是为了解决问题而出现的，`继承`也不例外。
+* 下面，我们将一起推导一下，`继承`为什么出现？
+
+### 2.1.2 封装
+
+* `封装就是对象代表什么，就得封装对应的数据，并提供数据对应的行为`。
+* 有了封装之后，我们就可以将一些零散的数据以及对应的行为封装为一个整体，这个整体就是我们所说的对象，如下所示：
+
+![封装之后所形成的对象](./assets/4.svg)
+
+* 其代码实现，如下所示：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
+
+    public Student() {}
+
+    public Student(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+    
+    /**
+     * 吃饭
+     */
+    public void eat() {
+        System.out.println(this.name + "正在吃饭~");
+    }
+
+    /**
+     * 睡觉
+     */
+    public void sleep() {
+        System.out.println(this.name + "正在睡觉~");
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" 
+            + "name='" + name + '\'' 
+            + ", age=" + age 
+            + ", gender='" + gender 
+            + '\'' + '}';
+    }
+}
+```
+
+```java {4-7} [StudentTest.java]
+public class StudentTest {
+    public static void main(String[] args) {
+
+        Student s1 = new Student("张三", 18, "男");
+        Student s2 = new Student("李四", 25, "女");
+        Student s3 = new Student("王五", 30, "男");
+        Student s4 = new Student("赵六", 35, "女");
+
+    }
+}
+```
+
+:::
+
+* 以后我们面向的就是这个对象的整体，而不是一些零散的数据，如下所示：
+
+![封装的好处](./assets/5.svg)
+
+* 其代码实现，如下所示：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
+
+    public Student() {}
+
+    public Student(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+    
+    /**
+     * 吃饭
+     */
+    public void eat() {
+        System.out.println(this.name + "正在吃饭~");
+    }
+
+    /**
+     * 睡觉
+     */
+    public void sleep() {
+        System.out.println(this.name + "正在睡觉~");
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" 
+            + "name='" + name + '\'' 
+            + ", age=" + age 
+            + ", gender='" + gender 
+            + '\'' + '}';
+    }
+}
+```
+
+```java [StudentUtil.java]
+public class StudentUtil {
+
+    /**
+    * 打印学生的信息
+    */
+    public static void printInfo(Student stu){
+        System.out.println(stu.getName());
+        System.out.println(stu.getAge());
+        System.out.println(stu.getGender());
+    }
+}
+```
+
+:::
+
+### 2.1.3 继承
+
+* 如果类似的`JavaBean`也来越多，就会造成`代码膨胀`，如下所示：
+
+![代码膨胀](./assets/6.svg)
+
+* 其代码实现，如下所示：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
+
+    public Student() {}
+
+    public Student(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    /**
+     * 吃饭
+     */
+    public void eat() {
+        System.out.println(this.name + "正在吃饭~");
+    }
+
+    /**
+     * 睡觉
+     */
+    public void sleep() {
+        System.out.println(this.name + "正在睡觉~");
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" 
+            + "name='" + name + '\'' 
+            + ", age=" + age 
+            + ", gender='" + gender + '\'' + '}';
+    }
+}
+```
+
+```java [Teacher.java]
+public class Teacher {
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
+
+    public Student() {}
+
+    public Student(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    /**
+     * 吃饭
+     */
+    public void eat() {
+        System.out.println(this.name + "正在吃饭~");
+    }
+
+    /**
+     * 睡觉
+     */
+    public void sleep() {
+        System.out.println(this.name + "正在睡觉~");
+    }
+
+    @Override
+    public String toString() {
+        return "Teacher{" 
+            + "name='" + name + '\'' 
+            + ", age=" + age 
+            + ", gender='" + gender + '\'' + '}';
+    }
+}
+```
+
+```java [PersonUtil.java]
+public class PersonUtil {
+
+    /**
+     * 打印学生的信息
+     * @param stu 学生对象
+     */
+    public static void printInfo(Student stu) {
+        System.out.println(stu.getName());
+        System.out.println(stu.getAge());
+        System.out.println(stu.getGender());
+    }
+
+    /**
+     * 打印老师的信息
+     * @param tea 老师对象
+     */
+    public static void printInfo(Teacher tea) {
+        System.out.println(tea.getName());
+        System.out.println(tea.getAge());
+        System.out.println(tea.getGender());
+    }
+}
+
+```
+
+:::
+
+* 此时，我们就可以将`相同的属性`和`相同的行为`抽取到一个`父类`中，`子类`只需要`继承`父类（子类可以有自己独有的属性和行为），如下所示：
+
+![继承](./assets/7.svg)
+
+* 其代码实现，如下所示：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
+
+    public Person() {}
+
+    public Person(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public void eat() {
+        System.out.println(this.name + "正在吃饭~");
+    }
+
+    public void sleep() {
+        System.out.println(this.name + "正在睡觉~");
+    }
+}
+```
+
+```java [Student.java]
+public class Student extends Person { // [!code highlight]
+
+    private double score;
+
+    public Student() {}
+
+    public Student(String name, int age, String gender, double score) {
+        super(name, age, gender);
+        this.score = score;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{} " + super.toString();
+    }
+}
+```
+
+```java [Teacher.java]
+public class Teacher extends Person { // [!code highlight]
+
+    private double salary;
+
+    public Teacher() {}
+
+    public Teacher(String name, int age, String gender, double salary) {
+        super(name, age, gender);
+        this.salary = salary;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(double salary) {
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "Teacher{" + "salary=" + salary + "} " + super.toString();
+    }
+}
+```
+
+```java [PersonUtil.java]
+public class PersonUtil {
+
+    /**
+     * 打印人类的信息
+     * @param p 人类对象
+     */
+    public static void printInfo(Person p) {
+        System.out.println(p.getName());
+        System.out.println(p.getAge());
+        System.out.println(p.getGender());
+    }
+
+}
+```
+
+:::
+
+## 2.2 Java 中继承语法
+
+* 语法：
+
+```java
+public class 父类 {
+    ...
+}
+```
+
+```java
+public class 子类 extends 父类 {
+     ...
+}
+```
+
+> [!CAUTION]
+>
+> Java 是单继承的，一个类只能继承一个直接父类，跟现实世界很像，但是 Java 中的子类是更加强大的。
+
+> [!NOTE]
+>
+> 继承的好处：
+>
+> * ① 可以将多个字类中重复的代码抽取到父类中，提高代码的复用性。
+> * ② 子类可以在父类的基础上，增加其他的功能，使得子类更加强大。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+    /**
+     * 姓名
+     */
+    private String name;
+    /**
+     * 年龄
+     */
+    private int age;
+    /**
+     * 性别
+     */
+    private String gender;
+
+    public Person() {}
+
+    public Person(String name, int age, String gender) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public void eat() {
+        System.out.println(this.name + "正在吃饭~");
+    }
+
+    public void sleep() {
+        System.out.println(this.name + "正在睡觉~");
+    }
+}
+```
+
+```java [Student.java]
+public class Student extends Person { // [!code highlight]
+
+}
+```
+
+```java [Teacher.java]
+public class Teacher extends Person { // [!code highlight]
+
+    private double salary;
+
+    public Teacher() {}
+
+    public Teacher(String name, int age, String gender, double salary) {
+        super(name, age, gender);
+        this.salary = salary;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(double salary) {
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "Teacher{" + "salary=" + salary + "} " + super.toString();
+    }
+}
+```
+
+:::
+
+## 2.3 什么时候使用继承？
+
+* `当类和类之间，存在相同的内容（共性），并满足子类是父类的一种，就可以考虑使用继承来优化代码`。
+
+
+
+* 示例：学生 --> 人类，老师 --> 人类
+
+![什么时候使用继承？](./assets/8.gif)
+
+## 2.4 继承的特点
+
+### 2.4.1 特点 1
+
+* Java 只支持单继承，即：一个子类只能继承一个父类。
+
+> [!NOTE]
+>
+> 生活举例：在生活中，一个儿子只能有一个父亲！！！
+
+
+
+* 示例：
+
+```java 
+class Person {}
+
+// ✅ 以下代码是正确的
+class Student extends Person {} // [!code highlight]
+```
+
+### 2.4.2 特点 2
+
+* Java 不支持多继承，即：一个子类不能同时继承多个父类。
+
+> [!NOTE]
+>
+> 生活举例：在生活中，一个儿子只能有一个亲父亲！！！
 
 
 
 * 示例：
 
 ```java
-package com.github.test;
+class Person1 {}
 
-/**
- * 计算数组的最值（最大值和最小值）
- */
-public class ArrayTest6 {
-    public static void main(String[] args) {
+class Person2 {}
 
-        int[] arr = {12, 2, 31, 24, 15, 36, 67, 108, 29, 51};
-
-        // 最大值
-        int max = arr[0];
-
-        // 最小值
-        int min = arr[0];
-
-        // 遍历获取最大值和最小值
-        for (int i = 1; i < arr.length; i++) {
-            if (arr[i] > max) {
-                max = arr[i];
-            }
-
-            if (arr[i] < min) {
-                min = arr[i];
-            }
-        }
-
-        // 数组中最大值为：108
-        System.out.println("数组中最大值为：" + max);
-        // 数组中最小值为：2
-        System.out.println("数组中最小值为：" + min);
-    }
-}
+// ❌ 以下代码是错误的
+class Son extends Person1,Person2{} // [!code error]
 ```
 
-### 2.7.3 应用示例
+### 2.4.3 特点 3
 
-* 需求：统计数组中某个元素出现的次数，要求：使用无限循环，如果输入的数字是 0 ，就退出。
+* Java 支持多层继承，即：`子类 A`继承`父类 B`，`父类 B`继承`父类 C`。
+
+> [!NOTE]
+>
+> 生活举例：在生活中，儿子可以继承父亲（直接父类），父亲也可以继承爷爷（直接父类），即：儿子间接地继承爷爷（间接父类）。
 
 
 
 * 示例：
 
 ```java
-package com.github.test;
+class GrandFather {}
 
-import java.util.Scanner;
+// ✅ 以下代码是正确的
+class Father extends GrandFather {} // [!code highlight]
+
+// ✅ 以下代码是正确的
+class Son extends Father {} // [!code highlight]
+```
+
+### 2.4.4 特点 4 
+
+* Java 中的每一个类都直接或间接地继承 Object 类。
+
+
+
+* 示例：
+
+```java
+public class Student { // extends Object 
+    
+}
+```
+
+
+
+* 示例：
+
+```java
+public class Person { // extends Object 
+
+}    
+```
+
+```java
+public class Student extends Person {
+    
+}
+```
+
+## 2.5 应用示例
+
+* 需求：现在有 4 种动物（布偶猫、中国狸花猫、哈士奇、泰迪），要求按照继承的思想进行继承体系的设计（只考虑行为，不考虑属性）。
+
+| 动物                       | 行为                     |
+| -------------------------- | ------------------------ |
+| 布偶猫（Ragdolls）         | 吃饭、喝水、抓老鼠       |
+| 中国狸花猫（ChineseLiHua） | 吃饭、喝水、抓老鼠       |
+| 哈士奇（Husky）            | 吃饭、喝水、看家、拆家   |
+| 泰迪（Teddy）              | 吃饭、喝水、看家、蹭一蹭 |
+
+> [!NOTE]
+>
+> ::: details 点我查看 类继承体系设计
+>
+> ```mermaid
+> ---
+> title: 类继承体系设计
+> ---
+> classDiagram
+> 	 note for Animal "动物"
+>         Animal <|-- Cat : extends
+>         Animal <|-- Dog : extends
+>         Animal: + eat()
+>         Animal: + drink()
+>         note for Cat "猫"
+>         Cat <|-- Ragdolls : extends
+>         note for Ragdolls "布偶猫"
+>         Cat <|-- ChineseLiHua : extends
+>         note for ChineseLiHua "中国狸花猫"
+>      Cat: + catchMouse()
+>      note for Dog "狗"
+>      Dog: + lookHome()
+>      Dog <|-- Husky : extends
+>      note for Husky "哈士奇"
+>      Dog <|-- Teddy : extends
+>      note for Teddy "泰迪"
+>      Husky: + tearDown()
+>      Teddy: + rub()
+> ```
+>
+> :::
+
+
+
+* 示例：动物、猫和狗
+
+::: code-group
+
+```java [Animal.java]
+package com.github.test3;
 
 /**
- * 统计数组中某个元素出现的次数，要求：使用无限循环，如果输入的数字是 0 ，就退出。
+ * 动物
  */
-public class ArrayTest7 {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+public class Animal {
 
-        int[] arr = {12, 2, 31, 24, 2, -36, 67, 108, 29, 51};
+    public void eat() {
+        System.out.println("吃饭");
+    }
 
-        while (true){
-            System.out.print("请输入一个数字：");
-            int num = sc.nextInt();
-            if (num == 0){
-                break;
-            }
-            int count = 0;
-            for (int i = 0; i < arr.length; i++) {
-                if (num == arr[i]){
-                    count++;
-                }
-            }
-            System.out.println("数字 " + num + " 出现了 " + count + " 次");
-        }
-
-        sc.close();
+    public void drink() {
+        System.out.println("喝水");
     }
 }
 ```
+
+```java [Cat.java]
+package com.github.test3;
+
+/**
+ * 猫
+ */
+public class Cat extends Animal {
+
+    public void catchMouse() {
+        System.out.println("抓老鼠~");
+    }
+}
+```
+
+```java [Dog.java]
+package com.github.test3;
+
+/**
+ * 狗
+ */
+public class Dog extends Animal {
+
+    public void lookHome() {
+        System.out.println("看家~");
+    }
+}
+```
+
+:::
+
+
+
+* 示例：布偶猫、中国狸花猫、哈士奇和泰迪
+
+::: code-group
+
+```java [Ragdolls.java]
+package com.github.test3;
+
+/**
+ * 布偶猫
+ */
+public class Ragdolls extends Cat {}
+```
+
+```java [ChineseLiHua.java]
+package com.github.test3;
+
+/**
+ * 中国狸花猫
+ */
+public class ChineseLiHua extends Cat {}
+```
+
+```java [Husky.java]
+package com.github.test3;
+
+/**
+ * 哈士奇
+ */
+public class Husky extends Dog {
+
+    public void tearDown() {
+        System.out.println("拆家");
+    }
+}
+```
+
+```java [Teddy.java]
+package com.github.test3;
+
+/**
+ * 泰迪
+ */
+public class Teddy extends Dog {
+
+    public void rub() {
+        System.out.println("蹭一蹭");
+    }
+}
+```
+
+:::
+
+## 2.6 子类到底可以继承父类中的哪些内容？
+
+### 2.6.1 概述
+
+* 之前，我们已经学过类的定义语法，如下所示：
+
+```java
+public class 类名 {
+    ① 成员变量(代表属性，一般是名词)
+    ② 成员方法(代表行为，一般是动词)
+    ③ 构造方法(在创建对象的时候，给成员变量进行初始化（赋值）)
+    ④ 代码块(后面学习)
+    ⑤ 内部类(后面学习)    
+}
+```
+
+* 到目前为止，我们已经学习了类的成员变量、成员方法和构造方法，如下所示：
+
+```java
+public class 类名 {
+    ① 成员变量(代表属性，一般是名词)
+    ② 成员方法(代表行为，一般是动词)
+    ③ 构造方法(在创建对象的时候，给成员变量进行初始化（赋值）)
+}
+```
+
+* 在 Java 中，对于类中成员变量、成员方法以及构造方法等，可以使用不同的`权限修饰符`来进行修饰；并且，我们可以将`权限修饰符`大致分为两类：
+
+| 权限修饰符 | 描述                       |
+| ---------- | -------------------------- |
+| 非私有     | public、default、protected |
+| 私有       | private                    |
+
+* 不同的权限修饰符修饰类中成员（父类），会对继承（子类）造成影响，如下所示：
+
+| 类型     | 访问修饰符                          | 影响                                          |
+| -------- | ----------------------------------- | --------------------------------------------- |
+| 构造方法 | 非私有权限修饰符<br>私有权限修饰符  | 子类无法继承<br/>子类无法继承                 |
+| 成员变量 | 非私有权限修饰符<br/>私有权限修饰符 | 子类可以继承<br/>子类可以继承（无法直接使用） |
+| 成员方法 | 非私有权限修饰符<br/>私有权限修饰符 | 子类可以继承<br/>子类无法继承                 |
+
+### 2.6.2 构造方法是否可以被子类继承？
+
+* 假设构造方法是可以继承的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    String name;
+    
+    int age;
+    
+    public Fu(){}
+    
+    public Fu(String name,int age){
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+    
+    
+}
+```
+
+:::
+
+* 那么，继承之后的代码就应该是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    String name;
+    
+    int age;
+    
+    public Fu(){}
+    
+    public Fu(String name,int age){
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+    
+    public Fu(){} // [!code highlight]
+    
+    public Fu(String name,int age){ // [!code highlight]
+        this.name = name; // [!code highlight]
+        this.age = age; // [!code highlight]
+    } // [!code highlight]    
+}
+```
+
+:::
+
+* 但是，这样就违背了构造方法的定义规则，即：构造方法需要和类名保持一致，如下所示：
+
+```java [Zi.java]
+public class Zi extends Fu {
+    
+    // ❌ 以下代码是错误的
+    public Fu(){} // [!code error]
+    
+    // ❌ 以下代码是错误的
+    public Fu(String name,int age){ // [!code error]
+        this.name = name; // [!code error]
+        this.age = age; // [!code error]
+    } // [!code error]  
+}
+```
+
+* 综上所述：`父类的构造方法是不能被子类继承的`。
+
+### 2.6.3 成员变量是否可以被子类继承？
+
+#### 2.6.3.1 概述
+
+* 不管父类的`成员变量`是`私有权限修饰符`还是`非私有权限修饰符`修饰，子类都可以继承。
+
+> [!NOTE]
+>
+> 如果父类的`成员变量`是`私有权限修饰符`修饰，子类继承过来的成员变量不能直接使用（除非通过对应的 setter 或 getter 方法）。
+
+
+
+* 示例：父类的成员变量是`非私有权限修饰符`修饰
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    String name; // [!code highlight]
+    int age; // [!code highlight]
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Fu fu = new Fu();
+        fu.name = "小头爸爸";
+        fu.age = 40;
+        System.out.println(fu.name + " " + fu.age);
+
+        Zi zi = new Zi();
+        zi.name = "大头儿子";
+        zi.age = 15;
+        System.out.println(zi.name + " " + zi.age);
+    }
+}
+```
+
+:::
+
+
+
+* 示例：父类的成员变量是`私有权限修饰符`修饰
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    private String name; // [!code highlight]
+    private int age; // [!code highlight]
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Fu fu = new Fu();
+        fu.setName("小头爸爸");
+        fu.setAge(40);
+        System.out.println(fu.getName() + " " + fu.getAge());
+
+        Zi zi = new Zi();
+        zi.setName("大头儿子");
+        zi.setAge(15);
+        System.out.println(zi.getName() + " " + zi.getAge());
+    }
+}
+```
+
+:::
+
+#### 2.6.3.2 内存图（父类的成员变量是`非私有权限修饰符`修饰）
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    String name; 
+    int age; 
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+    String game;
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Zi zi = new Zi();
+        zi.name = "张三";
+        zi.age = 15;
+        zi.game = "王者荣耀";
+        System.out.println(zi.name + " " + zi.age + " " + zi.game);
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![父类的成员变量是`非私有权限修饰符`修饰的内存动态图](./assets/12.gif)
+
+* 其完整内存动态图，如下所示：
+
+![父类的成员变量是`非私有权限修饰符`修饰的完整内存动态图](./assets/15.gif)
+
+#### 2.6.3.3 内存图（父类的成员变量是`私有权限修饰符`修饰）
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    private String name;
+    private int age;
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+    String game;
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Zi zi = new Zi();
+        zi.game = "王者荣耀";
+        // ❌ 以下代码是错误的
+        zi.name = "张三"; // [!code error]
+        // ❌ 以下代码是错误的
+        zi.age = 15; // [!code error]
+        System.out.println(zi.game);
+    }
+}
+```
+
+:::
+
+* 其完整的内存动态图，如下所示：
+
+![父类的成员变量是`私有权限修饰符`修饰的完整内存动态图](./assets/16.gif)
+
+* 我们可以在 IDEA 中验证 ：
+
+![](./assets/17.png)
+
+### 2.6.4 成员方法是否可以被子类继承？
+
+#### 2.6.4.1 概述
+
+* 如果父类的`成员方法`是`私有权限修饰符`进行修饰，子类无法继承。
+* 如果父类的`成员方法`是`非私有权限修饰符`进行修饰，子类可以继承。
+
+#### 2.6.4.2 方法查找是线性查找？
+
+* 假设类的继承结构是这样的，如下所示：
+
+![](./assets/18.svg)
+
+* 现在有这样的代码，如下所示：
+
+```java
+public class Test {
+    public static void main(String[] args){
+        A a = new A();
+        a.方法c();
+    }
+}
+```
+
+* 难道`方法查找`是通过`继承链`进行简单的`线性查找`，如下所示：
+
+![方法查找是通过`继承链`进行简单的线性查找？](./assets/19.svg)
+
+* 当然不对，如果 JVM 这么设计，性能就会非常差，一旦继承链过多，Java 的运行效率将会非常低，如下所示：
+
+![](./assets/20.svg)
+
+#### 2.6.4.3 方法查找通过虚方法表进行查找
+
+* Java 会从最顶级的父类开始，给其设置了一个名为`虚方法表`的数据结构，会将该类经常使用到的方法（虚方法）抽取出来，存入到虚方法表中，如下所示：
+
+> [!NOTE]
+>
+> * ① 虚方法：非 static、非 private、非 final 的方法。
+> * ② 虚方法表的本质就是一个方法地址的数组（指针数组）。
+
+![虚方法表](./assets/21.svg)
+
+* 在继承的时候，Java 会将虚方法传递给子类，这样 B 类就会有自己的虚方法表；并且，B 类也会将自己的虚方法存入到对应的虚方法表中，如下所示：
+
+![虚方法表](./assets/22.svg)
+
+* 依次类推，C 类也会有自己的虚方法表；并且，C 类也会将自己的虚方法存入到对应的虚方法表中，如下所示：
+
+![虚方法表](./assets/23.svg)
+
+> [!CAUTION]
+>
+> 子类并不会继承父类中的所有方法，只有父类中的`虚方法`才能被子类继承！！！
+
+#### 2.6.4.4 内存图
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+
+    public void fuShow1() {
+        System.out.println("Fu --- public --- fuShow1");
+    }
+
+    private void fuShow2() {
+        System.out.println("Fu --- private --- fuShow2");
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+
+    public void ziShow() {
+        System.out.println("Zi --- public --- ziShow");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.ziShow();
+        zi.fuShow1();
+        // ❌ 以下代码是错误的
+        zi.fuShow2(); // [!code error]
+    }
+}
+```
+
+:::
+
+* 其完整的内存图，如下所示：
+
+![方法查找通过`虚方法表`进行查找的完整内存图](./assets/24.gif)
+
+## 2.7 继承中成员变量的特点
+
+### 2.7.1 概述
+
+* 继承中成员变量的特点是`就近原则`，即：谁离我近，我就用谁。
+
+### 2.7.2 演示
+
+#### 2.7.2.1 演示一
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    String name = "Fu";
+}
+```
+
+```java {5} [Zi.java]
+public class Zi extends Fu {
+    String name = "Zi";
+    
+    public void ziShow(){
+        String name = "ziShow";
+        System.out.println(name);
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.ziShow();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![继承中成员变量的特点：就近原则](./assets/25.gif)
+
+#### 2.7.2.2 演示二
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    String name = "Fu";
+}
+```
+
+```java {2,5} [Zi.java]
+public class Zi extends Fu {
+    String name = "Zi";
+    
+    public void ziShow(){
+        // String name = "ziShow";
+        System.out.println(name);
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.ziShow();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![继承中成员变量的特点：就近原则](./assets/26.gif)
+
+#### 2.7.2.4 演示三
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java {2} [Fu.java]
+public class Fu {
+    String name = "Fu";
+}
+```
+
+```java {2,5} [Zi.java]
+public class Zi extends Fu {
+    // String name = "Zi";
+    
+    public void ziShow(){
+        // String name = "ziShow";
+        System.out.println(name);
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.ziShow();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![继承中成员变量的特点：就近原则](./assets/27.gif)
+
+### 2.7.3 如何区分？
+
+#### 2.7.3.1 概述
+
+* 可以通过`this`或`super`关键字来区别成员变量。
+
+#### 2.7.3.2 演示
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java  [Fu.java]
+public class Fu {
+    String name = "Fu";
+}
+```
+
+```java {6-8} [Zi.java]
+public class Zi extends Fu {
+    String name = "Zi";
+    
+    public void ziShow(){
+        String name = "ziShow";
+        System.out.println(name);
+        System.out.println(this.name);
+        System.out.println(super.name);
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.ziShow();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/28.gif)
 
 ### 2.7.4 应用示例
 
-* 需求：将数组 a 中的全部元素复制到数组 b 中。
+* 需求：根据给出的类继承体系，完整对应的需求。
+
+```mermaid
+classDiagram
+     Fu <|-- Zi : extends
+     Fu: + String name = "Fu"
+     Fu: + String hobby = "喝茶"
+     Zi: + String name = "Zi"
+     Zi: + String game = "王者荣耀"
+     Zi: + show() 
+```
+
+> [!NOTE]
+>
+> * ① 如何在 show() 方法中打印 Zi ？
+> * ② 如何在 show() 方法中打印 Fu ？
+> * ③ 如何在 show() 方法中打印喝茶 ？
+> * ④ 如何在 show() 方法中打印王者荣耀 ？
 
 
 
 * 示例：
 
+::: code-group
+
 ```java
-package com.github.test;
+public class Fu {
+    String name = "Fu";
+    String hobby = "喝茶";
+}
+```
 
-import java.util.Arrays;
-
-/**
- * 将数组 a 中的全部元素复制到数组 b 中。
- */
-public class ArrayTest8 {
-    public static void main(String[] args) {
-
-
-        int[] a = {12, 2, 31, 24, 2, -36, 67, 108, 29, 51};
-
-        int[] b = new int[a.length];
-
-        // 数组复制
-        for (int i = 0; i < a.length; i++) {
-            b[i] = a[i];
-        }
-
-        // 打印数组
-        // a = [12, 2, 31, 24, 2, -36, 67, 108, 29, 51]
-        System.out.println("a = " + Arrays.toString(a));
-        // b = [12, 2, 31, 24, 2, -36, 67, 108, 29, 51]
-        System.out.println("b = " + Arrays.toString(b));
-
+```java [Zi.java]
+public class Zi extends Fu {
+    String name = "Zi";
+    String game = "王者荣耀";
+    
+    public void show(){
+       // 如何打印 Zi
+       System.out.println(name);
+       // 如何打印 Fu
+       System.out.println(super.name);
+       // 如何打印喝茶
+       System.out.println(hobby);
+       // 如何打印王者荣耀
+        System.out.println(game);
     }
 }
 ```
 
-### 2.7.5 应用示例
-
-* 需求：数组对称位置的元素互换。
-
-> [!NOTE]
->
-> 假设数组一共有 10 个元素，那么：
->
-> *  a[0] 和 a[9] 互换。
-> * a[1] 和 a[8] 互换。
-> * ...
-> 
-> 规律就是 `a[i] <--互换--> arr[arr.length -1 -i]`
-
-
-
-* 示例：
-
 ```java
-package com.github.test;
-
-import java.util.Arrays;
-
-/**
- * 数组对称位置的元素互换。
- */
-public class ArrayTest9 {
-    public static void main(String[] args) {
-
-        int[] arr = {12, 2, 31, 24, 2, -36, 67, 108, 29, 51};
-
-        // 原先的数组：[12, 2, 31, 24, 2, -36, 67, 108, 29, 51]
-        System.out.println("原先的数组："+ Arrays.toString(arr));
-
-        // 进行数组对称位置元素的互换
-        for (int i = 0; i < arr.length / 2; i++) {
-            int temp = arr[i];
-            arr[i] = arr[arr.length - 1 - i];
-            arr[arr.length - 1 - i] = temp;
-        }
-
-        // 交换之后的数组：[51, 29, 108, 67, -36, 2, 24, 31, 2, 12]
-        System.out.println("交换之后的数组："+ Arrays.toString(arr));
-    }
-}
-```
-
-### 2.7.6 应用示例
-
-* 需求：将数组中的最大值移动到数组的最末尾。
-
-> [!NOTE]
->
-> 从数组的下标 `0` 开始依次遍历到 `length - 1` ：
->
-> * ① 如果 `i` 下标当前的值比 `i+1` 下标的值大，则交换。
-> * ② 否则，就不交换。
-
-
-
-* 示例：
-
-```java
-package com.github.test;
-
-import java.util.Arrays;
-
-/**
- * 将数组中的最大值移动到数组的最末尾。
- */
-public class ArrayTest10 {
-    public static void main(String[] args) {
-
-        int[] arr = {12, 2, 31, 24, 2, -36, 67, 108, 29, 51};
-
-        // 原先的数组：[12, 2, 31, 24, 2, -36, 67, 108, 29, 51]
-        System.out.println("原先的数组：" + Arrays.toString(arr));
-
-        // 移动最大值到数组的最后一个位置
-        for (int i = 0; i < arr.length - 1; i++) {
-            if (arr[i] > arr[i + 1]) {
-                int temp = arr[i];
-                arr[i] = arr[i + 1];
-                arr[i + 1] = temp;
-            }
-        }
-
-        // 移动之后的数组：[2, 12, 24, 2, -36, 31, 67, 29, 51, 108]
-        System.out.println("移动之后的数组："+ Arrays.toString(arr));
-    }
-}
-```
-
-### 2.7.7 应用示例
-
-* 需求：实现冒泡排序，即将数组的元素从小到大排列。
-
-> [!NOTE]
->
-> * ① 一层循环，能实现最大值移动到数组的最后。
-> * ② 二层循环（控制内部循环数组的长度）就能实现将数组的元素从小到大排序。
-
-
-
-
-* 示例：
-
-```java
-package com.github.test;
-
-import java.util.Arrays;
-
-/**
- * 实现冒泡排序，即将数组的元素从小到大排列。
- */
-public class ArrayTest11 {
-    public static void main(String[] args) {
-
-        int[] arr = {12, 2, 31, 24, 2, -36, 67, 108, 29, 51};
-
-        // 原先的数组：[12, 2, 31, 24, 2, -36, 67, 108, 29, 51]
-        System.out.println("原先的数组：" + Arrays.toString(arr));
-
-        // 冒泡排序
-        for (int j = 0; j < arr.length - 1; j++) {
-            for (int i = 0; i < arr.length - 1 - j; i++) {
-                if (arr[i] > arr[i + 1]) {
-                    int temp = arr[i];
-                    arr[i] = arr[i + 1];
-                    arr[i + 1] = temp;
-                }
-            }
-        }
-
-        // 排序之后的数组：[-36, 2, 2, 12, 24, 29, 31, 51, 67, 108]
-        System.out.println("排序之后的数组："+ Arrays.toString(arr));
-    }
-}
-```
-
-### 2.7.8 应用示例
-
-* 需求：数组中的元素是从小到大排列的，现在要求根据指定的元素获取其在数组中的位置。
-
-> [!NOTE]
->
-> 二分查找（折半查找）的前提条件是：数组中的元素必须是`有序`的（从小到大或从大到小）。其基本步骤，如下所示：
->
-> * ① 确定初始范围：定义数组的起始索引 `min = 0` 和结束索引 `max = len - 1` 。
-> * ② 计算中间索引：在每次迭代中，计算中间位置 `mid = (min + right) / 2`。
-> * ③ 比较中间值：
->   * 如果`目标值`比 `arr[mid]` 小，则继续在`左`半部分查找，那么 `min` 不变，而`max = mid - 1` 。
->   * 如果`目标值`比 `arr[mid]` 大，则继续在`右`半部分查找，那么 `max` 不变，而`min = mid + 1` 。
->   * 如果`目标值`和 `arr[mid]` 相等，则找到了目标，返回该索引。
-> * ④ 结束条件：当 `min > max` 的时候，表示查找范围为空，即：元素不存在，返回 `-1`。
-
-
-
-* 示例：
-
-```java
-package com.github.test;
-
-import java.util.Arrays;
-
-/**
- * 二分查找。
- */
-public class ArrayTest12 {
-    public static void main(String[] args) {
-
-        int[] arr = {1, 2, 3, 4, 5, 6};
-
-        System.out.println(search(arr, 4)); // 3
-    }
-
-    public static int search(int[] arr, int num) {
-        int min = 0;
-        int max = arr.length - 1;
-        while (min <= max) {
-            int mid = (min + max) / 2;
-            if (num < arr[mid]) { // 说明要查找的数据在左半边
-                max = mid - 1;
-            } else if (num > arr[mid]) { // 说明要查找的数据在右半边
-                min = mid + 1;
-            } else { // 说明找到了
-                return mid;
-            }
-        }
-        return -1;
-    }
-}
-```
-
-
-
-# 第三章：数组的内存分析（⭐）
-
-## 3.1 Java 内存分配
-
-* 在计算机中，每一个正在运行的应用（程序，软件）都是需要占用一块内存区域，Java 应用（Java 应用跑在 JVM 之上）也不例外，如下所示：
-
-![每个正在运行的应用都需要占用一块内存区域](./assets/24.svg)
-
-* 为了更好的利用内存区域，JVM 将其分为了 5 个部分，即：`本地方法栈`、`寄存器`、`栈`、`方法区`和`堆`（每个部分都有其各自的功能），如下所示：
-
-![JVM 内存区域](./assets/25.svg)
-
-* 在 JDK 7 之前，JVM 中的`堆`和`方法区`是连在一起的（在物理内存中也是连在一起的，即：一块连续的内存空间），如下所示：
-
-![JDK7 之前的 JVM 内存区域](./assets/26.svg)
-
-* 但是，这种设计并不是很好，在 JDK 8 的时候，取消了方法区，新增了元空间，并将原先方法区中的很多功能进行拆分，有的功能放到了堆中，有的功能放到了元空间中，如下所示：
-
-> [!NOTE]
->
-> JDK 7 中设计不好的原因是：方法区（永久代）使用的是虚拟机的内存，当加载过多的类，非常容易导致内存溢出，如：`OutOfMemoryError: PermGen space` 。
-
-![JDK 8 的 JVM 内存区域](./assets/27.svg)
-
-* 但是，为了方便理解，我们依然会使用 JDK7 之前的 JVM 内存区域来讲解，如下所示：
-
-> [!NOTE]
->
-> * ① **本地方法栈**：用于执行本地方法（Native Methods），是 Java 外部代码执行的栈空间。
-> * ② **寄存器**：硬件存储器，用于存储运算临时数据，提高计算效率。
-> * ③ `栈`：用于存储方法的局部变量、操作数、栈帧等，和方法的调用生命周期密切相关。
-> * ④ **方法区**：存储类的元数据、常量池等信息，类和方法的静态数据存储区域。
-> * ⑤ `堆`：存储对象和数组，是 JVM 管理的最大内存区域，涉及对象的创建和垃圾回收。
-
-![为了方便理解，使用 JDK 7 之前的 JVM 内存区域讲解](./assets/28.svg)
-
-## 3.2 Java 中的栈和堆
-
-### 3.2.1 栈
-
-* `栈的作用`：栈主要用于存储方法的局部变量、操作数和执行时的中间结果。在每个线程中，JVM 会为该线程分配一块栈内存。每当一个方法被调用时，JVM 会为该方法创建一个栈帧，将方法的局部变量、返回地址等信息存储在栈帧中；当方法执行完毕时，栈帧会被销毁。
-* `栈的特点`：
-  * ① 每个线程都有自己的栈。
-  * ② 方法调用时入栈，方法返回时出栈。
-  * ③ 栈内存较小，受大小限制，栈溢出通常是由于递归调用过深等问题。
-
-* 栈的动画，如下所示：
-
-![入栈和出栈](./assets/29.gif)
-
-### 3.2.2 堆
-
-- `堆的作用`：堆是 JVM 中最大的内存区域，主要用于存储对象实例和数组。所有的对象和数组都分配在堆内存中。堆内存的大小通常可以通过 `-Xms` 和 `-Xmx` 参数进行设置。垃圾回收器会定期清理堆中的无用对象。
-- `堆的特点`：
-  - 堆是 JVM 中唯一一个共享区域，所有线程都可以访问堆中的对象。
-  - 堆内存的管理与垃圾回收紧密相关，GC 会回收不再被引用的对象。
-- 堆的动画，如下所示：
-
-![栈和堆](./assets/30.png)
-
-## 3.3 Java 中基本数据类型的内存分配
-
-* 在实际开发中，我们会经常在方法中使用基本数据类型的变量，即：局部变量，如下所示：
-
-```java {4-6}
-public class Main{
+public class Test {
     public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.show();
+    }
+}
+```
+
+:::
+
+### 2.7.5 总结
+
+* ① 继承中成员变量的访问特点：就近原则，即：先在局部位置找，本类成员位置找，父类成员位置找，逐级向上查找。
+* ② 如果出现了相同名字（重名）的变量，可以使用 this 或 super 关键字来解决。
+
+```java
+public void show(){
+    String name = "show";
+    System.out.println(name); // 从局部位置开始往上查找
+    System.out.println(this.name); // 从本类成员位置开始往上查找
+    System.out.println(super.name); // 从父类成员位置开始往上查找
+}
+```
+
+## 2.8 继承中成员方法的特点
+
+### 2.8.1 概述
+
+* 继承中成员方法的特点是`就近原则`，即：谁离我近，我就用谁。
+
+### 2.8.2 演示
+
+#### 2.8.2.1 演示一
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    public void eat(){
+        System.out.println("吃米饭，吃菜");
+    }
+    
+    public void drink(){
+        System.out.println("喝开水");
+    }
+}
+```
+
+```java {5} [Zi.java]
+public class Zi extends Fu {
+    
+    public void lunch(){
+        eat();
+        drink();
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.lunch();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/29.gif)
+
+#### 2.8.2.2 演示二
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    public void eat(){
+        System.out.println("吃米饭，吃菜");
+    }
+    
+    public void drink(){
+        System.out.println("喝开水");
+    }
+}
+```
+
+```java {5} [Zi.java]
+public class Zi extends Fu {
+    public void eat(){
+        System.out.println("吃面条");
+    }
+    
+    public void drink(){
+        System.out.println("喝凉水");
+    }
+    
+    public void lunch(){
+        eat();
+        drink();
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.lunch();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/30.gif)
+
+#### 2.8.2.3 演示三
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    public void eat(){
+        System.out.println("吃米饭，吃菜");
+    }
+    
+    public void drink(){
+        System.out.println("喝开水");
+    }
+}
+```
+
+```java {5} [Zi.java]
+public class Zi extends Fu {
+    public void eat(){
+        System.out.println("吃面条");
+    }
+    
+    public void drink(){
+        System.out.println("喝凉水");
+    }
+    
+    public void lunch(){
+        eat();
+        drink();
         
+        super.eat();
+        super.drink();
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+        zi.lunch();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/31.gif)
+
+### 2.8.3 方法重写
+
+#### 2.8.3.1 概述
+
+* 当父类中的方法不能满足子类的需求，就需要进行方法重写。方法重写允许子类重新定义了父类中已存在的方法的行为。
+
+#### 2.8.3.2 方法重写的本质
+
+* 方法重写的本质是`子类覆盖了从父类中继承下来的虚方法表中的方法`。
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+
+    public void show1() { // [!code highlight]
+        System.out.println("Fu --- public --- show1");
+    }
+
+    public void show2() {
+        System.out.println("Fu --- public --- show2");
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+
+    public void show1() { // [!code highlight]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args){
+        Zi zi = new Zi();
+		zi.show1();
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![方法重写的本质](./assets/32.gif)
+
+#### 2.8.3.3 方法重写的注意事项和要求
+
+* ① 重写方法的方法签名必须相同，即：方法名、形参列表（参数类型、顺序、数量）必须和父类一致。
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+
+    public void show1() {
+        System.out.println("Fu --- public --- show1");
+    }
+
+    public void show2() {
+        System.out.println("Fu --- public --- show2");
+    }
+}
+```
+
+```java [ZiRight.java]
+public class ZiRight extends Fu {
+
+    // ✅ 以下代码是正确的
+    @Override
+    public void show1() { // [!code highlight]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+```java [ZiError.java]
+public class ZiError extends Fu {
+
+    // ❌ 以下代码是错误的 
+    @Override
+    public void show11() { // [!code error]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+:::
+
+* ② 子类重写父类方法时，访问权限子类必须大于等于父类（default < protected < public）。
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+
+    protected void show1() {
+        System.out.println("Fu --- public --- show1");
+    }
+
+    public void show2() {
+        System.out.println("Fu --- public --- show2");
+    }
+}
+```
+
+```java [ZiRight.java]
+public class ZiRight extends Fu {
+
+    // ✅ 以下代码是正确的
+    @Override
+    public void show1() { // [!code highlight]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+```java [ZiError.java]
+public class ZiError extends Fu {
+
+    // ❌ 以下代码是错误的 
+    @Override
+    void show11() { // [!code error]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+:::
+
+* ③ 子类重写父类方法时，返回值类型必须小于等于父类。
+
+::: code-group
+
+```java [Animal.java]
+public class Animal {
+    public Animal getAnimal() {
+        System.out.println("Animal 的 getAnimal 方法");
+        return new Animal();
+    }
+}
+```
+
+```java [DogRight.java]
+public class DogRight extends Animal {
+    // ✅ 以下代码是正确的
+    @Override
+    public Dog getAnimal() { // [!code highlight]
+        System.out.println("Dog 的 getAnimal 方法");
+        return new Dog();
+    }
+}
+```
+
+```java [DogError.java]
+public class DogError extends Fu {
+
+    // ❌ 以下代码是错误的 
+    @Override
+    public Object getAnimal() { // [!code error]
+        System.out.println("Dog 的 getAnimal 方法");
+        return new Object();
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Animal animal = new Animal();
+        // 父类引用指向子类对象
+        Animal animal2 = new Dog();
+
+        // 类似于 Animal a1 = new Animal();
+        Animal a1 = animal.getAnimal();
+        // 类似于 Animal a2 = new Dog();
+        Animal a2 = animal2.getAnimal();
+
+        System.out.println(a1 instanceof Animal); // true
+        System.out.println(a2 instanceof Dog); // true
+    }
+}
+```
+
+:::
+
+* ④ 只有被添加到虚方法表中的方法才能被重写。
+
+> [!NOTE]
+>
+> * ① 虚方法：非 static、非 private、非 final 的方法。
+> * ② 虚方法表的本质就是一个方法地址的数组（指针数组）。
+
+* ⑤ 强烈建议在子类重写的方法上使用 `@Override` 注解。
+
+> [!NOTE]
+>
+> 编译器会检查子类的方法是否真的符合重写规则 (方法签名是否一致等)。 
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+
+    protected void show1() {
+        System.out.println("Fu --- public --- show1");
+    }
+
+    public void show2() {
+        System.out.println("Fu --- public --- show2");
+    }
+}
+```
+
+```java [ZiRight.java]
+public class ZiRight extends Fu {
+
+    // ✅ 以下代码是正确的
+    @Override
+    public void show1() { // [!code highlight]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+```java [ZiError.java]
+public class ZiError extends Fu {
+
+    // ❌ 以下代码是错误的 
+    @Override
+    void show11() { // [!code error]
+        System.out.println("Zi --- public --- show1");
+    }
+}
+```
+
+:::
+
+* ⑤ 子类重写的方法抛出的受检异常类型`不能比父类方法抛出的受检异常类型更宽泛`。
+
+> [!NOTE]
+>
+> 可以抛出`运行时异常 (Runtime Exception)`，无论父类方法是否抛出运行时异常。
+
+#### 2.8.3.4 应用示例
+
+* 需求：根据给出的类继承体系，完整对应的需求。
+
+```mermaid
+classDiagram
+     Animal <|-- Dog  : extends
+     Animal <|-- Cat   : extends
+     Animal: + makeSound() 
+     Dog: + makeSound()
+     Cat: + makeSound()
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Animal.java]
+public class Animal {
+    public void makeSound() {
+        System.out.println("动物发出叫声");
+    }
+}
+```
+
+```java [Dog.java]
+public class Dog extends Animal {
+    // 重写父类 Animal 的 makeSound() 方法
+    @Override
+    public void makeSound() {
+        System.out.println("狗叫：汪汪汪");
+    }
+}
+```
+
+```java [Cat.java]
+public class Cat extends Animal {
+    // 重写父类 Animal 的 makeSound() 方法
+    @Override
+    public void makeSound() {
+        System.out.println("猫叫：喵喵喵");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Animal animal = new Animal();
+        Dog dog = new Dog();
+        Cat cat = new Cat();
+
+        animal.makeSound(); // 输出：动物发出叫声
+        dog.makeSound();    // 输出：狗叫：汪汪汪  (调用子类 Dog 重写的方法)
+        cat.makeSound();    // 输出：猫叫：喵喵喵  (调用子类 Cat 重写的方法)
+    }
+}
+```
+
+:::
+
+### 2.8.4 总结
+
+* ① 继承中成员方法的访问特点：就近原则，即：先在局部位置找，本类成员位置找，父类成员位置找，逐级向上查找。
+* ② 如果出现了相同名字（重名）的方法，可以使用 this 或 super 关键字来解决。
+
+```java
+public void lunch(){
+    eat();
+    drink();
+
+    super.eat();
+    super.drink();
+}
+```
+
+* ③ 当父类中的方法不能满足子类的需求，就需要进行方法重写。
+
+::: code-group
+
+```java [Animal.java]
+public class Animal {
+    
+    public void makeSound() {
+        System.out.println("动物发出叫声");
+    }
+}
+```
+
+```java [Dog.java]
+public class Dog extends Animal {
+    
+    @Override
+    public void makeSound() { // [!code highlight]
+        System.out.println("狗叫：汪汪汪");
+    }
+}
+```
+
+:::
+
+## 2.9 继承中构造方法的特点
+
+### 2.9.1 概述
+
+* 继承中构造方法的特点是`父类中的构造方法不会被子类继承。`
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    String name;
+    
+    int age;
+    
+    public Fu(){}
+    
+    public Fu(String name,int age){
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+    
+    // ❌ 以下代码是错误的，违反了构造方法的定义
+    public Fu(){} // [!code error]
+    
+    // ❌ 以下代码是错误的，违反了构造方法的定义
+    public Fu(String name,int age){ // [!code error]
+        this.name = name; // [!code error]
+        this.age = age; // [!code error]
+    } // [!code error]  
+}
+```
+
+:::
+
+* 继承中构造方法的特点是`子类中所有的构造方法默认先访问父类中的无参构造方法，再执行自己的构造方法`。
+
+> [!NOTE]
+>
+> 原因：
+>
+> * ① 子类在进行初始化的时候，可能会使用到父类中的数据（属性）；如果父类没有完成初始化，子类将无法使用父类的数据（属性）。
+> * ② 子类在初始化之前，一定要调用父类的构造方法，以便先完成父类数据（属性）的初始化。
+>
+> 如何调用父类的构造方法？
+>
+> * ① 子类构造方法的第一行语句默认都是：`super();`，即使不写也是存在的，且必须在第一行。
+> * ② 如果想要调用父类的有参构造，必须手动写 `super(xxx)` 进行调用，且必须在第一行。
+
+::: code-group
+
+```java [Fu.java]
+public class Fu {
+    
+    String name;
+    
+    int age;
+    
+    public Fu(){}
+    
+    public Fu(String name,int age){
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java [Zi.java]
+public class Zi extends Fu {
+    
+    public Zi(){
+        // 默认调用父类的无参构造方法，再调用自己的构造方法
+        super();
+    } 
+
+}
+```
+
+:::
+
+### 2.9.2 演示
+
+#### 2.9.2.1 演示一
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+
+    String name;
+    int age;
+
+    public Person() {
+        System.out.println("父类的无参构造方法");
+    }
+
+    public Person(String name, int age) {
+        System.out.println("父类的全参构造方法");
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java  [Student.java]
+public class Student extends Person {}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student();
+        System.out.println("stu = " + stu);
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/33.gif)
+
+#### 2.9.2.2 演示二
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+
+    String name;
+    int age;
+
+    public Person() {
+        System.out.println("父类的无参构造方法");
+    }
+
+    public Person(String name, int age) {
+        System.out.println("父类的全参构造方法");
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java  [Student.java]
+public class Student extends Person {
+
+    public Student() {
+        // super(); // 不写也存在
+        System.out.println("子类的无参构造方法");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student();
+        System.out.println("stu = " + stu);
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/34.gif)
+
+#### 2.9.2.3 演示三
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Person.java]
+public class Person {
+
+    String name;
+    int age;
+
+    public Person() {
+        System.out.println("父类的无参构造方法");
+    }
+
+    public Person(String name, int age) {
+        System.out.println("父类的全参构造方法");
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+```java  [Student.java]
+public class Student extends Person {
+
+    public Student() {
+        // super(); // 不写也存在
+        System.out.println("子类的无参构造方法");
+    }
+
+    public Student(String name, int age) {
+        super(name, age);
+        System.out.println("子类的全参构造方法");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student("张三", 18);
+        System.out.println("stu = " + stu);
+    }
+}
+```
+
+:::
+
+* 其内存动态图，如下所示：
+
+![](./assets/35.gif)
+
+### 2.9.3 总结
+
+* ① 子类不能继承父类的构造方法，但是可以通过 `super()` 或 `super(xxx)` 进行调用。
+* ② 子类构造方法的第一行，默认有一个 `super()`，即使不写也是存在的，且必须在第一行。
+* ③ 默认先访问父类中的无参构造方法，再执行自己的构造方法。
+* ④ 如果想要访问父类的有参构造方法，必须手动写 `super(xxx)` 进行调用，且必须在第一行。
+
+## 2.10 this 和 super 的使用总结
+
+### 2.10.1 前提
+
+#### 2.10.1.1 概述
+
+* 在 IDEA 中安装`jclasslib` 插件，并在工程中引入`JOL`依赖，以便查看字节码以及打印内存中的对象。
+
+#### 2.10.1.2 IDEA 插件的安装
+
+* `设置` --> `插件` --> `jclasslib` ：
+
+![](./assets/36.png)
+
+#### 2.10.1.3 Java Object Layout（JOL）
+
+* 如果使用 Maven 或 Gradle 构建工具，只需要在`pom.xml`或`build.gradle`文件中，编写依赖的信息，如下所示：
+
+::: code-group
+
+```xml [Maven]
+<dependency>
+    <groupId>org.openjdk.jol</groupId>
+    <artifactId>jol-core</artifactId>
+    <version>0.17</version>
+</dependency>
+```
+
+```groovy [Gradle]
+implementation 'org.openjdk.jol:jol-core:0.17'
+```
+
+:::
+
+* 如果没有使用 Maven 或 Gradle 构建工具，先去 Maven 中央仓库下载对应的 jar 包：
+
+![](./assets/37.png)
+
+* 在 IDEA 的工程中新建`lib`目录，然后将`jol-core-xxx.jar`包复制到该目录中，如下所示：
+
+![](./assets/38.png)
+
+* 在 IDEA 中，`鼠标右键` --> `添加到库`，如下所示：
+
+![](./assets/39.png)
+
+![](./assets/40.png)
+
+* 在 IDEA 中，`项目结构` --> `项目设置` --> `依赖`中，将刚才的库文件导入到类路径中，以便 IDEA 识别，如下所示：
+
+ ![](./assets/41.png)
+
+![](./assets/42.png)
+
+### 2.10.2 this
+
+#### 2.10.2.1 概述
+
+* this 就是一个变量，表示当前调用者的地址。
+
+#### 2.10.2.2 演示
+
+* 假设代码是这样的，如下所示：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    // 在调用该方法的时候，由 JVM 将 this 传递进来
+    public void show(Student this) { // [!code highlight]
         int a = 10;
-        int b = 10;
-        int c = a + b;
-        
-     	System.out.println(c);   
+        int b = 20;
+        System.out.println(a + b);
     }
 }
 ```
 
-* 其在内存中的图示，如下所示：
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student();
+        System.out.println("stu = " + stu);
 
-![方法中的局部变量是作用在栈中，其生命周期和栈保持一致](./assets/31.gif)
-
-## 3.4 Java 中引用数据类型的内存分配
-
-### 3.4.1 概述
-
-* 目前而言，只需要记住，一旦在代码中看到 new 关键字，就意味着 Java 会在`堆`中开辟空间来存储对象或数组。
-
-### 3.4.2 数组静态初始化
-
-* 如果已经明确了要操作的数据，推荐使用`数组静态初始化`，如下所示：
-
-```java {6}
-import java.util.*;
-
-public class Main{
-    public static void main(String[] args){
-        
-        int[] arr = new int[] {1,2,3,4,5,6};
-        
-        System.out.println(Arrays.toString(arr));
+        stu.show();
     }
 }
 ```
 
-* 其在内存中的图示，如下所示：
+::: 
 
-![数组静态初始化](./assets/32.gif)
+* 其在内存中，就是这样的，如下所示：
 
-### 3.4.3 数组动态初始化
+![](./assets/43.png)
 
-* 如果已经明确了元素的个数，但是不明确具体的数据，推荐使用`数组动态初始化`，如下所示：
+#### 2.10.2.3 对象中没有 this 
 
-```java {7,10}
-import java.util.*;
+* 假设代码是这样的，如下所示：
 
-public class Main{
-    public static void main(String[] args){
-        
-        // 在栈中保存一个引用而已，其值是 null
-        int[] arr; 
-        
-        // 在堆中开辟内存空间，并进行初始化，将堆内存地址赋值给 arr 变量
-        arr = new int[5]; 
-        
-        // 通过 arr 对堆中数组进行赋值
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = i;
-        }
-        
-        System.out.println(Arrays.toString(arr));
+::: code-group
+
+```java [Student.java]
+public class Student {
+
+    // 在调用该方法的时候，由 JVM 将 this 传递进来
+    public void show(Student this) { // [!code highlight]
+        int a = 10;
+        int b = 20;
+        System.out.println(a + b);
     }
 }
 ```
 
-* 其在内存中的图示，如下所示：
+```java [Test.java]
+import org.openjdk.jol.info.ClassLayout;
 
-![数组动态初始化](./assets/33.gif)
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student();
+        System.out.println("stu = " + stu);
 
-### 3.4.4 复杂数组的内存分配
+        stu.show();
 
-* 在实际开发中，我们会给数组中的元素赋值，以及获取数组中的元素，如下所示：
-
-```java {7,25}
-import java.util.Arrays;
-
-public class ArrayTest {
-    public static void main(String[] args){
-
-        // 定义第一个数组
-        int[] arr1 = new int[3];
-
-        System.out.println("arr1 = " + arr1);
-
-        // 获取数组中的元素
-        System.out.println("arr1[0] = " + arr1[0]);
-        System.out.println("arr1[1] = " + arr1[1]);
-        System.out.println("arr1[2] = " + arr1[2]);
-
-        // 修改数组中的元素
-        arr1[0] = 100;
-        arr1[1] = 200;
-        arr1[2] = 300;
-
-        // 打印数组中的元素
-        System.out.println(Arrays.toString(arr1));
-
-        // 定义第二个数组
-        int[] arr2 = {10, 20, 30};
-
-        System.out.println("arr2 = " + Arrays.toString(arr2));
-
-        // 修改数组中的元素
-        arr2[0] = 100;
-        arr2[1] = 200;
-        arr2[2] = 300;
-
-        // 打印数组中的元素
-        System.out.println("arr2 = " + Arrays.toString(arr2));
-
+        // 将对象在内存中的结构打印出来
+        ClassLayout classLayout = ClassLayout.parseInstance(stu);
+        System.out.println(classLayout.toPrintable());
     }
 }
 ```
 
-* 其在内存中的图示，如下所示：
+::: 
 
-![复杂数组的内存分配](./assets/34.gif)
+* 其执行结果，如下所示：
 
-### 3.4.5 复杂数组的内存分配
+```txt [cmd 控制台]
+stu = com.github.demo6.Student@214c265e
+30
+# WARNING: Unable to get Instrumentation. Dynamic Attach failed. You may add this JAR as -javaagent manually, or supply -Djdk.attach.allowAttachSelf
+com.github.demo6.Student object internals:
+OFF  SZ   TYPE DESCRIPTION               VALUE
+  0   8        (object header: mark)     0x000000214c265e01 (hash: 0x214c265e; age: 0)
+  8   4        (object header: class)    0x01001200
+ 12   4        (object alignment gap)    
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+```
 
-* 在实际开发中，有时我们会使用两个数组变量来引用同一个数组对象，如下所示：
+#### 2.10.2.4 this 仅仅是一个变量
 
-```java {7,25}
-import java.util.Arrays;
+* 假设代码是这样的，如下所示：
 
-public class ArrayTest {
-    public static void main(String[] args){
+::: code-group
 
-        // 定义第一个数组
-        int[] arr1 = new int[3];
+```java [Student.java]
+public class Student {
 
-        System.out.println("arr1 = " + arr1);
-
-        // 获取数组中的元素
-        System.out.println("arr1[0] = " + arr1[0]);
-        System.out.println("arr1[1] = " + arr1[1]);
-        System.out.println("arr1[2] = " + arr1[2]);
-
-        // 修改数组中的元素
-        arr1[0] = 100;
-        arr1[1] = 200;
-        arr1[2] = 300;
-
-        // 打印数组中的元素
-        System.out.println(Arrays.toString(arr1));
-
-        // 将 arr1 数组的地址赋值给 arr2
-        int[] arr2 = arr1;
-
-        System.out.println("arr2 = " + Arrays.toString(arr2));
-
-        // 修改数组中的元素
-        arr2[0] = 500;
-        arr2[1] = 600;
-        arr2[2] = 700;
-
-        // 打印数组中的元素
-        System.out.println("arr1 = " + Arrays.toString(arr1));
-        System.out.println("arr2 = " + Arrays.toString(arr2));
-
+    // 在调用该方法的时候，由 JVM 将 this 传递进来
+    public void show(Student this) { // [!code highlight]
+        int a = 10;
+        int b = 20;
+        System.out.println(a + b);
     }
 }
 ```
 
-* 其在内存中的图示，如下所示：
+```java [Test.java]
+import org.openjdk.jol.info.ClassLayout;
 
-![复杂数组的内存分配](./assets/35.gif)
+public class Test {
+    public static void main(String[] args) {
+        Student stu = new Student();
+        System.out.println("stu = " + stu);
+
+        stu.show();
+
+        // 将对象在内存中的结构打印出来
+        ClassLayout classLayout = ClassLayout.parseInstance(stu);
+        System.out.println(classLayout.toPrintable());
+    }
+}
+```
+
+::: 
+
+* 在 IDEA 中，执行该代码，并通过 jclasslib 查看，查看字节码信息：
+
+![](./assets/44.gif)
+
+### 2.10.3 super
+
+* super 表示父类的存储空间。
 
 
 
-# 第四章：多维数组（⭐）
+* 示例：
 
-## 4.1 概述
+::: code-group
 
-* 我们在`数学`、`物理`和`计算机科学`等学科中学习过`一维坐标`、`二维坐标`以及`三维坐标`。
+```java [Animal.java]
+class Animal {
+    String name;
 
-* 其中，`一维坐标`通常用于描述在线段或直线上的点的位置。
+    public Animal(String name) {
+        this.name = name;
+        System.out.println("Animal constructor called with name: " + name);
+    }
+
+    public void makeSound() {
+        System.out.println("Generic animal sound");
+    }
+}
+```
+
+```java {7,15} [Dog.java]
+class Dog extends Animal {
+    String breed;
+
+    // 子类构造器
+    public Dog(String name, String breed) {
+        // 调用父类的构造器，初始化父类的 name 字段
+        super(name); // 必须是第一行
+        this.breed = breed;
+        System.out.println("Dog constructor called with breed: " + breed);
+    }
+
+    @Override // 重写父类方法
+    public void makeSound() {
+        // 调用父类的 makeSound() 方法
+        super.makeSound(); // 访问父类的方法
+        System.out.println("Woof!"); // 子类自己的实现
+    }
+
+    public void displayInfo() {
+        // 可以直接访问父类的 name
+        System.out.println("Name: " + name + ", Breed: " + breed); 
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Dog dog = new Dog("Buddy", "Golden Retriever");
+        dog.makeSound(); // 输出：Generic animal sound \n Woof!
+        dog.displayInfo(); // 输出：Name: Buddy, Breed: Golden Retriever
+    }
+}
+```
+
+:::
+
+### 2.10.4 this 和 super 的使用
+
+* this 和 super 都可以访问成员变量、成员方法以及构造方法，如下所示：
+
+| 关键字 | 访问成员变量                        | 访问成员方法                             | 访问构造方法                    |
+| ------ | ----------------------------------- | ---------------------------------------- | ------------------------------- |
+| this   | this.成员变量<br>访问本类成员变量   | this.成员方法(...)<br/>访问本类成员方法  | this(...)<br/>访问本类构造方法  |
+| super  | super.成员变量<br/>访问父类成员变量 | super.成员方法(...)<br/>访问父类成员方法 | super(...)<br/>访问父类构造方法 |
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Animal.java]
+class Animal {
+    String name;
+
+    public Animal(String name) {
+        this.name = name;
+        System.out.println("Animal constructor called with name: " + name);
+    }
+
+    public void makeSound() {
+        System.out.println("Generic animal sound");
+    }
+}
+```
+
+```java {7,15} [Dog.java]
+class Dog extends Animal {
+    String breed;
+
+    // 子类构造器
+    public Dog(String name, String breed) {
+        // 调用父类的构造器，初始化父类的 name 字段
+        super(name); // 必须是第一行
+        this.breed = breed;
+        System.out.println("Dog constructor called with breed: " + breed);
+    }
+
+    @Override // 重写父类方法
+    public void makeSound() {
+        // 调用父类的 makeSound() 方法
+        super.makeSound(); // 访问父类的方法
+        System.out.println("Woof!"); // 子类自己的实现
+    }
+
+    public void displayInfo() {
+        // 可以直接访问父类的 name
+        System.out.println("Name: " + name + ", Breed: " + breed); 
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Dog dog = new Dog("Buddy", "Golden Retriever");
+        dog.makeSound(); // 输出：Generic animal sound \n Woof!
+        dog.displayInfo(); // 输出：Name: Buddy, Breed: Golden Retriever
+    }
+}
+```
+
+:::
+
+### 2.10.5 应用示例
+
+* 需求：编写带有继承体系结构的标准 JavaBean 类。
 
 > [!NOTE]
 >
-> ::: details 点我查看 一维坐标的主要应用
+> * ① 经理：
 >
-> * **数轴**：一维坐标可以用来表示数轴上的数值位置，这在基础数学和初等代数中非常常见。
+> | 成员变量               | 成员方法                           |
+> | ---------------------- | ---------------------------------- |
+> | 工号、姓名、工资、奖金 | 工作（管理其他人）、吃饭（吃米饭） |
 >
-> ![](./assets/8.png)
+> * ② 厨师：
 >
-> * **时间轴**：时间可以看作是一维的，它可以用一维坐标表示，例如：秒、分钟、小时等。
->
-> ![](./assets/9.png)
->
-> * **统计数据**：一维坐标常用于表示单变量的数据集，如：测量身高、体重、温度等。
->
-> ![](./assets/10.jpg)
->
-> :::
-
-* 其中，`二维坐标`用于描述平面上的点的位置。
-
-> [!NOTE]
->
-> ::: details 点我查看 二维坐标的主要应用
->
-> * **几何学**：在几何学中，二维坐标用于表示平面图形的顶点、边和面积等。
->
-> ![](./assets/11.png)
->
-> * **地图和导航**：地理坐标系统（经纬度）使用二维坐标来表示地球表面的任意位置。
->
-> ![image-20240724112326592](./assets/12.png)
->
-> * **图形设计和计算机图形学**：二维坐标在绘制图形、设计图案和用户界面中非常重要。
->
-> ![](./assets/13.png)
->
-> * **物理学**：二维运动和场，例如：在描述物体在平面上的运动轨迹时使用二维坐标。
->
-> ![](./assets/14.jpg)
->
-> :::
-
-* 其中，`三维坐标`用于描述空间中点的位置。
-
-> [!NOTE]
->
-> ::: details 点我查看 三维坐标的主要应用
->
-> * **几何学**：三维坐标在空间几何中用于表示立体图形的顶点、边、面和体积。
->
-> ![](./assets/15.png)
->
-> * **计算机图形学**：三维建模和动画需要使用三维坐标来创建和操控虚拟对象。
->
-> ![](./assets/16.png)
->
-> * **工程和建筑设计**：在设计建筑物、机械部件和其他工程项目时，使用三维坐标来精确定位和规划。
->
-> ![](./assets/17.png)
->
-> * **物理学**：三维空间中的力、运动和场，例如：描述物体在空间中的位置和运动轨迹。
->
-> ![](./assets/18.png)
->
-> :::
-
-
-
-* 总而言之，一维坐标、二维坐标和三维坐标，在不同的领域中各有其重要的应用，从基础数学到高级科学和工程技术，它们帮助我们更好地理解和描述世界的结构和行为。
-
-## 4.2 二维数组的定义
-
-### 4.2.1 声明
-
-* 语法：
-
-```java
-数据类型[][] 数组名; // 推荐用法
-```
-
-```java
-数据类型[] 数组名[];
-```
-
-```java
-数据类型 数组名[][];
-```
+> | 成员变量         | 成员方法                     |
+> | ---------------- | ---------------------------- |
+> | 工号、姓名、工资 | 工作（炒菜）、吃饭（吃米饭） |
 
 
 
 * 示例：
 
-```java
-package com.github.study;
+::: code-group
 
-public class ArrayDemo7 {
+```java [Employee.java]
+public class Employee {
+
+    private int id;
+
+    private String name;
+
+    private double salary;
+
+    public Employee() {}
+
+    public Employee(int id, String name, double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(double salary) {
+        this.salary = salary;
+    }
+
+    /**
+     * 工作
+     */
+    public void work() {
+        System.out.println("工作");
+    }
+
+    /**
+     * 吃饭
+     */
+    public void eat() {
+        System.out.println("吃米饭");
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" + 
+            "id=" + id 
+            + ", name='" + name + '\'' 
+            + ", salary=" + salary + '}';
+    }
+}
+
+```
+
+```java [Manager.java]
+public class Manager extends Employee {
+
+    private double bonus;
+
+    public Manager() {}
+
+    public Manager(double bonus) {
+        this.bonus = bonus;
+    }
+
+    public Manager(int id, String name, double salary, double bonus) {
+        super(id, name, salary);
+        this.bonus = bonus;
+    }
+
+    @Override
+    public void work() {
+        System.out.println("管理其他人");
+    }
+
+    @Override
+    public String toString() {
+        return "Manager{" + "bonus=" + bonus + "} " + super.toString();
+    }
+}
+
+```
+
+```java [Cook.java]
+public class Cook extends Employee {
+
+    public Cook() {}
+
+    public Cook(int id, String name, double salary) {
+        super(id, name, salary);
+    }
+
+    @Override
+    public void work() {
+        System.out.println("炒菜");
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
     public static void main(String[] args) {
+        Manager manager = new Manager(1, "张三", 800000, 5000);
+        System.out.println("manager = " + manager);
 
-        /*
-         * 声明一个 int 类型的二维数组
-         */
-        int[][] arr;
-
-        /*
-         * 声明一个 double 类型的二维数组
-         */
-        double[][] arr2;
-
-        /*
-         * 声明一个 char 类型的二维数组
-         */
-        char[][] chs;
-
-        /*
-         * 声明一个 String 类型的二维数组
-         */
-        String[][] str;
-
+        Cook cook = new Cook(2, "李四", 2000);
+        System.out.println("cook = " + cook);
     }
 }
 ```
 
-### 4.2.2 数组的静态初始化
-
-#### 4.2.2.1 完整格式
-
-* 语法：
-
-```java
-数据类型[][] 数组名;
-数组名 = new 数据类型[][]{{元素11,元素12,...},{元素21,元素22,...},...};
-```
-
-```java
-数据类型[][] 数组名 = new 数据类型[][]{{元素11,元素12,...},...};
-```
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo8 {
-    public static void main(String[] args) {
-
-        /*
-         * 声明一个 int 类型的二维数组，并将其初始化
-         */
-        int[][] arr = new int[][]{{11,12},{21,22}};
-
-        /*
-         * 声明一个 double 类型的二维数组，并将其初始化
-         */
-        double[][] arr2 = new double[][]{{11.1,12.2},{21.1,22.2}};
-
-        /*
-         * 声明一个 char 类型的二维数组，并将其初始化
-         */
-        char[][] chs = new char[][]{{'a','b'},{'c','d'}};
-
-        /*
-         * 声明一个 String 类型的二维数组，并将其初始化
-         */
-        String[][] str = new String[][]{{"hello","world"},{"java","python"}};
-
-    }
-}
-```
-
-#### 4.2.2.2 简化格式
-
-* 语法：
-
-```java
-数据类型[][] 数组名 = {{元素11,元素12,...},{元素21,元素22,...},...};
-```
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo8 {
-    public static void main(String[] args) {
-
-        /*
-         * 声明一个 int 类型的二维数组，并将其初始化
-         */
-        int[][] arr = {{11,12},{21,22}};
-
-        /*
-         * 声明一个 double 类型的二维数组，并将其初始化
-         */
-        double[][] arr2 = {{11.1,12.2},{21.1,22.2}};
-
-        /*
-         * 声明一个 char 类型的二维数组，并将其初始化
-         */
-        char[][] chs = {{'a','b'},{'c','d'}};
-
-        /*
-         * 声明一个 String 类型的二维数组，并将其初始化
-         */
-        String[][] str = {{"hello","world"},{"java","python"}};
-
-    }
-}
-```
-
-### 4.2.3 数组的动态初始化
-
-* 语法：
-
-```java
-数据类型[][] 数组名;
-数组名 = new 数据类型[一维数组的个数|行][一维数组的元素个数|列];
-```
-
-```java
-数据类型[][] 数组名 = new 数据类型[一维数组的个数|行][一维数组的元素个数|列];
-```
-
-
-
-* 示例：
-
-```java
-package com.github.study;
-
-public class ArrayDemo7 {
-    public static void main(String[] args) {
-
-        /*
-         * 定义一个 2 * 5 的 int 类型的二维数组
-         */
-        int[][] arr = new int[2][5];
-
-        /*
-         * 定义一个 3 * 4 的 double 类型的二维数组
-         */
-        double[][] arr2 = new double[3][4];
-
-        /*
-         * 定义一个 1 * 5 的 char 类型的二维数组
-         */
-        char[][] chs = new char[1][5];
-
-        /*
-         * 定义一个 2 * 1 的 String 类型的二维数组
-         */
-        String[][] str = new String[2][1];
-
-    }
-}
-```
-
-## 4.3 二维数组的理解
-
-### 4.3.1 概述
-
-* 二维数组，就是一维数组的一维数组，即：二维数组的元素是一维数组。
-* 假设二维数组的定义是这样的，如下所示：
-
-```java
-int[][] arr = new int[3][4]
-```
-
-* 其在内存中的图示，如下所示：
-
-![二维数组的内存结构](./assets/36.svg)
-
-* 假设二维数组的定义是这样的，如下所示：
-
-```java
-int[][] arr = new int[3][];
-
-arr[0] = new int[2];
-arr[1] = new int[3];
-arr[2] = new int[4];
-```
-
-* 其在内存中的图示，如下所示：
-
-![二维数组的内存结构](./assets/37.svg)
-
-### 4.3.2 二维数组的内存分析
-
-#### 4.3.2.1 二维数组的静态初始化
-
-* 和`一维数组`类似，如果已经明确了要操作的数据，推荐使用`数组静态初始化`，如下所示：
-
-```java
-import java.util.*;
-
-public class Main{
-    public static void main(String[] args){
-        
-        int[][] arr = new int[][] {{11,12,13},{21,22,23},{31,32,33}};
-        
-        System.out.println(Arrays.deepToString(arr));
-    }
-}
-```
-
-* 其在内存中的图示，如下所示：
-
-![](./assets/38.gif)
-
-#### 4.3.2.2 二维数组的静态初始化
-
-* 和`一维数组`类似，如果已经明确了要操作的数据，推荐使用`数组静态初始化`，如下所示：
-
-```java
-import java.util.*;
-
-public class Main{
-    public static void main(String[] args){
-        
-        int[][] arr = new int[][] {
-            {11,12,13},
-            {21,22,23,24},
-            {31,32,33,34,35}
-        };
-        
-        System.out.println(Arrays.deepToString(arr));
-    }
-}
-```
-
-* 其在内存中的图示，如下所示：
-
-![](./assets/39.gif)
-
-#### 4.3.2.3 二维数组的动态初始化
-
-* 和`一维数组`类似，如果已经明确了元素的个数，但是不明确具体的数据，推荐使用`数组动态初始化`，如下所示：
-
-```java
-import java.util.Arrays;
-
-public class ArrayTest {
-    public static void main(String[] args){
-
-        // 定义第一个数组
-        int[][] arr = new int[3][2];
-
-        System.out.println("arr = " + arr);
-
-        // 获取数组中的元素
-        System.out.println("arr[0][0] = " + arr[0][0]);
-        System.out.println("arr[0][1] = " + arr[0][1]);
-        System.out.println("arr[1][0] = " + arr[1][0]);
-        System.out.println("arr[1][1] = " + arr[1][1]);
-        System.out.println("arr[2][0] = " + arr[2][0]);
-        System.out.println("arr[2][1] = " + arr[2][1]);
-
-        // 修改数组中的元素
-        arr[0][0] = -10;
-        arr[0][1] = 20;
-        arr[1][0] = -30;
-        arr[1][1] = 40;
-        arr[2][0] = -50;
-        arr[2][1] = 60;
-
-        // 打印数组中的元素
-        System.out.println(Arrays.deepToString(arr));
-    }
-}
-```
-
-* 其在内存中的图示，如下所示：
-
-![](./assets/40.gif)
-
-#### 4.3.2.4 二维数组的动态初始化
-
-* 和`一维数组`类似，如果已经明确了元素的个数，但是不明确具体的数据，推荐使用`数组动态初始化`，如下所示：
-
-```java
-import java.util.Arrays;
-
-public class ArrayTest {
-    public static void main(String[] args){
-
-        // 定义第一个数组
-        int[][] arr = new int[3][];
-
-        System.out.println("arr = " + arr);
-
-        arr[0] = new int[2];
-        arr[1] = new int[3];
-        arr[2] = new int[4];
-        
-        // 获取数组中的元素
-        System.out.println("arr[0][0] = " + arr[0][0]);
-        System.out.println("arr[0][1] = " + arr[0][1]);
-        System.out.println("arr[1][0] = " + arr[1][0]);
-        System.out.println("arr[1][1] = " + arr[1][1]);
-        System.out.println("arr[1][2] = " + arr[1][2]);
-        System.out.println("arr[2][0] = " + arr[2][0]);
-        System.out.println("arr[2][1] = " + arr[2][1]);
-        System.out.println("arr[2][2] = " + arr[2][2]);
-        System.out.println("arr[2][3] = " + arr[2][3]);
-
-        // 修改数组中的元素
-        arr[0][0] = -10;
-        arr[0][1] = 20;
-        arr[1][0] = -30;
-        arr[1][1] = 40;
-        arr[1][2] = -50;
-        arr[2][0] = 60;
-        arr[2][1] = -70;
-        arr[2][2] = 80;
-        arr[2][3] = -90;
-
-        // 打印数组中的元素
-        System.out.println(Arrays.deepToString(arr));
-    }
-}
-```
-
-* 其在内存中的图示，如下所示：
-
-![](./assets/41.gif)
-
-## 4.4 二维数组的遍历
-
-* 遍历数组是指按顺序逐个访问数组中的每个元素，并对每个元素执行特定操作的过程。
-* `遍历数组`的目的是`访问数组中的每个元素`，以便进行`读取`、`修改`或`其他`操作，并不仅仅是打印数组中的元素。
-
-> [!NOTE]
->
-> 在实际开发中，通常会使用`循环结构（for、while、do...while）`来遍历数组。
-
-
-
-* 示例：
-
-```java
-public class ArrayDemo7 {
-    public static void main(String[] args) {
-
-        // 定义二维数组
-        int[][] arr = new int[3][2];
-
-        // 给数组中的元素赋值
-        int count = 1;
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                arr[i][j] = count++;
-            }
-        }
-
-        // 遍历数组中的元素
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                System.out.print(arr[i][j] + "\t");
-            }
-            System.out.println();
-        }
-
-    }
-}
-```
-
-## 4.5 二维数组的应用案例
-
-* 需求：计算出每个季度的总营业额和全年的总营业额。
-
-> [!NOTE]
->
-> 某个商城每个季度的营业额（单位是万），如下所示：
->
-> | 季度     | 营业额     |
-> | -------- | ---------- |
-> | 第一季度 | 22，66，44 |
-> | 第二季度 | 77，33，88 |
-> | 第三季度 | 25，45，65 |
-> | 第四季度 | 11，66，99 |
-
-
-
-* 示例：
-
-```java
-public class ArrayTest13 {
-    public static void main(String[] args) {
-
-        // 某个商城每个季度的营业额
-        int[][] arr = {
-            {22, 66, 44}, 
-            {77, 33, 88}, 
-            {25, 45, 65}, 
-            {11, 66, 99}
-        };
-
-        // 遍历二维数组，计算每个季度的总营业额以及全年的总营业额
-        int total = 0;
-        for (int i = 0; i < arr.length; i++) {
-            int sum = 0;
-            for (int j = 0; j < arr[i].length; j++) {
-                sum += arr[i][j];
-                total += arr[i][j];
-            }
-            System.out.println("第 " + (i + 1) + " 季度的总营业额是：" + sum);
-        }
-
-        System.out.println("全年总营业额是：" + total);
-
-    }
-}
-```
-
-
-
+:::

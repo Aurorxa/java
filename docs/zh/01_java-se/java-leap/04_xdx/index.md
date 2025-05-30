@@ -1,668 +1,162 @@
-# 第一章：文字版格斗游戏（回合制）
+# 第一章：问答题
 
-## 1.1 简单需求
+## 1.1 题目 1
 
-### 1.1.1 概述
+* 问：什么是多态？
+* 答：多态，从字面意思来看，就是指对象的多种形态。
 
-* 格斗游戏，每个游戏角色的姓名、血量都是不一样的。在选定人物（角色）的时候（new 对象的时候），这些信息就应该被确定下来。
-* 人物的角色，如下所示：
 
-```mermaid
-classDiagram
-    class 乔峰 {
-        - String 姓名 = "乔峰"
-        - int 血量 = 100
-    }
-    class 鸠摩智 {
-        - String 姓名 = "鸠摩智"
-        - int 血量 = 100
-    }
-```
 
-* 当游戏开始启动的时候，需要模拟回合制格斗游戏，如下所示：
+* 问：使用多态的条件是什么？
+* 答：类之间要存在继承或实现关系、父类引用指向子类对象以及需要有方法重写。
 
-```txt
-乔峰举起拳头打了鸠摩智一下，造成了 XX 点伤害，鸠摩智还剩下 XXX 点血。
-鸠摩智举起拳头打了鸠摩智一下，造成了 XX 点伤害，乔峰还剩下 XXX 点血。
-乔峰举起拳头打了鸠摩智一下，造成了 XX 点伤害，鸠摩智还剩下 XXX 点血。
-鸠摩智举起拳头打了鸠摩智一下，造成了 XX 点伤害，乔峰还剩下 XXX 点血。
+## 1.2 题目 2
 
-...
-乔峰 K.O 鸠摩智
-```
-
-* 如果你不了解回合制游戏，那么请看下面的`大话西游`，其就是典型的回合制游戏，如下所示：
-
-![召唤兽打造：被遗忘的苍凛- 大话西游攻略](./assets/1.jpeg)
-
-### 1.1.2 需求分析和需求实现
-
-* 首先，我们需要创建两个角色对象，如下所示：
-
-```java
-Role r1 = new Role("乔峰",100);
-```
-
-```java
-Role r2 = new Role("鸠摩智",100);
-```
-
-* 然后，我们需要拿 r1 攻击 r2 以及拿 r2 攻击 r1，如下所示：
-
-```java
-r1.attack(r2);
-```
-
-```java
-r2.attack(r1);
-```
-
-* 所以，Role 类中一定需要提供攻击的方法，如下所示：
-
-```java
-public void attack(Role role) {
-    // 计算造成的伤害
-    int currentAttack = RANDOM.nextInt(10) + 1;
-    // 计算剩余的血量
-    int remainBlood = role.blood - currentAttack;
-    // 判断剩余的血量是否小于0，如果小于 0 ，就赋值为 0 
-    remainBlood = Math.max(remainBlood, 0);
-    // 设置剩余的血量
-    role.setBlood(remainBlood);
-    // 打印输出
-    System.out.printf(
-            "%s举起拳头打了%s一下，造成了%d点伤害，%s还剩下%d点血。\n", 
-        this.name, role.name, currentAttack, role.name, remainBlood);
-}
-```
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Role.java]
-import java.security.SecureRandom;
-
-public class Role {
-    // 随机对象
-    public static final SecureRandom RANDOM = new SecureRandom();
-    // 姓名
-    private String name;
-    // 血量
-    private int blood = 100;
-
-    public Role() {}
-
-    public Role(String name, int blood) {
-        this.name = name;
-        this.blood = blood;
-    }
-
-    public Role(String name) {
-        this.name = name;
-    }
-
-    public void attack(Role role) {
-        // 计算造成的伤害
-        int currentAttack = RANDOM.nextInt(20) + 1;
-        // 计算剩余的血量
-        int remainBlood = role.blood - currentAttack;
-        // 判断剩余的血量是否小于0，如果小于 0 ，就赋值为 0 
-        remainBlood = Math.max(remainBlood, 0);
-        // 设置剩余的血量
-        role.setBlood(remainBlood);
-        // 打印输出
-        System.out.printf(
-                "%s举起拳头打了%s一下，造成了%d点伤害，%s还剩下%d点血。\n", 
-            this.name, role.name, currentAttack, role.name, remainBlood);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getBlood() {
-        return blood;
-    }
-
-    public void setBlood(int blood) {
-        this.blood = blood;
-    }
-}
-```
-
-```java [GameTest.java]
-public class GameTest {
-    public static void main(String[] args) {
-        // 创建第一个角色
-        Role role1 = new Role("乔峰");
-        // 创建第二个角色
-        Role role2 = new Role("鸠摩智");
-
-        while (true) {
-            // r1 开始攻击 r2
-            role1.attack(role2);
-            // 判断 r2 是否死亡
-            if (role2.getBlood() <= 0) {
-                System.out.printf("%s K.O %s\n", 
-                                  role1.getName(), role2.getName());
-                break;
-            }
-            // r2 开始攻击 r1
-            role2.attack(role1);
-            // 判断 r1 是否死亡
-            if (role1.getBlood() <= 0) {
-                System.out.printf("%s K.O %s\n", 
-                                  role2.getName(), role1.getName());
-                break;
-            }
-        }
-    }
-}
-```
-
-```txt[cmd 控制台]
-乔峰举起拳头打了鸠摩智一下，造成了3点伤害，鸠摩智还剩下97点血。
-鸠摩智举起拳头打了乔峰一下，造成了14点伤害，乔峰还剩下86点血。
-乔峰举起拳头打了鸠摩智一下，造成了9点伤害，鸠摩智还剩下88点血。
-鸠摩智举起拳头打了乔峰一下，造成了5点伤害，乔峰还剩下81点血。
-乔峰举起拳头打了鸠摩智一下，造成了2点伤害，鸠摩智还剩下86点血。
-鸠摩智举起拳头打了乔峰一下，造成了6点伤害，乔峰还剩下75点血。
-乔峰举起拳头打了鸠摩智一下，造成了2点伤害，鸠摩智还剩下84点血。
-鸠摩智举起拳头打了乔峰一下，造成了19点伤害，乔峰还剩下56点血。
-乔峰举起拳头打了鸠摩智一下，造成了4点伤害，鸠摩智还剩下80点血。
-鸠摩智举起拳头打了乔峰一下，造成了10点伤害，乔峰还剩下46点血。
-乔峰举起拳头打了鸠摩智一下，造成了7点伤害，鸠摩智还剩下73点血。
-鸠摩智举起拳头打了乔峰一下，造成了16点伤害，乔峰还剩下30点血。
-乔峰举起拳头打了鸠摩智一下，造成了7点伤害，鸠摩智还剩下66点血。
-鸠摩智举起拳头打了乔峰一下，造成了1点伤害，乔峰还剩下29点血。
-乔峰举起拳头打了鸠摩智一下，造成了12点伤害，鸠摩智还剩下54点血。
-鸠摩智举起拳头打了乔峰一下，造成了5点伤害，乔峰还剩下24点血。
-乔峰举起拳头打了鸠摩智一下，造成了18点伤害，鸠摩智还剩下36点血。
-鸠摩智举起拳头打了乔峰一下，造成了11点伤害，乔峰还剩下13点血。
-乔峰举起拳头打了鸠摩智一下，造成了9点伤害，鸠摩智还剩下27点血。
-鸠摩智举起拳头打了乔峰一下，造成了3点伤害，乔峰还剩下10点血。
-乔峰举起拳头打了鸠摩智一下，造成了4点伤害，鸠摩智还剩下23点血。
-鸠摩智举起拳头打了乔峰一下，造成了7点伤害，乔峰还剩下3点血。
-乔峰举起拳头打了鸠摩智一下，造成了15点伤害，鸠摩智还剩下8点血。
-鸠摩智举起拳头打了乔峰一下，造成了19点伤害，乔峰还剩下0点血。
-鸠摩智 K.O 乔峰
-```
-
-:::
-
-## 1.2 复杂需求
-
-### 1.2.1 概述
-
-* 格斗游戏，每个游戏角色的姓名、血量都是不一样的。在选定人物（角色）的时候（new 对象的时候），这些信息就应该被确定下来。
-
-* 人物的角色，如下所示：
-
-```mermaid
-classDiagram
-    class 乔峰 {
-        - String 姓名 = "乔峰"
-        - int 血量 = 100
-        - char 性别 = "男" # 可能是男，可能是女
-        - String 容颜 = "风流俊雅" 
-    }
-    class 鸠摩智 {
-        - String 姓名 = "鸠摩智"
-        - int 血量 = 100
-        - char 性别 = "男" # 可能是男，可能是女
-        - String 容颜 = "相貌英俊" 
-    }
-```
-
-* 其中，男女的容颜，如下所示：
-
-```java
-String[] boyfaces 
-   = {"风流俊雅","气宇轩昂","相貌英俊","五官端正","相貌平平","一塌糊涂","面目狰狞"};
-```
-
-```java
-String[] girlfaces 
-   = {"美奂绝伦","沉鱼落雁","婷婷玉立","身材娇好","相貌平平","相貌简陋","惨不忍睹"};
-```
-
-* 当游戏开始启动的时候，需要模拟回合制格斗游戏，如下所示：
-
-```txt
-乔峰使出了一招【背心钉】，转到对方的身后，一掌向鸠摩智背心的灵台穴拍去。结果给鸠摩智造成一处伤。
-鸠摩智使出了一招【游空探爪】，飞起身形自半空中变掌为抓锁向乔峰。结果乔峰退了半步，毫发无损。
-...
-乔峰 K.O 鸠摩智
-```
-
-* 其中，他们之间的武功招式（每次格斗的时候，从数组中随机选择一个武功），如下所示：
-
-```java
- String[] attacksDesc = {
-    "%s使出了一招【背心钉】，转到对方的身后，一掌向%s背心的灵台穴拍去。",
-    "%s使出了一招【游空探爪】，飞起身形自半空中变掌为抓锁向%s。",
-    "%s大喝一声，身形下伏，一招【劈雷坠地】，捶向%s双腿。",
-    "%s运气于掌，一瞬间掌心变得血红，一式【掌心雷】，推向%s。",
-    "%s阴手翻起阳手跟进，一招【没遮拦】，结结实实的捶向%s。",
-    "%s上步抢身，招中套招，一招【劈挂连环】，连环攻向%s。"
-};
-```
-
-```java
-String[] beWoundedDesc = {
-    "结果%s退了半步，毫发无损。",
-    "结果给%s造成一处瘀伤。",
-    "结果一击命中，%s痛得弯下腰。",
-    "结果%s痛苦地闷哼了一声，显然受了点内伤。",
-    "结果%s摇摇晃晃，一跤摔倒在地。",
-    "结果%s脸色一下变得惨白，连退了好几步。",
-    "结果『轰』的一声，%s口中鲜血狂喷而出。",
-    "结果%s一声惨叫，像滩软泥般塌了下去。"
-};
-```
-
-### 1.2.2 需求分析和需求实现
-
-* 首先，我们需要创建两个角色对象，如下所示：
-
-```java
-Role r1 = new Role("乔峰",100,"男","风流俊雅");
-```
-
-```java
-Role r2 = new Role("鸠摩智",100,"男","气宇轩昂");
-```
-
-* 然后，我们需要拿 r1 攻击 r2 以及拿 r2 攻击 r1，如下所示：
-
-```java
-r1.attack(r2);
-```
-
-```java
-r2.attack(r1);
-```
-
-* 所以，Role 类中一定需要提供攻击的方法，如下所示：
-
-```java
-public void attack(Role role) {
-    // ① 计算造成的伤害
-    int currentAttack = RANDOM.nextInt(20) + 1;
-    // ② 输出攻击者的攻击描述
-    String format = attacksDesc[RANDOM.nextInt(attacksDesc.length)] + "❌造成了%d点伤害。";
-    System.out.printf(format, this.name, role.name, currentAttack);
-    // ③ 计算剩余的血量
-    int remainBlood = role.blood - currentAttack;
-    // ④ 判断剩余的血量是否小于0
-    remainBlood = Math.max(remainBlood, 0);
-    // ⑤ 设置剩余的血量
-    role.setBlood(remainBlood);
-    // 打印输出
-    // System.out.printf(
-    //         "%s举起拳头打了%s一下，造成了%d点伤害，%s还剩下%d点血。\n", this.name, role.name, currentAttack, role.name, remainBlood);
-    // ⑥ 输出受击者的受击描述
-    format = beWoundedDesc[RANDOM.nextInt(beWoundedDesc.length)] + "✅还剩下%d点血。" + "\n";
-    System.out.printf(format, role.name, remainBlood);
-}
-```
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Role.java]
-import java.security.SecureRandom;
-
-public class Role {
-    // 随机值
-    public static final SecureRandom RANDOM = new SecureRandom();
-    // 男生脸
-    private final String[] boyFaces = {"风流俊雅", "气宇轩昂", "相貌英俊", "五官端正", "相貌平平", "一塌糊涂", "面目狰狞"};
-    // 女生脸
-    private final String[] girlFaces = {"美奂绝伦", "沉鱼落雁", "婷婷玉立", "身材娇好", "相貌平平", "相貌简陋", "惨不忍睹"};
-    // 攻击描述
-    private final String[] attacksDesc = {
-        "%s使出了一招【背心钉】，转到对方的身后，一掌向%s背心的灵台穴拍去。",
-        "%s使出了一招【游空探爪】，飞起身形自半空中变掌为抓锁向%s。",
-        "%s大喝一声，身形下伏，一招【劈雷坠地】，捶向%s双腿。",
-        "%s运气于掌，一瞬间掌心变得血红，一式【掌心雷】，推向%s。",
-        "%s阴手翻起阳手跟进，一招【没遮拦】，结结实实的捶向%s。",
-        "%s上步抢身，招中套招，一招【劈挂连环】，连环攻向%s。"
-    };
-    // 受伤描述
-    private final String[] beWoundedDesc = {
-        "结果%s退了半步，毫发无损。",
-        "结果给%s造成一处瘀伤。",
-        "结果一击命中，%s痛得弯下腰。",
-        "结果%s痛苦地闷哼了一声，显然受了点内伤。",
-        "结果%s摇摇晃晃，一跤摔倒在地。",
-        "结果%s脸色一下变得惨白，连退了好几步。",
-        "结果『轰』的一声，%s口中鲜血狂喷而出。",
-        "结果%s一声惨叫，像滩软泥般塌了下去。"
-    };
-
-    // 姓名
-    private String name;
-    // 血量
-    private int blood = 100;
-    // 性别
-    private char gender;
-    // 容颜
-    private String face;
-
-    public Role() {}
-
-    public Role(String name, int blood, char gender) {
-        this.name = name;
-        this.blood = blood;
-        this.gender = gender;
-        switch (gender) {
-            case '男':
-                this.setFace(boyFaces[RANDOM.nextInt(boyFaces.length)]);
-                break;
-            case '女':
-                this.setFace(girlFaces[RANDOM.nextInt(girlFaces.length)]);
-                break;
-            default:
-                this.setFace("不明~");
-        }
-    }
-
-    public void attack(Role role) {
-        // ① 计算造成的伤害
-        int currentAttack = RANDOM.nextInt(20) + 1;
-        // ② 总血量
-        int totalBlood = role.blood;
-        // ② 输出攻击者的攻击描述
-        String format = attacksDesc[RANDOM.nextInt(attacksDesc.length)] + "❌造成了%d点伤害。";
-        System.out.printf(format, this.name, role.name, currentAttack);
-        // ③ 计算剩余的血量
-        int remainBlood = role.blood - currentAttack;
-        // ④ 判断剩余的血量是否小于0
-        remainBlood = Math.max(remainBlood, 0);
-        // ⑤ 设置剩余的血量
-        role.setBlood(remainBlood);
-        // 打印输出
-        // System.out.printf(
-        //         "%s举起拳头打了%s一下，造成了%d点伤害，%s还剩下%d点血。\n", this.name, role.name, currentAttack, role.name, remainBlood);
-        // ⑥ 输出受击者的受击描述
-        double bloodPercentage = (double) remainBlood / totalBlood;
-        int beWoundedIndex = (int) (beWoundedDesc.length * (1.0 - bloodPercentage));
-        beWoundedIndex = Math.min(beWoundedIndex, beWoundedDesc.length - 1);
-        format = beWoundedDesc[beWoundedIndex] + "✅还剩下%d点血。" + "\n";
-        System.out.printf(format, role.name, remainBlood);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getBlood() {
-        return blood;
-    }
-
-    public void setBlood(int blood) {
-        this.blood = blood;
-    }
-
-    public char getGender() {
-        return gender;
-    }
-
-    public void setGender(char gender) {
-        this.gender = gender;
-    }
-
-    public String getFace() {
-        return face;
-    }
-
-    public void setFace(String face) {
-        this.face = face;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("姓名：%s\t血量：%d\t性别：%c\t容颜：%s", name, blood, gender, face);
-    }
-}
-```
-
-```java [GameTest.java]
-public class GameTest {
-    public static void main(String[] args) {
-
-        // 创建第一个角色
-        Role role1 = new Role("乔峰", 100, '男');
-        // 创建第二个角色
-        Role role2 = new Role("鸠摩智", 100, '男');
-        // 打印出角色信息
-        System.out.println(role1);
-        System.out.println(role2);
-
-        while (true) {
-            // r1 开始攻击 r2
-            role1.attack(role2);
-            // 判断 r2 是否死亡
-            if (role2.getBlood() <= 0) {
-                System.out.printf("%s K.O %s\n", role1.getName(), role2.getName());
-                break;
-            }
-            // r2 开始攻击 r1
-            role2.attack(role1);
-            // 判断 r1 是否死亡
-            if (role1.getBlood() <= 0) {
-                System.out.printf("%s K.O %s\n", role2.getName(), role1.getName());
-                break;
-            }
-        }
-    }
-}
-```
-
-```txt[cmd 控制台]
-姓名：乔峰	血量：100	性别：男	容颜：面目狰狞
-姓名：鸠摩智	血量：100	性别：男	容颜：相貌平平
-乔峰上步抢身，招中套招，一招【劈挂连环】，连环攻向鸠摩智。❌造成了9点伤害。结果鸠摩智退了半步，毫发无损。✅还剩下91点血。
-鸠摩智使出了一招【背心钉】，转到对方的身后，一掌向乔峰背心的灵台穴拍去。❌造成了16点伤害。结果给乔峰造成一处瘀伤。✅还剩下84点血。
-乔峰上步抢身，招中套招，一招【劈挂连环】，连环攻向鸠摩智。❌造成了16点伤害。结果给鸠摩智造成一处瘀伤。✅还剩下75点血。
-鸠摩智运气于掌，一瞬间掌心变得血红，一式【掌心雷】，推向乔峰。❌造成了7点伤害。结果乔峰退了半步，毫发无损。✅还剩下77点血。
-乔峰使出了一招【游空探爪】，飞起身形自半空中变掌为抓锁向鸠摩智。❌造成了17点伤害。结果给鸠摩智造成一处瘀伤。✅还剩下58点血。
-鸠摩智大喝一声，身形下伏，一招【劈雷坠地】，捶向乔峰双腿。❌造成了7点伤害。结果乔峰退了半步，毫发无损。✅还剩下70点血。
-乔峰上步抢身，招中套招，一招【劈挂连环】，连环攻向鸠摩智。❌造成了9点伤害。结果给鸠摩智造成一处瘀伤。✅还剩下49点血。
-鸠摩智运气于掌，一瞬间掌心变得血红，一式【掌心雷】，推向乔峰。❌造成了18点伤害。结果一击命中，乔峰痛得弯下腰。✅还剩下52点血。
-乔峰使出了一招【背心钉】，转到对方的身后，一掌向鸠摩智背心的灵台穴拍去。❌造成了10点伤害。结果给鸠摩智造成一处瘀伤。✅还剩下39点血。
-鸠摩智大喝一声，身形下伏，一招【劈雷坠地】，捶向乔峰双腿。❌造成了15点伤害。结果一击命中，乔峰痛得弯下腰。✅还剩下37点血。
-乔峰阴手翻起阳手跟进，一招【没遮拦】，结结实实的捶向鸠摩智。❌造成了13点伤害。结果一击命中，鸠摩智痛得弯下腰。✅还剩下26点血。
-鸠摩智运气于掌，一瞬间掌心变得血红，一式【掌心雷】，推向乔峰。❌造成了15点伤害。结果乔峰痛苦地闷哼了一声，显然受了点内伤。✅还剩下22点血。
-乔峰使出了一招【背心钉】，转到对方的身后，一掌向鸠摩智背心的灵台穴拍去。❌造成了15点伤害。结果鸠摩智摇摇晃晃，一跤摔倒在地。✅还剩下11点血。
-鸠摩智大喝一声，身形下伏，一招【劈雷坠地】，捶向乔峰双腿。❌造成了18点伤害。结果『轰』的一声，乔峰口中鲜血狂喷而出。✅还剩下4点血。
-乔峰阴手翻起阳手跟进，一招【没遮拦】，结结实实的捶向鸠摩智。❌造成了15点伤害。结果鸠摩智一声惨叫，像滩软泥般塌了下去。✅还剩下0点血。
-乔峰 K.O 鸠摩智
-```
-
-:::
-
-
-
-# 第二章：对象数组练习
-
-## 2.1 对象数组 1
-
-* 需求：定义数组，并存储 3 个商品对象。
+* 问：使用多态特性，带来了什么样的好处？
+* 答：可扩展性和可维护性，代码重用性、灵活性和解耦合、抽象性。
 
 > [!NOTE]
 >
-> * ① 商品的属性：id、名称、价格、库存。
-> * ② 创建 3 个商品对象，并将商品对象存入到数组中。
-> * ③ 遍历对象数组。
+> ::: details 点我查看 具体细节
+>
+> * ① 可扩展性和可维护性：
+>   * 增加新的子类，不影响现有代码：当需要添加新的功能或类型时，只需要创建新的子类并实现相应的方法，而无需修改已有的使用父类引用的代码。这极大地提高了代码的扩展性。
+>   * 代码结构更清晰，易于维护：多态将不同的实现细节隐藏在不同的子类中，使得代码结构更模块化，更易于理解和维护。
+> * ② 代码重用性：
+>   * 编写更通用的代码：可以使用父类类型编写通用的算法或框架，这些算法或框架可以处理各种不同的子类对象，而无需针对每个子类编写不同的代码。
+>   * 提高代码复用率： 父类的方法可以被多个子类继承和重用。
+> * ③ 灵活性和解耦合：
+>   * 降低类之间的依赖关系：使用父类引用，使得代码依赖于抽象的父类，而不是具体的子类。这降低了类之间的耦合度，提高了代码的灵活性。
+>   * 运行时动态绑定：多态的实现是基于运行时动态绑定或延迟绑定。这意味着在程序运行时才能确定具体调用哪个子类的方法。这使得程序更加灵活。
+> * ④ 抽象性（关注抽象，而非具体实现）：多态允许程序员关注接口 (父类或接口)，而无需关心具体的实现细节 (子类)。这提高了编程的抽象层次。
+>
+> :::
 
+## 1.3 题目 3
 
-
-* 示例：
-
-::: code-group
-
-```java [Product.java]
-public class Product {
-    
-    // id
-    private int id;
-    
-    // 名称
-    private String name;
-    
-    // 价格
-    private double price;
-    
-    // 库存
-    private int count;
-
-    public Product() {}
-
-    public Product(int id, String name, double price, int count) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.count = count;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    @Override
-    public String toString() {
-        return "Product{" + "id=" + id 
-            + ", name='" + name + '\'' 
-            + ", price=" + price 
-            + ", count=" + count + '}';
-    }
-}
-```
-
-```java [ProductTest.java]
-public class ProductTest {
-    public static void main(String[] args) {
-        // 创建对象数组
-        Product[] arr = new Product[3];
-        // 创建商品对象
-        Product p1 = new Product(1, "华为手机", 5999, 100);
-        Product p2 = new Product(2, "华为平板", 3999, 100);
-        Product p3 = new Product(3, "华为耳机", 199, 100);
-        // 将商品对象放入数组中
-        arr[0] = p1;
-        arr[1] = p2;
-        arr[2] = p3;
-        // 遍历对象数组
-        for (int i = 0; i < arr.length; i++) {
-            Product p = arr[i];
-            System.out.println(p);
-        }
-    }
-}
-```
-
-```txt [cmd 控制台]
-Product{id=1, name='华为手机', price=5999.0, count=100}
-Product{id=2, name='华为平板', price=3999.0, count=100}
-Product{id=3, name='华为耳机', price=199.0, count=100}
-```
-
-:::
-
-## 2.2 对象数组 2
-
-* 需求：定义数组，并存储 3 辆汽车对象。
+* 问：使用多态特性，注意什么样的弊端？  
+* 答：性能开销、增加代码的复杂性、可能破坏封装性以及类型转换的风险。
 
 > [!NOTE]
 >
-> * ① 汽车的属性：品牌、价格、颜色。
-> * ② 创建 3 个汽车对象，数据通过键盘录入，并将汽车对象存储到数组中。
-> * ③ 遍历对象数组。
+> ::: details 点我查看 具体细节
+>
+> * ① 性能开销：多态的实现依赖于运行时动态绑定，这意味着在程序运行时需要进行方法查找和调用，这会带来一定的性能开销，相比于静态方法调用，可能会略微降低执行效率。但是，通常情况下，这种开销是可以忽略不计的，除非在性能极其敏感的场景下。
+> * ② 增加代码的复杂性：
+>   * 理解多态概念的难度：对于初学者来说，理解多态的概念，特别是方法重写和动态绑定，可能需要一定的学习成本。
+>   * 代码阅读和维护的难度：当继承层次结构非常复杂时，理解代码的执行流程和查找具体执行的方法可能会变得更加困难，尤其是在大型项目中。
+> * ③ 可能破坏封装性：
+>   * 子类对父类的依赖：子类继承父类，意味着子类依赖于父类的实现细节。如果父类的实现发生改变，可能会影响到子类，甚至可能需要修改子类代码。
+>   * 不恰当的继承关系：如果设计不当，滥用继承可能会导致继承层次结构混乱，增加代码的维护难度，甚至破坏封装性。 应遵循 "is-a" 原则，确保继承关系是合理的。
+> * ④ 类型转换的风险：当使用父类引用指向子类对象时，如果需要调用子类特有的方法或属性，需要进行向下转型。 向下转型是不安全的，如果类型转换失败 (尝试将 `Animal` 引用转换为 `Cat` 引用，但实际对象是 `Dog`)，会抛出 `ClassCastException` 异常。
+>
+> :::
+
+## 1.4 题目 4 
+
+* 问：关于多态的弊端我们如何解决？
+* 答：合理设计继承结构、良好的代码风格和文档、谨慎使用向下转换、性能优化以及接口的使用。
+
+> [!NOTE]
+>
+> ::: details 点我查看 具体细节
+>
+> * ① 合理设计继承结构：
+>   * 遵循 "is-a" 原则：确保继承关系是逻辑合理的，子类确实是父类的一种特殊类型。
+>   * 避免过度深的继承层次：过深的继承层次会增加代码的复杂性和维护难度。 尽量保持继承层次的简洁。
+>   * 优先考虑组合 (Composition) 而不是继承 (Inheritance) (在某些情况下)：在某些场景下，组合可能比继承更灵活、更易于维护。 如果 "has-a" 关系比 "is-a" 关系更自然，可以考虑使用组合。
+> * ② 良好的代码风格和文档：
+>   * 清晰的命名：使用具有描述性的类名、方法名和变量名，提高代码的可读性。
+>   * 详细的注释：为复杂的继承结构和多态代码添加注释，解释其设计意图和实现细节。
+>   * 代码规范：遵循统一的代码规范，例如：缩进、格式化等，提高代码的可读性。
+> * ③ 谨慎使用向下转型：
+>   * 使用 `instanceof` 运算符进行类型检查：在进行向下转型之前，使用 `instanceof` 运算符检查对象的实际类型，避免 `ClassCastException` 异常。
+>   * 尽量避免频繁的向下转型：如果需要频繁进行向下转型，可能说明代码设计存在问题，应该考虑重新设计继承结构或使用其他设计模式。
+> * ④ 性能优化（在必要时）：
+>   * 避免不必要的动态绑定：对于不需要多态特性的方法，可以使用 `final` 关键字修饰，使其成为静态绑定，提高性能。
+>   * 代码分析和性能测试：如果性能成为瓶颈，可以使用性能分析工具 (profiler) 来定位性能瓶颈，并进行针对性的优化。
+> * ⑤ 接口的使用：
+>   * 使用接口代替抽象类 (在适当的情况下)：接口提供了比抽象类更松耦合的抽象方式。 类可以实现多个接口，而只能继承一个类。 接口更侧重于定义行为规范，更灵活。
+>   * 面向接口编程：提倡面向接口编程，而不是面向具体实现编程。 通过接口引用来操作对象，降低类之间的耦合度，提高代码的灵活性和可维护性。
+>
+> :::
+
+## 1.5 题目 5 
+
+* 问：在 A 包中我要同时使用 B 包下的 Student 和 C 包下的 Student 类，该如何使用？
+* 答：使用完全限定名。
+
+## 1.6 题目 6
+
+* 问：final 修饰类，修饰方法，修饰变量的特点。
+* 答：final 修饰类，表示该类是最终类，不可以被继承。final 修饰方法，表示该方法是最终方法，不可以被重写。final 修饰变量，表示该变量（常量），有且仅能被赋值一次。
 
 
+
+# 第二章：代码题
+
+## 2.1 概述
+
+* 需求：定义狗类、猫类以及人类，并写对应的测试方法。
+
+```mermaid
+classDiagram
+	 Pet <|-- Dog : extends
+	 Pet <|-- Cat : extends
+	 note for Pet "宠物"	
+     class Pet {
+        - int age
+        - String color
+        
+        + eat(String something) void
+     }
+     note for Dog "狗"	
+     class Dog {
+     	+ lookHome() void
+     }
+     note for Cat "猫"
+     class Cat {
+        + catchMouse() void
+     }
+     note for Person "人（饲养员）"	
+     class Person {
+           - String name
+           - int age
+           
+           + keep(Pet pet,String something) void
+     }
+```
+
+## 2.2 应用示例
 
 * 示例：
 
 ::: code-group
 
-```java [Car.java]
-public class Car {
-    
-    // 品牌
-    private String brand;
+```java [Pet.java]
+public class Pet {
 
-    // 价格
-    private double price;
+    private int age;
 
-    // 颜色
     private String color;
 
-    public Car(String brand, double price, String color) {
-        this.brand = brand;
-        this.price = price;
+    public Pet() {}
+
+    public Pet(int age, String color) {
+        this.age = age;
         this.color = color;
     }
 
-    public Car() {}
-
-    public String getBrand() {
-        return brand;
+    public void eat(String something) {
+        System.out.println("吃" + something);
     }
 
-    public void setBrand(String brand) {
-        this.brand = brand;
+    public int getAge() {
+        return age;
     }
 
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
+    public void setAge(int age) {
+        this.age = age;
     }
 
     public String getColor() {
@@ -673,91 +167,60 @@ public class Car {
         this.color = color;
     }
 
+}
+```
+
+```java [Cat.java]
+public class Cat extends Pet {
+
+    public Cat() {}
+
+    public Cat(int age, String color) {
+        super(age, color);
+    }
+
+    public void catchMouse() {
+        System.out.printf("%d岁的%s的猫抓老鼠\n", this.getAge(), this.getColor());
+    }
+
     @Override
-    public String toString() {
-        return "Car {" + "brand='" + brand+ '\'' 
-            + ", price=" + price 
-            + ", color='" + color + '\'' + '}';
+    public void eat(String something) {
+        System.out.printf("%d岁的%s的猫眯着眼睛侧着头吃%s\n", this.getAge(), this.getColor(), something);
     }
 }
 ```
 
-```java [CarTest.java]
-import java.util.Scanner;
+```java [Dog.java]
+public class Dog extends Pet {
 
-public class CarTest {
-    public static void main(String[] args) {
-        // 创建键盘录入对象
-        Scanner input = new Scanner(System.in);
-        // 创建 3 辆车的数组
-        Car[] car = new Car[3];
-        // 键盘录入，创建汽车对象，并将汽车对象存储到数组中
-        for (int i = 0; i < car.length; i++) {
-            System.out.print("请输入第 " + (i + 1) + " 辆车的品牌：");
-            String brand = input.next();
-            System.out.print("请输入第 " + (i + 1) + " 辆车的价格：");
-            double price = input.nextDouble();
-            System.out.print("请输入第 " + (i + 1) + " 辆车的颜色：");
-            String color = input.next();
-            // 将 Car 对象放入数组中
-            car[i] = new Car(brand, price, color);
-        }
-        // 打印数组
-        for (int i = 0; i < car.length; i++) {
-            System.out.println(car[i]);
-        }
-        // 关闭输入流
-        input.close();
+    public Dog() {}
+
+    public Dog(int age, String color) {
+        super(age, color);
+    }
+
+    public void lookHome() {
+        System.out.printf("%d岁的%s的狗看家\n", this.getAge(), this.getColor());
+    }
+
+    @Override
+    public void eat(String something) {
+        System.out.printf("%d岁的%s的狗两只前腿死死的抱住%s猛吃\n", this.getAge(), this.getColor(), something);
     }
 }
 ```
 
-```txt [cmd 控制台]
-Car {brand='宝马', price=100000.25, color='红色'}
-Car {brand='奔驰', price=350000.25, color='黑色'}
-Car {brand='皇马', price=9.9, color='白色'}
-```
-
-:::
-
-## 2.3 对象数组 3
-
-* 需求：定义数组，存储 4 个女朋友对象。
-
-> [!NOTE]
->
-> * ① 女朋友的属性：姓名、年龄、性别、爱好。
-> * ② 计算出四女朋友的平均年龄。
-> * ③ 统计年龄比平均值低的女朋友有几个？并把她们的所有信息打印出来。
-
-
-
-* 示例：
-
-::: code-group
-
-```java [GirlFriend.java]
-public class GirlFriend {
-
-    // 姓名
+```java [Person.java]
+public class Person {
     private String name;
 
-    // 年龄
     private int age;
 
-    // 性别
-    private char gender;
+    public Person() {}
 
-    // 爱好
-    private String hobby;
-
-    public GirlFriend() {}
-
-    public GirlFriend(String name, int age, char gender, String hobby) {
+    public Person(String name, int age) {
         this.name = name;
         this.age = age;
-        this.gender = gender;
-        this.hobby = hobby;
     }
 
     public String getName() {
@@ -776,360 +239,42 @@ public class GirlFriend {
         this.age = age;
     }
 
-    public char getGender() {
-        return gender;
-    }
-
-    public void setGender(char gender) {
-        this.gender = gender;
-    }
-
-    public String getHobby() {
-        return hobby;
-    }
-
-    public void setHobby(String hobby) {
-        this.hobby = hobby;
-    }
-
-    @Override
-    public String toString() {
-        return "GirlFriend{" + "name='"
-                + name + '\'' + ", age="
-                + age + ", gender="
-                + gender + ", hobby='"
-                + hobby + '\'' + '}';
+    public void keep(Pet pet, String something) {
+        System.out.printf("年龄为%d的%s养了一只", this.getAge(), this.getName());
+        if (pet instanceof Cat cat) {
+            System.out.printf("%s的%d岁的猫\n", cat.getColor(), cat.getAge());
+            pet.eat(something);
+            cat.catchMouse();
+        } else if (pet instanceof Dog dog) {
+            System.out.printf("%s的%d岁的狗\n", dog.getColor(), dog.getAge());
+            pet.eat(something);
+            dog.lookHome();
+        }
+        System.out.println();
     }
 }
 ```
 
-```java [GirlFriendTest.java]
-public class GirlFriendTest {
+```java [Test.java]
+public class Test {
     public static void main(String[] args) {
-        // 定义数组对象
-        GirlFriend[] gf = new GirlFriend[4];
-        // 创建 4 个女朋友对象
-        GirlFriend g1 = new GirlFriend("小红", 18, '女', "唱歌");
-        GirlFriend g2 = new GirlFriend("小花", 19, '女', "打游戏");
-        GirlFriend g3 = new GirlFriend("小绿", 20, '女', "看电影");
-        GirlFriend g4 = new GirlFriend("小黄", 21, '女', "看电影");
-        // 将 4 个女朋友对象放入数组中
-        gf[0] = g1;
-        gf[1] = g2;
-        gf[2] = g3;
-        gf[3] = g4;
-        // 计算出女朋友的平均年龄
-        double avgAge = avgAge(gf);
-        System.out.println("平均年龄：" + avgAge);
-        // 统计年龄比平均值低的女朋友有几个
-        int count = lessAvgAgeCount(gf, avgAge);
-        System.out.println("年龄比平均值低的女朋友有：" + count + " 个");
-        // 打印年龄比平均值低的女朋友
-        GirlFriend[] result = lessAvgAge(gf, avgAge, count);
-        for (int i = 0; i < result.length; i++) {
-            System.out.println(result[i]);
-        }
-    }
+        Person person = new Person("老王", 30);
+        person.keep(new Dog(2, "黑颜色"), "骨头");
 
-    /**
-     * 计算平均年龄
-     * @param gf 女朋友对象数组
-     * @return 平均年龄
-     */
-    public static double avgAge(GirlFriend[] gf) {
-        double sum = 0;
-        for (int i = 0; i < gf.length; i++) {
-            sum += gf[i].getAge();
-        }
-        return sum / gf.length;
-    }
-
-    /**
-     * 计算年龄比平均值低的女朋友的数量
-     * @param gf 女朋友对象数组
-     * @param avgAge 平均值
-     * @return 数量
-     */
-    public static int lessAvgAgeCount(GirlFriend[] gf, double avgAge) {
-        int count = 0;
-        for (int i = 0; i < gf.length; i++) {
-            if (gf[i].getAge() < avgAge) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    /**
-     * 返回年龄比平均值低的女朋友
-     * @param gf 女朋友对象数组
-     * @param avgAge 平均值
-     * @param count 数量
-     * @return 女朋友对象数组
-     */
-    public static GirlFriend[] lessAvgAge(GirlFriend[] gf, double avgAge, int count) {
-
-        GirlFriend[] result = new GirlFriend[count];
-
-        for (int i = 0, j = 0; i < gf.length; i++) {
-            if (gf[i].getAge() < avgAge) {
-                result[j++] = gf[i];
-            }
-        }
-
-        return result;
+        Person person2 = new Person("老李", 25);
+        person2.keep(new Cat(3, "灰颜色"), "鱼");
     }
 }
 ```
 
 ```txt [cmd 控制台]
-平均年龄：19.5
-年龄比平均值低的女朋友有：2 个
-GirlFriend{name='小红', age=18, gender=女, hobby='唱歌'}
-GirlFriend{name='小花', age=19, gender=女, hobby='打游戏'}
+年龄为30的老王养了一只黑颜色的2岁的狗
+2岁的黑颜色的狗两只前腿死死的抱住骨头猛吃
+2岁的黑颜色的狗看家
+
+年龄为25的老李养了一只灰颜色的3岁的猫
+3岁的灰颜色的猫眯着眼睛侧着头吃鱼
+3岁的灰颜色的猫抓老鼠
 ```
 
 :::
-
-## 2.4 对象数组 4
-
-* 需求：定义数组，存储 3 个学生对象作为初识数据，学生对象的学号、姓名各不相同。
-
-> [!NOTE]
->
-> * ① 学生的属性：学号，姓名，年龄。
-> * ② 再次添加一个学生的对象，并在添加的时候进行学号的唯一性判断。
-> * ③ 添加完毕之后，遍历所有学生信息。
-> * ④ 通过 id 删除学生信息：如果存在，则删除；如果不存在，则提示删除失败。
-> * ⑤ 删除完毕之后，遍历所有学生信息。
-> * ⑥ 查询 id 为 2 的学生，如果存在，就将其年龄 +1 岁。
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Student.java]
-public class Student {
-
-    private int id;
-
-    private String name;
-
-    private int age;
-
-    public Student() {}
-
-    public Student(int id, String name, int age) {
-        this.id = id;
-        this.name = name;
-        this.age = age;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" + "id=" + id + 
-            ", name='" + name + '\'' + ", age=" + age + '}';
-    }
-}
-```
-
-```java [StudentTest.java]
-public class StudentTest {
-    public static void main(String[] args) {
-        // 创建一个对象数组
-        Student[] arr = new Student[3];
-
-        // 创建三个学生对象
-        Student s1 = new Student(1, "林青霞", 30);
-        Student s2 = new Student(2, "张曼玉", 35);
-        Student s3 = new Student(3, "王祖蓝", 40);
-
-        // 把学生对象作为元素赋值给数组
-        arr[0] = s1;
-        arr[1] = s2;
-        arr[2] = s3;
-
-        // 遍历数组
-        printArray(arr);
-
-        // 添加元素
-        Student s4 = new Student(4, "刘意", 28);
-        arr = add(arr, s4);
-
-        // 遍历数组
-        printArray(arr);
-
-        // 通过 id 删除学生信息，如果存在，则删除；否则，则提示删除失败
-        delete(arr, 10);
-
-        // 遍历数组
-        printArray(arr);
-
-        // 修改信息
-        edit(arr, 3);
-
-        // 遍历数组
-        printArray(arr);
-    }
-
-    /**
-     * 判断数组中是否包含指定的元素
-     * @param arr 数组
-     * @param id 指定的元素
-     * @return true 包含，false 不包含
-     */
-    public static boolean contains(Student[] arr, int id) {
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] != null && arr[i].getId() == id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 添加元素到数组中
-     * @param arr 数组
-     * @param s 要添加的元素
-     * @return 返回添加后的数组
-     */
-    public static Student[] add(Student[] arr, Student s) {
-        if (contains(arr, s.getId())) {
-            System.out.println("当前id重复，请修改id后在添加");
-        } else {
-            // 添加数组元素
-            arr = append(arr, s);
-        }
-        return arr;
-    }
-
-    /**
-     * 打印数组中的元素
-     * @param arr 数组
-     */
-    public static void printArray(Student[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            System.out.println(arr[i]);
-        }
-        System.out.println("======================================");
-    }
-
-    /**
-     * 判断数组中元素的个数
-     * @param arr 数组
-     * @return 数组中元素的个数
-     */
-    public static int count(Student[] arr) {
-        int count = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] != null) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    public static Student[] append(Student[] arr, Student s) {
-        int count = count(arr);
-        if (count == arr.length) {
-            // 数组已经存满，需要进行扩容
-            Student[] newArr = new Student[arr.length + 1];
-            // 把原数组中的元素复制到新数组中
-            System.arraycopy(arr, 0, newArr, 0, arr.length);
-            // 把新元素赋值到新数组中
-            newArr[arr.length] = s;
-            // 把新数组赋值给原数组
-            arr = newArr;
-        } else {
-            // 数组没有存满，直接添加即可
-            arr[count] = s;
-        }
-
-        return arr;
-    }
-
-    /**
-     * 根据 id 删除信息
-     * @param arr 数组
-     * @param id id
-     */
-    public static void delete(Student[] arr, int id) {
-        if (!contains(arr, id)) {
-            System.out.println("id不存在，删除失败");
-        }
-        for (int i = 0; i < arr.length; i++) {
-            if (null != arr[i] && arr[i].getId() == id) {
-                arr[i] = null;
-            }
-        }
-    }
-
-    /**
-     * 修改用户信息
-     * @param arr 数组
-     * @param id id
-     */
-    public static void edit(Student[] arr, int id) {
-        if (!contains(arr, id)) {
-            System.out.println("id不存在，修改失败");
-        }
-        for (int i = 0; i < arr.length; i++) {
-            if (null != arr[i] && arr[i].getId() == id) {
-                arr[i].setAge(arr[i].getAge() + 1);
-            }
-        }
-    }
-}
-```
-
-```txt [cmd 控制台]
-Student{id=1, name='林青霞', age=30}
-Student{id=2, name='张曼玉', age=35}
-Student{id=3, name='王祖蓝', age=40}
-======================================
-Student{id=1, name='林青霞', age=30}
-Student{id=2, name='张曼玉', age=35}
-Student{id=3, name='王祖蓝', age=40}
-Student{id=4, name='刘意', age=28}
-======================================
-id不存在，删除失败
-Student{id=1, name='林青霞', age=30}
-Student{id=2, name='张曼玉', age=35}
-Student{id=3, name='王祖蓝', age=40}
-Student{id=4, name='刘意', age=28}
-======================================
-Student{id=1, name='林青霞', age=30}
-Student{id=2, name='张曼玉', age=35}
-Student{id=3, name='王祖蓝', age=41}
-Student{id=4, name='刘意', age=28}
-======================================
-```
-
-:::
-

@@ -1,1031 +1,589 @@
-# 第一章：关键字和标识符
+# 第一章： 字符集和字符集编码
 
-## 1.1 关键字
+## 1.1 概述
 
-### 1.1.1 概述
-
-* 在 Java 中，关键字是有特定意义的保留字，它们不能用作变量名、方法名或类名。
+* 字符集和字符集编码（简称编码）计算机系统中处理文本数据的两个基本概念，它们密切相关但又有区别。
+* 字符集（Character Set）是一组字符的集合，其中每个字符都被分配了一个`唯一的编号`（通常是数字）。字符可以是字母、数字、符号、控制代码（如换行符）等。`字符集定义了可以表示的字符的范围`，但它并不直接定义如何将这些字符存储在计算机中。
 
 > [!NOTE]
 >
-> * ① Java 中的关键字全是小写。
-> * ② Java 中的关键字不需要强行记忆，等用到的时候，会自然而然的记住！！！
-> * ③ 在高级记事本软件或 IDE（集成开发环境中），关键字非常好区分，因为其都是有特殊颜色的。
+> ASCII（美国信息交换标准代码）是最早期和最简单的字符集之一，它只包括了英文字母、数字和一些特殊字符，共 128 个字符。每个字符都分配给了一个从 0 到 127 的数字。
+
+* 字符集编码（Character Encoding，简称编码）是一种方案或方法，`它定义了如何将字符集中的字符转换为计算机存储和传输的数据（通常是一串二进制数字）`。简而言之，编码是字符到二进制数据之间的映射规则。
+
+> [!NOTE]
 >
-> ::: details 点我查看 高级记事本软件或 IDE 中 Java 的关键字
+> ASCII 编码方案定义了如何将 ASCII 字符集中的每个字符表示为 7 位的二进制数字。例如：大写字母`'A'`在 ASCII 编码中表示为二进制的`1000001`，十进制的 `65` 。
+
+* `字符集`和`字符集编码`之间的关系如下：
+
+![`字符集`和`字符集编码`之间的关系](./assets/1.png)
+
+* Linux 中安装帮助手册：
+
+![Linux 中安装帮助手册](./assets/2.gif)
+
+## 1.2 ASCII 编码
+
+* 从`冯·诺依曼`体系结构中，我们知道，计算机中所有的`数据`和`指令`都是以`二进制`的形式表示的；所以，计算机中对于文本数据的数据也是以二进制来存储的，那么对应的流程如下：
+
+![编码和解码](./assets/3.png)
+
+* 我们知道，计算机是上个世纪 60 年代在美国研制成功的，为了实现字符和二进制的转换，美国就制定了一套字符编码，即英语字符和二进制位之间的关系，即 ASCII （American Standard Code for Information Interchange）编码：
+  - ASCII 编码只包括了英文字符、数字和一些特殊字符，一共 128 个字符，并且每个字符都分配了唯一的数字，范围是 0 - 127。
+  - ASCII 编码中的每个字符都使用 7 位的二进制数字表示；但是，计算机中的存储的最小单位是 1 B = 8 位，那么最高位统一规定为 0 。
+
+> [!NOTE]
 >
-> ```java
-> public class HelloWorld {
-> 	public static void main(String[] args){
-> 		System.out.println("Hello World!!!");
-> 	}
-> }
-> ```
+> - ① 其实，早期是没有字符集的概念的，只是后来为了解决乱码问题，而产生了字符集的概念。
+> - ② 对于英文体系来说，`a-zA-Z0-9`以及一些`特殊字符`一共 `128` 就可以满足实际存储需求；所以，在也是为什么 ASCII 码使用 7 位二进制（2^7 = 128 ）来存储的。
+
+* 在操作系统中，就内置了对应的编码表，Linux 也不例外；可以使用如下的命令查看：
+
+```shell
+man ascii
+```
+
+![Linux 查看 ascii 码表](./assets/4.gif)
+
+* 其对应的 ASCII 编码表，如下所示：
+
+![ASCII 编码表](./assets/5.gif)
+
+* 但是，随着计算机的发展，计算机开始了东征之路，由美国传播到东方：
+
+![计算机传播之路](./assets/6.png)
+
+- 先是传播到了欧洲，欧洲在兼容 ASCII 编码的基础上，推出了 ISO8859-1 编码，即：
+  - ISO8859-1 编码包括基本的拉丁字母表、数字、标点符号，以及西欧语言中特有的一些字符，如：法语中的 `è`、德语中的 `ü` 等。
+  - ISO 8859-1 为每个字符分配一个单字节（8 位）编码，意味着它可以表示最多 256 （2^8）个不同的字符（编号从 0 到 255）。
+  - ISO 8859-1 的前 128 个字符与 ASCII 编码完全一致，这使得 ASCII 编码的文本可以无缝转换为 ISO 8859-1 编码。
+
+![](./assets/7.gif)
+
+![](./assets/8.gif)
+
+- 计算机继续传播到了亚洲，亚洲（双字节）各个国家分别给出了自己国家对应的字符集编码，如：
+  - 日本推出了 Shift-JIS 编码：
+    - 单字节 ASCII 范围：0 - 127。
+    - 双字节范围：
+      - 第一个字节：129 - 159 和 224 - 239 。
+      - 第二个字节：64 - 126 和 128 - 252 。
+  - 韩国推出了 EUC-KR 编码：
+    - 单字节 ASCII 范围：0 - 127。
+    - 双字节范围：从 41281 - 65278。
+  - 中国推出了 GBK 编码：
+    - 单字节 ASCII 范围：0 - 127。
+    - 双字节范围：33088 - 65278 。
+
+> [!NOTE]
+>
+> - ① 通过上面日本、韩国、中国的编码十进制范围，我们可以看到，虽然这些编码系统在技术上的编码范围存在重叠（特别是在高位字节区域），但因为它们各自支持的字符集完全不同，所以实际上它们并不直接冲突。
+> - ② 但是，如果一个中国人通过 GBK 编码写的文章，通过邮件发送给韩国人，因为韩国和中国在字符集编码上的高位字节有重叠部分，必然会造成歧义。
+
+## 1.3 Unicode 编码
+
+- 在 Unicode 之前，世界上存在着数百种不同的编码系统，每一种编码系统都是为了支持特定语言或一组语言的字符集。这些编码系统，包括：ASCII、ISO 8859 系列、GBK、Shift-JIS、EUC-KR 等，它们各自有不同的字符范围和编码方式。这种多样性虽然在局部范围内解决了字符表示的问题，但也带来了以下几个方面的挑战：
+  - `编码冲突`：由于不同的编码系统可以为相同的字节值分配不同的字符，因此在不同编码之间转换文本时，如果没有正确处理编码信息，就很容易产生乱码。这种编码冲突在尝试处理多种语言的文本时尤为突出。
+  - `编码的复杂性`：随着全球化的发展，软件和系统需要支持越来越多的语言，这就要求开发者和系统同时处理多种不同的编码系统。这不仅增加了开发和维护的复杂性，而且也增加了出错的风险。
+  - `资源限制`：在早期计算机技术中，内存和存储资源相对有限。不同的编码标准要求系统存储多套字符集数据，这无疑增加了对有限资源的消耗。
+  - ……
+- 针对上述的种种问题，为了推行全球化，Unicode 应运而生，Unicode 的核心规则和设计原则是建立一个全球统一的字符集，使得世界上所有的文字和符号都能被唯一地识别和使用，无论使用者位于何地或使用何种语言。这套规则包括了字符的编码、表示、处理和转换机制，旨在确保不同系统和软件间能够无缝交换和处理文本数据。
+  - `通用字符集 (UCS)`：Unicode 为每一个字符分配一个唯一的编号（称为`“码点”`）。这些码点被组织在一个统一的字符集中，官方称之为 “通用字符集”（Universal Character Set，UCS）。码点通常表示为 `U+` 后跟一个十六进制数，例如：`U+0041` 代表大写的英文字母 `“A”`。
+  - `编码平面和区段`：Unicode 码点被划分为多个 “平面（Planes）”，每个平面包含 65536（16^4）个码点。目前，Unicode定义了 17 个平面（从 0 到16），每个平面被分配了一个编号，从 “基本多文种平面（BMP）” 的 0 开始，到 16 号平面结束。这意味着 Unicode 理论上可以支持超过 110万（17*65536）个码点。
+
+- Unicode 仅仅只是字符集，给每个字符设置了唯一的数字编号而已，却没有给出这些数字编号实际如何存储，可以通过如下命令查看：
+
+![Linux 查看 Unicode ](./assets/9.gif)
+
+- 为了在计算机系统中表示 Unicode 字符，定义了几种编码方案，这些方案包括 UTF-8、UTF-16 和 UTF-32 等。
+  - **UTF-8**：使用 1 - 4 个字节表示每个 Unicode 字符，兼容 ASCII，是网络上最常用的编码。
+  - **UTF-16**：使用 2 - 4 个字节表示每个 Unicode 字符，适合于需要经常处理基本多文种平面之外字符的应用。
+  - **UTF-32**：使用固定的 4 个字节表示每个 Unicode 字符，简化了字符处理，但增加了存储空间的需求。
+
+> [!NOTE]
+>
+> * ① 只有 UTF-8 兼容 ASCII，UTF-32 和 UTF-16 都不兼容 ASCII，因为它们没有单字节编码。
+>
+> ::: details 点我查看
+>
+> * UTF-8 使用尽量少的字节来存储一个字符，不但能够节省存储空间，而且在网络传输时也能节省流量，所以很多纯文本类型的文件，如：各种编程语言的源文件、各种日志文件和配置文件等以及绝大多数的网页，如：百度、新浪、163 等都采用 UTF-8 编码。但是，UTF-8 的缺点是效率低，不但在存储和读取时都要经过转换，而且在处理字符串时也非常麻烦。例如：要在一个 UTF-8 编码的字符串中找到第 10 个字符，就得从头开始一个一个地检索字符，这是一个很耗时的过程，因为 UTF-8 编码的字符串中每个字符占用的字节数不一样，如果不从头遍历每个字符，就不知道第 10 个字符位于第几个字节处，就无法定位。不过，随着算法的逐年精进，UTF-8 字符串的定位效率也越来越高了，往往不再是槽点了。
+> * UTF-32 是“以空间换效率”，正好弥补了 UTF-8 的缺点，UTF-32 的优势就是效率高：UTF-32 在存储和读取字符时不需要任何转换，在处理字符串时也能最快速地定位字符。例如：在一个 UTF-32 编码的字符串中查找第 10 个字符，很容易计算出它位于第 37 个字节处，直接获取就行，不用再逐个遍历字符了，没有比这更快的定位字符的方法了。但是，UTF-32 的缺点也很明显，就是太占用存储空间了，在网络传输时也会消耗很多流量。我们平常使用的字符编码值一般都比较小，用一两个字节存储足以，用四个字节简直是暴殄天物，甚至说是不能容忍的，所以 UTF-32 在应用上不如 UTF-8 和 UTF-16 广泛。
+>
+> * UTF-16 可以看做是 UTF-8 和 UTF-32 的折中方案，它平衡了存储空间和处理效率的矛盾。对于常用的字符，用两个字节存储足以，这个时候 UTF-16 是不需要转换的，直接存储字符的编码值即可。
 >
 > :::
-
-* Java 的关键字定义了语言的语法和结构，并决定了程序的控制流、数据结构等方面的行为。
-
-### 1.1.2 Java 中的关键字
-
-* 以下是 Java 中的关键字：
-
-![Java 中的关键字](./assets/1.png)
+>
+> * ② 总而言之，**UTF-8** 编码兼容性强，适合大多数应用，特别是英文文本处理。**UTF-16** 编码适合处理大量亚洲字符，但在处理英文或其他拉丁字符时相对浪费空间。**UTF-32**编码简单直接，但非常浪费空间，适合需要固定字符宽度的特殊场景。
+> * ③ 在实际应用中，UTF-8 通常是最常用的编码方式，因为它在兼容性和空间效率之间提供了良好的平衡。
 
 > [!IMPORTANT]
 >
-> * ① `const` 和 `goto` 是保留字，虽然它们可能在当前 JDK 版本中暂时未被使用，但在未来的 JDK 版本中可能会被赋予新的功能。
-> * ② `true`、`false` 和 `null` 看起来像关键字，但从技术角度，它们是特殊的布尔值和空值。
+> * ① Windows 内核、.NET Framework、Java String 内部采用的都是 `UTF-16` 编码，主要原因是为了在兼顾字符处理效率的同时，能够有效处理多种语言的字符集，即：历史遗留问题、兼容性要求和多语言支持的需要。
+> * ② 不过，UNIX 家族的操作系统（Linux、Mac OS、iOS 等）内核都采用 `UTF-8` 编码，主要是为了兼容性和灵活性，因为 UTF-8 编码可以无缝处理 ASCII 字符，同时也能够支持多字节的 Unicode 字符，即：为了最大限度地兼容 ASCII，同时保持系统的简单性、灵活性和效率。
 
-## 1.2 标识符
+- `Unicode 字符集`和对应的`UTF-8 字符编码`之间的关系，如下所示：
 
-### 1.2.1 概述
+![`Unicode 字符集`和对应的`UTF-8 字符编码`之间的关系](./assets/10.png)
 
-* 凡是程序员自己可以命名的部分就是标识符，即：给`类`、`变量`、`方法`等命名的`字符序列`就是`标识符`。
-
-### 1.2.2 标识符的命名规则（必须遵守，强制）
-
-- ① 只能使用 `26` 个英文字母大小写，`0~9` 的数字，下划线 `_` 和美元符号 `$` 。
-- ② 不能使用 Java 的关键字或保留字以及特殊值。
-- ③ 数字不能开头。
-- ④ 不能包含空格。
-- ⑤ 严格区分大小写。
-
-> [!CAUTION]
+>[!NOTE]
 >
-> 规则是硬性规定，一旦违反，程序就会在编译过程中报错。
-
-
-
-* 示例：合法标识符（✅）
-
-```txt
-age, student_1, _tempValue, $result
-```
-
-
-
-* 示例：不合法标识符（❌）
-
-```txt
-1student, @value, #total
-```
-
-### 1.2.3 标识符的命名规则（柔性规范，非强制）
-
-- ① 见名知意。 
-- ② 类名、接口名等：每个单词的首字母都大写，如：`XxxYyyZxx` 。 
-- ③ 变量、方法名等：从第二个单词开始首字母大写，其余字母小写，如：`xxxYyyZzz` 。 
-- ④ 包名等：每一个单词都小写，单词之间使用点 `.` 分隔，如：`com.github` 。 
-- ⑤ 常量名等：每一个单词都大写，单词之间使用下划线 `_` 分隔，如：`XXX_YYY_ZZZ` 。
-
-> [!CAUTION]
+>`宽字符`和`窄字符`是编程和计算机系统中对字符类型的一种分类，主要用于描述字符在内存中的表示形式及其与编码方式的关系。
 >
-> 规范是柔性规范：违反规范，不会导致编译报错，但是如果不遵守基本的规范，可能会被大家鄙视。 
+>* ① `窄字符`通常指使用单个字节（8 位）来表示的字符。在许多传统的编码系统中，窄字符通常代表 ASCII 字符或其它单字节字符集中的字符。换言之，`窄字符`适合处理简单的单字节字符集，如：ASCII，适用于处理西方语言的应用。
+>* ② `宽字符`指使用多个字节（通常是两个或更多）来表示的字符。这些字符通常用于表示比 ASCII 范围更广的字符集，如 Unicode 字符。换言之，`宽字符`适合处理多字节字符集，如：UTF-32、UTF-16 等，适用于需要处理多种语言和符号的国际化应用。
+>
+>在现代编程中，`窄字符`通常与 `UTF-8` 编码关联，特别是在处理文本输入、输出和网络传输时。尽管 `UTF-8` 是变长编码，由于其高效的空间利用和对 `ASCII` 的优化，通常与`窄字符`概念关联。而`宽字符`通常与 `UTF-16` 编码或 `UTF-32`编码关联，这些编码使用更大的固定或半固定长度来表示字符，适合处理更大的字符集。
 
 
 
-
-* 示例：符合规范的标识符
-
-```txt
-studentName, totalAmount, counterValue
-```
-
-
-
-# 第二章：常量（⭐）
+# 第二章： WSL2 中设置默认编码为中文
 
 ## 2.1 概述
 
-* 常量指的是在程序执行的过程中，其值不可以发生改变的量。
+* 查看 WSL2 的 Linux 发行版的默认编码：
 
-## 2.2 常量的分类
+```shell
+echo $LANG
+```
 
-* 常量的分类，如下所示：
-
-![常量的分类](./assets/2.png)
+![查看 WSL2 的 Linux 发行版的默认编码](./assets/11.gif)
 
 > [!NOTE]
 >
-> 问：如何理解`"字面值常量"`中的`"字面"`？
+> `C.UTF-8` 是一种字符编码设置，结合了 `C` 区域设定和 `UTF-8` 字符编码。
 >
-> 答：`"字面"`就是数据本身，`"字面"`含义就是`数据`；换言之，就是告诉程序员，数据在程序中的书写格式。
-
-> [!CAUTION]
+> * ① **C 区域设定**：这是一个标准的、最小化的区域设置，通常用于系统默认的语言环境。`C` 区域设定下，所有字符都被认为是 ASCII 字符集的一部分，这意味着仅支持基本的英文字符和符号。在 `C` 区域设定中，字符串的排序和比较是基于简单的二进制值比较，这与本地化的语言设置相比相对简单。
+> * ② **UTF-8 编码**：UTF-8 是一种变长的字符编码方式，可以编码所有的 Unicode 字符。它是一种广泛使用的字符编码，能够支持多种语言和符号。每个 UTF-8 字符可以由1到4个字节表示，这使得它兼容 ASCII（对于标准 ASCII 字符，UTF-8 只使用一个字节）。
 >
-> * ① 字符常量，使用单引号（`''`）括起来，必须有且仅能包含一个字符。
-> * ② 空常量，不可以在输出语句中直接打印！！！
+> 因此，`C.UTF-8` 结合了 `C` 区域设定和 UTF-8 字符编码的优势。使用 `C.UTF-8` 时，系统默认语言环境保持简单和高效，同时支持更广泛的字符集，特别是多语言和非英语字符。这样可以在需要兼容性的同时，提供对全球化字符的支持。
 
-## 2.3 常量的使用
+## 2.2 AlmaLinux9 设置默认编码
 
-* ① 整数常量：所有的整数都属于整数常量；但是，如果整数的范围太大，就需要再后面加上`L` ，表示是一个 `long` 类型的常量。
-* ② 浮点数常量：所有的浮点数（小数）都属于浮点常量，根据精度的不同，分为单精度浮点常量（需要加上 `F` 作为后缀）和双精度浮点常量（默认，也可以加上 `D` 作为后缀）。
-* ③ 字符常量：需要使用单引号（`''`）括起来，单引号中有且仅有一个内容，如：`'a'`、`'1'` 、`'个'` 等。
-* ④ 字符串常量：需要使用双引号（`""`）括起来，双引号中的内容任意，如：`""`、`"你好啊"`、`"呵呵哒"` 等。
-* ⑤ 布尔常量：只能是 `true` 或 `false` 。
-* ⑥ 空常量：就是 `null` ，表示数据不存在。
+* ① 搜索中文语言包：
 
-
-
-* 示例：整数常量
-
-```java
-package com.github.day02;
-
-/**
- * 整数常量
- */
-public class ConstantDemo1 {
-    public static void main(String[] args) {
-
-        // 普通整数：正数
-        System.out.println(12);
-        // 普通整数：负数
-        System.out.println(-12);
-        // 整数常量默认是 int 类型，如果超过这个范围，需要加 L，转换为 long 类型
-        System.out.println(220000000000000000L); 
-
-    }
-}
+```shell
+dnf search locale zh
 ```
 
+![搜索中文语言包](./assets/12.gif)
 
+* ② 安装中文语言包：
 
-* 示例：浮点数常量
-
-```java
-package com.github.day02;
-
-/**
- * 浮点数常量
- */
-public class ConstantDemo2 {
-    public static void main(String[] args) {
-
-        // 单精度浮点类型常量
-        System.out.println(3.14F);
-        // 双精度浮点类型常量，可以加 d 或 D 。
-        // 如果不写，默认就是双精度浮点类型常量
-        System.out.println(3.14); 
-
-    }
-}
+```shell
+dnf -y install glibc-langpack-zh
 ```
 
+![安装中文语言包](./assets/13.gif)
 
+* ③ 切换语言环境为中文：
 
-* 示例：字符常量
-
-```java
-package com.github.day02;
-
-/**
- * 字符常量
- */
-public class ConstantDemo4 {
-    public static void main(String[] args) {
-
-        System.out.println('a');
-        System.out.println('许');
-        System.out.println('大');
-        System.out.println('仙');
-        System.out.println('\t');
-
-    }
-}
+```shell
+localectl set-locale LANG=zh_CN.UTF-8
 ```
 
+![切换语言环境为中文](./assets/14.gif)
 
+* ④ 手动加载配置文件，使其生效：
 
-* 示例：字符串常量
-
-```java
-package com.github.day02;
-
-/**
- * 字符串常量
- */
-public class ConstantDemo3 {
-    public static void main(String[] args) {
-
-        // 普通字符串
-        System.out.println("HelloWorld");
-        // 只包含一个字符的字符串
-        System.out.println("a");
-        // 空字符串
-        System.out.println(""); 
-
-    }
-}
+```shell
+source /etc/locale.conf
 ```
 
+![手动加载配置文件，使其生效](./assets/15.gif)
 
+## 2.3 Ubuntu 22.04 设置默认编码
 
-* 示例：布尔常量
+* ① 安装中文语言包：
 
-```java
-package com.github.day02;
-
-/**
- * 布尔常量
- */
-public class ConstantDemo5 {
-    public static void main(String[] args) {
-
-        System.out.println(true);
-        System.out.println(false);
-
-    }
-}
+```shell
+apt update -y && apt install language-pack-zh-hans -y
 ```
 
-## 2.4 常量之间的运算
+![安装中文语言包](./assets/16.gif)
 
-### 2.4.1 概述
+* ② 切换环境为中文：
 
-* 在 Java 中，常量之间是可以进行运算的，但是运算的类型取决于常量的类型。
-
-### 2.4.2 整数常量的运算
-
-* Java 支持对`整数常量`进行`加`、`减`、`乘`、`除`、`取模`（取余数）等运算。
-
-
-
-* 示例：
-
-```java
-package com.github.day02;
-
-/**
- * 整数常量的运算
- */
-public class ConstantExe1 {
-    public static void main(String[] args) {
-        // 加法
-        System.out.println(1 + 1);
-        // 减法
-        System.out.println(1 - 2);
-        // 乘法
-        System.out.println(2 * 2);
-        // 除法
-        System.out.println(1 / 2);
-        // 取模
-        System.out.println(1 % 2);
-    }
-}
+```shell
+update-locale LANG=zh_CN.UTF-8 LANGUAGE=zh_CN:zh
 ```
 
-### 2.4.3 浮点数常量的运算
+![切换环境为中文](./assets/17.gif)
 
-* Java 支持对`浮点数常量`进行`加`、`减`、`乘`、`除`、`取模`（取余数）等运算；但是，在进行`除法`的时候，不会截断小数部分。
+* ③ 手动加载配置文件，使其生效：
 
-
-
-* 示例：
-
-```java
-package com.github.day02;
-
-/**
- * 浮点数常量的运算
- */
-public class ConstantExe2 {
-    public static void main(String[] args) {
-        // 加法
-        System.out.println(1 + 1.1); // 2.1
-        // 减法
-        System.out.println(1 - 2.1); // -1.1
-        // 乘法
-        System.out.println(2 * 2.1); // 4.2
-        // 除法
-        System.out.println(1 / 2.0); // 0.5
-        // 取模
-        System.out.println(1 % 2.0); // 1.0
-    }
-}
+```shell
+source /etc/default/locale
 ```
 
-### 2.4.4 字符常量的运算
-
-* 在 Java 中，字符常量可以进行数学运算，如：ASCII 码计算。
+![手动加载配置文件，使其生效](./assets/18.gif)
 
 
 
-* 示例：
-
-```java
-package com.github.day02;
-
-/**
- * 字符常量的运算
- */
-public class ConstantExe3 {
-    public static void main(String[] args) {
-        // 转换为整数
-        System.out.println((int) 'A'); // 65
-        // 转换为整数
-        System.out.println((int) 'B'); // 66
-        // 计算 'B' 和 'A' 之间的距离
-        System.out.println('B' - 'A'); // 1
-    }
-}
-```
-
-### 2.4.5 布尔常量的运算
-
-* Java 不能对布尔常量进行运算，但是可以使用逻辑运算符（`&&`、`||`、`!`）进行逻辑运算。
-
-
-
-* 示例：
-
-```java
-package com.github.day02;
-
-/**
- * 布尔常量的逻辑运算
- */
-public class ConstantExe4 {
-    public static void main(String[] args) {
-
-        System.out.println(true && true); // true
-        System.out.println(true && false); // false
-        System.out.println(false && true); // false
-        System.out.println(false && false); // false
-
-        System.out.println(true || true); // true
-        System.out.println(true || false); // true
-        System.out.println(false || true); // true
-        System.out.println(false || false); // false
-
-        System.out.println(!true); // false
-        System.out.println(!false); // true
-
-    }
-}
-```
-
-### 2.4.6 字符串常量的运算
-
-* Java 中的字符串常量可以使用 `+` 进行拼接。
-
-
-
-* 示例：
-
-```java
-package com.github.day02;
-
-/**
- * 字符串常量的拼接
- */
-public class ConstantExe5 {
-    public static void main(String[] args) {
-
-        System.out.println("hello"); // hello
-        System.out.println("world"); // world
-        System.out.println("hello" + "world"); // helloworld
-    }
-}
-```
-
-## 2.5 自定义常量
-
-* 在 Java 中，自定义常量通常使用 `final` 关键字来声明，一旦赋值后，其值就无法更改。
-* 在 Java 中，自定义常量的标识符一般采用全大写字母命名，并使用下划线分隔单词，如：`MAX_VALUE` 等，这是一种常见的命名约定。
-
-
-
-* 示例：
-
-```java
-package com.github.day02;
-
-/**
- * 自定义常量
- */
-public class MathConstants {
-    public static void main(String[] args) {
-
-        final int X = 5;
-
-        System.out.println("X: " + X);
-    }
-}
-```
-
-
-
-# 第三章：初识数据类型（⭐）
+# 第三章：计算机的存储规则（⭐）
 
 ## 3.1 概述
 
-* Java 中的数据类型分为两大类，如下所示：
-
-![](./assets/3.png)
-
-## 3.2 基本数据类型
-
-* Java 中的`基本数据类型`是`四类八种`，如下所示：
-
-![](./assets/4.jpg)
-
-* 常量整数值： 
-
-  - 赋值给 byte，只要在 byte 范围内即可。
-
-  - 赋值给 short，只要在 short 范围内即可。
-
-  - 赋值给 int，只要在 int 范围内即可。
-
-  - 赋值给 long，在 int 范围内的，可以加 L 也可以不加 L ，会自动升级为 long ，如果数字超过了 int 范围，必须加 L 。
-
-* 浮点常量值：无论多大，如果不加 F，就是 double 类型。
-
-
-
-# 第四章：变量（⭐）
-
-## 4.1 程序中变化的数据
-
-- 在生活中，我们使用最多的不是固定的数据，而是会变化的数据：
-  - ① 购物车商品的`数量`、`价格`等。
-  - ② 一首歌`播放的时间`、`进度条`、`歌词的展示`等。
-  - ③ 微信聊天中`消息条数`、`时间`、`语音的长度`、`头像`、`名称`等。
-  - ④ 游戏中技能的`冷却时间`、`血量`、`蓝量`、`buff 时间`、`金币的数量`等。
-  - ……
-- 下图是一个`购物车`中`变化`的`数据`，即：
-
-![购物车中变化的数据](./assets/5.png)
-
-* 那么，在实际开发中，我们就会使用`变量`来`保存`和`操作`这些`变化`的`数据`。
-
-## 4.2 变量的理解
-
-- 变量的定义：变量是程序中不可或缺的组成单位，最基本的存储单元。其实，变量就是一个存储数据的临时空间，可以向其中存储不同类型的数据，如：整数、小数、字符、字符串等，并且变量中的数据在程序运行的时候可以动态改变。
+* 在计算机中，通常有三种常见的数据：`文本`（Text）、`图片`（Image）和`声音`（Sound），如下所示：
 
 > [!NOTE]
 >
-> - `变量`：用来`存储数据`的`容器`。
-> - `数据`：可以是一个用来计算的`数字`，如：上文购物车中的`价格`等；也可以是一句话中的`关键词`或`其它任意格式的数据`。
-> - 变量的`特别`之处就在于`它存放的数据是可以改变`的。
+> 视频就是很多图片和声音的结合体而已！！！
 
-* 我们可以将`变量`想象为一个`容器`，盒子中`装的`就是我们想要的`数据`，并且我们需要`给`盒子`取`一个`特别的名称`；通过这个`特别的名称`，我们可以`给`盒子`添加数据`或`移除数据`，这个`特别的名称`就是`变量名`。
+![](./assets/19.png)
 
-![变量名](./assets/6.png)
+* 并且，`文本`是由`数字`、`字母`和`汉字`组成，如下所示：
 
-> [!NOTE]
->
-> - ① `变量`是内存中的一个`存储区域`，该区域的数据可以在`同一类型`范围内`不断变化`。
-> - ② 通过`变量名`，可以`操作`这块内存区域，向其中`存储数据`或`获取数据`以及`移除数据`。
-> - ③ 变量的构成包含三个要素：`数据类型`、`变量名`、`需要存储的数据`。
-> - ④ 在生活中，我们会经常说：这件衣服的价格是 `100（整型）` 元，这双鞋子的价格是 `250.5（小数，浮点类型）` 元，`今天天气真好（字符串类型）`之类的话；在计算机科学中，这些都是数据，并且它们是有类型，即：数据类型。（数据类型用于定义变量所能存储的数据的种类以及可以对这些数据进行的操作的一种分类，每种数据类型都有特定的属性和用途，它们决定了变量在内存中如何表示和存储，以及变量可以执行哪些操作）
+![](./assets/20.png)
 
-## 4.3 变量的声明、赋值和使用
 
-* ① 变量的声明语法：
 
-```java
-数据类型 变量名;
-```
+## 3.2 计算机中文本数据的存储
 
-* ② 变量的赋值语法：
+* 在计算机中，任何数据都是以二进制的形式进行存储，文本数据也不例外。
+* 其中，`数字`中的`整数`采用的是`计算机补码`，而`数字`中的`小数`采取的是 `IE754 标准`。
+* 其中，`字母`采取的是`ASCII 编码`或 `Unicode 编码`（UTF-8、UTF-16、UTF-32）。
+* 其中，`汉字`采取的是`GBK 编码`或 `Unicode 编码`（UTF-8、UTF-16、UTF-32）
 
-```java
-变量名 = 值;
-```
+## 3.3 计算机中图片数据的存储
+
+### 3.3.1 概述
+
+* `图片`在计算机中分为：`黑白图`、`灰度图`和`彩色图`，如下所示：
+
+![](./assets/21.jpg)
+
+* `图片`的存储，还需要涉及显示器的三个知识点：`分辨率`、`像素`和`三原色`。
 
 > [!NOTE]
 >
-> * ① 我们可以声明变量之后，再给变量赋值，如：`int age; age = 10;`。
-> * ② 我们也可以在声明变量的同时，给变量赋值，这称为初始化，如：`int age = 10 ;`。
-
-* ③ 变量的使用：变量在赋值后可以在程序中使用
-
-```java
-变量名;
-```
-
-> [!CAUTION]
+> * ① `分辨率`：分辨率指的是显示设备或图像的清晰度，通常用宽度和高度的像素数表示，如：1920x1080 就是一种常见的分辨率，表示图像的宽度有 1920 个像素，高度有 1080 个像素。分辨率越高，图像就越清晰。
 >
-> 变量使用的注意事项：
+> ::: details 点我查看 分辨率
 >
-> * ① 变量必须先定义（赋值或初始化）再使用。
-> * ② 局部变量在使用之前必须先初始化（类属性，会有系统根据其数据类型，自动赋予初始化值）。
-> * ③ 变量是有作用域的。
-> * ④ 在同一个作用域中不能有同样的变量名；换言之，一个变量在作用域中只能使用一次。
-
-
-
-* 示例：变量的声明
-
-```java
-package com.github.day02;
-
-public class VariableDemo1 {
-    public static void main(String[] args){
-        
-        // 声明一个变量，名称是 age，其数据类型是 int
-        int age; // [!code highlight]
-        // 声明一个变量，名称是 name，其数据类型是 String
-        String name; // [!code highlight]
-        // 声明一个变量，名称是 salary，其数据类型是 double
-        double salary; // [!code highlight]
-        
-    }
-}
-```
-
-
-
-* 示例：变量的赋值
-
-```java
-package com.github.day02;
-
-public class VariableDemo1 {
-    public static void main(String[] args) {
-
-        // 声明一个变量，名称是 age，其数据类型是 int
-        int age;
-        // 声明一个变量，名称是 name，其数据类型是 String
-        String name;
-        // 声明一个变量，名称是 salary，其数据类型是 double
-        double salary;
-
-        // 给变量 age 赋值 10
-        age = 10; // [!code highlight]
-        // 给变量 name 赋值 "张三"
-        name = "张三"; // [!code highlight]
-        // 给变量 salary 赋值 100
-        salary = 10000.0; // [!code highlight]
-    }
-}
-```
-
-
-
-* 示例：变量的使用
-
-```java
-package com.github.day02;
-
-public class VariableDemo1 {
-    public static void main(String[] args) {
-
-        // 声明一个变量，名称是 age，其数据类型是 int
-        int age;
-        // 声明一个变量，名称是 name，其数据类型是 String
-        String name;
-        // 声明一个变量，名称是 salary，其数据类型是 double
-        double salary;
-
-        // 给变量 age 赋值 10
-        age = 10;
-        // 给变量 name 赋值 "张三"
-        name = "张三";
-        // 给变量 salary 赋值 100
-        salary = 10000.0;
-
-        // 输出变量 name 的值
-        System.out.println("姓名是：" + name); // [!code highlight]
-        // 输出变量 age 的值
-        System.out.println("年龄是：" + age); // [!code highlight]
-        // 输出变量 salary 的值
-        System.out.println("工资是：" + salary); // [!code highlight]
-    }
-}
-```
-
-
-
-* 示例：变量的初始化
-
-```java
-package com.github.day02;
-
-public class VariableDemo2 {
-    public static void main(String[] args) {
-
-        // 变量的初始化
-        int age = 10; // [!code highlight]
-        // 变量的初始化
-        String name = "张三"; // [!code highlight]
-        // 变量的初始化
-        double salary = 10000.0; // [!code highlight]
-
-        // 输出变量 name 的值
-        System.out.println("姓名是：" + name);
-        // 输出变量 age 的值
-        System.out.println("年龄是：" + age);
-        // 输出变量 salary 的值
-        System.out.println("工资是：" + salary);
-    }
-}
-```
-
-## 4.4 变量的作用域
-
-* 所谓`变量的作用域`就是`变量的有效范围`。
-
-> [!CAUTION]
+> ![](./assets/22.png)
 >
-> 变量必须在有效范围内使用；否则，将会编译失败。
+> :::
+>
+> * ② `像素`：像素是图像的基本单元，通常是显示设备屏幕上的一个小点。每个像素通常由红、绿、蓝三种颜色的光点组成，组合这些光点可以表现出不同的颜色和亮度。图像的质量和清晰度与像素的数量密切相关。
+>
+> ::: details 点我查看 像素
+>
+> ![](./assets/23.png)
+>
+> :::
+>
+> * ③ `三原色`：三原色指的是组成所有颜色的基本颜色。对于显示设备来说，通常使用`红色（Red）`、`绿色（Green）`和`蓝色（Blue）`作为三原色，合称为 RGB 颜色模型。通过调节这三种颜色的亮度，可以混合出各种不同的颜色。这也是为什么显示器、电视屏幕等设备使用 RGB 来显示色彩的原因。
+>
+> ::: details 点我查看 三原色
+>
+> ![](./assets/24.png)
+>
+> :::
 
-* 在 Java 语言中，变量的作用域就是其所在的一组 `{}` 。
+### 3.3.2 黑白图
+
+* 定义：黑白图（二值图像）指图像中只有两种颜色：黑和白，通常用 `0` 和 `1` 来表示，如下所示：
+
+![](./assets/25.jpg)
+
+* 应用场景：黑白图像常用于一些简单的图像处理任务，如：文档扫描、条形码识别、图像二值化等。
+
+<xgplayer url="/image/bin-image.mp4" poster="/image/bin-image.png" />
+
+### 3.3.3 灰度图
+
+* 定义：灰度图像是指图像中每个像素包含的颜色信息是不同强度的灰色，介于纯黑（0）和纯白（255）之间。灰度图的每个像素值通常用 `8 位（0-255）`来表示，从完全黑（0）到完全白（255），中间是不同强度的灰色，如下所示：
+
+![](./assets/26.jpg)
+
+* 应用场景：灰度图像在图像处理、计算机视觉和医学影像中有广泛应用，它能够保留较多的亮度信息，但不包含色彩（色相）信息。
+
+![](./assets/27.jpg)
+
+### 3.3.4 彩色图
+
+- 定义：彩色图像是指图像中每个像素包含了`红色（R）`、`绿色（G）`和`蓝色（B）`的颜色信息，这三种颜色的不同组合形成了丰富的色彩。这通常使用 `RGB 颜色模型`来表示每个像素的颜色信息，如下所示：
+
+![](./assets/28.png)
+
+- 用途：彩色图像应用广泛，几乎所有的日常照片、视频以及大部分的图形设计都使用彩色图像。它能够传达更多的信息和情感，因为人类视觉系统对颜色的感知非常敏感。
+
+![](./assets/29.png)
+
+## 3.4 计算机中声音数据的存储
+
+* 计算机中`声音`数据的存储一般通过将`声音信号`数字化并以`数字`形式保存，如下所示：
+
+![](./assets/30.png)
+
+* 整个过程涉及到`采样`、`量化`、`编码`以及`存储`等过程。
+
+> [!NOTE]
+>
+> * ① **采样（Sampling）**： 采样是将连续的声音信号转化为离散的数字信号。即在固定的时间间隔内记录声音信号的幅度值。采样的频率（采样率）决定了每秒钟采样的次数，常见的音频采样率有 44.1 kHz（CD音质）或 48 kHz等。采样率越高，声音的还原度越高，但文件大小也越大。
+> * ② **量化（Quantization）**： 量化是将每个采样值映射到离散的数值范围内，通常是将模拟信号的幅度值转换为数字信号。量化的精度通常由比特深度（Bit Depth）来决定，常见的比特深度有 8位、16位、24位等。比特深度越大，表示的精度越高，声音质量越好，但文件的大小也更大。
+> * ③ **编码（Encoding）**： 编码是将采样和量化后的数据进行压缩和编码，生成计算机能够处理的音频文件格式。常见的音频文件格式包括：
+>   - **未压缩格式**：如 WAV、AIFF等，这些文件保留了所有的音频数据，因此音质较好，但文件较大。
+>   - **压缩格式**：如 MP3、AAC等，这些格式通过丢弃一些人耳不易察觉的声音信息来减少文件大小，但会牺牲一定的音质。
+> * ④ **存储**： 存储音频数据时，计算机将其保存为文件，并在需要时通过音频播放器或处理软件读取。音频文件的大小通常与采样率、比特深度以及是否使用压缩格式有关。一般来说，未压缩的音频文件比较大，而压缩后的音频文件则较小。
+
+
+
+# 第四章：Java 中的编码（⭐）
+
+## 4.1 概述
+
+* 如果你和别人交流 Java，当提及 Java 的编码的时候，别人一定会和你说 Java 的默认字符集是 Unicode；但是，我们也知道 Unicode 字符集的实现（字符编码标准），有很多种，如：UTF-8、UTF-16 以及 UTF-32 等；那么，Java 中的字符编码到底是什么？
+
+> [!NOTE]
+>
+> * ① **Unicode** 是一种字符集标准，目的是为全球所有语言的字符提供一个唯一的编码，涵盖了几乎所有的字符，包括常见的英语字符、汉字、符号等。Unicode 为每个字符分配了一个唯一的编码点。
+> * ② **UTF-8**、**UTF-16**、**UTF-32** 是 Unicode 的具体编码方式。它们都是将 Unicode 编码点转换为字节序列的不同方法：
+>   - **UTF-8**：变长编码方式，每个字符使用 1 到 4 个字节来表示，兼容 ASCII。
+>   - **UTF-16**：每个字符使用 2 或 4 个字节，通常以两字节为主。
+>   - **UTF-32**：每个字符固定使用 4 个字节。
+
+## 4.2 常见操作系统默认编码
+
+### 4.2.1 Windows
+
+* 首先说明一点，Windows 内核采用的是 UTF-16 编码，一方面是为了支持多语言（英文、中文、日文等），一方面是因为当时的计算机的性能远远不如今天，如果采取 UTF-8 编码（非定长编码），会消耗操作系统的性能；如果采取是 UTF-32 编码，将会占用更多的存储空间，考虑到种种因素，WIndows 的内核选择了 UTF-16 编码。
+
+> [!NOTE]
+>
+> 为了支持更多的字符集和国际化需求，微软在Windows NT （1993 年）系列开始决定使用 Unicode 来统一字符表示，于是 UTF-16 成为了默认的编码。
+
+* 在 Windows 7 （简体中文）操作系统（2009-10-22 正式发布）上，控制台采取的是 GBK 编码，而文件编码也采取的是 GBK ，如下所示：
+
+![Windows 7 操作系统（简体中文）默认控制台编码](./assets/31.png)
+
+![Windows 7 操作系统（简体中文）默认文件编码](./assets/32.png)
+
+* 但是，随着时间的推移，硬件的性能越来越强大，由于历史遗留问题，Windows 的内核依然是 UTF-16 编码；但是，控制台虽然依然是 GBK 编码，文件编码却早已改为了 UTF-8 编码，如下所示：
+
+![Windows 11 操作系统（简体中文）默认控制台编码](./assets/33.png)
+
+![Windows 11 操作系统（简体中文）默认文件编码](./assets/34.png)
+
+### 4.2.2 Linux
+
+* Linux 默认就是 `UTF-8` 编码，如下所示：
+
+![Linux 系统的默认编码](./assets/35.png)
+
+## 4.3 JDK 18 之前
+
+### 4.3.1 概述
+
+* Java 是在 1996 年的时候发布的第一个版本，Unicode 已经成为一种广泛支持的字符集，而 UTF-16 已被认为是处理 Unicode 字符的标准方式之一。
+* Java 设计者选择使用 UTF-16，是为了确保与 Unicode 标准的兼容性，且这种选择在当时广泛被其他操作系统（Windows NT）采用。
+
+### 4.3.2 字符串编码
+
+* Java 中的字符串在内存中的表示是 UTF-16 编码，即：Java 中的 `String` 类是基于 `UTF-16` 编码来存储字符的。
 
 
 
 * 示例：
 
-```java
-public class VariableDemo{
+```java {42}
+/**
+ * The {@code String} class represents character strings. All
+ * string literals in Java programs, such as {@code "abc"}, are
+ * implemented as instances of this class.
+ * <p>
+ * Strings are constant; their values cannot be changed after they
+ * are created. String buffers support mutable strings.
+ * Because String objects are immutable they can be shared. For example:
+ * <blockquote><pre>
+ *     String str = "abc";
+ * </pre></blockquote><p>
+ * is equivalent to:
+ * <blockquote><pre>
+ *     char data[] = {'a', 'b', 'c'};
+ *     String str = new String(data);
+ * </pre></blockquote><p>
+ * Here are some more examples of how strings can be used:
+ * <blockquote><pre>
+ *     System.out.println("abc");
+ *     String cde = "cde";
+ *     System.out.println("abc" + cde);
+ *     String c = "abc".substring(2, 3);
+ *     String d = cde.substring(1, 2);
+ * </pre></blockquote>
+ * <p>
+ * The class {@code String} includes methods for examining
+ * individual characters of the sequence, for comparing strings, for
+ * searching strings, for extracting substrings, and for creating a
+ * copy of a string with all characters translated to uppercase or to
+ * lowercase. Case mapping is based on the Unicode Standard version
+ * specified by the {@link java.lang.Character Character} class.
+ * <p>
+ * The Java language provides special support for the string
+ * concatenation operator (&nbsp;+&nbsp;), and for conversion of
+ * other objects to strings. For additional information on string
+ * concatenation and conversion, see <i>The Java Language Specification</i>.
+ *
+ * <p> Unless otherwise noted, passing a {@code null} argument to a constructor
+ * or method in this class will cause a {@link NullPointerException} to be
+ * thrown.
+ *
+ * <p>A {@code String} represents a string in the UTF-16 format
+ * in which <em>supplementary characters</em> are represented by <em>surrogate
+ * pairs</em> (see the section <a href="Character.html#unicode">Unicode
+ * Character Representations</a> in the {@code Character} class for
+ * more information).
+ * Index values refer to {@code char} code units, so a supplementary
+ * character uses two positions in a {@code String}.
+ * <p>The {@code String} class provides methods for dealing with
+ * Unicode code points (i.e., characters), in addition to those for
+ * dealing with Unicode code units (i.e., {@code char} values).
+ *
+ * <p>Unless otherwise noted, methods for comparing Strings do not take locale
+ * into account.  The {@link java.text.Collator} class provides methods for
+ * finer-grain, locale-sensitive String comparison.
+ *
+ * @implNote The implementation of the string concatenation operator is left to
+ * the discretion of a Java compiler, as long as the compiler ultimately conforms
+ * to <i>The Java Language Specification</i>. For example, the {@code javac} compiler
+ * may implement the operator with {@code StringBuffer}, {@code StringBuilder},
+ * or {@code java.lang.invoke.StringConcatFactory} depending on the JDK version. The
+ * implementation of string conversion is typically through the method {@code toString},
+ * defined by {@code Object} and inherited by all classes in Java.
+ *
+ * @author  Lee Boynton
+ * @author  Arthur van Hoff
+ * @author  Martin Buchholz
+ * @author  Ulf Zibis
+ * @see     java.lang.Object#toString()
+ * @see     java.lang.StringBuffer
+ * @see     java.lang.StringBuilder
+ * @see     java.nio.charset.Charset
+ * @since   1.0
+ * @jls     15.18.1 String Concatenation Operator +
+ */
+
+public final class String
+    implements java.io.Serializable, Comparable<String>, CharSequence,
+               Constable, ConstantDesc {
+	...               
+}                   
+```
+
+### 4.3.3 文件编码
+
+* 默认情况下，对于文件，Java 使用的是`平台默认`的编码，即：在 `Windows` 上通常是 `GBK`，而在 `Linux` 上通常是 `UTF-8` 。
+* 当然，我们在使用 `InputStreamReader` 或 `OutputStramWriter` 等类的时候，也可以手动指定编码。
+
+
+
+* 示例：
+
+```java {5}
+/**
+ * Reads text from character files using a default buffer size. Decoding from bytes
+ * to characters uses either a specified {@linkplain java.nio.charset.Charset charset}
+ * or the platform's
+ * {@linkplain java.nio.charset.Charset#defaultCharset() default charset}.
+ *
+ * <p>
+ * The {@code FileReader} is meant for reading streams of characters. For reading
+ * streams of raw bytes, consider using a {@code FileInputStream}.
+ *
+ * @see InputStreamReader
+ * @see FileInputStream
+ *
+ * @author      Mark Reinhold
+ * @since       1.1
+ */
+public class FileReader extends InputStreamReader {
+    ...
+}
+```
+
+
+
+* 示例：
+
+```java {6,61}
+/**
+ * An InputStreamReader is a bridge from byte streams to character streams: It
+ * reads bytes and decodes them into characters using a specified {@link
+ * java.nio.charset.Charset charset}.  The charset that it uses
+ * may be specified by name or may be given explicitly, or the platform's
+ * {@link Charset#defaultCharset() default charset} may be accepted.
+ *
+ * <p> Each invocation of one of an InputStreamReader's read() methods may
+ * cause one or more bytes to be read from the underlying byte-input stream.
+ * To enable the efficient conversion of bytes to characters, more bytes may
+ * be read ahead from the underlying stream than are necessary to satisfy the
+ * current read operation.
+ *
+ * <p> For top efficiency, consider wrapping an InputStreamReader within a
+ * BufferedReader.  For example:
+ *
+ * <pre>
+ * BufferedReader in
+ *   = new BufferedReader(new InputStreamReader(anInputStream));
+ * </pre>
+ *
+ * @see BufferedReader
+ * @see InputStream
+ * @see java.nio.charset.Charset
+ *
+ * @author      Mark Reinhold
+ * @since       1.1
+ */
+
+public class InputStreamReader extends Reader {
+
+    private final StreamDecoder sd;
+
+    /**
+     * Creates an InputStreamReader that uses the
+     * {@link Charset#defaultCharset() default charset}.
+     *
+     * @param  in   An InputStream
+     *
+     * @see Charset#defaultCharset()
+     */
+    public InputStreamReader(InputStream in) {
+        super(in);
+        sd = StreamDecoder.forInputStreamReader(in, this,
+                Charset.defaultCharset()); // ## check lock object
+    }
+
+    /**
+     * Creates an InputStreamReader that uses the named charset.
+     *
+     * @param  in
+     *         An InputStream
+     *
+     * @param  charsetName
+     *         The name of a supported
+     *         {@link java.nio.charset.Charset charset}
+     *
+     * @throws     UnsupportedEncodingException
+     *             If the named charset is not supported
+     */
+    public InputStreamReader(InputStream in, String charsetName)
+        throws UnsupportedEncodingException
+    {
+        super(in);
+        if (charsetName == null)
+            throw new NullPointerException("charsetName");
+        sd = StreamDecoder.forInputStreamReader(in, this, charsetName);
+    }
     
-    public void method(){
-        
-        {
-            boolean flag = true;
-        }
-        // ❌ 错误：此处代码有问题，将会编译失败
-        System.out.println(flag); // [!code error]
-    }
-}
+    ...   
+
+}    
 ```
 
-## 4.5 变量的三要素
+## 4.4 JDK 18 之后
 
-### 4.5.1 概述
+* 在 JDK18 之后，Java 开始使用 UTF-8 作为默认的字符集，而不再根据操作系统的默认编码来决定。这是为了确保跨平台的一致性，减少因字符编码不一致而导致的问题。
 
-* 变量的定义语法是这样的，如下所示：
-
-```java
-数据类型 变量名 = 值;
-```
-
-* 从中，我们可以得知，变量的三要素是`数据类型`、`变量名`和`值`。
-
-### 4.5.2 变量名
-
-* `变量名`是引用`绑定`的值。换言之，在程序中，`变量名`是程序员用来`引用`和`操作`存储在该变量中的数据的`标识符`。
-
-> [!NOTE]
->
-> * ① 变量名通常应该具有描述性，符合一定的命名规范（见名知意）。
-> * ② 数据类型只在定义变量的时候声明，而且必须声明；在使用变量的时候，就无需再声明，因为此时的数据类型已经确定的。
-
-### 4.5.3 值
-
-* `值`就是变量存储的`实际数据`。
-
-> [!NOTE]
->
-> - ① 整型变量的值可能是`10`。
-> - ② 字符型变量的值可能是`'A'`。
-> - ③ 布尔型变量的值可能是`true`或者`false`。
-
-### 4.5.4 数据类型
-
-* `数据类型`是编程语言中用于规范变量或表达式的性质的一个抽象概念。它确定了所存储数据的形式、大小和布局，并定义了可对该类型数据执行的操作集合。
-* 剥离本质，`数据类型`的定义就是：规定了一组合法的数据集合以及针对这组数据集合的合法操作，即：数据类型 = 数据 + 操作。
-
-> [!NOTE]
->
-> ::: details 点我查看
->
-> * ① `数据的种类`：（编码）：数据类型首先定义了变量能存储什么类型的数据，不同的类型代表着不同的“数据种类”，即：不同的数据类型让我们能够存储和处理不同种类的值，如下所示：
->   - **整型（int）**：用于存储整数，例如 `-1`、`0`、`100` 等。
->   - **浮点型（float 或 double）**：用于存储有小数点的数字，如： `3.14`、`-0.5` 等。
->   - **字符型（char）**：用于存储单个字符，例如 `'A'`、`'b'` 等。
->   - **布尔型（boolean）**：用于存储真（true）或假（false）值，通常用于逻辑判断。
->   - **字符串类型（string）**：用于存储字符的序列，如：`"Hello, World!"`。
-> * ② `数据的存储空间`：（内存大小）：数据类型还决定了计算机如何在内存中存储这些数据，不同的数据类型占用的内存空间不同，即：数据类型不仅决定了能存储的数据种类，还影响数据在内存中的存储方式和空间，如下所示：
->   - **整型（int）**：通常占用 4 字节（具体大小取决于系统架构），表示整数。
->   - **字符型（char）**：只占 1 字节，表示一个字符。
->   - **浮点型（float）**：占 4 字节，表示带小数的浮动数。
->   - **浮点型（double）**：占 8 字节，表示高精度的浮动数。
-> * ③ 操作方式：：数据类型决定了可以对变量执行哪些操作，每种数据类型都有自己的运算规则和支持的操作，即：不同的数据类型有不同的操作规则，操作方式取决于数据类型的定义，如下所示：
->   - **整型（int）**：支持加法、减法、乘法、除法等常规算术运算。
->   - **浮动型（float 或 double）**：支持加减乘除运算，但会有浮动精度的考虑，还可以进行一些特有的数学运算，如求平方根、对数等。
->   - **字符型（char）**：支持字符的比较（`'A' == 'B'`），可以进行字符的转换（从字符到 ASCII 值的转换）。
->   - **布尔型（boolean）**：常用于逻辑运算，如：与（AND）、或（OR）、非（NOT）等。
->
-> :::
-
-* `数据类型`决定了变量可以存储哪类数据（种类），以及计算机如何在内存中存储这些数据（空间）；同时，`数据类型`也决定了我们可以如何操作这些数据（方法和运算规则）。
-* 当然，我们可以对`数据类型`进行更进一步的抽象，`数据类型`主要有`限定变量的取值范围`和`限定变量能够执行的操作`的作用。
-
-> [!IMPORTANT]
->
-> ::: details 点我查看
->
-> - ① 限定变量的取值范围（编码+内存大小）。
->   - `编码`：是指数据如何在计算中表示。不同的数据类型采用不同的编码方式来表示值，如：整数类型（int ）通常采用补码来表示整数（正整数、0 和负整数），浮点类型（float 或 double）采用 IEEE 754 标准进行编码，字符类型（char）在 Java 语言中采用 Unicode 进行编码（在 JDK18 之后，采取 UTF-8 编码），这些数据类型的编码方式不同，导致它们能表示的值的范围和精度不同（32 位的 int 的范围是 `[-2^31,2^31-1]`；而 float 类型则能表示更广泛的数值范围，但是精度和有效位是有限的 ）。
->   - `内存大小`：数据类型的大小决定了在内存中占用的空间，这直接影响到它能够存储的值的大小，如：32 位的 int 占用 4 个字节大小，最多可以表示 `2^32` 个整数，其取值范围是 `[-2^31,2^31-1]`。
->
-> - ② 限定变量能够执行的操作。
->   - 对于`int`类型的变量，你可以执行算术运算（加法、减法、乘法等），但不能对其执行字符串操作。
->   - 对于`boolean`类型的变量，你只能执行逻辑操作（`&&`、`||`等），而不能进行算术运算。
->   - 对于`String`类型的变量，你可以执行字符串连接、比较等操作，但不能进行直接的算术运算。
->
-> :::
-
-### 4.5.5 变量初始化的底层细节
-
-* 之前，我们给变量进行初始化的时候，是这样的：
-
-```java
-int num = 10;
-```
-
-* 上述的代码其实透露了三个重要的信息：
-  * ① `数据存储在哪里？`
-  * ② `数据的长度（范围）是多少？`
-  * ③ `数据的处理方式？`
-
-* 其实，编译器对程序编译的时候，是这样做的：
-  * ① `编译器在编译的时候，就将变量替换为内存中存储单元的内存地址（知道了你家的门牌号），这样就可以方便的进行存取数据了`（解答了上述的问题 ① ）。
-  * ② `变量中其实存储的是初始化值 10 在内存中存储单元的首地址，我们也知道，数据类型 int 的存储空间是 4 个字节，那么根据首地址 + 4 个字节就可以完整的将数据从内存空间中取出来或存进去`（解答了上述的问题 ② ）。
-  * ③ `我们知道，数据在计算机底层的存储方式是不一样的，如：整数在计算机底层的存储就是计算机补码的方式，浮点数在计算机底层的存储类似于科学计数法；但是，字符类型在计算机底层的存储和整数以及浮点数完全不同，需要查码表，即：在存储的时候，需要先查询码表，转换为二进制进行存储；在读取的时候，也需要先查询码表，将二进制转换为对应的字符`（解答了上述的问题 ③ ）。
-
-* 所以，程序中的变量在内存中就是这样的，如下所示：
-
-![](./assets/7.svg)
-
-## 4.6 变量声明 VS 变量定义
-
-* 变量声明的语法是：
-
-```java
-数据类型 变量名;
-```
-
-> [!NOTE]
->
-> * ① C/C++ 编程语言，对于变量声明，如：`int age;`，编译器会在内存中开辟一块内存空间，并为其赋值为随机值，这样在调用变量的时候，会产生未定义行为（这也是为什么 C/C++ 被称为内存不安全的原因之一）。
-> * ② Java 编程语言，对于变量声明，如：`int age;`，如果没有对变量进行赋值，编译器在编译的时候直接报错，告诉程序员该变量没有进行赋值，从编译期就规避了未定义行为（这也是  Java 被称为内存安全的原因之一）。
-
-* 其在内存中，是这样的，如下所示：
-
-![](./assets/8.svg)
-
-* 变量定义的语言是：
-
-```java
-数据类型 变量名;
-变量名 = 值;
-```
-
-```java
-数据类型 变量名 = 值;
-```
-
-> [!NOTE]
->
-> * ① C/C++ 编程语言，对`变量声明`和`变量定义`，编译器是不同的处理方式；所以，在 C/C++ 中，变量声明和变量定义，是不一样的。
-> * ② Java 编程语言，由于编译器的处理，导致了如果不对变量进行赋值，在进行变量调用的时候，在编译期就会报错；所以，对于 Java 程序员而言，`变量声明`和`变量定义`，并没什么区别。
-
-![](./assets/9.svg)
-
-## 4.7 变量的使用场景
-
-* ① 输出打印。
-
-```java {7}
-package com.github;
-
-public class VariableDemo3 {
-    public static void main(String[] args) {
-
-       int num = 10;
-       System.out.println(num); // 10
-        
-    }
-}
-```
-
-* ② 参与计算。
-
-```java {8}
-package com.github;
-
-public class VariableDemo4 {
-    public static void main(String[] args) {
-
-        int a = 10;
-        int b = 20;
-        System.out.println(a + b); // 30
-        
-    }
-}
-```
-
-* ③ 修改记录的值。
-
-```java {9}
-package com.github;
-
-public class VariableDemo5 {
-    public static void main(String[] args) {
-
-        int num = 10;
-        System.out.println(num); // 10
-
-        num = 20;
-        System.out.println(num); // 20
-        
-    }
-}
-```
-
-## 4.8 变量的注意事项
-
-* ① 变量中只能存在一个值。
-
-```java
-package com.github;
-
-public class VariableTest1 {
-    public static void main(String[] args) {
-
-        int num = 10;
-        System.out.println(num); // 10
-
-        num = 20;
-        System.out.println(num); // 20
-        
-    }
-}
-```
-
-* ② 变量名在同一作用域内不允许重复定义。
-
-```java
-package com.github;
-
-public class VariableTest2 {
-    public static void main(String[] args) {
-
-        int num = 10;
-        System.out.println(num); 
-		
-        // ❌ 错误：下面的代码是错误的
-        int num = 20; // [!code error]
-        System.out.println(num); 
-        
-    }
-}
-```
-
-* ③ 一条语句中可以定义多个变量（不常用）。
-
-```java {6}
-package com.github;
-
-public class VariableTest3 {
-    public static void main(String[] args) {
-
-        int a = 10,b = 20;
-        System.out.println(a); // 10
-        System.out.println(b); // 20
-        
-    }
-}
-```
-
-* ④ 变量在使用之前一定要进行赋值。
-
-```java
-package com.github;
-
-public class VariableTest4 {
-    public static void main(String[] args) {
-
-        int num;
-        // ❌ 错误：以下的代码是错误的
-        System.out.println("num = " + num); // [!code error]
-        
-    }
-}
-```
-
-* ⑤ 变量只在其作用域范围内有效。
-
-```java
-package com.github;
-
-public class VariableTest5 {
-    public static void main(String[] args) {
-
-        {
-            int num = 10;
-            System.out.println("num = " + num);
-        }
-        
-        // ❌ 错误：以下的代码是错误的
-        System.out.println("num = " + num); // [!code error]
-        
-    }
-}
-```
-
-
-
-# 第五章：作业
-
-## 5.1 单选题
-
-* ① 下面关于变量的声明，那个是错误的？
-
-- [ ] A：int x = 5;
-- [ ] B：double d = 3.14;
-- [ ] C：char c = 'C';
-- [x] D：String name = 'Hello World';
-
-> [!NOTE]
->
-> * ① 字符常量，使用单引号（`''`）括起来，必须有且仅能包含一个字符。
-> * ② 字符串常量，使用双引号（`""`）括起来。
-
-* ② 下面的代码，那个是创建一个变量？
-
-- [x] A：int age = 18;
-- [ ] B：age = 20;
-- [ ] C：age = "许大仙";
-- [ ] D：String name;
-
-> [!NOTE]
->
-> 变量定义的语法，如下所示：
->
-> ```java
-> 数据类型 变量名;
-> 变量名 = 值;
-> ```
->
-> ```java
-> 数据类型 变量名 = 值;
-> ```
-
-## 5.2 多选题
-
-* ① 下面的变量名，那些是正确的？
-
-- [x] A：mybirthday
-- [x] B：myname 
-- [ ] C：my name
-- [ ] D：my birthday
-- [ ] E：1987
-- [ ] D："许大仙"
-
-> [!NOTE]
->
-> 标识符的命名规则（必须遵守，强制）：
->
-> - ① 只能使用 `26` 个英文字母大小写，`0~9` 的数字，下划线 `_` 和美元符号 `$` 。
-> - ② 不能使用 Java 的关键字或保留字以及特殊值。
-> - ③ 数字不能开头。
-> - ④ 不能包含空格。
-> - ⑤ 严格区分大小写。
-
-* ② 关于变量的说法，那些是对的？
-
-- [ ] A：一个变量一次可以存储很多种不同的数据。
-- [x] B：变量是值的容器，定义变量可以存放值。
-- [ ] C：变量可以随时修改存储数据的类型。
-- [x] D：定义变量可以帮助我们存储信息，以便后面使用。
-
-## 5.3 代码题
-
-* 需求：请用代码描述下列银行流水变化过程。
-
-> [!NOTE]
->
-> * ① 小明账户 bankBalance 初始值有 500.00 元。
-> * ② 存入 250 元。
-> * ③ 支出 100 元。
-> * ④ 打印剩余存款。
-
-
-
-* 示例：
-
-```java
-package com.github.test;
-
-public class VariableTest2 {
-    public static void main(String[] args) {
-
-        // 小明账户 bankBalance 初始值有 500.00 元。
-        double bankBalance = 500.00;
-        // 存入 250 元
-        bankBalance = bankBalance + 250;
-        // 支出 100 元。
-        bankBalance = bankBalance - 100;
-        // 打印剩余存款。
-        System.out.println("剩余存款：" + bankBalance + "元");
-
-    }
-}
-```
+* 这个变化始于 [JEP 400: UTF-8 by Default](https://openjdk.org/jeps/400)，它在 JDK 18 版本中被正式引入并生效。
 

@@ -1,1310 +1,1897 @@
-# 第一章：前言
+# 第一章：泛型（⭐）
 
 ## 1.1 概述
 
-* 很多人认为：将一堆打乱的数据进行`排序`或在一堆数据中`查找`到想要的数据，这就是`算法`。
+* 泛型（Generics）是在 JDK5 中引入的特性，可以在`编译阶段`约束操作的`数据类型`，并进行检查。
+* 泛型的语法：
 
-![将一堆打乱的数据进行`排序`，这就是`算法`](./assets/1.gif)
+```java
+<数据类型>
+```
 
-![在一堆数据中`查找`到想要的数据，这就是`算法`](./assets/2.webp)
-
-> [!NOTE]
+> [!CAUTION]
 >
-> 其实，上述仅仅是基础操作（基操）而已！！！
-
-* 在企业中，算法都是用来解决一个又一个真实的需求。
-
-![地图中的`最优路径算法`](./assets/3.png)
-
-![电商系统中的`推荐算法`，可以做到千人千面](./assets/4.png)
-
-
-
-## 1.2 常见的算法
-
-* 常见的算法有`查找算法`、`排序算法`以及`字符串匹配算法`等，如下所示：
-
-![](./assets/5.png)
-
-# 第二章：查找算法
-
-## 2.1 概述
-
-* `查找算法`有`基本查找`、`二分查找`、`插值查找`、`斐波那契查找`、`分块查找`、`哈希查找`以及`树表查找`，如下所示：
-
-![](./assets/6.svg)
-
-## 2.2 基本查找（顺序查找）
-
-* `基本查找（顺序查找）`是最简单的一种查找方法，它通过逐一检查列表中的每个元素，直到找到目标元素为止。如果找到目标元素，则返回其位置，否则返回“未找到”。
-
-![基本查找（顺序查找）](./assets/7.gif)
-
-* `算法的步骤`：
-  * ① 从列表的第一个元素开始，逐个比较每个元素和目标元素是否相等。
-  * ② 如果相等，则返回元素的索引。
-  * ③ 如果遍历完整个列表都没有找到目标元素，则返回一个表示未找到的值，如：`-1` 。
-
-* `时间复杂度`：**O(n)**，n 表示列表中元素的数量。
-
-![基本查找的时间复杂度 O(n) ，在坐标系中的数学曲线](./assets/8.png)
-
-* `适用场景`：当数据量较小或数据无序时，顺序查找非常高效。
+> 在 Java 中，泛型只支持引用数据类型！！！
 
 
 
 * 示例：
 
 ```java
-package com.github.algorithm.search;
+package com.github.collection2;
 
-public class BasicSearchTest {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
     public static void main(String[] args) {
-        int[] arr = {2, -6, 4, 6, 2, 5, 88, 4, 5, 7, 0, 7, 5, 2, 1, 64, 98};
+        // 限制 list 集合中只能存储 String，不能存储其它类型的数据
+        List<String> list = new ArrayList<>(); // [!code highlight]
         
-        int index = indexOf(arr, 98);
-        System.out.println(index); // 16
+        list.add("hello");
+        list.add("world");
         
-        index = indexOf(arr, -100);
-        System.out.println(index); // -1
-    }
-
-    /**
-     * 基本查找
-     * @param arr 数组
-     * @param num 查找元素
-     * @return 元素在数组上的索引，如果元素不在数组中，将返回 -1
-     */
-    public static int indexOf(int[] arr, int num) {
-        for (int i = 0; i < arr.length; i++) {
-            if (num == arr[i]) {
-                return i;
-            }
-        }
-        return -1;
+        list.forEach(System.out::println);
     }
 }
 ```
-
-## 2.3 二分查找（折半查找）
-
-* `二分查找（折半查找）`是针对已排序的数据结构的一种查找方法。它通过将数据集分成两半来不断缩小查找范围，从而提高查找效率。
-
-![二分查找（折半查找）](./assets/9.gif)
-
-* `算法步骤`：
-  - ① 将数据集分为两部分，检查中间元素是否为目标元素。
-  - ② 如果目标元素小于中间元素，则继续在左半部分查找；如果大于，则在右半部分查找。
-  - ③ 重复以上步骤直到找到目标元素，或者查找范围为空。
-* `时间复杂度`： **O(log n)**，其中 n 是数据集中的元素数量。
-
-![二分查找的时间复杂度 O(log n) ，在坐标系中的数学曲线](./assets/10.png)
-
-* `适用场景`：仅适用于`已排序`的数据集。
 
 
 
 * 示例：
 
 ```java
-package com.github.algorithm.search;
+package com.github.collection2;
 
-public class BinarySearchTest {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
     public static void main(String[] args) {
-        int[] arr = {2, 3, 5, 7, 9, 11, 12, 15, 20, 25, 30, 31, 32, 40, 45};
+        // 限制 list 集合中只能存储 Integer，不能存储其它类型的数据
+        List<Integer> list = new ArrayList<>(); // [!code highlight]
 
-        int index = indexOf(arr, 20);
-        System.out.println(index); // 8
+        list.add(1);
+        list.add(2);
 
-        index = indexOf(arr, -100);
-        System.out.println(index); // -1
-    }
-
-    /**
-     * 二分查找
-     * @param arr 数组
-     * @param num 查找元素
-     * @return 元素在数组上的索引，如果元素不在数组中，将返回 -1
-     */
-    public static int indexOf(int[] arr, int num) {
-        // 定义起始元素索引
-        int min = 0;
-        // 定义最后元素索引
-        int max = arr.length - 1;
-        // 循环条件
-        while (min <= max) {
-            // 计算中间元素索引
-            int mid = (min + max) / 2;
-            // 如果中间元素就是要查找的元素，直接返回索引
-            if (num == arr[mid]) {
-                return mid;
-            }
-            // 如果需要查找的元素比中间的元素小
-            // 那么 max 就是此时的 mid+1，然后再计算 mid
-            if (num < arr[mid]) {
-                max = mid - 1;
-            }
-            // 如果需要查找的元素比中间的元素大
-            // 那么 min 就是此时的 mid-1，然后再计算 mid
-            if (num > arr[mid]) {
-                min = mid + 1;
-            }
-        }
-        return -1;
+        list.forEach(System.out::println);
     }
 }
 ```
 
-## 2.4 插值查找
+## 1.2 泛型细节
 
-* `插值查找`是一种改进的二分查找算法，适用于在`均匀分布的有序数据`中查找元素。它通过估算目标元素在数据中的位置来优化查找过程，从而提高查找效率。
+### 1.2.1 没有泛型时的 Java
 
-![插值查找](./assets/11.png)
-
-* `算法步骤`：
-  - ① 给定一个有序数组 `arr` 和目标元素 `num`，确定查找区间的左右边界 `min` 和 `max`。
-  - ② 使用插值公式计算中间位置 `mid`： $[ mid = min+ \frac{(num- arr[min]) \times (max- min)}{arr[max] - arr[min]} ]$ ，这里的 `mid` 位置是根据目标值与当前区间的最小值、最大值的差值来动态估算的。
-  - ③ 如果 `arr[mid] == num`，则找到目标元素，返回该位置。
-  - ④ 如果 `arr[mid] < num`，则目标元素在右半部分，将 `min = mid + 1`。
-  - ⑤ 如果 `arr[mid] > num`，则目标元素在左半部分，将 `max = mid - 1`。
-  - ⑥ 重复`步骤②` ~ `步骤⑤`，直到找到目标元素或区间无效，即：`min > max`。
-
-* `时间复杂度`：
-  * 最优时间复杂度：**O(log log n)**，当数据均匀分布时，插值查找的效率接近 O(log log n)。
-  * 最坏时间复杂度： **O(n)**，当数据分布非常不均匀时，插值查找退化为线性查找，性能最差。
-
-![](./assets/12.png)
-
-  * `适用场景`：
-
-      - 插值查找适用于`已排序且数据分布比较均匀`的数组。
-
-      - 如果数据不均匀分布或分布不规律，插值查找的性能可能非常差，甚至退化为线性查找，因此不适用于所有有序数据。
-
-
-
-
-* 示例：
-
-```java
-package com.github.algorithm.search;
-
-public class InsertBinarySearchTest {
-    public static void main(String[] args) {
-        int[] arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
-        int index = indexOf(arr, 3);
-        System.out.println(index); // 2
-
-        index = indexOf(arr, -1);
-        System.out.println(index); // -1
-    }
-
-    /**
-     * 插值查找
-     * @param arr 数组
-     * @param num 查找元素
-     * @return 元素在数组上的索引，如果元素不在数组中，将返回 -1
-     */
-    public static int indexOf(int[] arr, int num) {
-        // 定义起始元素索引
-        int min = 0;
-        // 定义最后元素索引
-        int max = arr.length - 1;
-        // 循环条件
-        while (min <= max) {
-            // 计算中间元素索引
-            int mid = min + (num - arr[min]) / (arr[max] - arr[min]) * (max - min);
-            // 如果中间元素就是要查找的元素，直接返回索引
-            if (num == arr[mid]) {
-                return mid;
-            }
-            // 如果需要查找的元素比中间的元素小
-            // 那么 max 就是此时的 mid+1，然后再计算 mid
-            if (num < arr[mid]) {
-                max = mid - 1;
-            }
-            // 如果需要查找的元素比中间的元素大
-            // 那么 min 就是此时的 mid-1，然后再计算 mid
-            if (num > arr[mid]) {
-                min = mid + 1;
-            }
-        }
-        return -1;
-    }
-}
-```
-
-## 2.5 斐波那契查找
-
-### 2.5.1 黄金分割点
-
-* 黄金分割是指将整体一分为二，`较大部分`与`整体部分`的比值等于`较小部分`与`较大部分`的比值，其比值约为 0.618。
-
-![](./assets/13.svg)
-
-### 2.5.2 斐波那契数列
-
-* 在数学中有一个著名的数学规律（斐波那契数列）：0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89…….
+* 在 JDK5 之前，由于 Java 还没有引入 `泛型`（Generics），集合类（ `ArrayList`, `HashMap` 等）都是基于 `Object` 类型 来存储元素的。
 
 > [!NOTE]
 >
-> * ① 斐波那契数列存储到数组中，如下所示：
+> * ① 这个机制其实非常简单粗暴 —— **“一律当作 Object 存储”**！！！
+> * ② 存储元素的时候，默认都是 Object 类型。
+> * ③ 读取元素的时候，针对特定类型，需要手动强制类型转换。
+
+> [!CAUTION]
 >
-> ![](./assets/14.svg)
+> 在没有泛型的时候，会有如下的问题：
 >
-> * ② 斐波那契数列：对于任意下标k（k>=2），F[k] = F[k-1] + F[k-2]，即：后边每一个数都是前面两个数的和。
+> * ① 类型不安全 —— 编译器无法检查类型。
+> * ② 容易抛出 `ClassCastException`。
+> * ③ 可读性和可维护性都很差！！！
 
 
 
-* 示例：
+* 示例：存储元素的时候，默认都是 Object 类型
 
 ```java
-package com.github.algorithm.search;
+package com.github.collection2;
 
-public class Test {
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class GenericsTest {
     public static void main(String[] args) {
-        int fib = fib(0);
-        System.out.println("fib = " + fib);
-    }
+        List list = new ArrayList();
 
-    /**
-     * 获取指定位置上的斐波那契数列
-     * @param n 位置
-     * @return 数
-     */
-    public static int fib(int n) {
-        if (n == 0) {
-            return 0;
-        }
-        if (n == 1 || n == 2) {
-            return 1;
-        }
-        return fib(n - 1) + fib(n - 2);
+        list.add(1); // [!code highlight:3]
+        list.add("hello");
+        list.add(new Date());
+
+        System.out.println(list);
     }
 }
 ```
 
 
 
-* 示例：
+* 示例：读取元素的时候，针对特定类型，需要手动强制类型转换
 
 ```java
-package com.github.algorithm.search;
+package com.github.collection2;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-public class Test {
+public class GenericsTest {
     public static void main(String[] args) {
-        int[] fib = fib(3);
-        System.out.println("fib = " + Arrays.toString(fib));
-    }
+        List list = new ArrayList();
 
-    /**
-     * 获取斐波那契数列组成的数组
-     * @param n 索引
-     * @return 数组
-     */
-    public static int[] fib(int n) {
-        int[] arr = new int[n + 1];
-        arr[0] = 0;
-        if (n >= 1) {
-            arr[1] = 1;
-        }
-        for (int i = 2; i <= n; i++) {
-            arr[i] = arr[i - 1] + arr[i - 2];
-        }
-        return arr;
+        list.add(1);
+        list.add("hello");
+        list.add(new Date());
+
+        System.out.println(list);
+
+        final int num = (int) list.get(0); // [!code highlight:6]
+        System.out.println(num);
+        final String str = (String) list.get(1);
+        System.out.println(str);
+        final Date date = (Date) list.get(2);
+        System.out.println(date);
+
     }
 }
 ```
 
-### 2.5.3 斐波那契查找的前提
-
-* 如果一个有序表的元素个数为 n，并且 n 正好是某个斐波那契数减 1，即满足 `n = F[k]-1` 时，才能使用斐波那契查找。
-
-> [!NOTE]
->
-> * ① 斐波那契查找图示，如下所示：
->
-> ![](./assets/15.png)
->
-> * ② 斐波那契查找公式推导：$[ n = {\color{red}(F_{k-1}-1)} + {\color{blue}(F_{k-2}-1)} + {\color{green}1} = (F_{k-1} + F_{k-2}) - 1 = F_k - 1 ]$
-
-* 如果元素个数 n 不满足这个关系，那么需要将查找表扩展（用最后一个元素扩展），直到 n 满足这个关系 。
 
 
-
-* 示例：假设 n = F[k]-1，并且数组长度 n = 7（可以正确的递归执行）
-
-![](./assets/16.svg)
-
-
-
-* 示例：假设 n = F[k]，并且数组长度 n = 8（没有保留中间位置，下一次递归，无法继续分割）
-
-![](./assets/17.svg)
-
-### 2.5.4 斐波那契查找（TODO）
-
-* `斐波那契查找`利用斐波那契数列的性质来确定查找区间的大小，并逐步缩小查找范围。
-
-* `算法步骤`：
-  * ① 初始化斐波那契数列：首先，确定斐波那契数列中比数组长度大的最小数 ( F(k) )，并设置两个索引 `min = 0` 和 `max = n - 1`，其中 `n` 是数组的长度。
-  * ② 计算分割点：使用公式计算当前分割点： [ mid = min + F(k-1) - 1 ] 这里的 `mid` 是通过斐波那契数列来确定的分割点。
-  * ③ 比较目标值：
-    - 如果 `arr[mid] == num`，则找到了目标元素，返回索引 `mid`。
-    - 如果 `arr[mid] > num`，则目标元素在 `mid` 左侧，更新 `max = mid - 1`，并调整斐波那契数列的大小。
-    - 如果 `arr[mid] < num`，则目标元素在 `mid` 右侧，更新 `min= mid + 1`，并调整斐波那契数列的大小。
-  * ④ 调整斐波那契数列：根据查找结果更新 `k`，即更新斐波那契数列中的位置，直到 `min` 超过 `max`。
-
-
-
-* 示例：
+* 示例：泛型的好处
 
 ```java
+package com.github.collection2;
 
-```
+import java.util.ArrayList;
+import java.util.List;
 
-## 2.6 分块查找
-
-
-
-
-
-
-
-## 2.7 哈希查找
-
-
-
-
-
-# 第三章：排序算法
-
-## 3.1 概述
-
-
-
-
-
-
-
-
-
-
-
-
-
-# 第四章：Arrays（⭐）
-
-## 4.1 概述
-
-* Arrays 是用来操作数组的工具类，如：对数组中的元素进行排序、搜索数组中指定的元素等。
-
-## 4.2 常用 API
-
-### 4.2.1 将数组内容拼接为字符串
-
-* 返回指定数组内容的字符串表示形式，如：`[元素1，元素2，元素3...]`：
-
-```java
-public static String toString(boolean[] a) { ... }
-```
-
-```java
-public static String toString(char[] a) { ... }
-```
-
-```java
-public static String toString(double[] a) { ... }
-```
-
-```java
-public static String toString(long[] a) { ... }
-```
-
-```java
-public static String toString(Object[] a) { ... }
-```
-
-* 返回多维数组内容的字符串表示形式：
-
-```java
-public static String deepToString(Object[] a) { ... }
-```
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Test.java]
-package com.github.algorithm.arrays;
-
-import java.util.Arrays;
-
-public class Test {
-    public static void main(String[] args) {
-
-        int[] arr = {1, 2, 3, 4, 5, 6};
-
-        System.out.println(Arrays.toString(arr));
-    }
-}
-```
-
-```txt [cmd 控制台]
-[1, 2, 3, 4, 5, 6]
-```
-
-:::
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Student.java]
-package com.github.algorithm.arrays;
-
-import java.util.Objects;
-
-public class Student {
-    private String name;
-
-    private Integer age;
-
-    public Student() {}
-
-    public Student(String name, Integer age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Student student = (Student) o;
-        return Objects.equals(name, student.name) 
-            && Objects.equals(age, student.age);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, age);
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" + "name='" + name + '\'' + ", age=" + age + '}';
-    }
-}
-
-```
-
-```java [Test.java]
-package com.github.algorithm.arrays;
-
-import java.util.Arrays;
-
-public class Test {
-    public static void main(String[] args) {
-
-        Student[] stuArr = {
-            new Student("张三", 18), 
-            new Student("李四", 19), 
-            new Student("王五", 20),
-        };
-
-        System.out.println(Arrays.toString(stuArr));
-    }
-}
-```
-
-```txt [cmd 控制台]
-[Student{name='张三', age=18}, Student{name='李四', age=19}, Student{name='王五', age=20}]
-```
-
-:::
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Test.java]
-package com.github.algorithm.arrays;
-
-import java.util.Arrays;
-
-public class Test {
-    public static void main(String[] args) {
-
-        int[][] arr = {{11, 12, 13}, {21, 22, 23}, {31, 32, 33, 34}};
-
-        System.out.println(Arrays.deepToString(arr));
-    }
-}
-```
-
-```txt [cmd 控制台]
-[[11, 12, 13], [21, 22, 23], [31, 32, 33, 34]]
-```
-
-:::
-
-### 4.2.2 二分查找法
-
-* 通过二分查找法，査找指定的元素：
-
-```java
-public static int binarySearch(char[] a, char key) { ... }
-```
-
-```java
-public static int binarySearch(char[] a, int fromIndex, int toIndex,
-                                   char key) { ... }
-```
-
-```java
-public static int binarySearch(double[] a, double key) { ... }
-```
-
-```java
-public static int binarySearch(double[] a, int fromIndex, int toIndex,
-                                   double key) { ... }
-```
-
-```java
-public static int binarySearch(Object[] a, Object key) { ... }
-```
-
-```java
-public static int binarySearch(Object[] a, int fromIndex, int toIndex,
-                                   Object key) { ... }
-```
-
-```java
-public static <T> int binarySearch(T[] a, T key, Comparator<? super T> c) { ... }
-```
-
-```java
- public static <T> int binarySearch(T[] a, int fromIndex, int toIndex,
-                                       T key, Comparator<? super T> c) { ... }
-```
-
-```java
-public static int binarySearch(long[] a, long key) { ... }
-```
-
-```java
-public static int binarySearch(long[] a, int fromIndex, int toIndex,
-                                   long key) { ... }
-```
-
-
-
-* 示例：
-
-```java
-package com.github.algorithm.arrays;
-
-import java.util.Arrays;
-
-public class Test {
-    public static void main(String[] args) {
-        int[] arr = {1, 2, 3, 4, 5, 6, 7};
-
-        int index = Arrays.binarySearch(arr, 8);
-        System.out.println(index); // -8
-
-        index = Arrays.binarySearch(arr, 6);
-        System.out.println(index); // 5
-    }
-}
-```
-
-### 4.2.3 拷贝数组
-
-* 拷贝数组：
-
-```java
 /**
-* 会根据第二个参数创建新的数组
-* 如果新数组的长度 < 旧数组的长度，会部分拷贝
-* 如果新数组的长度 = 旧数组的长度，会完全拷贝
-* 如果新数组的长度 > 就数组的长度，在完全拷贝的同时，补上默认初始值
-*/
-public static boolean[] copyOf(boolean[] original, int newLength) { ... }
+ * Java 在 JDK5 推出了泛型之后，可以在添加数据的时候将类型统一。
+ * 而且在获取数据的时候，也不需要进行强转，非常方便。
+ */
+public class GenericsTest {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        
+        // 添加数据的时候将类型统一。
+        list.add("1");
+        list.add("hello");
+        list.add("abc");
+
+        // 在获取数据的时候，也不需要进行强转，非常方便。
+        for (String str : list) {
+            System.out.println(str);
+        }
+
+    }
+}
 ```
+
+### 1.2.2 Java 泛型的本质
+
+* Java 泛型的本质是`类型擦除`（Type Erasure）。换言之，Java 泛型是一个`编译时语法糖`，在编译之后泛型信息会被“擦除”，即：生成的 class （字节码）文件是没有泛型类型信息的。
+
+> [!NOTE]
+>
+> * ① Java 中的泛型没有运行时信息，主要出于`向后兼容`的考虑。
+> * ② Java 泛型是在 JDK5 引入的，如果保留类型信息会导致老的 JVM 无法识别，破坏兼容性。
+
+* 假设代码是这样的，如下所示：
 
 ```java
-public static <T> T[] copyOf(T[] original, int newLength) { ... }        
+package com.github.collection2;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class GenericsTest {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+
+        // 添加数据的时候将类型统一。
+        list.add("1");
+        list.add("hello");
+        list.add("abc");
+
+        // 在获取数据的时候，也不需要进行强转，非常方便。
+        for (String str : list) {
+            System.out.println(str);
+        }
+    }
+}
 ```
+
+* 我们使用反编译工具对其进行反编译，就会发现底层还是会被当做 Object 来存储，如下所示：
+
+![](./assets/1.png)
+
+* 就像这样，如下所示：
+
+![泛型擦除](./assets/2.svg)
+
+* 当我们获取数据的时候，底层会帮我们进行强转，如下所示：
+
+![](./assets/3.png)
+
+* 就像这样，如下所示：
+
+![泛型擦除](./assets/4.svg)
+
+### 1.2.3 总结
+
+* ① Java 中的泛型只能是引用数据类型。
+
+> [!NOTE]
+>
+> 如果是基本数据类型，在进行类型擦除之后，是没有办法`直接`转换 Object 类型！！！
+
+* ② 指定泛型的具体类型后，在传递数据时，可以传入该类类型或其子类类型。
 
 ```java
-public static long[] copyOf(long[] original, int newLength) { ... }
+List<Animal> list = new ArrayList<>();
+
+list.add(new Animal());
+list.add(new Dog());
+list.add(new Cat());
 ```
+
+* ③ 如果不写泛型，类型默认是 Object。
 
 ```java
-public static char[] copyOf(char[] original, int newLength) { ... }
+List list = new ArrayList();
+
+list.add(1);
+list.add("hello");
+list.add(new Date());
 ```
+
+## 1.3 泛型的定义格式
+
+### 1.3.1 概述
+
+* 泛型可以在很多地方定义，如：`类后面`（泛型类）、`方法上面`（泛型方法）以及`接口后面`（泛型接口），如下所示：
+
+![](./assets/5.svg)
+
+### 1.3.2 泛型类
+
+* 如果一个类中，某些字段、方法或操作的数据类型在定义时不确定，且希望保持类型安全并支持多种类型时，就可以定义带有泛型的类，即：泛型类。
+
+> [!NOTE]
+>
+> * ① 操作的数据类型，包括以下几个方面：
+>   * 类的字段，即：成员变量。
+>   * 方法的参数和返回值。
+>   * 方法体内部的局部变量（如果其类型依赖`泛型类`的`类型`）。
+>   * 数据结构中的元素，如：`List<T>` 中的 `T`。
+> * ② 只有当类中多个字段或多个方法都需要共享同一种泛型类型时，才考虑使用泛型类！！！
+
+* 语法：
 
 ```java
-public static double[] copyOf(double[] original, int newLength) { ... }
+权限访问修饰符 class 类名<类型> {
+    ...
+}
 ```
 
-```java
-public static <T,U> T[] copyOf(U[] original, int newLength, Class<? extends T[]> newType) { ... }
-```
-
-* 拷贝数组（指定范围）：
-
-```java
-/**
-* 将老数组指定索引范围的元素拷贝到新数组中。
-* [from,to) 包头不包尾，包左不包右
-*/
-public static boolean[] copyOfRange(boolean[] original, int from, int to) { ... }
-```
-
-```java
-public static <T> T[] copyOfRange(T[] original, int from, int to) { ... }
-```
-
-```java
-public static long[] copyOfRange(long[] original, int from, int to) { ... }
-```
-
-```java
-public static char[] copyOfRange(char[] original, int from, int to) { ... }
-```
-
-```java
-public static double[] copyOfRange(double[] original, int from, int to) { ... }
-```
-
-```java
-public static <T,U> T[] copyOfRange(U[] original, int from, int to, Class<? extends T[]> newType) { ... }
-```
+> [!NOTE]
+>
+> * ① ArrayList 底层使用了泛型类，如下所示：
+>
+> ```java
+> public class ArrayList<E> 
+>     	extends AbstractList<E>
+>         implements List<E>, RandomAccess, Cloneable, java.io.Serializable {
+>     
+>   	...
+> }    
+> ```
+> * ② 上面的 E 可以理解为变量（类型变量），但是不是用来记录数据的，而是用来记录数据的类型，可以写成：T、E、K、V 等。
 
 
 
 * 示例：
-
-```java
-package com.github.algorithm.arrays;
-
-import java.util.Arrays;
-
-public class Test {
-    public static void main(String[] args) {
-
-        int[] arr = {1, 2, 3, 4, 5};
-
-        int[] newArr = Arrays.copyOf(arr, 2);
-        System.out.println(Arrays.toString(newArr)); // [1, 2]
-
-        newArr = Arrays.copyOf(arr, arr.length);
-        System.out.println(Arrays.toString(newArr)); // [1, 2, 3, 4, 5]
-
-        newArr = Arrays.copyOf(arr, arr.length + 2);
-        System.out.println(Arrays.toString(newArr)); // [1, 2, 3, 4, 5, 0, 0]
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.algorithm.arrays;
-
-import java.util.Arrays;
-
-public class Test {
-    public static void main(String[] args) {
-
-        int[] arr = {1, 2, 3, 4, 5};
-
-        int[] newArr = Arrays.copyOfRange(arr, 1, arr.length);
-        System.out.println(Arrays.toString(newArr)); // [2, 3, 4, 5]
-    }
-}
-```
-
-### 4.2.4 填充数组
-
-* 将指定元素填充到数组中：
-
-```java
-public static void fill(long[] a, long val) { ... }
-```
-
-```java
-public static void fill(char[] a, char val) { ... }
-```
-
-```java
-public static void fill(double[] a, double val) { ... }
-```
-
-```java
-public static void fill(Object[] a, Object val) { ... }
-```
-
-* 将指定元素填充到数组中（指定范围）：
-
-```java
-public static void fill(long[] a, int fromIndex, int toIndex, long val) { ... }
-```
-
-```java
-public static void fill(char[] a, int fromIndex, int toIndex, char val) { ... }
-```
-
-```java
-public static void fill(double[] a, int fromIndex, int toIndex,double val) { ... }
-```
-
-```java
-public static void fill(Object[] a, int fromIndex, int toIndex, Object val) { ... }
-```
-
-
-
-* 示例：
-
-```java
-package com.github.arrays;
-
-import java.util.Arrays;
-
-public class Test {
-    public static void main(String[] args) {
-        int[] arr = {1, 2, 3, 4, 5};
-
-        // 填充数组
-        Arrays.fill(arr, 10);
-        System.out.println(Arrays.toString(arr)); // [10, 10, 10, 10, 10]
-
-        // 重新赋值
-        arr = new int[] {1, 2, 3, 4, 5};
-
-        // 填充数组（指定范围）
-        Arrays.fill(arr, 1, 3, 100);
-        System.out.println(Arrays.toString(arr)); // [1, 100, 100, 4, 5]
-    }
-}
-```
-
-### 4.2.5 数组排序
-
-* 按照默认方式进行数组排序：
-
-```java
-public static void sort(long[] a) { ... }
-public static void sort(short[] a, int fromIndex, int toIndex) { ... }
-```
-
-```java
-public static void sort(char[] a) { ... }
-public static void sort(char[] a, int fromIndex, int toIndex) { ... }
-```
-
-```java
-public static void sort(double[] a) { ... }
-public static void sort(double[] a, int fromIndex, int toIndex) { ... }
-```
-
-```java
-public static void sort(Object[] a) { ... }
-public static void sort(Object[] a, int fromIndex, int toIndex) { ... }
-```
-
-* 按照指定规则进行数组排序：
-
-```java
-public static <T> void sort(T[] a, Comparator<? super T> c) { ... }
-```
-
-```java
-public static <T> void parallelSort(T[] a, int fromIndex, int toIndex,
-                                        Comparator<? super T> cmp) { ... }
-```
-
-
-
-* 示例：按照默认方式进行数组排序（自然排序）
-
-```java
-package com.github.arrays;
-
-import java.util.Arrays;
-
-public class Test {
-    public static void main(String[] args) {
-        int[] arr = {2, 3, 5, 7, 9, 25, 30, 31, 32, 40, 11, 12, 15, 20, 45};
-
-        Arrays.sort(arr);
-
-        // [2, 3, 5, 7, 9, 11, 12, 15, 20, 25, 30, 31, 32, 40, 45]
-        System.out.println(Arrays.toString(arr));
-    }
-}
-```
-
-
-
-* 示例：按照指定规则进行数组排序（自定义排序）
-
-```java 
-package com.github.arrays;
-
-import java.util.Arrays;
-import java.util.Comparator;
-
-public class Test {
-    public static void main(String[] args) {
-
-        // 包装类型数组，才可以使用自定义排序
-        Integer[] arr = {2, 3, 5, 7, 9, 25, 30, 31, 32, 40, 11, 12, 15, 20, 45};
-
-        Arrays.sort(arr, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return Integer.compare(o2, o1);
-            }
-        });
-
-        // [45, 40, 32, 31, 30, 25, 20, 15, 12, 11, 9, 7, 5, 3, 2]
-        System.out.println(Arrays.toString(arr));
-    }
-}
-```
-
-
-
-* 示例：按照默认方式进行数组排序（自然排序）
 
 ::: code-group
 
-```java [Student.java]
-package com.github.arrays;
+```java [MyArrayList.java]
+package com.github.collection3;
 
-import java.util.Objects;
+import java.util.StringJoiner;
 
-public class Student implements Comparable<Student> { // [!code highlight]
-    private String name;
+public class MyArrayList<E> {
+    private final int capacity = 100;
+    private final Object[] elementData = new Object[capacity];
+    private final StringJoiner joiner = new StringJoiner(", ", "[", "]");
+    private int size;
 
-    private Integer age;
-
-    public Student() {}
-
-    public Student(String name, Integer age) {
-        this.name = name;
-        this.age = age;
+    public boolean add(E e) {
+        elementData[size] = e;
+        size++;
+        return true;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Student student = (Student) o;
-        return Objects.equals(name, student.name) 
-            && Objects.equals(age, student.age);
+    public E get(int index) {
+        return (E) elementData[index];
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, age);
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public int size() {
+        return size;
     }
 
     @Override
     public String toString() {
-        return "Student{" + "name='" + name + '\'' + ", age=" + age + '}';
-    }
-
-    @Override
-    public int compareTo(Student o) { // [!code highlight:5]
-        // 先比较年龄，如果年龄不相等，则比较年龄；否则，就比较姓名
-        return this.age - o.age != 0
-            ? (this.age - o.age) : this.name.compareTo(o.name);
+        for (int i = 0; i < size; i++) {
+            joiner.add(String.valueOf(elementData[i]));
+        }
+        return joiner.toString();
     }
 }
-
 ```
 
 ```java [Test.java]
-package com.github.arrays;
-
-import java.util.Arrays;
-import java.util.Comparator;
+package com.github.collection3;
 
 public class Test {
     public static void main(String[] args) {
-        // 定义数组
-        Student[] stuArr = {
-            new Student("张三", 50),
-            new Student("李四", 25),
-            new Student("王五", 9),
-            new Student("赵六", 18),
-            new Student("田七", 35),
-            new Student("王八", 46),
-            new Student("呵呵", 18),
-        };
+        MyArrayList<String> list = new MyArrayList<>();
+        
+        list.add("hello");
+        list.add("world");
+        list.add("java");
 
-        // 自然排序
-        Arrays.sort(stuArr);
-
-        // 打印数组内容
-        Arrays.stream(stuArr).forEach(System.out::println);
+        for (int i = 0; i < list.size(); i++) {
+            final String str = list.get(i);
+            System.out.println(str);
+        }
+        
+        System.out.println(list);
     }
 }
 ```
 
 ```txt [cmd 控制台]
-Student{name='王五', age=9}
-Student{name='呵呵', age=18}
-Student{name='赵六', age=18}
-Student{name='李四', age=25}
-Student{name='田七', age=35}
-Student{name='王八', age=46}
-Student{name='张三', age=50}
+hello
+world
+java
+[hello, world, java]
 ```
 
 :::
 
+### 1.3.3 泛型方法
 
+* 当方法的参数或返回值类型不确定时，且这个类型只在方法内部使用，不依赖于类的其他成员时，就可以定义带有泛型的方法。
 
-* 示例：按照指定规则进行数组排序（自定义排序）
-
-::: code-group
-
-```java [Student.java]
-package com.github.arrays;
-
-import java.util.Objects;
-
-public class Student implements Comparable<Student> { // [!code highlight]
-    private String name;
-
-    private Integer age;
-
-    public Student() {}
-
-    public Student(String name, Integer age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Student student = (Student) o;
-        return Objects.equals(name, student.name) 
-            && Objects.equals(age, student.age);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, age);
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" + "name='" + name + '\'' + ", age=" + age + '}';
-    }
-
-    @Override
-    public int compareTo(Student o) { // [!code highlight:5]
-        // 先比较年龄，如果年龄不相等，则比较年龄；否则，就比较姓名
-        return this.age - o.age != 0
-            ? (this.age - o.age) : this.name.compareTo(o.name);
-    }
-}
-
-```
-
-```java [Test.java]
-package com.github.arrays;
-
-import java.util.Arrays;
-import java.util.Comparator;
-
-public class Test {
-    public static void main(String[] args) {
-        // 定义数组
-        Student[] stuArr = {
-            new Student("张三", 50),
-            new Student("李四", 25),
-            new Student("王五", 9),
-            new Student("赵六", 18),
-            new Student("田七", 35),
-            new Student("王八", 46),
-            new Student("呵呵", 18),
-        };
-
-        // 自定义排序
-        Arrays.sort(stuArr, new Comparator<>() {
-            @Override
-            public int compare(Student o1, Student o2) {
-                return Integer.compare(o2.getAge(), o1.getAge());
-            }
-        });
-
-        // 打印数组内容
-        Arrays.stream(stuArr).forEach(System.out::println);
-    }
-}
-```
-
-```txt [cmd 控制台]
-Student{name='张三', age=50}
-Student{name='王八', age=46}
-Student{name='田七', age=35}
-Student{name='李四', age=25}
-Student{name='赵六', age=18}
-Student{name='呵呵', age=18}
-Student{name='王五', age=9}
-```
-
-:::
-
-
-
-# 第五章：综合练习
-
-## 5.1 练习一
-
-* 需求：定义数组并存储一些女朋友对象，请利用 Arrays 中的 sort 方法进行排序。
-
-> [!NOTE]
->
-> 要求：
->
-> * ① 属性有姓名、年龄和身高。
-> * ② 按照年龄的大小进行排序，如果年龄一样，按照身高排序；如果身高一样，则按照姓名进行排序。
-
-
-
-* 示例：
-
-::: code-group
-
-```java [GirFriend.java]
-package com.github.test;
-
-import java.util.Objects;
-
-public class GirFriend {
-
-    private String name;
-
-    private Integer age;
-
-    private double height;
-
-    public GirFriend() {}
-
-    public GirFriend(String name, Integer age, double height) {
-        this.name = name;
-        this.age = age;
-        this.height = height;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        GirFriend girFriend = (GirFriend) o;
-        return Double.compare(getHeight(), girFriend.getHeight()) == 0
-                && Objects.equals(getName(), girFriend.getName())
-                && Objects.equals(getAge(), girFriend.getAge());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getName(), getAge(), getHeight());
-    }
-
-    @Override
-    public String toString() {
-        return "{" + "name='" + name + '\'' 
-            + ", age=" + age + ", height=" + height + '}';
-    }
-}
-```
-
-```java [Test.java]
-package com.github.test;
-
-import java.util.Arrays;
-
-public class Test {
-    public static void main(String[] args) {
-        // 创建女朋友对象
-        GirFriend gf1 = new GirFriend("泷巧蕊", 18, 1.65);
-        GirFriend gf2 = new GirFriend("杨不悔", 19, 1.72);
-        GirFriend gf3 = new GirFriend("周芷若", 19, 1.78);
-        GirFriend gf4 = new GirFriend("公羊茜", 19, 1.63);
-        GirFriend gf5 = new GirFriend("咸含秀", 20, 1.55);
-        GirFriend gf6 = new GirFriend("桐合美", 20, 1.55);
-
-        // 创建数组
-        GirFriend[] arr = {gf1, gf2, gf3, gf4, gf5, gf6};
-
-        // 对数组中的元素进行排序
-        Arrays.sort(arr, (o1, o2) -> {
-            if (!o1.getAge().equals(o2.getAge())) {
-                return Integer.compare(o1.getAge(), o2.getAge());
-            }
-            if (Double.compare(o1.getHeight(), o2.getHeight()) != 0) {
-                return Double.compare(o1.getHeight(), o2.getHeight());
-            }
-            return o1.getName().compareTo(o2.getName());
-        });
-
-        // 打印数组
-        Arrays.stream(arr).forEach(System.out::println);
-    }
-}
-```
-
-```txt[cmd 控制台]
-{name='泷巧蕊', age=18, height=1.65}
-{name='公羊茜', age=19, height=1.63}
-{name='杨不悔', age=19, height=1.72}
-{name='周芷若', age=19, height=1.78}
-{name='咸含秀', age=20, height=1.55}
-{name='桐合美', age=20, height=1.55}
-```
-
-:::
-
-## 5.2 练习二
-
-* 需求：有一对兔子，从出生后第 3 个月开始起每个月能生一对兔子，小兔子长到第 3 个月后每个月又能生一对兔子，假设兔子都不死，问第 12 个月兔子的对数是多少？
-
-![](./assets/18.svg)
-
-> [!NOTE]
->
-> * 我们可以试图对应的数学模型，如下所示：
->   * ① f(1) = 1。
->   * ② f(2) = 1。
->   * ③ f(3) = 2 = f(2) + f(1)。
->   * ④ f(4) = 3 = f(3) + f(2)。
->   * ⑤ f(5) = 5 = f(3) + f(2)。
->   * ⑥ f(6) = 8 = f(5) + f(4)。
->   * ⑦ ....
-> * 综上所述，f(n) = f(n-1) + f(n-2)，如果 n == 1 || n ==2，f(n) = 1 。
-
-
-
-* 示例：
+* 语法：
 
 ```java
-package com.github.test;
+访问修饰符 <T> 返回值类型 方法名(T t);
+```
 
-public class Test {
-    public static void main(String[] args) {
-        System.out.println(rabbit(1)); // ·
-        System.out.println(rabbit(2)); // 2
-        System.out.println(rabbit(3)); // 3
-        System.out.println(rabbit(4)); // 4
-        System.out.println(rabbit(5)); // 5
-        System.out.println(rabbit(6)); // 8
-        System.out.println(rabbit(7)); // 11
-    }
+> [!NOTE]
+>
+> 泛型类和泛型方法的应用场景有所不同：
+>
+> * ① `泛型方法`：当方法的**参数**或**返回值**的类型不确定时，使用泛型方法。**只需要在方法级别参数化类型**，而不需要影响整个类。
+> * ② `泛型类`：当一个类的**多个字段或方法**都需要支持相同类型的不同数据时，才需要定义泛型类。**类级别的类型参数化**通常是为了类中多个成员能够共享相同的泛型类型。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Utils.java]
+package com.github.collection2;
+
+public class Utils {
+    
+    private Utils(){}
 
     /**
-     * 不死神兔
+     * 打印数组中的元素
      *
-     * @param num 次数
-     * @return 数量
+     * @param arr 数组
+     * @param <T> 泛型
      */
-    public static int rabbit(int num) {
-        if (num == 1 || num == 2) {
-            return 1;
+    public static <T> void printArray(T[] arr) {
+        for (T t : arr) {
+            System.out.println(t);
         }
-        return rabbit(num - 1) + rabbit(num - 2);
+    }
+
+    /**
+     * 交换数组中指定位置上的元素
+     *
+     * @param arr 数组
+     * @param i   索引
+     * @param j   索引
+     * @param <T> 泛型
+     */
+    public static <T> void swap(T[] arr, int i, int j) {
+        T temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 }
 ```
+
+```java [Test.java]
+package com.github.collection2;
+
+public class Test {
+    public static void main(String[] args) {
+        Integer[] arr = {1, 2, 3, 4, 5};
+
+        Utils.printArray(arr);
+
+        System.out.println("---------");
+
+        Utils.swap(arr, 0, arr.length - 1);
+
+        Utils.printArray(arr);
+    }
+}
+```
+
+```txt [cmd 控制台]
+1
+2
+3
+4
+5
+---------
+5
+2
+3
+4
+1
+```
+
+:::
+
+### 1.3.4 泛型接口
+
+* 当一个接口中，类型不确定的时候，就可以使用泛型接口。
+
+* 语法：
+
+```java
+权限访问修饰符 interface 类名<类型> {
+    ...
+}
+```
+
+> [!NOTE]
+>
+> Java 中的 List 接口就是一个泛型接口：
+>
+> ```java
+> public interface List<E> extends Collection<E> { 
+> 	...
+> }
+> ```
+
+* 如何使用一个带泛型的接口，有如下两种方式：
+  * ① 实现类给出具体的类型，创建对象的时候不需要确定具体的类型。
+  * ② 实现类延续泛型，创建对象的时候需要确定具体的类型。
+
+> [!NOTE]
+>
+> 应用场景：希望创建一个`与类型无关的、可复用的接口`，而具体的类型由实现类或使用者在使用时决定。
+
+
+
+* 示例：实现类给出具体的泛型
+
+::: code-group
+
+```java [MyArrayList2.java]
+package com.github.collection3;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
+// MyArrayList2 的类型已经确定，就是 String
+public class MyArrayList2 implements List<String> { // [!code highlight]
+
+    @Override
+    public int size() {
+        return 0;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return false;
+    }
+
+    @Override
+    public Iterator<String> iterator() {
+        return null;
+    }
+
+    @Override
+    public Object[] toArray() {
+        return new Object[0];
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return null;
+    }
+
+    @Override
+    public boolean add(String s) { // [!code highlight]
+        return false;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return false;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends String> c) {
+        return false;
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends String> c) {
+        return false;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public String get(int index) {
+        return "";
+    }
+
+    @Override
+    public String set(int index, String element) {
+        return "";
+    }
+
+    @Override
+    public void add(int index, String element) {
+
+    }
+
+    @Override
+    public String remove(int index) {
+        return "";
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        return 0;
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        return 0;
+    }
+
+    @Override
+    public ListIterator<String> listIterator() {
+        return null;
+    }
+
+    @Override
+    public ListIterator<String> listIterator(int index) {
+        return null;
+    }
+
+    @Override
+    public List<String> subList(int fromIndex, int toIndex) {
+        return List.of();
+    }
+}
+```
+
+```java [Test.java]
+package com.github.collection3;
+
+public class Test {
+    public static void main(String[] args) {
+        
+        // 创建对象的时候不需要确定具体的类型
+        MyArrayList2 list = new MyArrayList2(); // [!code highlight]
+
+        // ✅ MyArrayList2 中只能存储 String 类型的元素
+        list.add("hello"); // [!code highlight]
+        
+        // ❌ MyArrayList2 中只能存储 String 类型的元素
+        list.add(1); // [!code highlight]
+
+    }
+}
+```
+
+:::
+
+
+
+* 示例：实现类延续泛型
+
+::: code-group
+
+```java [MyArrayList2.java]
+package com.github.collection3;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
+// MyArrayList2 的类型还不确定，在创建对象的时候给出具体类型
+public class MyArrayList2<E> implements List<E> { // [!code highlight]
+
+    @Override
+    public int size() {
+        return 0;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return false;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return null;
+    }
+
+    @Override
+    public Object[] toArray() {
+        return new Object[0];
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return null;
+    }
+
+    @Override
+    public boolean add(E e) { // [!code highlight]
+        return false;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return false;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends E> c) {
+        return false;
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends E> c) {
+        return false;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public E get(int index) {
+        return null;
+    }
+
+    @Override
+    public E set(int index, E element) {
+        return null;
+    }
+
+    @Override
+    public void add(int index, E element) {
+
+    }
+
+    @Override
+    public E remove(int index) {
+        return null;
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        return 0;
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        return 0;
+    }
+
+    @Override
+    public ListIterator<E> listIterator() {
+        return null;
+    }
+
+    @Override
+    public ListIterator<E> listIterator(int index) {
+        return null;
+    }
+
+    @Override
+    public List<E> subList(int fromIndex, int toIndex) {
+        return List.of();
+    }
+}
+
+```
+
+```java [Test.java]
+package com.github.collection3;
+
+public class Test {
+    public static void main(String[] args) {
+        
+        // 创建对象的时候不需要确定具体的类型 
+        MyArrayList2<String> list = new MyArrayList2<>(); // [!code highlight]
+
+        // ✅ 创建 list 对象的时候，已经确定了 MyArrayList2 只能存储 String 元素
+        list.add("hello"); // [!code highlight]
+
+        // ❌ 创建 list 对象的时候，已经确定了 MyArrayList2 只能存储 String 元素
+        list.add(1); // [!code highlight]
+
+    }
+}
+```
+
+:::
+
+## 1.4 协变、逆变和不变
+
+### 1.4.1 概述
+
+* `协变`（Covariance） 和 `逆变`（Contravariance） 是描述类型继承关系在复杂类型（泛型、数组、函数参数等）中如何传递的概念。
+* 它们的核心在于：`子类型关系在复杂类型中的表现是否与原始类型一致` 。
+
+### 1.4.2 协变
+
+* 如果 A 是 B 的子类，如果 Container(A) 也被认为是 Container(B) 的子类型，这就是协变（协同变化）。
+
+> [!NOTE]
+>
+> * ① 如果`苹果`（Apple）是`水果`（Fruit），那么`一筐苹果`（`Box<Apple>`）可以当做`一筐水果`（`Box<Fruit>`），这就叫做协变（协同变化）。
+> * ② 协变`强调方向一致`，即：在协变中，类型参数允许一种从子类型到父类型的替换关系，如：A -->B ，那么 Container(A) --> Container(B) 。这种由子类型到父类型的传递关系体现了“协变”的数学意思，即：类型参数的继承关系在容器级别也保持不变。
+> * ③ 协变`强调一致性和可替换性`：协变强调子类型在能够替换为父类型的上下文中的一致性。在编程中，这允许我们处理更具体的对象（子类型）而无需修改处理这些对象的代码逻辑。这种一致性是“协变”名称的核心。
+> * ④ 斜变读取安全，但是写入不安全！！！
+
+* Java 中的`数组`就是典型的`协变`设计，如下所示：
+
+> [!NOTE]
+>
+> `String`是`Object`的子类型，那么`String[]`也是`Object[]`的子类型。
+
+```java
+package com.github.collection3;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+
+        String[] strArr = {"hello", "world", "java"};
+
+        // 协变
+        Object[] objArr = strArr; // [!code highlight]
+
+        System.out.println(Arrays.toString(objArr)); // [hello, world, java]
+    }
+
+}
+```
+
+* 在学习多态的时候，我们就知道，多态的优点是：父类可以用来处理（操作、指向）子类对象。
+
+::: code-group
+
+```java [Animal.java]
+package com.github.collection3;
+
+public class Animal {
+    String name = "动物";
+
+    public void show() {
+        System.out.println("Animal --- show");
+    }
+}
+```
+
+```java [Cat.java]
+package com.github.collection3;
+
+public class Cat extends Animal {
+
+    String name = "猫";
+
+    @Override
+    public void show() {
+        System.out.println("Cat --- show");
+    }
+
+    public void catchMouse() {
+        System.out.println("猫抓老鼠");
+    }
+
+}
+```
+
+```java [Dog.java]
+package com.github.collection3;
+
+public class Dog extends Animal {
+
+    String name = "狗";
+
+    @Override
+    public void show() {
+        System.out.println("Dog --- show");
+    }
+
+    public void lookHome() {
+        System.out.println("狗看家");
+    }
+}
+```
+
+```java [Test.java]
+package com.github.collection3;
+
+public class Test {
+    public static void main(String[] args) {
+
+        show(new Dog()); // [!code highlight]
+        show(new Cat()); // [!code highlight]
+        
+    }
+
+    // 相当于 Animal animal = new Dog()
+    // 相当于 Animal animal = new Cat()
+    public static void show(Animal animal) { // [!code highlight]
+        animal.show();
+    }
+
+}
+```
+
+```txt [cmd 控制台]
+Dog --- show
+Cat --- show
+```
+
+:::
+
+* Java 将这种设计理念也扩展到了数组中，使得开发者可以通过较为通用的父类型数组（`Object[]`）来操作子类数组（`String[]`）
+
+::: code-group
+
+```java [Animal.java]
+package com.github.collection3;
+
+public class Animal {
+    String name = "动物";
+
+    public void show() {
+        System.out.println("Animal --- show");
+    }
+}
+```
+
+```java [Cat.java]
+package com.github.collection3;
+
+public class Cat extends Animal {
+
+    String name = "猫";
+
+    @Override
+    public void show() {
+        System.out.println("Cat --- show");
+    }
+
+    public void catchMouse() {
+        System.out.println("猫抓老鼠");
+    }
+
+}
+```
+
+```java [Dog.java]
+package com.github.collection3;
+
+public class Dog extends Animal {
+
+    String name = "狗";
+
+    @Override
+    public void show() {
+        System.out.println("Dog --- show");
+    }
+
+    public void lookHome() {
+        System.out.println("狗看家");
+    }
+}
+```
+
+```java [Test.java]
+package com.github.collection3;
+
+public class Test {
+    public static void main(String[] args) {
+        Dog[] dogs = new Dog[]{new Dog(), new Dog(), new Dog()};
+
+        Cat[] cat2 = new Cat[]{new Cat(), new Cat()};
+
+        show(dogs); // [!code highlight]
+        show(cat2); // [!code highlight]
+    }
+
+    // 相当于 Animal[] animals = new Dog[]{new Dog(), new Dog(), new Dog()};
+    // 相当于 Animal[] animals = new Cat[]{new Cat(), new Cat()};
+    public static void show(Animal[] animals) { // [!code highlight]
+        for (int i = 0; i < animals.length; i++) {
+            Animal animal = animals[i];
+            animal.show();
+        }
+    }
+}
+```
+
+```txt [cmd 控制台]
+Dog --- show
+Dog --- show
+Dog --- show
+Cat --- show
+Cat --- show
+```
+
+:::
+
+* 在学习多态的时候，我们就知道，多态的弊端是：父类不能调用子类的独有功能的，除非进行强制类型转换。
+
+::: code-group
+
+```java [Animal.java]
+package com.github.collection3;
+
+public class Animal {
+    String name = "动物";
+
+    public void show() {
+        System.out.println("Animal --- show");
+    }
+}
+```
+
+```java [Cat.java]
+package com.github.collection3;
+
+public class Cat extends Animal {
+
+    String name = "猫";
+
+    @Override
+    public void show() {
+        System.out.println("Cat --- show");
+    }
+
+    public void catchMouse() {
+        System.out.println("猫抓老鼠");
+    }
+
+}
+```
+
+```java [Dog.java]
+package com.github.collection3;
+
+public class Dog extends Animal {
+
+    String name = "狗";
+
+    @Override
+    public void show() {
+        System.out.println("Dog --- show");
+    }
+
+    public void lookHome() {
+        System.out.println("狗看家");
+    }
+}
+```
+
+```java [Test.java]
+package com.github.collection3;
+
+public class Test {
+    public static void main(String[] args) {
+
+        show(new Dog()); // [!code highlight]
+        show(new Cat()); // [!code highlight]
+
+    }
+
+    // 相当于 Animal animal = new Dog()
+    // 相当于 Animal animal = new Cat()
+    public static void show(Animal animal) { // [!code highlight]
+        animal.show();
+        if (animal instanceof Dog dog) { // [!code highlight]
+            dog.lookHome();
+        } else if (animal instanceof Cat cat) { // [!code highlight]
+            cat.catchMouse();
+        }
+    }
+
+}
+```
+
+```txt [cmd 控制台]
+Dog --- show
+狗看家
+Cat --- show
+猫抓老鼠
+```
+
+:::
+
+* Java 将这种设计理念也扩展到了数组中，那么我们在调用子类独有功能的时候，也需要继续强制类型转换：
+
+::: code-group
+
+```java [Animal.java]
+package com.github.collection3;
+
+public class Animal {
+    String name = "动物";
+
+    public void show() {
+        System.out.println("Animal --- show");
+    }
+}
+```
+
+```java [Cat.java]
+package com.github.collection3;
+
+public class Cat extends Animal {
+
+    String name = "猫";
+
+    @Override
+    public void show() {
+        System.out.println("Cat --- show");
+    }
+
+    public void catchMouse() {
+        System.out.println("猫抓老鼠");
+    }
+
+}
+```
+
+```java [Dog.java]
+package com.github.collection3;
+
+public class Dog extends Animal {
+
+    String name = "狗";
+
+    @Override
+    public void show() {
+        System.out.println("Dog --- show");
+    }
+
+    public void lookHome() {
+        System.out.println("狗看家");
+    }
+}
+```
+
+```java [Test.java]
+package com.github.collection3;
+
+public class Test {
+    public static void main(String[] args) {
+        Dog[] dogs = new Dog[]{new Dog(), new Dog(), new Dog()};
+
+        Cat[] cat2 = new Cat[]{new Cat(), new Cat()};
+
+        show(dogs); // [!code highlight]
+        show(cat2); // [!code highlight]
+    }
+
+    // 相当于 Animal[] animals = new Dog[]{new Dog(), new Dog(), new Dog()};
+    // 相当于 Animal[] animals = new Cat[]{new Cat(), new Cat()};
+    public static void show(Animal[] animals) { // [!code highlight]
+        for (int i = 0; i < animals.length; i++) {
+            Animal animal = animals[i];
+            animal.show();
+            if (animal instanceof Dog dog) { // [!code highlight]
+                dog.lookHome();
+            } else if (animal instanceof Cat cat) { // [!code highlight]
+                cat.catchMouse();
+            }
+        }
+    }
+}
+```
+
+```txt [cmd 控制台]
+Dog --- show
+狗看家
+Dog --- show
+狗看家
+Dog --- show
+狗看家
+Cat --- show
+猫抓老鼠
+Cat --- show
+猫抓老鼠
+```
+
+:::
+
+* 但是，Java 的这种设计，将多态的扩展到了数组层次，虽然提高了数组的灵活性；但是，也带来了`运行时安全`问题。
+
+> [!NOTE]
+>
+> * 所谓的灵活性：程序员可以利用协变，在数组中存储多个不同类型的对象，只要它们都是对象的子类。
+> * 所谓的运行时安全问题：程序允许通过一个 Animal[] 引用指向 Dog[] 对象，但是在 Animal[] 中插入了 Cat 对象。
+
+```java
+package com.github.collection3;
+
+public class Test {
+    public static void main(String[] args) {
+        
+        Animal[] animals = new Dog[3];
+        animals[0] = new Dog();
+        animals[1] = new Dog();
+        animals[2] = new Dog();
+
+        show(animals);
+    }
+
+    public static void show(Animal[] animals) {
+        // ❌ 会抛出 java.lang.ArrayStoreException
+        animals[0] = new Cat(); // [!code error]
+        for (int i = 0; i < animals.length; i++) {
+            Animal animal = animals[i];
+            animal.show();
+        }
+    }
+}
+```
+
+> [!NOTE]
+>
+> 对于协变数组而言，读是安全的，但是写是不安全的。
+
+* 我们可以将一个`Dog[]`当做`Animal[]`来使用，即：Dog[] 中的每个元素都可以是 Animal ，如下所示：
+
+```java
+package com.github.collection3;
+
+public class Test {
+    public static void main(String[] args) {
+
+        Animal[] animals = new Dog[]{
+                new Dog(), new Dog(), new Dog(), new Dog(), new Dog()
+        };
+
+        // 没什么问题，animals[0] 实际上就是 new Dog()
+        // Animal animal = new Dog();
+        Animal animal = animals[0]; // [!code highlight]
+
+        animal.show(); // Dog --- show
+
+    }
+}
+```
+
+* 但是，写入是不安全的，因为 `Animal[]` 应该允许写入任何 `Animal` 子类（Cat、Dog 等），但是实际上`Animal[]`存储类型是`Dog[]`，是不可以写入`Cat`的，所以 Java 会报 ArrayStoreException 异常。
+
+> [!NOTE]
+>
+> 类比场景：
+>
+> * 本来有一个狗窝，装的都是狗（`new Dog[]{...}`），每只狗 100 元。
+> * 你告诉我：这个窝里都是动物（`Animal[] animals = dogs`），每只 100 元。
+> * 但是，你背着我偷偷在狗窝里塞猫（ `animals[0] = new Cat()`），猫每只 50 元。
+> * 然后，将整窝动物卖我（每只 100 元），你觉得我傻（里面又不都是狗）？
+
+```java
+package com.github.collection3;
+
+public class Test {
+    public static void main(String[] args) {
+
+        Animal[] animals = new Dog[]{
+                new Dog(), new Dog(), new Dog(), new Dog(), new Dog()
+        };
+
+        // 没什么问题，animals[0] 实际上就是 new Dog()
+        // Animal animal = new Dog();
+        Animal animal = animals[0]; // [!code highlight]
+
+        animal.show(); // Dog --- show
+
+        // 写操作
+        // 编译不会报错，但是运行会报错 ArrayStoreException
+        animals[0] = new Cat(); // [!code error]
+
+        // 即使上面的代码不报错，将会出现 Cat --- show，这就造成了类型错误
+        animals[0].show(); // [!code highlight]
+
+    }
+}
+```
+
+### 1.4.3 逆变
+
+* 如果 A 是 B 的子类，如果 Container(B) 是 Container(A) 的子类型，这就是逆变。
+
+> [!NOTE]
+>
+> * ① 如果你会处理水果，那么你应该也会处理苹果，这就叫做逆变。
+> * ② 逆变`强调反向替换关系`：逆变允许从父类型到子类型的替换关系。这对于函数参数尤其重要，因为一个能够接受父类类型的操作自然能接受其所有子类。
+> * ③ 逆变写入安全，但是读取不安全！！！
+
+* Java 中的`方法重写`就是典型的`逆变`：
+
+> [!NOTE]
+>
+> * ① 只有被添加到虚方法表中的方法才能被重写！！！
+> * ② 子类重写父类方法时，返回值类型必须小于等于父类。
+
+::: code-group
+
+```java [Animal.java]
+public class Animal {
+    
+    public Animal getAnimal() {
+        System.out.println("Animal 的 getAnimal 方法");
+        return new Animal();
+    }
+}
+```
+
+```java [Dog.java]
+public class Dog extends Animal {
+    // ✅ 以下代码是正确的
+    @Override
+    public Dog getAnimal() { 
+        System.out.println("Dog 的 getAnimal 方法");
+        return new Dog();
+    }
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Animal animal = new Animal();
+        // 父类引用指向子类对象
+        Animal animal2 = new Dog();
+
+        // 类似于 Animal a1 = new Animal();
+        Animal a1 = animal.getAnimal();
+        // 类似于 Animal a2 = new Dog();
+        Animal a2 = animal2.getAnimal();
+
+        System.out.println(a1 instanceof Animal); // true
+        System.out.println(a2 instanceof Dog); // true
+    }
+}
+```
+
+:::
+
+### 1.4.4 不变
+
+* 如果 A 是 B 的子类，如果 Container(A) 不是 Container(B) 的子类型或 Container(B) 不是 Container(A) 的子类型，这就是不变。
+
+> [!NOTE]
+>
+> * ① 不变的类型必须完全匹配，不能替代。
+> * ② 不变适合类型完全一致的读写操作，即：读写都安全。
+
+* Java 中的`泛型`就是典型的`不变`：
+
+```java
+package com.github.collection3;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+
+        List<String> list = new ArrayList<>();
+        
+        // 写的时候是 String
+        list.add("hello"); // [!code highlight]
+        list.add("world");
+
+        // 读的时候是 String
+        for (String str : list) { // [!code highlight]
+            System.out.println(str);
+        }
+    }
+}
+```
+
+* Java 中的泛型都是协变，如下所示：
+
+```java
+package com.github.collection3;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+
+        List<String> list = new ArrayList<>();
+
+        // 写的时候是 String
+        list.add("hello");
+        list.add("world");
+
+        // 读的时候是 String
+        for (String str : list) {
+            System.out.println(str);
+        }
+        
+        // 错误 ❌
+        List<Object> list2 = list; // [!code error]
+    }
+}
+```
+
+### 1.4.5 总结
+
+* `协变数组`是早期 Java 为了保证灵活性和向后兼容性的设计选择，但由于安全性问题在现代开发中不推荐。
+* `Java 泛型的不变性`则是为了提供更好的编译时安全性和简化代码复杂性，避免潜在的运行时错误。这种设计反映了对现代软件开发中安全性和可靠性的高度重视。
+
+## 1.5 泛型的高级特性
+
+### 1.5.1 概述
+
+* 在 Java 中泛型在运行时是被`类型擦除`的，但是通过 `Type` 相关接口可以``部分恢复泛型信息`，特别是在字段、方法、父类等位置。
+
+![](./assets/6.png)
+
+* Java 通过了四种核心接口来描述泛型结构：
+
+| 接口名              | 示例               | 描述                                 |
+| ------------------- | ------------------ | ------------------------------------ |
+| `GenericArrayType`  | `T[]`              | 泛型数组                             |
+| `ParameterizedType` | `List<String>`     | 参数化类型（带泛型参数）             |
+| `TypeVariable`      | `<T>`              | 类型变量（声明在类或方法上的  `T` ） |
+| `WildcardType`      | `? extends Number` | 通配符类型                           |
+
+### 1.5.2 类型变量
+
+#### 1.5.2.1 概述
+
+* 类型变量（`<T>`中的 `T`）通常出现在`类`、`方法`、`接口`处，我们也称这些`类`、`接口`或`方法`是`泛型类`、`泛型方法`或`泛型接口`。
+
+> [!NOTE]
+>
+> * ① T 是类型变量，由调用者决定它是什么类型。并且，编译器会推断出具体的类型。
+> * ② 类型变量适用于自定义泛型类、泛型接口以及泛型方法，控制输入输出的一致性。
+
+
+
+* 示例：泛型类
+
+```java
+public class MyArrayList<E> {
+    ...
+}
+```
+
+
+
+*   示例：泛型方法
+
+```java
+public class Utils {
+    
+    private Utils(){}
+
+    /**
+     * 打印数组中的元素
+     *
+     * @param arr 数组
+     * @param <T> 泛型
+     */
+    public static <T> void printArray(T[] arr) {
+        for (T t : arr) {
+            System.out.println(t);
+        }
+    }
+}
+```
+
+
+
+* 示例：泛型接口
+
+```java
+public interface List<E> extends Collection<E> { 
+	...
+}
+```
+
+#### 1.5.2.2 类型上限
+
+* 在 Java 中，类型变量可以有上限，但是不能有下限。
+* 类型变量可以通过 `extends` 指定上限：
+
+```java
+// T 只能是 Number 的子类，例如 Integer, Double 等
+class Box<T extends Number> {
+    
+}
+```
+
+* 类型变量可以通过 `extends` 并结合`&`指定多个上限（多重上限）：
+
+```java
+// T 必须是 Number 的子类，并且实现了 Comparable 接口
+class Box<T extends Number & Comparable<T>> {
+    
+}
+```
+
+> [!CAUTION]
+>
+> * ① 在多重上限中，类（`Number`）必须放在最前面，后面的都是接口！！！
+> * ② 如果在声明 `<类型变量>` 时没有指定任何上限，则默认上限是 java.lang.Object 。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [SumTools.java]
+package com.github.collection3;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+public class SumTools<T extends Number & Comparable<T>> {
+
+    private final T t1;
+
+    private final T t2;
+
+    public SumTools(T t1, T t2) {
+        this.t1 = t1;
+        this.t2 = t2;
+    }
+
+    public T getSum() {
+        if (this.t1 instanceof Integer i1 && this.t2 instanceof Integer i2) {
+            return (T) Integer.valueOf(i1 + i2);
+        }
+        if (this.t1 instanceof Double d1 && this.t2 instanceof Double d2) {
+            return (T) Double.valueOf(d1 + d2);
+        }
+        if (this.t1 instanceof Float f1 && this.t2 instanceof Float f2) {
+            return (T) Float.valueOf(f1 + f2);
+        }
+        if (this.t1 instanceof Long l1 && this.t2 instanceof Long l2) {
+            return (T) Long.valueOf(l1 + l2);
+        }
+        if (this.t1 instanceof Short s1 && this.t2 instanceof Short s2) {
+            return (T) Short.valueOf((short) (s1 + s2));
+        }
+        if (this.t1 instanceof Byte b1 && this.t2 instanceof Byte b2) {
+            return (T) Byte.valueOf((byte) (b1 + b2));
+        }
+        if (this.t1 instanceof BigInteger b1 && this.t2 instanceof BigInteger b2) {
+            return (T) b1.add(b2);
+        }
+        if (this.t1 instanceof BigDecimal b1 && this.t2 instanceof BigDecimal b2) {
+            return (T) b1.add(b2);
+        }
+        throw new UnsupportedOperationException("不支持该操作");
+    }
+
+
+}
+```
+
+```java [Test.java]
+package com.github.collection3;
+
+public class Test {
+    public static void main(String[] args) {
+
+        SumTools<Integer> sumTools = new SumTools<>(1, 2);
+        Integer sum = sumTools.getSum();
+        System.out.println("sum = " + sum); // sum = 3
+    }
+}
+```
+
+:::
+
+### 1.5.3 类型通配符
+
+#### 1.5.3.1 概述
+
+* 如果一个`方法`的`类型参数`需要进行限制，就需要使用到类型通配符。
+
+> [!NOTE]
+>
+> 类型通配符不仅仅可以应用于泛型方法，也可以应用于泛型类、泛型接口的方法类型声明中，以实现类型的灵活性和兼容性。
+
+#### 1.5.3.2 无界通配符
+
+* 语法：
+
+```java
+类名<?> 或 接口名<?>
+```
+
+> [!NOTE]
+>
+> * ① `用途`：允许使用任何类型而不关心具体类型。
+> * ② `应用场景`：只需要读取数据，不会向集合中添加任何元素。
+
+
+
+* 示例：
+
+```java
+package com.github.collection3;
+
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+
+        List<String> list = List.of("a", "b", "c");
+
+        List<Integer> list2 = List.of(1, 2, 3);
+
+        // ✅ 允许使用任何类型而不关心具体类型。
+        // 类似于 List<?> list = new ArrayList<String>();
+        method(list);
+        
+        // ✅ 允许使用任何类型而不关心具体类型。
+        // 类似于 List<?> list = new ArrayList<String>();
+        method(list2);
+
+    }
+
+    public static void method(List<?> list) {
+        // 只需要读取数据，不会向集合中添加任何元素。
+        for (Object o : list) {
+            System.out.println(o);
+        }
+    }
+
+}
+```
+
+#### 1.5.3.3 上限通配符
+
+* 语法：
+
+```java
+类名<? extends 上限类型>
+```
+
+```java
+接口名<? extends 上限类型>
+```
+
+> [!NOTE]
+>
+> - ① `用途`：限制可以使用的类型必须是某个类型的子类（协变）。
+> - ② `应用场景`：读取数据时，我们只关心数据的父类特性，而不需要知道确切的子类。
+
+* 准备工作（类继承关系）：
+
+::: code-group
+
+```java [Animal.java]
+package com.github.collection3;
+
+public class Animal {
+    String name = "动物";
+
+    public void show() {
+        System.out.println("Animal --- show");
+    }
+}
+```
+
+```java [Cat.java]
+package com.github.collection3;
+
+public class Cat extends Animal {
+
+    String name = "猫";
+
+    @Override
+    public void show() {
+        System.out.println("Cat --- show");
+    }
+
+    public void catchMouse() {
+        System.out.println("猫抓老鼠");
+    }
+
+}
+```
+
+```java [Dog.java]
+package com.github.collection3;
+
+public class Dog extends Animal {
+
+    String name = "狗";
+
+    @Override
+    public void show() {
+        System.out.println("Dog --- show");
+    }
+
+    public void lookHome() {
+        System.out.println("狗看家");
+    }
+}
+```
+
+```java [HuskyDog.java]
+class HuskyDog extends Dog {}
+```
+
+```java [TabbyCat.java]
+class TabbyCat extends Cat {}
+```
+
+:::
+
+
+
+* 示例：
+
+```java
+package com.github.collection3;
+
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+        List<Dog> dogList = List.of(new Dog(), new Dog());
+        // ✅ 限定只能是 Dog 或 Dog 的子类，不能是其它类型
+        // 类似于 List<? extends Dog> list = new ArrayList<Dog>();
+        method(dogList); // [!code highlight]
+
+        List<HuskyDog> dogList2 = List.of(new HuskyDog(), new HuskyDog());
+        // ✅ 限定只能是 Dog 或 Dog 的子类，不能是其它类型
+        // 类似于 List<? extends Dog> list = new ArrayList<HuskyDog>();
+        method(dogList); // [!code highlight]
+        
+        List<Cat> catList = List.of(new Cat(), new Cat());
+        // ❌ 限定只能是 Dog 或 Dog 的子类，不能是其它类型
+        // 类似于 List<? extends Dog> list = new ArrayList<Cat>();
+        method(catList); // [!code error]
+
+    }
+
+    /**
+     * 只能是狗类型
+     * 协变，适合读取数据
+     */
+    public static void method(List<? extends Dog> list) { // [!code highlight]
+        for (Dog dog : list) {
+            dog.show();
+        }
+
+    }
+}
+```
+
+#### 1.5.3.4 下限通配符
+
+* 语法：
+
+```java
+类名<? super 下限类型> 
+```
+
+```java
+接口名<? super 下限类型>
+```
+
+> [!NOTE]
+>
+> - ① `用途`：限制可以使用的类型必须是某个类型的父类（逆变）。
+> - ② `应用场景`：向集合中添加数据时，我们需要保证所写入的数据类型与集合中的类型一致或为其子类。
+
+* 准备工作（类继承关系）：
+
+::: code-group
+
+```java [Animal.java]
+package com.github.collection3;
+
+public class Animal {
+    String name = "动物";
+
+    public void show() {
+        System.out.println("Animal --- show");
+    }
+}
+```
+
+```java [Cat.java]
+package com.github.collection3;
+
+public class Cat extends Animal {
+
+    String name = "猫";
+
+    @Override
+    public void show() {
+        System.out.println("Cat --- show");
+    }
+
+    public void catchMouse() {
+        System.out.println("猫抓老鼠");
+    }
+
+}
+```
+
+```java [Dog.java]
+package com.github.collection3;
+
+public class Dog extends Animal {
+
+    String name = "狗";
+
+    @Override
+    public void show() {
+        System.out.println("Dog --- show");
+    }
+
+    public void lookHome() {
+        System.out.println("狗看家");
+    }
+}
+```
+
+```java [HuskyDog.java]
+class HuskyDog extends Dog {}
+```
+
+```java [TabbyCat.java]
+class TabbyCat extends Cat {}
+```
+
+:::
+
+
+
+* 示例：
+
+```java
+package com.github.collection3;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+		// ✅ 限定只能是 Dog 或 Dog 的父类，不能是其它类型
+        // 类似于 List<? super Dog> list = new ArrayList<Dog>();
+        List<Dog> list = new ArrayList<>();
+        method(list); // [!code highlight]
+        System.out.println(list);
+
+        // ✅ 限定只能是 Dog 或 Dog 的父类，不能是其它类型
+        // 类似于 List<? super Dog> list = new ArrayList<Object>();
+        List<Object> list2 = new ArrayList<>();
+        method(list2); // [!code highlight]
+        System.out.println(list2);
+
+         // ❌ 限定只能是 Dog 或 Dog 的父类，不能是其它类型
+        // 类似于 List<? super Dog> list = new ArrayList<Cat>();
+        List<Cat> list3 = new ArrayList<>();
+        method(list3); // [!code error]
+        System.out.println(list3);
+    }
+
+    /**
+     * 只能是狗类型
+     * 逆变，适合写数据
+     */
+    public static void method(List<? super Dog> list) { // [!code highlight]
+        list.add(new Dog());
+        list.add(new HuskyDog());
+    }
+
+}
+```
+
+
+
+# 第二章：数据结构（树）
+
+
+
+
+
+
+
+# 第三章：Set 接口（⭐）
+
+
+
+
 

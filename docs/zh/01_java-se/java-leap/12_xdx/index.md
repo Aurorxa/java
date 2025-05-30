@@ -1,754 +1,437 @@
-
-
 # 第一章：前言
 
 ## 1.1 概述
 
-* 之前，我们学过类的定义，如下所示：
+* 很多人认为：将一堆打乱的数据进行`排序`或在一堆数据中`查找`到想要的数据，这就是`算法`。
 
-```java
-public class 类名 {
-    ① 成员变量(代表属性，一般是名词)
-    ② 成员方法(代表行为，一般是动词)
-    ③ 构造器
-    ④ 代码块
-    ⑤ 内部类（后面学习）    
-}
-```
+![将一堆打乱的数据进行`排序`，这就是`算法`](./assets/1.gif)
 
-* 到目前为止，我们已经学习过了`类`的`成员变量`、`成员方法`、`构造器`以及`代码块`，接下来我们将学习`类`的`内部类`。
-
-## 1.2 什么是内部类 
-
-### 1.2.1 回顾嵌套循环
-
-* 所谓的嵌套循环，是指一个循环结构 A 的循环体是另一个循环结构 B 。例如：for 循环里面还有一个for 循环，就是嵌套循环。
-* 语法：
-
-```java
-for(初始化语句①; 循环条件语句②; 迭代语句⑦) {
-    for(初始化语句③; 循环条件语句④; 迭代语句⑥) {
-      	循环体语句⑤;
-    }
-}
-```
-
-- 其中，for 、while 、do-while 均可以作为外层循环或内层循环。
-
-![嵌套循环](./assets/1.png)
+![在一堆数据中`查找`到想要的数据，这就是`算法`](./assets/2.webp)
 
 > [!NOTE]
 >
-> - ① 实际上，嵌套循环就是将内层循环当成外层循环的循环体。当只有内层循环的循环条件为 false ，才会完全跳出内层循环，才可结束外层的当次循环，开始下一次循环。
-> - ② 假设外层循环次数为 m 次，内层循环次数为 n 次，则内层循环体实际上需要执行 m × n 次。
-> - ③ 从二维图形的角度看，外层循环控制`行数`，内层循环控制`列数`。
-> - ④ 实际开发中，我们最多见到的嵌套循环是两层，一般不会出现超过三层的嵌套循环。如果将要出现，一定要停下来重新梳理业务逻辑，重新思考算法的实现，控制在三层以内；否则，可读性会很差。
+> 其实，上述仅仅是基础操作（基操）而已！！！
 
+* 在企业中，算法都是用来解决一个又一个真实的需求。
 
+![地图中的`最优路径算法`](./assets/3.png)
 
-* 示例：
+![电商系统中的`推荐算法`，可以做到千人千面](./assets/4.png)
 
-```java
-public class Main {
-    public static void main(String[] args) {
-        for (int i = 1; i <= 5; ++i) { // 外层循环
-            for (int j = 1; j < 6; ++j) { // 内层循环
-                System.out.print("* ");
-            }
-            System.out.println();
-        }
-    }
-}
-```
 
-### 1.2.2 内部类的概念
 
-* 所谓的内部类，就是在一个类的里面，再定义一个类，这个类被称为内部类。
+## 1.2 常见的算法
 
-> [!NOTE]
->
-> 在 Java 中，允许一个类`Inner`的定义在另一个类`Outer`的内部，类`Inner`就被称为`内部类`，而类`Outer`就被称为`外部类`。
-
-```java
-public class Outer  { // 外部类
-    
-    public class Inner { // 内部类
-        
-    }
-}
-```
-
-
-
-# 第二章：为什么要学习内部类？
-
-## 2.1 概述
-
-* 内部类表示的事物是外部类的一部分，内部类单独出现没有任何意义，如：汽车的`发送机`、人的`心脏`等。
-
-## 2.2 应用示例
-
-* 需求：写一个 JavaBean 类用来描述汽车。
-
-> [!NOTE]
->
-> 属性：汽车的品牌、车龄、颜色、发动机的品牌以及发动机的使用年限。
-
-
-
-* 示例：
-
-```java
-public class Car {
-    
-    String carName;
-    
-    int carAge;
-    
-    String carColor;
-    
-    // 不太好，显得太分散了（发动机应该是整体）
-    String engineName;
-    
-    // 不太好，显得太分散了（发动机应该是整体）
-    int engineAge;
-}
-```
-
-
-
-* 示例：内部类表示的事物是外部类的一部分，内部类单独出现没有任何意义
-
-```java
-public class Car { // 外部类
-
-    String carName;
-
-    int carAge;
-
-    String carColor;
-
-    // 非常棒，很好地显示了发送机是个整体，并且依赖于汽车，是汽车的一部分
-    class Engine { // 内部类
-        
-        String engineName;
-
-        int engineAge;
-    }
-}
-```
-
-## 2.3 特点
-
-* ① 内部类可以直接访问外部类的成员，包括私有成员。
-* ② 外部类要想访问内部类的成员，必须创建对象。
-
-
-
-* 示例：内部类可以直接访问外部类的成员，包括私有成员
-
-```java {19-24}
-package com.github.demo8;
-
-public class Car {
-
-    String carName;
-
-    int carAge;
-
-    String carColor;
-
-    class Engine {
-
-        String engineName;
-
-        int engineAge;
-
-        // 内部类可以直接访问外部类的成员，包括私有成员。
-        public void show(){ 
-            System.out.println(engineName);
-            System.out.println(engineAge);
-
-            System.out.println(carName);
-            System.out.println(carAge);
-            System.out.println(carColor);
-        }
-    }
-}
-```
-
-
-
-* 示例：外部类要想访问内部类的成员，必须创建对象
-
-```java {15-18}
-package com.github.demo8;
-
-public class Car {
-
-    String carName;
-
-    int carAge;
-
-    String carColor;
-
-    // 外部类要想访问内部类的成员，必须创建对象
-    public void show(Car this){
-        // this 表示调用者的地址
-        System.out.println(this.carName);
-        // 此时，show 方法中没有 Engine 对象，所以要创建对象
-        Engine engine = new Engine();
-        System.out.println(engine.engineName);
-        System.out.println(engine.engineAge);
-        engine.show();
-    }
-    
-    class Engine {
-
-        String engineName;
-
-        int engineAge;
-
-        // 内部类可以直接访问外部类的成员，包括私有成员。
-        public void show(){
-            System.out.println(engineName);
-            System.out.println(engineAge);
-
-            System.out.println(carName);
-            System.out.println(carAge);
-            System.out.println(carColor);
-        }
-    }
-}
-```
-
-## 2.4 JDK 中的内部类
-
-* JDK 中的 ArrayList 类中就有内部类的身影。
-
-
-
-* 示例：
-
-```java
-public class ArrayList<E> extends AbstractList<E>
-        implements List<E>, RandomAccess, Cloneable, java.io.Serializable {   
-    
-	public Iterator<E> iterator() {
-        // 外部类要想访问内部类的成员，必须创建对象。
-        return new Itr();
-    }
-
-    /**
-     * 内部类
-     */
-    private class Itr implements Iterator<E> { // [!code highlight]
-        int cursor;       // index of next element to return
-        int lastRet = -1; // index of last element returned; -1 if no such
-        int expectedModCount = modCount;
-
-        // prevent creating a synthetic constructor
-        Itr() {}
-
-        public boolean hasNext() {
-            return cursor != size;
-        }
-
-        @SuppressWarnings("unchecked")
-        public E next() {
-            checkForComodification();
-            int i = cursor;
-            if (i >= size)
-                throw new NoSuchElementException();
-            Object[] elementData = ArrayList.this.elementData;
-            if (i >= elementData.length)
-                throw new ConcurrentModificationException();
-            cursor = i + 1;
-            return (E) elementData[lastRet = i];
-        }
-
-        public void remove() {
-            if (lastRet < 0)
-                throw new IllegalStateException();
-            checkForComodification();
-
-            try {
-                ArrayList.this.remove(lastRet);
-                cursor = lastRet;
-                lastRet = -1;
-                expectedModCount = modCount;
-            } catch (IndexOutOfBoundsException ex) {
-                throw new ConcurrentModificationException();
-            }
-        }
-
-        @Override
-        public void forEachRemaining(Consumer<? super E> action) {
-            Objects.requireNonNull(action);
-            final int size = ArrayList.this.size;
-            int i = cursor;
-            if (i < size) {
-                final Object[] es = elementData;
-                if (i >= es.length)
-                    throw new ConcurrentModificationException();
-                for (; i < size && modCount == expectedModCount; i++)
-                    action.accept(elementAt(es, i));
-                // update once at end to reduce heap write traffic
-                cursor = i;
-                lastRet = i - 1;
-                checkForComodification();
-            }
-        }
-
-        final void checkForComodification() {
-            if (modCount != expectedModCount)
-                throw new ConcurrentModificationException();
-        }
-    }
-    
-    // 其余略
-}    
-```
-
-
-
-# 第三章：内部类
-
-## 3.1 内部类的分类
-
-* 根据内部类`声明位置`的不同，可以将内部类分为如下两类：
-
-![内部类分类](./assets/2.png)
-
-## 3.2 成员内部类（非静态成员内部类）
-
-### 3.2.1 语法
-
-* 写在成员位置（类中方法外），属于外部类的成员。
-* 语法：
-
-```java
-[权限修饰符2种] class 外部类名{
-    [权限修饰符4种] [final] class 内部类名 {
-        ...
-    }
-}
-```
-
-> [!NOTE]
->
-> * ① 成员内部类可以被一些修饰符所修饰，如：private、默认、protected、public、abstract、final、static 等。
-> * ② 在成员内部类里面，JDK16 之前不可以定义静态变量，JDK16 之后可以定义静态变量。
-> * ③ 在创建内部类的对象时，对象中有一个隐含的 `Outer.this` 记录外部类的对象的地址值。
-> * ④ 成员内部类编译之后有自己独立的字节码文件（class 文件），只不过是在内部类前面冠以`外部类名和$符号`，如：`Outer$Inner.class`。
-> * ⑤ 成员内部类可以继承自己想要继承的父类以及实现自己想要实现的接口，和外部类（外部接口）无关。
-
-
-
-* 示例：
-
-```java {9}
-public class Car { // 外部类
-
-    String carName;
-
-    int carAge;
-
-    String carColor;
-
-    class Engine { // 成员内部类（非静态成员内部类）
-        
-        String engineName;
-
-        int engineAge;
-    }
-}
-```
-
-
-
-* 示例：
-
-```java {9}
-public class Car { // 外部类
-
-    String carName;
-
-    int carAge;
-
-    String carColor;
-
-    private class Engine { // 成员内部类（非静态成员内部类）
-        
-        String engineName;
-
-        int engineAge;
-    }
-}
-```
-
-
-
-* 示例：
-
-```java {9}
-public class Car { // 外部类
-
-    String carName;
-
-    int carAge;
-
-    String carColor;
-
-    protected class Engine { // 成员内部类（非静态成员内部类）
-        
-        String engineName;
-
-        int engineAge;
-    }
-}
-```
-
-
-
-* 示例：
-
-```java {9}
-public class Car { // 外部类
-
-    String carName;
-
-    int carAge;
-
-    String carColor;
-
-    public class Engine { // 成员内部类（非静态成员内部类）
-        
-        String engineName;
-
-        int engineAge;
-    }
-}
-```
-
-### 3.2.2 如何创建成员内部类的对象
-
-#### 3.2.2.1 方式一
-
-* 在外部类中编写方法，对外提供内部的对象。
-
-```java
-public class Outer {
-
-    class Inner {}
-
-    public Inner getInstance(){
-        return new Inner();
-    }
-}
-```
-
-> [!NOTE]
->
-> 应用场景：通常应用于内部类使用`private`修饰。
-
-
-
-* 示例：
-
-::: code-group
-
-```java {8,15-17} [Outer.java]
-package com.github.demo8;
-
-public class Outer {
-
-    String name;
-
-
-    class Inner { // [!code highlight]
-
-        String name;
-
-        int age;
-    }
-
-    public Inner getInstance(){
-        return new Inner();
-    }
-
-}
-```
-
-```java [Test.java]
-package com.github.demo8;
-
-public class Test {
-    public static void main(String[] args) {
-        // 之前创建对象
-        // 类名 对象名 = new 类名();
-        Outer outer = new Outer();
-        // 根据外部类对象调用方法获取内部类对象
-        // Outer.Inner 表示内部类不能脱离外部类而存在，即：Inner 是 Outer 的内部类
-        Outer.Inner inner = outer.getInstance();
-        inner.name = "张三";
-        inner.age = 18;
-        System.out.println(inner.name + ":" + inner.age);
-        // com.github.demo8.Outer$Inner@15aeb7ab
-        System.out.println(inner); 
-    }
-}
-```
-
-:::
-
-
-
-* 示例：
-
-::: code-group
-
-```java {8,15-17} [Outer.java]
-package com.github.demo8;
-
-public class Outer {
-
-    String name;
-
-
-    private class Inner { // [!code highlight]
-
-        String name;
-
-        int age;
-    }
-
-    public Inner getInstance(){
-        return new Inner();
-    }
-
-}
-```
-
-```java [Test.java]
-package com.github.demo9;
-
-public class Test {
-    public static void main(String[] args) {
-        // 之前创建对象
-        // 类名 对象名 = new 类名();
-        Outer outer = new Outer();
-        // 只能使用 Object 来接收，因为 Inner 是 private 权限
-        Object inner = outer.getInstance();
-        // com.github.demo9.Outer$Inner@41629346
-        System.out.println(inner); 
-    }
-}
-```
-
-:::
-
-#### 3.2.2.2 方式二
-
-* 直接在外部类中创建内部类的对象。
-
-```java
-外部类名.内部类名 对象名 = 外部对象.内部对象;
-```
-
-> [!NOTE]
->
-> 应用场景：通常应用于内部类使用`非private`修饰。
-
-
-
-* 示例：
-
-::: code-group
-
-```java {8,15-17} [Outer.java]
-package com.github.demo8;
-
-public class Outer {
-
-    String name;
-
-
-    class Inner { // [!code highlight]
-
-        String name;
-
-        int age;
-    }
-
-    public Inner getInstance(){
-        return new Inner();
-    }
-
-}
-```
-
-```java [Test.java]
-package com.github.demo8;
-
-public class Test {
-    public static void main(String[] args) {
-
-        // 外部类名.内部类名 对象名 = 外部类对象.内部类对象;
-        // 因为内部类不能脱离外部类而存在，Outer.Inner 表示 Inner 是 Outer 的内部类
-        Outer.Inner inner = new Outer().new Inner();
-        inner.name = "张三";
-        inner.age = 18;
-        System.out.println(inner.name + ":" + inner.age);
-    }
-}
-```
-
-:::
-
-### 3.2.3 成员内部类的特点
-
-* 成员内部类编译之后有自己独立的字节码文件（class 文件），只不过是在内部类前面冠以`外部类名和$符号`，如：`Outer$Inner.class`。
-
-
-
-* 示例：
-
-::: code-group
-
-```java {8,15-17} [Outer.java]
-package com.github.demo8;
-
-public class Outer {
-
-    String name;
-
-
-    class Inner { // [!code highlight]
-
-        String name;
-
-        int age;
-    }
-
-    public Inner getInstance(){
-        return new Inner();
-    }
-
-}
-```
-
-```java [Test.java]
-package com.github.demo8;
-
-public class Test {
-    public static void main(String[] args) {
-
-        // 外部类名.内部类名 对象名 = 外部类对象.内部类对象;
-        // 因为内部类不能脱离外部类而存在，Outer.Inner 表示 Inner 是 Outer 的内部类
-        Outer.Inner inner = new Outer().new Inner();
-        inner.name = "张三";
-        inner.age = 18;
-        System.out.println(inner.name + ":" + inner.age);
-    }
-}
-```
-
-:::
-
-* 编译后的字节码文件，如下所示：
-
-![](./assets/3.png)
-
-
-
-### 3.2.3 成员内部类如何获取外部类的成员变量？
-
-* 在创建内部类的对象时，对象中有一个隐含的 `外部类.this` 记录外部类的对象的地址值。
-* 如果在内部类中有变量和外部类的成员变量相同，可以使用 `外部类.this.变量名` 进行区别。
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Outer.java]
-package com.github.demo10;
-
-public class Outer {
-
-    private int a = 10;
-
-    class Inner {
-
-        private int a = 20;
-
-        public void show(Outer.Inner this){
-            int a = 30;
-            // Outer.this 获取外部类对象的地址值
-            System.out.println(Outer.this.a); // 10
-            System.out.println(this.a); // 20
-            System.out.println(a); // 30
-        }
-    }
-}
-```
-
-```java [Test.java]
-package com.github.demo10;
-
-public class Test {
-    public static void main(String[] args) {
-        Outer.Inner inner = new Outer().new Inner();
-        inner.show();
-    }
-}
-```
-
-:::
-
-* 其内存动态图，如下所示：
-
-![](./assets/4.gif)
-
-### 3.2.4 证明
-
-* 我们可以通过`JOL`工具或 IDEA 的`JclassLib`插件来证明成员内部类对象中有一个隐含的 `外部类.this` 记录外部类的对象的地址值。
-
-
-
-* 示例：
+* 常见的算法有`查找算法`、`排序算法`以及`字符串匹配算法`等，如下所示：
 
 ![](./assets/5.png)
 
-## 3.3 静态成员内部类
+# 第二章：查找算法
 
-### 3.3.1 语法
+## 2.1 概述
 
-* 写在成员位置（类中方法外），属于外部类的成员。和成员内部类不同的是，使用`static`关键字修饰。
-* 语法：
+* `查找算法`有`基本查找`、`二分查找`、`插值查找`、`斐波那契查找`、`分块查找`、`哈希查找`以及`树表查找`，如下所示：
+
+![](./assets/6.svg)
+
+## 2.2 基本查找（顺序查找）
+
+* `基本查找（顺序查找）`是最简单的一种查找方法，它通过逐一检查列表中的每个元素，直到找到目标元素为止。如果找到目标元素，则返回其位置，否则返回“未找到”。
+
+![基本查找（顺序查找）](./assets/7.gif)
+
+* `算法的步骤`：
+  * ① 从列表的第一个元素开始，逐个比较每个元素和目标元素是否相等。
+  * ② 如果相等，则返回元素的索引。
+  * ③ 如果遍历完整个列表都没有找到目标元素，则返回一个表示未找到的值，如：`-1` 。
+
+* `时间复杂度`：**O(n)**，n 表示列表中元素的数量。
+
+![基本查找的时间复杂度 O(n) ，在坐标系中的数学曲线](./assets/8.png)
+
+* `适用场景`：当数据量较小或数据无序时，顺序查找非常高效。
+
+
+
+* 示例：
 
 ```java
-[权限修饰符2种] class 外部类名{
-    [权限修饰符4种] static [final] class 内部类名 {
-        ...
+package com.github.algorithm.search;
+
+public class BasicSearchTest {
+    public static void main(String[] args) {
+        int[] arr = {2, -6, 4, 6, 2, 5, 88, 4, 5, 7, 0, 7, 5, 2, 1, 64, 98};
+        
+        int index = indexOf(arr, 98);
+        System.out.println(index); // 16
+        
+        index = indexOf(arr, -100);
+        System.out.println(index); // -1
+    }
+
+    /**
+     * 基本查找
+     * @param arr 数组
+     * @param num 查找元素
+     * @return 元素在数组上的索引，如果元素不在数组中，将返回 -1
+     */
+    public static int indexOf(int[] arr, int num) {
+        for (int i = 0; i < arr.length; i++) {
+            if (num == arr[i]) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
 ```
 
-> [!NOTE]
->
-> * ① 静态内部类可以直接访问外部类的静态成员。
-> * ② 静态内部类不可以直接访问外部类的非静态成员，如果需要访问需要创建外部类的对象。
-> * ③ 静态内部类没有`外部类.this`变量。
+## 2.3 二分查找（折半查找）
 
-### 3.3.2 如何创建静态内部类的对象
+* `二分查找（折半查找）`是针对已排序的数据结构的一种查找方法。它通过将数据集分成两半来不断缩小查找范围，从而提高查找效率。
 
-* 语法：
+![二分查找（折半查找）](./assets/9.gif)
+
+* `算法步骤`：
+  - ① 将数据集分为两部分，检查中间元素是否为目标元素。
+  - ② 如果目标元素小于中间元素，则继续在左半部分查找；如果大于，则在右半部分查找。
+  - ③ 重复以上步骤直到找到目标元素，或者查找范围为空。
+* `时间复杂度`： **O(log n)**，其中 n 是数据集中的元素数量。
+
+![二分查找的时间复杂度 O(log n) ，在坐标系中的数学曲线](./assets/10.png)
+
+* `适用场景`：仅适用于`已排序`的数据集。
+
+
+
+* 示例：
 
 ```java
-外部类.内部类 对象 = new 外部类.静态内部类();
+package com.github.algorithm.search;
+
+public class BinarySearchTest {
+    public static void main(String[] args) {
+        int[] arr = {2, 3, 5, 7, 9, 11, 12, 15, 20, 25, 30, 31, 32, 40, 45};
+
+        int index = indexOf(arr, 20);
+        System.out.println(index); // 8
+
+        index = indexOf(arr, -100);
+        System.out.println(index); // -1
+    }
+
+    /**
+     * 二分查找
+     * @param arr 数组
+     * @param num 查找元素
+     * @return 元素在数组上的索引，如果元素不在数组中，将返回 -1
+     */
+    public static int indexOf(int[] arr, int num) {
+        // 定义起始元素索引
+        int min = 0;
+        // 定义最后元素索引
+        int max = arr.length - 1;
+        // 循环条件
+        while (min <= max) {
+            // 计算中间元素索引
+            int mid = (min + max) / 2;
+            // 如果中间元素就是要查找的元素，直接返回索引
+            if (num == arr[mid]) {
+                return mid;
+            }
+            // 如果需要查找的元素比中间的元素小
+            // 那么 max 就是此时的 mid+1，然后再计算 mid
+            if (num < arr[mid]) {
+                max = mid - 1;
+            }
+            // 如果需要查找的元素比中间的元素大
+            // 那么 min 就是此时的 mid-1，然后再计算 mid
+            if (num > arr[mid]) {
+                min = mid + 1;
+            }
+        }
+        return -1;
+    }
+}
+```
+
+## 2.4 插值查找
+
+* `插值查找`是一种改进的二分查找算法，适用于在`均匀分布的有序数据`中查找元素。它通过估算目标元素在数据中的位置来优化查找过程，从而提高查找效率。
+
+![插值查找](./assets/11.png)
+
+* `算法步骤`：
+  - ① 给定一个有序数组 `arr` 和目标元素 `num`，确定查找区间的左右边界 `min` 和 `max`。
+  - ② 使用插值公式计算中间位置 `mid`： $[ mid = min+ \frac{(num- arr[min]) \times (max- min)}{arr[max] - arr[min]} ]$ ，这里的 `mid` 位置是根据目标值与当前区间的最小值、最大值的差值来动态估算的。
+  - ③ 如果 `arr[mid] == num`，则找到目标元素，返回该位置。
+  - ④ 如果 `arr[mid] < num`，则目标元素在右半部分，将 `min = mid + 1`。
+  - ⑤ 如果 `arr[mid] > num`，则目标元素在左半部分，将 `max = mid - 1`。
+  - ⑥ 重复`步骤②` ~ `步骤⑤`，直到找到目标元素或区间无效，即：`min > max`。
+
+* `时间复杂度`：
+  * 最优时间复杂度：**O(log log n)**，当数据均匀分布时，插值查找的效率接近 O(log log n)。
+  * 最坏时间复杂度： **O(n)**，当数据分布非常不均匀时，插值查找退化为线性查找，性能最差。
+
+![](./assets/12.png)
+
+  * `适用场景`：
+
+      - 插值查找适用于`已排序且数据分布比较均匀`的数组。
+
+      - 如果数据不均匀分布或分布不规律，插值查找的性能可能非常差，甚至退化为线性查找，因此不适用于所有有序数据。
+
+
+
+
+* 示例：
+
+```java
+package com.github.algorithm.search;
+
+public class InsertBinarySearchTest {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+        int index = indexOf(arr, 3);
+        System.out.println(index); // 2
+
+        index = indexOf(arr, -1);
+        System.out.println(index); // -1
+    }
+
+    /**
+     * 插值查找
+     * @param arr 数组
+     * @param num 查找元素
+     * @return 元素在数组上的索引，如果元素不在数组中，将返回 -1
+     */
+    public static int indexOf(int[] arr, int num) {
+        // 定义起始元素索引
+        int min = 0;
+        // 定义最后元素索引
+        int max = arr.length - 1;
+        // 循环条件
+        while (min <= max) {
+            // 计算中间元素索引
+            int mid = min + (num - arr[min]) / (arr[max] - arr[min]) * (max - min);
+            // 如果中间元素就是要查找的元素，直接返回索引
+            if (num == arr[mid]) {
+                return mid;
+            }
+            // 如果需要查找的元素比中间的元素小
+            // 那么 max 就是此时的 mid+1，然后再计算 mid
+            if (num < arr[mid]) {
+                max = mid - 1;
+            }
+            // 如果需要查找的元素比中间的元素大
+            // 那么 min 就是此时的 mid-1，然后再计算 mid
+            if (num > arr[mid]) {
+                min = mid + 1;
+            }
+        }
+        return -1;
+    }
+}
+```
+
+## 2.5 斐波那契查找
+
+### 2.5.1 黄金分割点
+
+* 黄金分割是指将整体一分为二，`较大部分`与`整体部分`的比值等于`较小部分`与`较大部分`的比值，其比值约为 0.618。
+
+![](./assets/13.svg)
+
+### 2.5.2 斐波那契数列
+
+* 在数学中有一个著名的数学规律（斐波那契数列）：0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89…….
+
+> [!NOTE]
+>
+> * ① 斐波那契数列存储到数组中，如下所示：
+>
+> ![](./assets/14.svg)
+>
+> * ② 斐波那契数列：对于任意下标k（k>=2），F[k] = F[k-1] + F[k-2]，即：后边每一个数都是前面两个数的和。
+
+
+
+* 示例：
+
+```java
+package com.github.algorithm.search;
+
+public class Test {
+    public static void main(String[] args) {
+        int fib = fib(0);
+        System.out.println("fib = " + fib);
+    }
+
+    /**
+     * 获取指定位置上的斐波那契数列
+     * @param n 位置
+     * @return 数
+     */
+    public static int fib(int n) {
+        if (n == 0) {
+            return 0;
+        }
+        if (n == 1 || n == 2) {
+            return 1;
+        }
+        return fib(n - 1) + fib(n - 2);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.algorithm.search;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+        int[] fib = fib(3);
+        System.out.println("fib = " + Arrays.toString(fib));
+    }
+
+    /**
+     * 获取斐波那契数列组成的数组
+     * @param n 索引
+     * @return 数组
+     */
+    public static int[] fib(int n) {
+        int[] arr = new int[n + 1];
+        arr[0] = 0;
+        if (n >= 1) {
+            arr[1] = 1;
+        }
+        for (int i = 2; i <= n; i++) {
+            arr[i] = arr[i - 1] + arr[i - 2];
+        }
+        return arr;
+    }
+}
+```
+
+### 2.5.3 斐波那契查找的前提
+
+* 如果一个有序表的元素个数为 n，并且 n 正好是某个斐波那契数减 1，即满足 `n = F[k]-1` 时，才能使用斐波那契查找。
+
+> [!NOTE]
+>
+> * ① 斐波那契查找图示，如下所示：
+>
+> ![](./assets/15.png)
+>
+> * ② 斐波那契查找公式推导：$[ n = {\color{red}(F_{k-1}-1)} + {\color{blue}(F_{k-2}-1)} + {\color{green}1} = (F_{k-1} + F_{k-2}) - 1 = F_k - 1 ]$
+
+* 如果元素个数 n 不满足这个关系，那么需要将查找表扩展（用最后一个元素扩展），直到 n 满足这个关系 。
+
+
+
+* 示例：假设 n = F[k]-1，并且数组长度 n = 7（可以正确的递归执行）
+
+![](./assets/16.svg)
+
+
+
+* 示例：假设 n = F[k]，并且数组长度 n = 8（没有保留中间位置，下一次递归，无法继续分割）
+
+![](./assets/17.svg)
+
+### 2.5.4 斐波那契查找（TODO）
+
+* `斐波那契查找`利用斐波那契数列的性质来确定查找区间的大小，并逐步缩小查找范围。
+
+* `算法步骤`：
+  * ① 初始化斐波那契数列：首先，确定斐波那契数列中比数组长度大的最小数 ( F(k) )，并设置两个索引 `min = 0` 和 `max = n - 1`，其中 `n` 是数组的长度。
+  * ② 计算分割点：使用公式计算当前分割点： [ mid = min + F(k-1) - 1 ] 这里的 `mid` 是通过斐波那契数列来确定的分割点。
+  * ③ 比较目标值：
+    - 如果 `arr[mid] == num`，则找到了目标元素，返回索引 `mid`。
+    - 如果 `arr[mid] > num`，则目标元素在 `mid` 左侧，更新 `max = mid - 1`，并调整斐波那契数列的大小。
+    - 如果 `arr[mid] < num`，则目标元素在 `mid` 右侧，更新 `min= mid + 1`，并调整斐波那契数列的大小。
+  * ④ 调整斐波那契数列：根据查找结果更新 `k`，即更新斐波那契数列中的位置，直到 `min` 超过 `max`。
+
+
+
+* 示例：
+
+```java
+
+```
+
+## 2.6 分块查找
+
+
+
+
+
+
+
+## 2.7 哈希查找
+
+
+
+
+
+# 第三章：排序算法
+
+## 3.1 概述
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 第四章：Arrays（⭐）
+
+## 4.1 概述
+
+* Arrays 是用来操作数组的工具类，如：对数组中的元素进行排序、搜索数组中指定的元素等。
+
+## 4.2 常用 API
+
+### 4.2.1 将数组内容拼接为字符串
+
+* 返回指定数组内容的字符串表示形式，如：`[元素1，元素2，元素3...]`：
+
+```java
+public static String toString(boolean[] a) { ... }
+```
+
+```java
+public static String toString(char[] a) { ... }
+```
+
+```java
+public static String toString(double[] a) { ... }
+```
+
+```java
+public static String toString(long[] a) { ... }
+```
+
+```java
+public static String toString(Object[] a) { ... }
+```
+
+* 返回多维数组内容的字符串表示形式：
+
+```java
+public static String deepToString(Object[] a) { ... }
 ```
 
 
@@ -757,213 +440,26 @@ public class Test {
 
 ::: code-group
 
-```java [Outer.java]
-package com.github.demo11;
-
-public class Outer {
-    
-    static class Inner {}
-    
-}
-```
-
 ```java [Test.java]
-package com.github.demo11;
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
 
 public class Test {
     public static void main(String[] args) {
-        Outer.Inner inner = new Outer.Inner();
+
+        int[] arr = {1, 2, 3, 4, 5, 6};
+
+        System.out.println(Arrays.toString(arr));
     }
 }
+```
+
+```txt [cmd 控制台]
+[1, 2, 3, 4, 5, 6]
 ```
 
 :::
-
-### 3.3.4 调用静态内部类成员
-
-* 如果是调用静态内部类的非静态成员，需要先创建`对象`，再通过对象调用：
-
-```java
-Outer.Inner inner = new Outer.Inner();
-inner.xxx = 'aa'; // 调用属性
-inner.yyy(); // 调用方法   
-```
-
-* 如果是调用静态内部类的静态成员，直接`外部类.静态内部类.成员`：
-
-```java
-Outer.Innter.xxx ; // 调用静态内部类的静态属性
-Outer.Innter.yyy() ; // 调用静态内部类的静态方法
-```
-
-
-
-* 示例：调用静态内部类的非静态成员
-
-::: code-group
-
-```java [Outer.java]
-package com.github.demo11;
-
-public class Outer {
-
-    static class Inner {
-
-        String name = "许大仙"; // [!code highlight]
-
-        public void show(){ // [!code highlight]
-            System.out.println(name);
-        }
-
-    }
-
-}
-```
-
-```java [Test.java]
-package com.github.demo11;
-
-public class Test {
-    public static void main(String[] args) {
-        Outer.Inner inner = new Outer.Inner();
-        System.out.println(inner.name); // [!code highlight]
-        inner.show(); // [!code highlight]
-    }
-}
-```
-
-:::
-
-
-
-* 示例：调用静态内部类的静态成员
-
-::: code-group
-
-```java [Outer.java]
-package com.github.demo11;
-
-public class Outer {
-
-    static class Inner {
-
-        static String name = "许大仙"; // [!code highlight]
-
-        public static void show(){ // [!code highlight]
-            System.out.println(name);
-        }
-
-    }
-
-}
-```
-
-```java [Test.java]
-package com.github.demo11;
-
-public class Test {
-    public static void main(String[] args) {
-        System.out.println(Outer.Inner.name); // [!code highlight]
-        Outer.Inner.show(); // [!code highlight]
-    }
-}
-```
-
-:::
-
-## 3.4 局部内部类（有名字的局部内部类）
-
-* 定义在方法内部的类（鸡肋，实际开发中，使用为 0 ）。
-* 语法：
-
-```java
-[权限修饰符] class 外部类 {
-    [权限修饰符] 返回值类型 方法名(形参列表){
-        [abstract|final] class 内部类 {
-            ...
-        }
-    }
-}
-```
-
-> [!NOTE]
->
-> * ① 外界是无法访问局部内部类的，需要在方法内部创建对象并使用。
-> * ② 局部内部类可以直接访问外部类的成员，也可以访问方法内的局部变量。
-
-
-
-* 示例：
-
-::: code-group
-
-```java [Outer.java]
-package com.github.demo12;
-
-public class Outer {
-
-    static String name = "张三";
-    int age = 30;
-
-    public static void outerMethod() {
-        // 局部内部类
-        class Inner2 { // [!code highlight]
-            public void innerMethod() {
-                System.out.println(name);
-            }
-        }
-
-        Inner2 inner2 = new Inner2();
-        inner2.innerMethod();
-    }
-
-    public void method() {
-        // 局部变量
-        int number = 10;
-        // 局部内部类
-        class Inner { // [!code highlight]
-
-            public void innerMethod() {
-                System.out.println(Outer.this.age);
-                System.out.println(name);
-                System.out.println(number);
-            }
-        }
-
-        Inner inner = new Inner();
-        inner.innerMethod();
-    }
-
-}
-```
-
-```java [Test.java]
-package com.github.demo12;
-
-public class Test {
-    public static void main(String[] args) {
-        Outer.outerMethod();
-        Outer outer = new Outer();
-        outer.method();
-    }
-}
-```
-
-:::
-
-## 3.5 匿名内部类（⭐）
-
-### 3.5.1 匿名对象
-
-* 语法：
-
-```java
-new 类名();
-```
-
-> [!NOTE]
->
-> 没有名字的对象，通常应用于对象只使用一次的场景。
 
 
 
@@ -972,18 +468,40 @@ new 类名();
 ::: code-group
 
 ```java [Student.java]
-package com.github.demo13;
+package com.github.algorithm.arrays;
+
+import java.util.Objects;
 
 public class Student {
-
     private String name;
 
-    private int age;
+    private Integer age;
 
     public Student() {}
 
-    public Student(String name, int age) {
+    public Student(String name, Integer age) {
         this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return Objects.equals(name, student.name) 
+            && Objects.equals(age, student.age);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
         this.age = age;
     }
 
@@ -995,64 +513,38 @@ public class Student {
         this.name = name;
     }
 
-    public int getAge() {
-        return age;
+    @Override
+    public String toString() {
+        return "Student{" + "name='" + name + '\'' + ", age=" + age + '}';
     }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public void study() {
-        System.out.println(this.getName() + ":" + "正在学习~");
-    }
-
 }
+
 ```
 
 ```java [Test.java]
-package com.github.demo13;
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
 
 public class Test {
     public static void main(String[] args) {
-        show(new Student("张三",18)); // [!code highlight]
-        show(new Student("李四",20)); // [!code highlight]
-    }
 
-    public static void show(Student stu){
-        stu.study();
+        Student[] stuArr = {
+            new Student("张三", 18), 
+            new Student("李四", 19), 
+            new Student("王五", 20),
+        };
+
+        System.out.println(Arrays.toString(stuArr));
     }
 }
 ```
 
 ```txt [cmd 控制台]
-张三:正在学习~
-李四:正在学习~
+[Student{name='张三', age=18}, Student{name='李四', age=19}, Student{name='王五', age=20}]
 ```
 
 :::
-
-### 3.5.2 概述
-
-* 匿名内部类的本质是隐藏了名字（不需要我们定义名字，由系统给我们创建）并继承类或实现接口的局部内部类对象。
-
-### 3.5.3 语法
-
-* 语法：
-
-```java
-new 类名或接口名(){
-    重写方法();
-}
-```
-
-> [!NOTE]
->
-> 匿名内部类包含了以下三种含义：
->
-> * ① 继承或实现关系。
-> * ② 方法重写。
-> * ③ 创建对象。
 
 
 
@@ -1060,309 +552,759 @@ new 类名或接口名(){
 
 ::: code-group
 
-```java [Swim.java]
-package com.github.demo14;
-
-public interface Swim {
-
-    void swimming();
-}
-```
-
 ```java [Test.java]
-package com.github.demo14;
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
 
 public class Test {
     public static void main(String[] args) {
-        Swim swim = new Swim(){ // [!code highlight]
-            @Override
-            public void swimming() {
-                System.out.println("游泳~");
-            }
-        };
 
-        swim.swimming();
+        int[][] arr = {{11, 12, 13}, {21, 22, 23}, {31, 32, 33, 34}};
+
+        System.out.println(Arrays.deepToString(arr));
     }
 }
 ```
 
+```txt [cmd 控制台]
+[[11, 12, 13], [21, 22, 23], [31, 32, 33, 34]]
+```
+
 :::
 
-### 3.5.4 如何理解匿名内部类？
+### 4.2.2 二分查找法
 
-* 之前，我们都是创建某个实现类，去继承某个类（抽象类）或实现某个接口，并重写其中的所有抽象方法，然后通过多态来调用抽象方法，如下所示：
+* 通过二分查找法，査找指定的元素：
 
-::: code-group
+```java
+public static int binarySearch(char[] a, char key) { ... }
+```
 
-```java [Swim.java]
-public interface Swim {
+```java
+public static int binarySearch(char[] a, int fromIndex, int toIndex,
+                                   char key) { ... }
+```
 
-    void swimming();
+```java
+public static int binarySearch(double[] a, double key) { ... }
+```
+
+```java
+public static int binarySearch(double[] a, int fromIndex, int toIndex,
+                                   double key) { ... }
+```
+
+```java
+public static int binarySearch(Object[] a, Object key) { ... }
+```
+
+```java
+public static int binarySearch(Object[] a, int fromIndex, int toIndex,
+                                   Object key) { ... }
+```
+
+```java
+public static <T> int binarySearch(T[] a, T key, Comparator<? super T> c) { ... }
+```
+
+```java
+ public static <T> int binarySearch(T[] a, int fromIndex, int toIndex,
+                                       T key, Comparator<? super T> c) { ... }
+```
+
+```java
+public static int binarySearch(long[] a, long key) { ... }
+```
+
+```java
+public static int binarySearch(long[] a, int fromIndex, int toIndex,
+                                   long key) { ... }
+```
+
+
+
+* 示例：
+
+```java
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5, 6, 7};
+
+        int index = Arrays.binarySearch(arr, 8);
+        System.out.println(index); // -8
+
+        index = Arrays.binarySearch(arr, 6);
+        System.out.println(index); // 5
+    }
 }
 ```
+
+### 4.2.3 拷贝数组
+
+* 拷贝数组：
+
+```java
+/**
+* 会根据第二个参数创建新的数组
+* 如果新数组的长度 < 旧数组的长度，会部分拷贝
+* 如果新数组的长度 = 旧数组的长度，会完全拷贝
+* 如果新数组的长度 > 就数组的长度，在完全拷贝的同时，补上默认初始值
+*/
+public static boolean[] copyOf(boolean[] original, int newLength) { ... }
+```
+
+```java
+public static <T> T[] copyOf(T[] original, int newLength) { ... }        
+```
+
+```java
+public static long[] copyOf(long[] original, int newLength) { ... }
+```
+
+```java
+public static char[] copyOf(char[] original, int newLength) { ... }
+```
+
+```java
+public static double[] copyOf(double[] original, int newLength) { ... }
+```
+
+```java
+public static <T,U> T[] copyOf(U[] original, int newLength, Class<? extends T[]> newType) { ... }
+```
+
+* 拷贝数组（指定范围）：
+
+```java
+/**
+* 将老数组指定索引范围的元素拷贝到新数组中。
+* [from,to) 包头不包尾，包左不包右
+*/
+public static boolean[] copyOfRange(boolean[] original, int from, int to) { ... }
+```
+
+```java
+public static <T> T[] copyOfRange(T[] original, int from, int to) { ... }
+```
+
+```java
+public static long[] copyOfRange(long[] original, int from, int to) { ... }
+```
+
+```java
+public static char[] copyOfRange(char[] original, int from, int to) { ... }
+```
+
+```java
+public static double[] copyOfRange(double[] original, int from, int to) { ... }
+```
+
+```java
+public static <T,U> T[] copyOfRange(U[] original, int from, int to, Class<? extends T[]> newType) { ... }
+```
+
+
+
+* 示例：
+
+```java
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+
+        int[] arr = {1, 2, 3, 4, 5};
+
+        int[] newArr = Arrays.copyOf(arr, 2);
+        System.out.println(Arrays.toString(newArr)); // [1, 2]
+
+        newArr = Arrays.copyOf(arr, arr.length);
+        System.out.println(Arrays.toString(newArr)); // [1, 2, 3, 4, 5]
+
+        newArr = Arrays.copyOf(arr, arr.length + 2);
+        System.out.println(Arrays.toString(newArr)); // [1, 2, 3, 4, 5, 0, 0]
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.algorithm.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+
+        int[] arr = {1, 2, 3, 4, 5};
+
+        int[] newArr = Arrays.copyOfRange(arr, 1, arr.length);
+        System.out.println(Arrays.toString(newArr)); // [2, 3, 4, 5]
+    }
+}
+```
+
+### 4.2.4 填充数组
+
+* 将指定元素填充到数组中：
+
+```java
+public static void fill(long[] a, long val) { ... }
+```
+
+```java
+public static void fill(char[] a, char val) { ... }
+```
+
+```java
+public static void fill(double[] a, double val) { ... }
+```
+
+```java
+public static void fill(Object[] a, Object val) { ... }
+```
+
+* 将指定元素填充到数组中（指定范围）：
+
+```java
+public static void fill(long[] a, int fromIndex, int toIndex, long val) { ... }
+```
+
+```java
+public static void fill(char[] a, int fromIndex, int toIndex, char val) { ... }
+```
+
+```java
+public static void fill(double[] a, int fromIndex, int toIndex,double val) { ... }
+```
+
+```java
+public static void fill(Object[] a, int fromIndex, int toIndex, Object val) { ... }
+```
+
+
+
+* 示例：
+
+```java
+package com.github.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5};
+
+        // 填充数组
+        Arrays.fill(arr, 10);
+        System.out.println(Arrays.toString(arr)); // [10, 10, 10, 10, 10]
+
+        // 重新赋值
+        arr = new int[] {1, 2, 3, 4, 5};
+
+        // 填充数组（指定范围）
+        Arrays.fill(arr, 1, 3, 100);
+        System.out.println(Arrays.toString(arr)); // [1, 100, 100, 4, 5]
+    }
+}
+```
+
+### 4.2.5 数组排序
+
+* 按照默认方式进行数组排序：
+
+```java
+public static void sort(long[] a) { ... }
+public static void sort(short[] a, int fromIndex, int toIndex) { ... }
+```
+
+```java
+public static void sort(char[] a) { ... }
+public static void sort(char[] a, int fromIndex, int toIndex) { ... }
+```
+
+```java
+public static void sort(double[] a) { ... }
+public static void sort(double[] a, int fromIndex, int toIndex) { ... }
+```
+
+```java
+public static void sort(Object[] a) { ... }
+public static void sort(Object[] a, int fromIndex, int toIndex) { ... }
+```
+
+* 按照指定规则进行数组排序：
+
+```java
+public static <T> void sort(T[] a, Comparator<? super T> c) { ... }
+```
+
+```java
+public static <T> void parallelSort(T[] a, int fromIndex, int toIndex,
+                                        Comparator<? super T> cmp) { ... }
+```
+
+
+
+* 示例：按照默认方式进行数组排序（自然排序）
+
+```java
+package com.github.arrays;
+
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) {
+        int[] arr = {2, 3, 5, 7, 9, 25, 30, 31, 32, 40, 11, 12, 15, 20, 45};
+
+        Arrays.sort(arr);
+
+        // [2, 3, 5, 7, 9, 11, 12, 15, 20, 25, 30, 31, 32, 40, 45]
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
+
+
+* 示例：按照指定规则进行数组排序（自定义排序）
+
+```java 
+package com.github.arrays;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class Test {
+    public static void main(String[] args) {
+
+        // 包装类型数组，才可以使用自定义排序
+        Integer[] arr = {2, 3, 5, 7, 9, 25, 30, 31, 32, 40, 11, 12, 15, 20, 45};
+
+        Arrays.sort(arr, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return Integer.compare(o2, o1);
+            }
+        });
+
+        // [45, 40, 32, 31, 30, 25, 20, 15, 12, 11, 9, 7, 5, 3, 2]
+        System.out.println(Arrays.toString(arr));
+    }
+}
+```
+
+
+
+* 示例：按照默认方式进行数组排序（自然排序）
+
+::: code-group
 
 ```java [Student.java]
-public class Student implements Swim{ // [!code highlight]
+package com.github.arrays;
+
+import java.util.Objects;
+
+public class Student implements Comparable<Student> { // [!code highlight]
+    private String name;
+
+    private Integer age;
+
+    public Student() {}
+
+    public Student(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
+
     @Override
-    public void swimming() { // [!code highlight]
-        System.out.println("重写了游泳方法~");
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return Objects.equals(name, student.name) 
+            && Objects.equals(age, student.age);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" + "name='" + name + '\'' + ", age=" + age + '}';
+    }
+
+    @Override
+    public int compareTo(Student o) { // [!code highlight:5]
+        // 先比较年龄，如果年龄不相等，则比较年龄；否则，就比较姓名
+        return this.age - o.age != 0
+            ? (this.age - o.age) : this.name.compareTo(o.name);
+    }
+}
+
+```
+
+```java [Test.java]
+package com.github.arrays;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class Test {
+    public static void main(String[] args) {
+        // 定义数组
+        Student[] stuArr = {
+            new Student("张三", 50),
+            new Student("李四", 25),
+            new Student("王五", 9),
+            new Student("赵六", 18),
+            new Student("田七", 35),
+            new Student("王八", 46),
+            new Student("呵呵", 18),
+        };
+
+        // 自然排序
+        Arrays.sort(stuArr);
+
+        // 打印数组内容
+        Arrays.stream(stuArr).forEach(System.out::println);
     }
 }
 ```
 
-```java [Test.java]
-public class Test {
-    public static void main(String[] args) {        
-        Swim swim = new Student(); // [!code highlight]
-        swim.swimming(); // [!code highlight]
-    }
-}
+```txt [cmd 控制台]
+Student{name='王五', age=9}
+Student{name='呵呵', age=18}
+Student{name='赵六', age=18}
+Student{name='李四', age=25}
+Student{name='田七', age=35}
+Student{name='王八', age=46}
+Student{name='张三', age=50}
 ```
 
 :::
 
-* 其图示，如下所示：
 
-![](./assets/6.svg)
 
-* 我们可以解析下实现类（子类），如下所示：
-
-```java
-public class Student implements Swim{ // [!code highlight]
-    @Override
-    public void swimming() { // [!code highlight]
-        System.out.println("重写了游泳方法~");
-    }
-}
-```
-
-* 其图示，如下所示：
-
-![](./assets/7.svg)
-
-* 如果将`类名`删除，不就变为了没有名字的类（匿名类）吗？
-
-![](./assets/8.svg)
-
-* 此时，这个没有名字的类（匿名类）想要实现接口，就需要将接口写在`{}`前面，表示这个匿名类实现了接口，并重写了接口中所有的抽象方法，如下所示：
-
-![](./assets/9.svg)
-
-* 之前，我们创建匿名对象是这样的，如下所示：
-
-```java
-new 类名();
-```
-
-* 现在，我们给匿名类创建对象也是同样的道理，如下所示：
-
-```java
-new 类名或接口名() {
-  重写方法  
-};
-```
-
-* 其图示，如下所示：
-
-![](./assets/10.svg)
-
-* 而所谓的`匿名内部类`中的`内部类`指的是该语法只能定义在方法内部，不可以定义在成员位置，如下所示：
-
-```java
-public class Test {
-    public static void main(String[] args) {
-        new Swim(){ // 只能定义在方法内部，现在就是匿名内部类
-            @Override
-            public void swimming() {
-                System.out.println("游泳~");
-            }
-        };
-    }
-}
-```
-
-* 剖析下匿名内部类的特点之一：`继承或实现关系`，如下所示：
-
-![](./assets/11.svg)
-
-* 剖析下匿名内部类的特点之一：`重写方法`，如下所示：
-
-![](./assets/12.svg)
-
-* 剖析下匿名内部类的特点之一：`创建对象`，如下所示：
-
-![](./assets/13.svg)
-
-### 3.5.5 证明
-
-* 假设代码是这样的，如下所示：
+* 示例：按照指定规则进行数组排序（自定义排序）
 
 ::: code-group
 
-```java [Swim.java]
-package com.github.demo14;
+```java [Student.java]
+package com.github.arrays;
 
-public interface Swim {
+import java.util.Objects;
 
-    void swimming();
+public class Student implements Comparable<Student> { // [!code highlight]
+    private String name;
+
+    private Integer age;
+
+    public Student() {}
+
+    public Student(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return Objects.equals(name, student.name) 
+            && Objects.equals(age, student.age);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" + "name='" + name + '\'' + ", age=" + age + '}';
+    }
+
+    @Override
+    public int compareTo(Student o) { // [!code highlight:5]
+        // 先比较年龄，如果年龄不相等，则比较年龄；否则，就比较姓名
+        return this.age - o.age != 0
+            ? (this.age - o.age) : this.name.compareTo(o.name);
+    }
 }
+
 ```
 
 ```java [Test.java]
-package com.github.demo14;
+package com.github.arrays;
+
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class Test {
     public static void main(String[] args) {
-        Swim swim = new Swim(){ // [!code highlight]
-            @Override
-            public void swimming() {
-                System.out.println("游泳~");
-            }
+        // 定义数组
+        Student[] stuArr = {
+            new Student("张三", 50),
+            new Student("李四", 25),
+            new Student("王五", 9),
+            new Student("赵六", 18),
+            new Student("田七", 35),
+            new Student("王八", 46),
+            new Student("呵呵", 18),
         };
 
-        swim.swimming();
+        // 自定义排序
+        Arrays.sort(stuArr, new Comparator<>() {
+            @Override
+            public int compare(Student o1, Student o2) {
+                return Integer.compare(o2.getAge(), o1.getAge());
+            }
+        });
+
+        // 打印数组内容
+        Arrays.stream(stuArr).forEach(System.out::println);
     }
 }
 ```
 
+```txt [cmd 控制台]
+Student{name='张三', age=50}
+Student{name='王八', age=46}
+Student{name='田七', age=35}
+Student{name='李四', age=25}
+Student{name='赵六', age=18}
+Student{name='呵呵', age=18}
+Student{name='王五', age=9}
+```
+
 :::
 
-* 编译完毕之后，将在磁盘上产生这样的文件，如下所示：
 
-![](./assets/14.png)
 
-* 我们可以使用 Java 提供的反编译工具，对该字节码文件进行反编译，如下所示：
+# 第五章：综合练习
 
-```java
-javap Test$1.class
-```
+## 5.1 练习一
+
+* 需求：定义数组并存储一些女朋友对象，请利用 Arrays 中的 sort 方法进行排序。
 
 > [!NOTE]
 >
-> 所谓的匿名并不是没有名字，而是由 Java 在底层编译的时候替我们给生成的类命名，只是程序员看到没有给类进行命名！！！
-
-![](./assets/15.png)
-
-### 3.5.6 应用场景
-
-* 当我们希望定义一个只使用一次的类时，就可以考虑使用匿名内部类。匿名内部类出现的目的就是为了简化代码。
+> 要求：
+>
+> * ① 属性有姓名、年龄和身高。
+> * ② 按照年龄的大小进行排序，如果年龄一样，按照身高排序；如果身高一样，则按照姓名进行排序。
 
 
 
-* 示例：没有使用匿名内部类
+* 示例：
 
 ::: code-group
 
-```java [Swim.java]
-public interface Swim {
+```java [GirFriend.java]
+package com.github.test;
 
-    void swimming();
-}
-```
+import java.util.Objects;
 
-```java [Student.java]
-public class Student implements Swim {
+public class GirFriend {
+
+    private String name;
+
+    private Integer age;
+
+    private double height;
+
+    public GirFriend() {}
+
+    public GirFriend(String name, Integer age, double height) {
+        this.name = name;
+        this.age = age;
+        this.height = height;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
 
     @Override
-    public void swimming() {
-        System.out.println("重写了 swimming 方法");
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        GirFriend girFriend = (GirFriend) o;
+        return Double.compare(getHeight(), girFriend.getHeight()) == 0
+                && Objects.equals(getName(), girFriend.getName())
+                && Objects.equals(getAge(), girFriend.getAge());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getAge(), getHeight());
+    }
+
+    @Override
+    public String toString() {
+        return "{" + "name='" + name + '\'' 
+            + ", age=" + age + ", height=" + height + '}';
     }
 }
 ```
 
 ```java [Test.java]
+package com.github.test;
+
+import java.util.Arrays;
+
 public class Test {
     public static void main(String[] args) {
-        new  Student().swimming();
-    }
-}
-```
+        // 创建女朋友对象
+        GirFriend gf1 = new GirFriend("泷巧蕊", 18, 1.65);
+        GirFriend gf2 = new GirFriend("杨不悔", 19, 1.72);
+        GirFriend gf3 = new GirFriend("周芷若", 19, 1.78);
+        GirFriend gf4 = new GirFriend("公羊茜", 19, 1.63);
+        GirFriend gf5 = new GirFriend("咸含秀", 20, 1.55);
+        GirFriend gf6 = new GirFriend("桐合美", 20, 1.55);
 
-:::
+        // 创建数组
+        GirFriend[] arr = {gf1, gf2, gf3, gf4, gf5, gf6};
 
-
-
-* 示例：使用匿名内部类
-
-::: code-group
-
-```java [Swim.java]
-public interface Swim {
-
-    void swimming();
-}
-```
-
-```java [Test.java]
-public class Test {
-    public static void main(String[] args) {
-        new Swim(){
-            @Override
-            public void swimming() {
-                System.out.println("游泳~");
+        // 对数组中的元素进行排序
+        Arrays.sort(arr, (o1, o2) -> {
+            if (!o1.getAge().equals(o2.getAge())) {
+                return Integer.compare(o1.getAge(), o2.getAge());
             }
-        }.swimming();
-        
-        Swim swim = new Swim(){
-            @Override
-            public void swimming() {
-                System.out.println("游泳~");
+            if (Double.compare(o1.getHeight(), o2.getHeight()) != 0) {
+                return Double.compare(o1.getHeight(), o2.getHeight());
             }
-        };
-
-        swim.swimming();
-    }
-}
-```
-
-:::
-
-
-
-* 示例：使用匿名内部类
-
-::: code-group
-
-```java [Swim.java]
-public interface Swim {
-
-    void swimming();
-}
-```
-
-```java [Test.java]
-public class Test {
-    public static void main(String[] args) {
-        goSwimming(new Swim() {
-            @Override
-            public void swimming() {
-                System.out.println("重写了 swimming 方法");
-            }
+            return o1.getName().compareTo(o2.getName());
         });
-    }
 
-    // 定义一个方法,模拟请一些人去游泳
-    public static void goSwimming(Swim s) {
-        s.swimming();
+        // 打印数组
+        Arrays.stream(arr).forEach(System.out::println);
     }
 }
 ```
 
+```txt[cmd 控制台]
+{name='泷巧蕊', age=18, height=1.65}
+{name='公羊茜', age=19, height=1.63}
+{name='杨不悔', age=19, height=1.72}
+{name='周芷若', age=19, height=1.78}
+{name='咸含秀', age=20, height=1.55}
+{name='桐合美', age=20, height=1.55}
+```
+
 :::
 
-### 3.5.7 总结
+## 5.2 练习二
 
-#### 3.5.7.1 总结一
+* 需求：有一对兔子，从出生后第 3 个月开始起每个月能生一对兔子，小兔子长到第 3 个月后每个月又能生一对兔子，假设兔子都不死，问第 12 个月兔子的对数是多少？
 
-* 【问】什么是匿名内部类？
-* 【答】隐藏了名字（不需要我们定义名字，由系统给我们命名）并继承类或实现接口的局部内部类对象。
+![](./assets/18.svg)
 
-#### 3.5.7.2 总结二
+> [!NOTE]
+>
+> * 我们可以试图对应的数学模型，如下所示：
+>   * ① f(1) = 1。
+>   * ② f(2) = 1。
+>   * ③ f(3) = 2 = f(2) + f(1)。
+>   * ④ f(4) = 3 = f(3) + f(2)。
+>   * ⑤ f(5) = 5 = f(3) + f(2)。
+>   * ⑥ f(6) = 8 = f(5) + f(4)。
+>   * ⑦ ....
+> * 综上所述，f(n) = f(n-1) + f(n-2)，如果 n == 1 || n ==2，f(n) = 1 。
 
-* 【问】匿名内部类格式的细节（`new 类名或接口名(){重写方法}`）？
-* 【答】继承或实现关系，方法重写，创建对象，即：一个类的子类对象或接口的实现类对象。
 
-#### 3.5.7.3 总结三
 
-* 【问】使用场景？
-* 【答】当方法的参数是类或接口的时候，如果实现类只需要使用一次，就可以使用匿名内部类来简化代码。
+* 示例：
+
+```java
+package com.github.test;
+
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(rabbit(1)); // ·
+        System.out.println(rabbit(2)); // 2
+        System.out.println(rabbit(3)); // 3
+        System.out.println(rabbit(4)); // 4
+        System.out.println(rabbit(5)); // 5
+        System.out.println(rabbit(6)); // 8
+        System.out.println(rabbit(7)); // 11
+    }
+
+    /**
+     * 不死神兔
+     *
+     * @param num 次数
+     * @return 数量
+     */
+    public static int rabbit(int num) {
+        if (num == 1 || num == 2) {
+            return 1;
+        }
+        return rabbit(num - 1) + rabbit(num - 2);
+    }
+}
+```
+

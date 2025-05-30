@@ -1,322 +1,133 @@
-# 第一章：JDK 8 之前时间相关类
+# 第一章：集合体系结构
 
 ## 1.1 概述
 
-* 地球是有`经纬线`的，`经线`（子午线）是连接南北两极竖着的线，而`纬线`（平行线）是与地球赤道平行的环绕地球的假想线，如下所示：
+* 集合是 Java 提供的一种容器，可以用来存储多个数据。集合的本质是用来`存储对象`。
 
 > [!NOTE]
 >
-> * ① `经线`指示南北方向的位置，并用于测量**经度**，即：地球上某一点相对于本初子午线（0 度经线，通常通过英国格林威治天文台）的东西方向上的角度。所有的经线长度都**相等**，并在南北两极**汇聚**。经度分为**东经 (E)** 和 **西经 (W)**，各有 0° 到 180°。
->
-> ::: details 点我查看 具体细节
->
-> * `经`是`纵向`、`直的`、`贯穿`的意思，如：“经脉”指身体里纵向的主要通道。
->
-> ![](./assets/2.jpeg)
->
-> * `经线`是连接地球南北两极的，呈现纵向的形态，就像一根根“经”线贯穿地球的南北。因此，用“经”来形容这种纵向的线非常贴切。
->
-> :::
->
-> * ② `纬线`指示东西方向的位置，并用于测量**纬度**，即：地球上某一点相对于赤道的南北方向上的角度。所有的纬线都互相**平行**，但长度**不相等**，赤道最长，越靠近两极纬线越短，到两极缩成一个点。赤道是 0 度纬线。纬度分为**北纬 (N)** 和 **南纬 (S)**，各有 0°（赤道）到 90°（两极）。
->
-> ::: details 点我查看 具体细节
->
-> * `纬`是横向的、水平的、交织的意思，如：纬纱”指的是织布过程中横向的纱线。
->
-> ![](./assets/3.jpg)
->
-> *  `纬线`是与赤道平行的横向圆圈，环绕地球，与纵向的经线交织成网格。因此，用“纬”来形容这种横向的线非常形象。
->
-> :::
+> * 【问】：集合只能用来存储对象？为什么也可以存储基本数据类型？
+> * 【答】：在 JDK5 的时候，新增了一个特性：自动装箱和自动拆箱。换言之，向集合中添加基本类型数据的时候，会先转换为对应的包装类型对象，然后在进行存储。
 
-![经线和纬线](./assets/1.png)
+* 集合和数组都是容器，它们之间的区别？
+  * ① 数组的长度是固定的，集合的长度是可变的。
+  * ② 数组中可以存储基本类型的数据，也可以存储对象；但是，集合中只能存储对象。
 
-* 当地球围绕太阳旋转的时候，围绕太阳转一圈是一年（公转），地球自己转一圈是一天（自转），如下所示：
+## 1.2 集合体系结构
 
-![公转和自转](./assets/4.gif)
+* Java 中的集合主要分为两大类：
+  * ① Collection（单列集合）：在添加数据的时候，一次只能添加一个数据，如：`脉动`、`康师傅`、`奥利奥`等。
+  * ② Map（双列集合）：在添加数据的时候，一次需要添加一对数据，如：`脉动:5元`、`康师傅:12元`、`奥利奥:8.5元`，
 
-* 在同一条`经线`上的时间是一样的，如下所示：
+![单列集合 VS 多列集合](./assets/1.svg)
 
-![图中红线标注的是经线，并且是正午 12 点](./assets/5.png)
-
-* 之前，我们都是以`零度经线`为标准，认为它是标准的世界时间，如下所示：
+* Java 集合框架图，如下所示：
 
 > [!NOTE]
 >
-> 零度经线（本初子午线），英国的格林威治正好坐落在零度经线上，所以之前的标准世界时间也被称为`格林威治时间`。
+> * ① List 系列集合：添加的元素是有序、可重复、有索引。
+>   * 有序：`存`和`取`的顺序是一样的，如：存数据是`张三、李四、王五`，那么取数据也是`张三、李四、王五`；和之前学习的`排序`（从小到大或从大到小）没有任何关系。
+>   * 可重复：集合存储的元素是可以重复的。
+>   * 有索引：可以通过索引去获取集合中的元素。
+> * ② Set 系列集合：添加的元素是无序、不重复、无索引。
+>   * 无序：`存`和`取`的顺序有可能是不一样，如：存数据是`张三、李四、王五`，那么取数据可能是`张三、王五、李四`。
+>   * 不重复：集合存储的元素是不可以重复的。
+>   * 无索引：不可以通过索引去获取集合中的元素。
 
-![零度经线（本初子午线）](./assets/6.png)
+![集合体系结构](./assets/2.webp)
 
-* 全世界一共有 24 个时区，每个时区都是按照`标准世界时间`进行`加`或`减`，即：在本初子午线右侧的 12 个时区，称为`东部区域`；剩余的 12 个时区，称为`西部区域`，如下所示：
+
+
+# 第二章：Collection 接口（⭐）
+
+## 2.1 概述
+
+* Collection 接口是 List、Set 接口的父接口，该接口中定义的方法既可以用于操作 List 集合，也可以用于操作 Set 集合。
 
 > [!NOTE]
 >
-> 中国在东八区，所以中国的标准时间 = 标准世界时间 + 8 。
+> JDK 不提供此接口的任何直接实现，而是提供更具体的子接口（如：List 、Set 等）实现。
 
-![](./assets/7.png)
-
-> [!NOTE]
->
-> 总结：
->
-> * ① 全世界的时间，有一个统一的计算标准，在 1884 年，规定`零度经线`上的时间是`标准时间`，又因为英国的`格林威治`坐落在`零度经线`上，所以`世界标准时间`也被称为`格林威治时间`（Greenwich Mean Time），简称 `GMT`，其计算的核心是：地球自转一天是 24 小时，再将时间划分为 24 等份，太阳直射时是正午 12 点。
-> * ② 上述的计算方式并没有太大的问题，对于平时生活已经足够的；但是，随着时代的发展，人们发现地球自转的速度是不均匀的，使用`格林威治时间`作为`世界时间标准`和`实际真正的时间`是有误差的，历史统计，最大的误差曾达 16 分钟，现在`格林威治时间`已经不再作为`世界标准时间`去使用了。
-> * ③ 后来，人们为了彻底解决定义的时间的流逝不均匀的问题，到了 1972 年，开始使用`原子钟`（利用铯原子的震动频率计算出来的时间）定义`世界标准时间`，即：世界协调时间（法语：**T**emps **U**niversel **C**oordonné，简称为`UTC`），所以目前的`世界标准时间`是`世界协调时间`（UTC）。
-> * ④ 中国位于东八区，中国标准时间 = 世界标准时间（UTC）+ 8 。
-
-## 1.2 Date
-
-### 1.2.1 概述
-
-* `Date`类用来描述时间，精确到毫秒，这个类的对象表示某个时间点的对象。
-
-### 1.2.2 构造方法
-
-* 使用空参构造方法创建的对象，表示系统当前时间：
-
-```java
-public Date() { // [!code focus]
-    this(System.currentTimeMillis());
-} // [!code focus]
-```
-
-* 使用有参构造方法创建的对象，表示指定的时间：
-
-```java
-public Date(long date) { // [!code focus]
-    fastTime = date;
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.date;
-
-import java.util.Date;
-
-public class Test {
-    public static void main(String[] args) {
-        // 当前系统时间
-        Date date = new Date();
-        // date = Tue Apr 22 11:03:51 CST 2025
-        System.out.println("date = " + date); 
+```mermaid
+classDiagram
+    Collection <|-- List :extends
+    Collection <|-- Queue :extends
+    Collection <|-- Set :extends
+    List <|-- ArrayList :implements
+    List <|-- LinkedList :implements
+    List <|-- Vector :implements
+    note for Vector "已过时，不推荐使用"
+    Queue <|-- LinkedList :implements
+    Set <|-- HashSet :implements
+    Set <|-- TreeSet :implements
+    HashSet <|-- LinkedHashSet :extends
+    class Collection{
+        <<interface>>
     }
+    class Queue{
+        <<interface>>
+    }
+    class List{
+        <<interface>>
+    }
+    class Set{
+        <<interface>>
+    }
+
+```
+
+* 由于 JDK 5 增加了 `泛型` 特性，使得 Java 集合可以记住容器中对象的数据类型。
+
+```java
+public interface Collection<E> extends Iterable<E> {
+    ...
 }
 ```
 
+## 2.2 常用 API
 
+### 2.2.1 添加元素
 
-* 示例：
+* 添加元素对象到当前集合中：
 
 ```java
-package com.github.date;
-
-import java.util.Date;
-
-public class Test {
-    public static void main(String[] args) {
-        // 指定时间
-        Date date = new Date(System.currentTimeMillis() + 10);
-        // date = Tue Apr 22 11:05:19 CST 2025
-        System.out.println("date = " + date);
-    }
-}
+boolean add(E e);
 ```
 
-### 1.2.3 常用 API
-
-#### 1.2.3.1 将 Date 对象转换为时间戳
-
-* 获取时间对象的毫秒值：
+* 添加另一个集合中的所有元素到当前集合中：
 
 ```java
-public long getTime() { // [!code focus]
-    return getTimeImpl();
-} // [!code focus]
-
-private final long getTimeImpl() {
-    if (cdate != null && !cdate.isNormalized()) {
-        normalize();
-    }
-    return fastTime;
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.date;
-
-import java.util.Date;
-
-public class Test {
-    public static void main(String[] args) {
-        // 当前系统时间
-        Date date = new Date();
-        // date = Tue Apr 22 11:03:51 CST 2025
-        System.out.println("date = " + date);
-
-        long time = date.getTime(); // [!code highlight]
-        // time = 1745291495789
-        System.out.println("time = " + time);
-    }
-}
-```
-
-#### 1.2.3.2 将毫秒值转换为 Date 对象
-
-* 设置或修改毫秒值：
-
-```java
-public void setTime(long time) { // [!code focus]
-    fastTime = time;
-    cdate = null;
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.date;
-
-import java.util.Date;
-
-public class Test {
-    public static void main(String[] args) {
-        // 指定时间
-        Date date = new Date(System.currentTimeMillis() + 1000);
-        // date = Tue Apr 22 11:13:44 CST 2025
-        System.out.println("date = " + date);
-        // 设置或修改毫秒值
-        date.setTime(System.currentTimeMillis()); // [!code highlight]
-        // date = Tue Apr 22 11:13:43 CST 2025
-        System.out.println("date = " + date);
-    }
-}
-```
-
-#### 1.2.3.3 判断当前时间是否晚于指定时间
-
-* 判断当前时间是否晚于指定时间：
-
-```java
-public boolean after(Date when) { // [!code focus]
-    return getMillisOf(this) > getMillisOf(when);
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.date;
-
-import java.util.Date;
-
-public class Test {
-    public static void main(String[] args) {
-        Date d1 = new Date();
-
-        Date d2 = new Date(d1.getTime() + 100000);
-
-        System.out.println(d1.after(d2)); // false
-    }
-}
-```
-
-#### 1.2.3.4 判断当前时间是否早于指定时间
-
-* 判断当前时间是否早于指定时间：
-
-```java
-public boolean before(Date when) { // [!code focus]
-    return getMillisOf(this) < getMillisOf(when);
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.date;
-
-import java.util.Date;
-
-public class Test {
-    public static void main(String[] args) {
-        Date d1 = new Date();
-
-        Date d2 = new Date(d1.getTime() + 100000);
-
-        System.out.println(d1.before(d2)); // true
-    }
-}
-```
-
-## 1.3 SimpleDateFormat
-
-### 1.3.1 概述
-
-* `SimpleDateFormat`是格式化时间的类，有如下的作用：
-  * ① `格式化`：可以将`Date 对象`格式化我们喜欢的格式，如：`2025-04-22`、`2025/04/22`、`2025年04月22日`等。
-  * ② `解析`：可以将`字符串表示的时间`变为`Date 对象`。
-
-### 1.3.2 构造方法
-
-* 使用默认格式，创建一个 SimpleDateFormat 对象：
-
-```java
-public SimpleDateFormat() { // [!code focus]
-    this("", Locale.getDefault(Locale.Category.FORMAT));
-    applyPatternImpl(LocaleProviderAdapter.getResourceBundleBased().getLocaleResources(locale)
-                     .getDateTimePattern(SHORT, SHORT, calendar));
-} // [!code focus]
-```
-
-* 使用指定格式，创建一个 SimpleDateFormat 对象（推荐）：
-
-```java
-public SimpleDateFormat(String pattern) { // [!code focus]
-    this(pattern, Locale.getDefault(Locale.Category.FORMAT));
-} // [!code focus]
+boolean addAll(Collection<? extends E> c);
 ```
 
 > [!NOTE]
 >
-> ::: details 点我查看 pattern 的具体含义
->
-> ![日期格式化规则](./assets/8.webp)
->
-> :::
+> * ① 当我们向 List 系列集合添加元素的时候，方法永远返回 true ，因为 List 系列集合是允许元素重复的。
+> * ② 当我们向 Set 系列集合添加元素的时候，如果要添加的元素在集合中不存在，方法返回 true ，表示添加成功；如果要添加的元素在集合中已经存在，方法返回 false，表示添加失败，因为 Set 系列集合是不允许元素重复的。
+> * ③ 在实际开发中，我们通常不会关心`add()`方法或`addAll()`方法的返回值。
 
 
 
 * 示例：
 
 ```java
-package com.github.simple;
+package com.github.collecton;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Test {
     public static void main(String[] args) {
-        SimpleDateFormat format = new SimpleDateFormat();
-
-        String str = format.format(new Date());
-
-        // str = 2025/4/22 下午1:33
-        System.out.println("str = " + str);
+        // 创建集合
+        Collection<Integer> coll = new ArrayList<>();
+        // 添加元素
+        coll.add(1);
+        coll.add(2);
+        coll.add(3);
+        coll.add(4);
+        coll.add(5);
+        // 打印集合中的元素
+        System.out.println(coll); // [1, 2, 3, 4, 5]
     }
 }
 ```
@@ -326,34 +137,59 @@ public class Test {
 * 示例：
 
 ```java
-package com.github.simple;
+package com.github.collecton;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class Test {
     public static void main(String[] args) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        String str = format.format(new Date());
-
-        // str = 2025-04-22 13:33:55
-        System.out.println("str = " + str);
+        // 创建另一个集合
+        List<Integer> list = List.of(1, 2, 3, 4, 5);
+        // 创建集合
+        Collection<Integer> coll = new ArrayList<>();
+        // 给集合添加元素
+        coll.add(11);
+        coll.add(22);
+        coll.add(33);
+        // 添加另一个集合中的所有元素到本集合中
+        coll.addAll(list);
+        // 打印集合中的元素
+        System.out.println(coll); // [11, 22, 33, 1, 2, 3, 4, 5]
     }
 }
 ```
 
-### 1.3.3 常用 API
+### 2.2.2 删除元素
 
-#### 1.3.3.1 将日期对象格式化为字符串
-
-* 格式化（日期对象 --> 字符串）：
+* 从当前集合中删除第一个和 obj 对象匹配（调用 equals() 方法）的元素：
 
 ```java
-public final String format(Date date){ // [!code focus]
-    return format(date, new StringBuffer(),
-                  DontCareFieldPosition.INSTANCE).toString();
-} // [!code focus]
+boolean remove(Object o);
+```
+
+* 从当前集合中删除所有与 c 集合中相同的元素，即：求差集：
+
+```java
+boolean removeAll(Collection<?> c);
+```
+
+* 删除满足指定条件的集合中所有元素<Badge type="danger" text="jdk8+" />：
+
+```java
+default boolean removeIf(Predicate<? super E> filter) {
+    Objects.requireNonNull(filter);
+    boolean removed = false;
+    final Iterator<E> each = iterator();
+    while (each.hasNext()) {
+        if (filter.test(each.next())) {
+            each.remove();
+            removed = true;
+        }
+    }
+    return removed;
+}
 ```
 
 
@@ -361,106 +197,549 @@ public final String format(Date date){ // [!code focus]
 * 示例：
 
 ```java
-package com.github.simple;
+package com.github.collecton;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Test {
     public static void main(String[] args) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Collection<String> c1 = new ArrayList<>();
+        c1.add("aa");
+        c1.add("bb");
+        c1.add("cc");
+        System.out.println("c1 = " + c1); // c1 = [aa, bb, cc]
+        // 删除
+        c1.remove("cc");
+        System.out.println("c1 = " + c1); // c1 = [aa, bb]
 
-        String str = format.format(new Date()); // [!code highlight]
-
-        // str = 2025-04-22 13:33:55
-        System.out.println("str = " + str);
     }
 }
 ```
 
-#### 1.3.3.2 将字符串解析为日期对象
 
-* 解析（字符串 --> 日期对象）：
+
+* 示例：
 
 ```java
-public Date parse(String source) throws ParseException {  // [!code focus]
-    ParsePosition pos = new ParsePosition(0);
-    Date result = parse(source, pos);
-    if (pos.index == 0)
-        throw new ParseException("Unparseable date: \"" + source + "\"" ,
-            pos.errorIndex);
-    return result;
-}  // [!code focus]
+package com.github.collecton;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection<String> c1 = new ArrayList<>();
+        c1.add("aa");
+        c1.add("bb");
+        c1.add("cc");
+
+        Collection<String> c2 = new ArrayList<>();
+        c2.add("ee");
+        c2.add("ff");
+
+        c1.addAll(c2);
+
+        System.out.println("c1 = " + c1); // c1 = [aa, bb, cc, ee, ff]
+
+        // 求差集
+        c1.removeAll(c2);
+
+        System.out.println("c1 = " + c1); // c1 = [aa, bb, cc]
+
+    }
+}
 ```
+
+
+
+* 示例：
+
+```java
+package com.github.collecton;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection<Integer> c1 = new ArrayList<>();
+
+        c1.add(1);
+        c1.add(2);
+        c1.add(3);
+        c1.add(4);
+        c1.add(5);
+
+        System.out.println("c1 = " + c1); // c1 = [1, 2, 3, 4, 5]
+
+        // 从集合中删除所有偶数
+        c1.removeIf(x -> x % 2 == 0);
+
+        System.out.println("c1 = " + c1); // c1 = [1, 3, 5]
+    }
+}
+```
+
+### 2.2.3 清空集合
+
+* 清空集合，即：将集合中的所有元素删除：
+
+```java
+void clear();
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collecton;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection<String> c1 = new ArrayList<>();
+        c1.add("aa");
+        c1.add("bb");
+        c1.add("cc");
+
+        System.out.println("c1 = " + c1); // c1 = [aa, bb, cc]
+
+        // 清空集合
+        c1.clear();
+
+        System.out.println("c1 = " + c1); // c1 = []
+
+    }
+}
+```
+
+### 2.2.4 判断
+
+* 判断当前集合是否是空集合（没有任何元素）：
+
+```java
+boolean isEmpty();
+```
+
+* 判断当前集合是否包含指定的元素（底层会调用 o 对象的 equals() 方法）：
+
+```java
+boolean contains(Object o);
+```
+
+* 判断 c 集合中的元素是否都在当前集合中存在，即：c 集合是否是当前集合的子集：
+
+```java
+boolean containsAll(Collection<?> c);
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collecton;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection<Integer> c1 = new ArrayList<>();
+
+        c1.add(1);
+        c1.add(2);
+        c1.add(3);
+        c1.add(4);
+        c1.add(5);
+
+        System.out.println(c1.isEmpty()); // false
+
+        Collection<Integer> c2 = new ArrayList<>();
+
+        System.out.println(c2.isEmpty()); // true
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collecton;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection<String> c1 = new ArrayList<>();
+        c1.add("aa");
+        c1.add("bb");
+        c1.add("cc");
+        c1.add("dd");
+
+        System.out.println("c1 = " + c1.contains("aa")); // c1 = true
+        System.out.println("c1 = " + c1.contains("aaa")); // c1 = false
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collecton;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection<String> c1 = new ArrayList<>();
+        c1.add("aa");
+        c1.add("bb");
+        c1.add("cc");
+        c1.add("dd");
+
+        Collection<String> c2 = new ArrayList<>();
+        c2.add("aa");
+        c2.add("bb");
+        c2.add("ee");
+
+        // c1.containsAll(c2) = false
+        System.out.println("c1.containsAll(c2) = " + c1.containsAll(c2));
+
+        Collection<String> c3 = new ArrayList<>();
+        c3.add("aa");
+        c3.add("bb");
+
+        // c1.containsAll(c3) = true
+        System.out.println("c1.containsAll(c3) = " + c1.containsAll(c3));
+    }
+}
+```
+
+### 2.2.5 获取集合中元素的个数
+
+* 获取当前集合中实际存储的元素个数：
+
+```java
+int size();
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collecton;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection<String> c1 = new ArrayList<>();
+        c1.add("aa");
+        c1.add("bb");
+        c1.add("cc");
+        c1.add("dd");
+
+        System.out.println("c1.size() = " + c1.size()); // c1.size() = 4
+
+        c1.clear();
+
+        System.out.println("c1.size() = " + c1.size()); // c1.size() = 0
+    }
+}
+
+```
+
+### 2.2.6 交集
+
+* 当前集合仅保留与 c 集合中的元素相同的元素，即当前集合中仅保留两个集合的交集：
+
+```java
+boolean retainAll(Collection<?> c);
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collecton;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection<String> c1 = new ArrayList<>();
+        c1.add("aa");
+        c1.add("bb");
+        c1.add("cc");
+        c1.add("dd");
+
+        System.out.println("c1 = " + c1); // c1 = [aa, bb, cc, dd]
+
+        Collection<String> c2 = new ArrayList<>();
+        c2.add("bb");
+
+        System.out.println("c2 = " + c2); // c2 = [bb]
+
+        c1.retainAll(c2);
+
+        System.out.println("c1 = " + c1); // c1 = [bb]
+    }
+}
+```
+
+### 2.2.7 转数组
+
+* 将当前集合中的所有元素转换为 Object 数组：
+
+```java
+Object[] toArray();
+```
+
+* 将当前集合中的所有元素转换为对应元素类型的数组（需要自己传递数组的长度）：
+
+```java
+<T> T[] toArray(T[] a);
+```
+
+* 将当前集合中的所有元素转换为对应元素类型的数组（推荐，<Badge type="danger" text="jdk8+" />）：
+
+```java
+default <T> T[] toArray(IntFunction<T[]> generator) {
+    return toArray(generator.apply(0));
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collecton;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection<String> c1 = new ArrayList<>();
+        c1.add("aa");
+        c1.add("bb");
+        c1.add("cc");
+        c1.add("dd");
+
+        // 将集合中的所有元素转换为 Object 数组
+        Object[] arr = c1.toArray();
+
+        System.out.println(Arrays.toString(arr)); // [aa, bb, cc, dd]
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collecton;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection<String> c1 = new ArrayList<>();
+        c1.add("aa");
+        c1.add("bb");
+        c1.add("cc");
+        c1.add("dd");
+
+        // 将集合中的所有元素转换为 String 数组
+        String[] arr = c1.toArray(new String[c1.size()]);
+
+        System.out.println(Arrays.toString(arr)); // [aa, bb, cc, dd]
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collecton;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        Collection<String> c1 = new ArrayList<>();
+        c1.add("aa");
+        c1.add("bb");
+        c1.add("cc");
+        c1.add("dd");
+        c1.add("ee");
+
+        // 将集合中的所有元素转换为 String 数组
+        String[] arr = c1.toArray(String[]::new);
+
+        System.out.println(Arrays.toString(arr)); // [aa, bb, cc, dd, ee]
+    }
+}
+```
+
+## 2.3 遍历方式
+
+### 2.3.1 概述
+
+* Collection 集合是没有普通的 for 循环遍历，因为 Collection 集合是单列集合的顶层接口，其子接口 Set 是不可以通过索引来获取元素的。
+
+```mermaid
+classDiagram
+    Collection <|-- List :extends
+    note for List "😄可以通过索引获取元素"
+    Collection <|-- Queue :extends
+    Collection <|-- Set :extends
+    note for Set "😭不可以通过索引获取元素"
+    List <|-- ArrayList :implements
+    List <|-- LinkedList :implements
+    List <|-- Vector :implements
+    note for Vector "已过时，不推荐使用"
+    Queue <|-- LinkedList :implements
+    Set <|-- HashSet :implements
+    Set <|-- TreeSet :implements
+    HashSet <|-- LinkedHashSet :extends
+    class Collection{
+        <<interface>>
+    }
+    class Queue{
+        <<interface>>
+    }
+    class List{
+        <<interface>>
+    }
+    class Set{
+        <<interface>>
+    }
+```
+
+* 为了程序的通用性，Collection 集合提供了三种遍历方式：
+  * ① 迭代器遍历。
+  * ② 增强 for 遍历。
+  * ③ Lambda 表达式遍历。
+
+### 2.3.2 迭代器遍历
+
+#### 2.3.2.1 概述
+
+* 我们可以通过`迭代器对象`，将集合中的元素依次获取出来，如下所示：
+
+![](./assets/3.gif)
+
+#### 2.3.2.2 Iterator 接口
+
+* Iterator 接口也是 Java 集合中的一员，但是它和 Collection 接口以及 Map 接口有所不同：
+  * Collection 接口和 Map 接口主要用来存储元素。
+  * Iterator 接口主要用来迭代访问，即：遍历 Collection 集合或 Map 集合中的元素。
 
 > [!CAUTION]
 >
-> 如果给定的字符串内容和 SimpleDateFormat 对象中传递的 pattern 参数不匹配，将会报错！！！
+> 所谓的迭代器，就是实现 Iterator 接口的对象！！！
+
+* Collection 接口获取迭代器：
+
+| 方法                      | 描述                                                  |
+| ------------------------- | ----------------------------------------------------- |
+| `Iterator<E> iterator();` | 返回迭代器对象（创建指针），默认指向集合索引 0 的位置 |
+
+* Iterator 接口的常用方法：
+
+| 方法                 | 描述                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| `boolean hasNext();` | 判断当前位置是否有元素，如果有，返回 true；如果没有，返回 false |
+| `E next();`          | 获取当前位置上的元素，并将迭代器对象移动到下一个位置（移动指针） |
+
+* 迭代器的内存示意图，如下所示：
+
+![](./assets/4.gif)
 
 
 
 * 示例：
 
 ```java
-package com.github.simple;
+package com.github.collection;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class Test {
-    public static void main(String[] args) throws ParseException {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        Date parse = format.parse("2012-12-12 12:12:12"); // [!code highlight]
-
-        // parse = Wed Dec 12 12:12:12 CST 2012
-        System.out.println("parse = " + parse);
+    public static void main(String[] args) {
+        // 创建集合对象
+        Collection<String> col = new ArrayList<>();
+        // 向集合中添加元素
+        col.add("aa");
+        col.add("bb");
+        col.add("cc");
+        col.add("dd");
+        // 获取迭代器对象，默认指向集合的 0 索引处
+        Iterator<String> iterator = col.iterator();
+        // 利用循环不断地去获取集合中的每一个元素
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            System.out.println("next = " + next);
+        }
     }
 }
 ```
-
-### 1.3.4 应用示例
-
-* 需求：假设初恋的出生日期是`2000-11-11`，请用字符串表示这个数据，并将其转换为`2000年11月11日`。
 
 
 
 * 示例：
 
 ```java
-package com.github.simple;
+package com.github.collection;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class Test {
-    public static void main(String[] args) throws ParseException {
-        String str = "2000-11-11";
-        // 解析
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = sdf1.parse(str);
-        // 格式化
-        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日");
-        String str2 = sdf2.format(date);
-        System.out.println(str2); // 2000年11月11日
+    public static void main(String[] args) {
+        // 创建集合对象
+        Collection<String> col = new ArrayList<>();
+        // 向集合中添加元素
+        col.add("aa");
+        col.add("bb");
+        col.add("cc");
+        col.add("dd");
+        // 使用 for 循环来改写 while 循环
+        for (Iterator<String> iterator = col.iterator(); iterator.hasNext(); ) {
+            String next = iterator.next();
+            System.out.println("next = " + next);
+        }
     }
 }
 ```
-
-### 1.3.5 应用示例
-
-* 需求：秒杀活动。
-
-> [!NOTE]
->
-> 用代码判断下面两位同学能否参与这次秒杀活动？
->
-> * ① 小贾下单并付款的时间是：`2023年11月11日 0:01:00`。
-> * ② 小皮下单并付款的时间是：`2023年11月11日 0:11:00`。
-
-![](./assets/9.png)
 
 
 
@@ -468,1973 +747,451 @@ public class Test {
 
 ::: code-group
 
-```java [Test.java]
-package com.github.simple;
+```java [Student.java]
+package com.github.collection;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+public class Student {
+
+    private final String name;
+
+    private final Integer age;
+
+    public Student(String name, Integer age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" + "name='" + name + '\'' + ", age=" + age + '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class Test {
-    public static void main(String[] args) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
-        Date skillStartDate = sdf.parse("2023年11月11日 00:00:00");
-        Date skillEndDate = sdf.parse("2023年11月11日 00:10:00");
-
-        Date xiaoJiaDate = sdf.parse("2023年11月11日 00:01:00");
-        Date xiaoPiDate = sdf.parse("2023年11月11日 00:11:00");
-
-        if (xiaoJiaDate.after(skillStartDate) 
-            && xiaoJiaDate.before(skillEndDate)) {
-            System.out.println("小贾可以参与此次秒杀活动");
-        } else {
-            System.out.println("小贾不能参与此次秒杀活动");
-        }
-
-        if (xiaoPiDate.after(skillStartDate) 
-            && xiaoPiDate.before(skillEndDate)) {
-            System.out.println("小皮可以参与此次秒杀活动");
-        } else {
-            System.out.println("小皮不能参与此次秒杀活动");
+    public static void main(String[] args) {
+        // 创建集合
+        Collection<Student> collection = new ArrayList<>();
+        // 给集合添加元素
+        collection.add(new Student("张三", 11));
+        collection.add(new Student("李四", 59));
+        collection.add(new Student("王五", 19));
+        collection.add(new Student("赵六", 42));
+        collection.add(new Student("田七", 8));
+        collection.add(new Student("王八", 2));
+        // 遍历集合
+        Iterator<Student> iterator = collection.iterator();
+        while (iterator.hasNext()){
+            Student next = iterator.next();
+            System.out.println(next);
         }
     }
 }
 ```
 
 ```txt [cmd 控制台]
-小贾可以参与此次秒杀活动
-小皮不能参与此次秒杀活动
+Student{name='张三', age=11}
+Student{name='李四', age=59}
+Student{name='王五', age=19}
+Student{name='赵六', age=42}
+Student{name='田七', age=8}
+Student{name='王八', age=2}
 ```
 
 :::
 
-## 1.4 Calendar
+#### 2.3.2.3 迭代器的实现原理
 
-### 1.4.1 概述
-
-* Calendar 代表了系统当前时间的日历对象，可以单独修改、获取时间中的年、月、日等。
-
-> [!CAUTION]
->
-> Calendar 是一个抽象类，不能直接创建对象；但是，其提供一个静态方法返回 Calendar 实例。
-
-### 1.4.2 静态方法
-
-* 静态方法获取 Calendar 实例：
+* 在 Collection 接口中提供了获取 Iterator 接口的方法：
 
 ```java
-public static Calendar getInstance(){ // [!code focus]
-    Locale aLocale = Locale.getDefault(Locale.Category.FORMAT);
-    return createCalendar(defaultTimeZone(aLocale), aLocale);
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.calendar;
-
-import java.util.Calendar;
-
-public class Test {
-    public static void main(String[] args){
-        Calendar calendar = Calendar.getInstance();
-        System.out.println("calendar = " + calendar);
-    }
+public interface Collection<E> extends Iterable<E> {
+    
+    Iterator<E> iterator();
+    
+    ...
 }
 ```
 
-### 1.4.3 常用 API
-
-#### 1.4.3.1 获取日期对象
-
-* 将 Calendar 实例转换为日期对象：
+* 实现 Collection 接口或子接口的实现类都必须实现该方法，以 ArrayList 为例：
 
 ```java
-public final Date getTime() { // [!code focus]
-    return new Date(getTimeInMillis());
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.calendar;
-
-import java.util.Calendar;
-import java.util.Date;
-
-public class Test {
-    public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        Date date = calendar.getTime();
-        // date = Tue Apr 22 14:58:13 CST 2025
-        System.out.println("date = " + date);
+public class ArrayList<E> extends AbstractList<E>
+        implements List<E>, RandomAccess, Cloneable, java.io.Serializable {
+    
+	public Iterator<E> iterator() {
+        return new Itr();
     }
-}
-```
-
-#### 1.4.3.2 给日历设置日期对象
-
-* 将日期对象转换为 Calendar 实例：
-
-```java
-public final void setTime(Date date) { // [!code focus]
-    Objects.requireNonNull(date, "date must not be null");
-    setTimeInMillis(date.getTime());
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.calendar;
-
-import java.util.Calendar;
-import java.util.Date;
-
-public class CalendarTest3 {
-    public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        System.out.println("calendar = " + calendar);
-    }
-}
-```
-
-#### 1.4.3.3 获取毫秒值
-
-* 将 Calendar 实例转换为毫秒值：
-
-```java
-public long getTimeInMillis() { // [!code focus]
-    if (!isTimeSet) {
-        updateTime();
-    }
-    return time;
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.calendar;
-
-import java.util.Calendar;
-
-public class Test {
-    public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        long time = calendar.getTimeInMillis();
-        // time = 1745305350908
-        System.out.println("time = " + time);
-    }
-}
-```
-
-#### 1.4.3.4 给日历设置毫秒值
-
-* 将毫秒值转换为 Calendar 实例：
-
-```java
-public void setTimeInMillis(long millis) { // [!code focus]
-    // If we don't need to recalculate the calendar field values,
-    // do nothing.
-    if (time == millis && isTimeSet && areFieldsSet && areAllFieldsSet
-        && (zone instanceof ZoneInfo) && !((ZoneInfo)zone).isDirty()) {
-        return;
-    }
-    time = millis;
-    isTimeSet = true;
-    areFieldsSet = false;
-    computeFields();
-    areAllFieldsSet = areFieldsSet = true;
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.calendar;
-
-import java.util.Calendar;
-
-public class Test {
-    public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        System.out.println("calendar = " + calendar);
-    }
-}
-```
-
-#### 1.4.3.5 获取日历中某个字段信息
-
-* 获取日历中某个字段信息：
-
-```java
-public int get(int field) { // [!code focus]
-    complete();
-    return internalGet(field);
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.calendar;
-
-import java.util.Calendar;
-
-public class Test {
-    public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        System.out.println("year = " + year); // year = 2025
-        int month = calendar.get(Calendar.MONTH) + 1;
-        System.out.println("month = " + month); // month = 4
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        System.out.println("day = " + day); // day = 22
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        System.out.println("hour = " + hour); // hour = 14
-        int minute = calendar.get(Calendar.MINUTE);
-        System.out.println("minute = " + minute); // minute = 53
-        int second = calendar.get(Calendar.SECOND);
-        System.out.println("second = " + second); // second = 48
-        int milliSecond = calendar.get(Calendar.MILLISECOND);
-        System.out.println("milliSecond = " + milliSecond); // milliSecond = 658
-
-    }
-}
-```
-
-#### 1.4.3.6 修改日历中某个字段信息
-
-* 修改日历中某个字段信息：
-
-```java
-public void set(int field, int value) { // [!code focus]
-    // If the fields are partially normalized, calculate all the
-    // fields before changing any fields.
-    if (areFieldsSet && !areAllFieldsSet) {
-        computeFields();
-    }
-    internalSet(field, value);
-    isTimeSet = false;
-    areFieldsSet = false;
-    isSet[field] = true;
-    stamp[field] = nextStamp++;
-    if (nextStamp == Integer.MAX_VALUE) {
-        adjustStamp();
-    }
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.calendar;
-
-import java.util.Calendar;
-
-public class Test {
-    public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR,2005);
-        // calendar = 2005
-        System.out.println("calendar = " + calendar.get(Calendar.YEAR));
-    }
-}
-```
-
-#### 1.4.3.7 为某个字段增加或减少指定的值
-
-* 设置日历字段的偏移量：
-
-```java
-public abstract void add(int field, int amount);
-```
-
-> [!NOTE]
->
-> 如果是增加，amount 是正数；如果是减少，amount 是负数。
-
-
-
-* 示例：
-
-```java
-package com.github.calendar;
-
-import java.util.Calendar;
-
-public class Test {
-    public static void main(String[] args) {
-        Calendar calendar = Calendar.getInstance();
-        // 日历向后移动 180 天
-        calendar.add(Calendar.DAY_OF_MONTH, 180);
-        int year = calendar.get(Calendar.YEAR);
-        System.out.println("year = " + year); // year = 2025
-        int month = calendar.get(Calendar.MONTH) + 1;
-        System.out.println("month = " + month); // month = 10
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        System.out.println("day = " + day); // day = 19
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        System.out.println("hour = " + hour); // hour = 15
-        int minute = calendar.get(Calendar.MINUTE);
-        System.out.println("minute = " + minute); // minute = 8
-        int second = calendar.get(Calendar.SECOND);
-        System.out.println("second = " + second); // second = 55
-        int milliSecond = calendar.get(Calendar.MILLISECOND);
-        System.out.println("milliSecond = " + milliSecond); // milliSecond = 136
-    }
-}
-```
-
-
-
-# 第二章：JDK 8 新增时间相关类（⭐）
-
-## 2.1 概述
-
-* Java 1.0 中包含了一个 Date 类，但是它的大多数方法已经在 Java 1.1 中引入 Calendar 类的时候被废弃了。
-* 但是，Calendar 并不比 Date 类好多少，它们有如下的问题：
-  * ① 可变性：像日期和时间这样的类对象应该是不可变的。Calendar 类可以使用三种方法更改日历字段：`set()` 、`add()` 和 `roll()` 。
-  - ② 偏移性：Date 和 Calendar 中的月份是从 0 开始的。
-  - ③ 格式化：格式化只对 Date 有效，Calendar 则不行。
-  - ④ 它们不是线程安全的，不能处理闰秒等。
-* 在 JDK8 之前，对日期和时间的操作一直是 Java 程序员最为痛苦的地方，没有之一。第三方库 joda-time 在 JDK8 出现之前的很长时间备受 Java 程序员欢迎。JDK8 吸收了 joda-time 的精华，以一个新的开始，为 Java 程序员提供优秀的时间日期 API 。
-  * ① `java.time` – 包含值对象的基础包。
-  - ② `java.time.chrono` – 提供对不同的日历系统的访问。
-  - ③ `java.time.format` – 格式化和解析时间和日期。
-  - ④ `java.time.temporal` – 包括底层框架和扩展特性。
-  - ⑤ `java.time.zone` – 包含时区支持的类。
-  
-* JDK7 和 JDK8 的对比，如下所示：
-
-| 代码层面                                                | 安全层面                                                     |
-| ------------------------------------------------------- | ------------------------------------------------------------ |
-| JDK7 编码麻烦，日期对象 <--> 毫秒值。                   | JDK7 在多线程环境下会导致数据安全问题。                      |
-| JDK8 编码简单，提供了判断的方法以及计算时间间隔的方法。 | JDK8 的时间日期对象都是不可变对象，一举解决了之前在多线程下导致数据安全的问题。 |
-
-## 2.2 JDK8 新增的时间相关类
-
-* JDK8 新增的时间相关类非常多，如下所示：
-
-| JDK8 新增的时间相关类 | 描述                   |
-| --------------------- | ---------------------- |
-| ZoneId                | 时区                   |
-| Instant               | 时间戳                 |
-| ZoneDateTime          | 带时区的时间           |
-| DateTimeFormatter     | 用于时间的格式化和解析 |
-| LocalDate             | 年、月、日             |
-| LocalTime             | 时、分、秒             |
-| LocalDateTime         | 年、月、日、时、分、秒 |
-| Duration              | 时间间隔（秒，纳秒）   |
-| Period                | 时间间隔（年、月、日） |
-| ChronoUnit            | 时间间隔（所有单位）   |
-
-* 我们可以对比 JDK8 之前的 API 来学习，如下所示：
-
-![](./assets/10.svg)
-
-## 2.2 时区（ZoneId）
-
-### 2.2.1 概述
-
-* 全世界一共分为 24 个时区，每个时区都是按照`标准世界时间`进行`加`或`减`，中国处于东八区，如下所示：
-
-![](./assets/11.png)
-
-* Java 在定义时区的时候，并不是采取`东一区`、`东二区`、... ，而是采取`洲名/城市名`或`国家名/城市名`，如下所示：
-
-> [!CAUTION]
->
-> * ① Java 在定义时区的时候是没有北京的，如：`Asia/Beijing`。
-> * ② 在实际开发中，我们通常会使用`Asia/Shanghai`来表示中国的时区。
-
-![](./assets/12.png)
-
-### 2.2.2 常用 API
-
-* 获取 Java 中支持的所有时区：
-
-```java
-public static Set<String> getAvailableZoneIds() { // [!code focus]
-    return new HashSet<String>(ZoneRulesProvider.getAvailableZoneIds());
-} // [!code focus]
-```
-
-* 获取系统默认的时区：
-
-```java
-public static ZoneId systemDefault() { // [!code focus]
-    return TimeZone.getDefault().toZoneId();
-} // [!code focus]
-```
-
-* 获取指定的时区：
-
-```java
-public static ZoneId of(String zoneId) { // [!code focus]
-    return of(zoneId, true);
-} // [!code focus]
-```
-
-> [!CAUTION]
->
-> Java 提供的时区太多了，我们并不需要记住，只需要使用上面的 API 就可以获取对应的时区！！！
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8;
-
-import java.time.ZoneId;
-import java.util.Set;
-
-public class Test {
-
-    public static void main(String[] args) throws InterruptedException {
-        Set<String> availableZoneIds = ZoneId.getAvailableZoneIds();
-        System.out.println("availableZoneIds = " + availableZoneIds);
-        ZoneId zoneId = ZoneId.systemDefault();
-        System.out.println("zoneId = " + zoneId);
-        ZoneId zoneId2 = ZoneId.of("Asia/Chongqing");
-        System.out.println("zoneId2 = " + zoneId2);
-    }
-}
-```
-
-## 2.3 时间戳（Instant）
-
-### 2.3.1 概述
-
-* Instant 类在 Java 中表示的是时间线上的一个瞬时点（时间戳），它并不直接关联任何特定的时区。 
-* Instant 对象本质上是以 UTC（世界协调时间）为基准的时间戳，记录自 1970 年 1 月 1 日 00:00:00（UTC）以来的秒数和纳秒数。 
-
-### 2.3.2 常用 API
-
-#### 2.3.2.1 获取 Instant 对象
-
-* 获取当前时间的 Instant 对象（标准时间 UTC）：
-
-```java
-public static Instant now() { // [!code focus]
-    return Clock.currentInstant();
-} // [!code focus]
-```
-
-* 根据秒、毫秒、纳秒获取 Instant 对象（标准时间 UTC）：
-
-```java
-// 根据秒获取 Instant 对象
-public static Instant ofEpochSecond(long epochSecond) { // [!code focus]
-    return create(epochSecond, 0);
-} // [!code focus]
-```
-
-```java
-// 根据毫秒获取 Instant 对象
-public static Instant ofEpochMilli(long epochMilli) { // [!code focus]
-    long secs = Math.floorDiv(epochMilli, 1000);
-    int mos = Math.floorMod(epochMilli, 1000);
-    return create(secs, mos * 1000_000);
-} // [!code focus]
-```
-
-```java
-// 根据秒和纳秒获取 Instant 对象
-public static Instant ofEpochSecond(long epochSecond, long nanoAdjustment) { // [!code focus]
-    long secs = Math.addExact(epochSecond, Math.floorDiv(nanoAdjustment, NANOS_PER_SECOND));
-    int nos = (int)Math.floorMod(nanoAdjustment, NANOS_PER_SECOND);
-    return create(secs, nos);
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.instant;
-
-import java.time.Instant;
-
-public class Test {
-    public static void main(String[] args) {
-        Instant now = Instant.now();
-        // now = 2025-04-23T01:02:02.398288Z
-        System.out.println("now = " + now);
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.instant;
-
-import java.time.Instant;
-
-public class Test {
-    public static void main(String[] args) {
-
-        Instant instant1 = Instant.ofEpochSecond(1);
-        // instant1 = 1970-01-01T00:00:01Z
-        System.out.println("instant1 = " + instant1);
-
-        Instant instant2 = Instant.ofEpochMilli(1000);
-        // instant2 = 1970-01-01T00:00:01Z
-        System.out.println("instant2 = " + instant2);
-
-        Instant instant3 = Instant.ofEpochSecond(0, (long) Math.pow(10, 9));
-        // instant3 = 1970-01-01T00:00:01Z
-        System.out.println("instant3 = " + instant3);
-    }
-}
-```
-
-#### 2.3.2.2 转换时区
-
-* 将 UTC 表示的时间戳转换为指定时区的时间：
-
-```java
-public ZonedDateTime atZone(ZoneId zone) { // [!code focus]
-    return ZonedDateTime.ofInstant(this, zone);
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.instant;
-
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
-public class Test {
-    public static void main(String[] args) {
-        Instant now = Instant.now();
-
-        // UTC = 2025-04-23T01:09:18.513139200Z
-        System.out.println("UTC = " + now);
-
-        ZonedDateTime zonedDateTime = now.atZone(ZoneId.of("Asia/Shanghai"));
-
-        // 2025-04-23T09:09:18.513139200+08:00[Asia/Shanghai]
-        System.out.println("zonedDateTime = " + zonedDateTime);
-    }
-}
-```
-
-#### 2.3.2.3 判断系列方法
-
-* 判断`当前时间戳（时刻）`是否在`指定时间戳（时刻）`之前：
-
-```java
-public boolean isBefore(Instant otherInstant) { // [!code focus]
-    return compareTo(otherInstant) < 0;
-} // [!code focus]
-```
-
-* 判断`当前时间戳（时刻）`是否在`指定时间戳（时刻）`之后：
-
-```java
-public boolean isAfter(Instant otherInstant) { // [!code focus]
-    return compareTo(otherInstant) > 0;
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.instant;
-
-import java.time.Instant;
-
-public class Test {
-    public static void main(String[] args) {
-        Instant instant = Instant.ofEpochSecond(0);
-        Instant now = Instant.now();
-
-        System.out.println(instant.isBefore(now)); // true
-        System.out.println(instant.isAfter(now)); // false
-    }
-}
-```
-
-#### 2.3.2.4 增加时间系列方法
-
-* 在`当前时间戳（时刻）`基础上增加`秒`：
-
-```java
-public Instant plusSeconds(long secondsToAdd) { // [!code focus]
-    return plus(secondsToAdd, 0);
-} // [!code focus]
-```
-
-* 在`当前时间戳（时刻）`基础上增加`毫秒`：
-
-```java
-public Instant plusMillis(long millisToAdd) { // [!code focus]
-    return plus(millisToAdd / 1000, (millisToAdd % 1000) * 1000_000);
-} // [!code focus]
-```
-
-* 在`当前时间戳（时刻）`基础上增加`纳秒`：
-
-```java
-public Instant plusNanos(long nanosToAdd) { // [!code focus]
-    return plus(0, nanosToAdd);
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.instant;
-
-import java.time.Instant;
-
-public class Test {
-    public static void main(String[] args) {
-        Instant instant = Instant.ofEpochSecond(0);
-        // instant = 1970-01-01T00:00:00Z
-        System.out.println("instant = " + instant);
-        Instant instant2 = instant.plusSeconds(7);
-        // instant2 = 1970-01-01T00:00:07Z
-        System.out.println("instant2 = " + instant2);
-        Instant instant3 = instant.plusMillis(1000);
-        // instant3 = 1970-01-01T00:00:01Z
-        System.out.println("instant3 = " + instant3);
-        Instant instant4 = instant.plusNanos((long) Math.pow(10, 9));
-        // instant4 = 1970-01-01T00:00:01Z
-        System.out.println("instant4 = " + instant4);
-    }
-}
-```
-
-#### 2.3.2.5 减少时间系列方法
-
-* 在`当前时间戳（时刻）`基础上减少`秒`：
-
-```java
-public Instant minusSeconds(long secondsToSubtract) { // [!code focus]
-    if (secondsToSubtract == Long.MIN_VALUE) {
-        return plusSeconds(Long.MAX_VALUE).plusSeconds(1);
-    }
-    return plusSeconds(-secondsToSubtract);
-} // [!code focus]
-```
-
-* 在`当前时间戳（时刻）`基础上减少`毫秒`：
-
-```java
-public Instant minusMillis(long millisToSubtract) { // [!code focus]
-    if (millisToSubtract == Long.MIN_VALUE) {
-        return plusMillis(Long.MAX_VALUE).plusMillis(1);
-    }
-    return plusMillis(-millisToSubtract);
-} // [!code focus]
-```
-
-* 在`当前时间戳（时刻）`基础上减少`纳秒`：
-
-```java
-public Instant minusNanos(long nanosToSubtract) { // [!code focus]
-    if (nanosToSubtract == Long.MIN_VALUE) {
-        return plusNanos(Long.MAX_VALUE).plusNanos(1);
-    }
-    return plusNanos(-nanosToSubtract);
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.instant;
-
-import java.time.Instant;
-
-public class Test {
-    public static void main(String[] args) {
-        Instant instant = Instant.now();
-        // instant = 2025-04-23T01:37:22.990790600Z
-        System.out.println("instant = " + instant);
-        Instant instant2 = instant.minusSeconds(7);
-        // instant2 = 2025-04-23T01:37:15.990790600Z
-        System.out.println("instant2 = " + instant2);
-        Instant instant3 = instant.minusMillis(1000);
-        // instant3 = 2025-04-23T01:37:21.990790600Z
-        System.out.println("instant3 = " + instant3);
-        Instant instant4 = instant.minusNanos((long) Math.pow(10, 9));
-        // instant4 = 2025-04-23T01:37:21.990790600Z
-        System.out.println("instant4 = " + instant4);
-    }
-}
-```
-
-## 2.4 带时区的时间（ZoneDateTime）
-
-### 2.4.1 概述
-
-* ZoneDateTime 用于表示带有时区信息的日期和时间。
-
-### 2.4.2 常用 API
-
-#### 2.4.2.1 获取 ZoneDateTime 对象
-
-* 获取当前时间的 ZoneDateTime 对象（带有时区）：
-
-```java
-public static ZonedDateTime now() { // [!code focus]
-    return now(Clock.systemDefaultZone());
-} // [!code focus]
-```
-
-* 年、月、日、时、分、秒、纳秒方式获取 ZoneDateTime 对象（带有时区）：
-
-```java
-public static ZonedDateTime of( // [!code focus]
-        int year, int month, int dayOfMonth,  // [!code focus]
-        int hour, int minute, int second, int nanoOfSecond, ZoneId zone) { // [!code focus]
-    LocalDateTime dt = LocalDateTime.of(year, month, dayOfMonth, 
-                                        hour, minute, second, nanoOfSecond);
-    return ofLocal(dt, zone, null);
-} // [!code focus]
-```
-
-* Instant + 时区方式获取 ZoneDateTime 对象（带有时区）：
-
-```java
-public static ZonedDateTime ofInstant(Instant instant, ZoneId zone) { // [!code focus]
-    Objects.requireNonNull(instant, "instant");
-    Objects.requireNonNull(zone, "zone");
-    return create(instant.getEpochSecond(), instant.getNano(), zone);
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.zonedatetime;
-
-import java.time.ZonedDateTime;
-
-public class Test {
-    public static void main(String[] args) {
-        ZonedDateTime now = ZonedDateTime.now();
-        // now = 2025-04-23T09:50:51.743019300+08:00[Asia/Shanghai]
-        System.out.println("now = " + now);
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.zonedatetime;
-
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
-public class Test {
-    public static void main(String[] args) {
-
-        ZonedDateTime zonedDateTime = ZonedDateTime.of(2025, 4, 3,
-                11, 11, 11,
-                11, ZoneId.of("Asia/Shanghai"));
-        // zonedDateTime = 2025-04-03T11:11:11.000000011+08:00[Asia/Shanghai]
-        System.out.println("zonedDateTime = " + zonedDateTime);
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.zonedatetime;
-
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
-public class Test {
-    public static void main(String[] args) {
-
-        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(
-            Instant.now(), ZoneId.of("Asia/Shanghai"));
-        // zonedDateTime = 2025-04-23T09:57:52.336562200+08:00[Asia/Shanghai]
-        System.out.println("zonedDateTime = " + zonedDateTime);
-    }
-}
-```
-
-#### 2.4.2.2 修改时间系列方法
-
-* 修改年：
-
-```java
-public ZonedDateTime withYear(int year) { // [!code focus]
-    return resolveLocal(dateTime.withYear(year));
-} // [!code focus]
-```
-
-* 修改秒：
-
-```java
-public ZonedDateTime withSecond(int second) { // [!code focus]
-    return resolveLocal(dateTime.withSecond(second));
-} // [!code focus]
-```
-
-* 修改纳秒：
-
-```java
-public ZonedDateTime withNano(int nanoOfSecond) { // [!code focus]
-    return resolveLocal(dateTime.withNano(nanoOfSecond));
-} // [!code focus]
-```
-
-* 修改任意时间（年、月、日、时、分、秒、毫秒、纳秒）：
-
-```java
-public ZonedDateTime with(TemporalField field, long newValue) { // [!code focus]
-    if (field instanceof ChronoField chronoField) {
-        switch (chronoField) {
-            case INSTANT_SECONDS:
-                return create(newValue, getNano(), zone);
-            case OFFSET_SECONDS:
-                ZoneOffset offset = 
-                    ZoneOffset.ofTotalSeconds(
-                    chronoField.checkValidIntValue(newValue));
-                return resolveOffset(offset);
+    
+    private class Itr implements Iterator<E> {
+        int cursor;       // index of next element to return
+        int lastRet = -1; // index of last element returned; -1 if no such
+        int expectedModCount = modCount;
+
+        // prevent creating a synthetic constructor
+        Itr() {}
+
+        public boolean hasNext() {
+            return cursor != size;
         }
-        return resolveLocal(dateTime.with(field, newValue));
-    }
-    return field.adjustInto(this, newValue);
-} // [!code focus]
-```
 
-
-
-* 示例：
-
-```java
-package com.github.jdk8.zonedatetime;
-
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
-
-public class Test {
-    public static void main(String[] args) {
-
-        ZonedDateTime zonedDateTime = ZonedDateTime.now();
-        System.out.println("zonedDateTime = " + zonedDateTime);
-        // 修改年
-        ZonedDateTime zonedDateTime1 = zonedDateTime.withYear(2024);
-        System.out.println("zonedDateTime1 = " + zonedDateTime1);
-        // 修改月
-        ZonedDateTime zonedDateTime2 = zonedDateTime.withMonth(1);
-        System.out.println("zonedDateTime2 = " + zonedDateTime2);
-        // 修改日
-        ZonedDateTime zonedDateTime3 = zonedDateTime.withDayOfMonth(20);
-        System.out.println("zonedDateTime3 = " + zonedDateTime3);
-        // 修改小时
-        ZonedDateTime zonedDateTime4 = zonedDateTime.withHour(1);
-        System.out.println("zonedDateTime4 = " + zonedDateTime4);
-        // 修改分钟
-        ZonedDateTime zonedDateTime5 = zonedDateTime.withMinute(1);
-        System.out.println("zonedDateTime5 = " + zonedDateTime5);
-        // 修改秒
-        ZonedDateTime zonedDateTime6 = zonedDateTime.withSecond(1);
-        System.out.println("zonedDateTime6 = " + zonedDateTime6);
-        // 修改毫秒
-        ZonedDateTime zonedDateTime7 = zonedDateTime.with(ChronoField.MILLI_OF_SECOND, 1);
-        System.out.println("zonedDateTime7 = " + zonedDateTime7);
-        // 修改纳秒
-        ZonedDateTime zonedDateTime8 = zonedDateTime.withNano(1);
-        System.out.println("zonedDateTime8 = " + zonedDateTime8);
-    }
-}
-```
-
-#### 2.4.2.3 增加时间系列方法
-
-* 在`当前时间戳（时刻）`基础上增加`年`：
-
-```java
-public ZonedDateTime plusYears(long years) { // [!code focus]
-    return resolveLocal(dateTime.plusYears(years));
-} // [!code focus]
-```
-
-* 在`当前时间戳（时刻）`基础上增加`秒`：
-
-```java
-public ZonedDateTime plusSeconds(long seconds) { // [!code focus]
-    return resolveInstant(dateTime.plusSeconds(seconds));
-} // [!code focus]
-```
-
-* 在`当前时间戳（时刻）`基础上增加`纳秒`：
-
-```java
-public ZonedDateTime plusNanos(long nanos) { // [!code focus]
-    return resolveInstant(dateTime.plusNanos(nanos));
-} // [!code focus]
-```
-
-* 在`当前时间戳（时刻）`基础上增加`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
-
-```java
-public ZonedDateTime plus(long amountToAdd, TemporalUnit unit) { // [!code focus]
-    if (unit instanceof ChronoUnit) {
-        if (unit.isDateBased()) {
-            return resolveLocal(dateTime.plus(amountToAdd, unit));
-        } else {
-            return resolveInstant(dateTime.plus(amountToAdd, unit));
+        @SuppressWarnings("unchecked")
+        public E next() {
+            checkForComodification();
+            int i = cursor;
+            if (i >= size)
+                throw new NoSuchElementException();
+            Object[] elementData = ArrayList.this.elementData;
+            if (i >= elementData.length)
+                throw new ConcurrentModificationException();
+            cursor = i + 1;
+            return (E) elementData[lastRet = i];
         }
-    }
-    return unit.addTo(this, amountToAdd);
-} // [!code focus]
-```
 
-
-
-* 示例：
-
-```java
-package com.github.jdk8.zonedatetime;
-
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-
-public class Test {
-    public static void main(String[] args) {
-        ZonedDateTime zonedDateTime = ZonedDateTime.now();
-        System.out.println("zonedDateTime = " + zonedDateTime);
-        // 增加年
-        ZonedDateTime zonedDateTime1 = zonedDateTime.plusYears(2024);
-        System.out.println("zonedDateTime1 = " + zonedDateTime1);
-        // 增加月
-        ZonedDateTime zonedDateTime2 = zonedDateTime.plusMonths(1);
-        System.out.println("zonedDateTime2 = " + zonedDateTime2);
-        // 增加日
-        ZonedDateTime zonedDateTime3 = zonedDateTime.plusDays(20);
-        System.out.println("zonedDateTime3 = " + zonedDateTime3);
-        // 增加小时
-        ZonedDateTime zonedDateTime4 = zonedDateTime.plusHours(1);
-        System.out.println("zonedDateTime4 = " + zonedDateTime4);
-        // 增加分钟
-        ZonedDateTime zonedDateTime5 = zonedDateTime.plusMinutes(1);
-        System.out.println("zonedDateTime5 = " + zonedDateTime5);
-        // 增加秒
-        ZonedDateTime zonedDateTime6 = zonedDateTime.plusSeconds(1);
-        System.out.println("zonedDateTime6 = " + zonedDateTime6);
-        // 增加毫秒
-        ZonedDateTime zonedDateTime7 = zonedDateTime.plus(1L, ChronoUnit.MILLIS);
-        System.out.println("zonedDateTime7 = " + zonedDateTime7);
-        // 增加纳秒
-        ZonedDateTime zonedDateTime8 = zonedDateTime.plusNanos(1);
-        System.out.println("zonedDateTime8 = " + zonedDateTime8);
-    }
-}
-```
-
-#### 2.4.2.4 减少时间系列方法
-
-* 在`当前时间戳（时刻）`基础上减少`年`：
-
-```java
-public ZonedDateTime minusYears(long years) { // [!code focus]
-    return (years == Long.MIN_VALUE ? 
-            plusYears(Long.MAX_VALUE).plusYears(1) : plusYears(-years));
-} // [!code focus]
-```
-
-* 在`当前时间戳（时刻）`基础上减少`秒`：
-
-```java
-public ZonedDateTime minusSeconds(long seconds) { // [!code focus]
-    return (seconds == Long.MIN_VALUE ? 
-            plusSeconds(Long.MAX_VALUE).plusSeconds(1) : 
-            plusSeconds(-seconds));
-} // [!code focus]
-```
-
-* 在`当前时间戳（时刻）`基础上减少`纳秒`：
-
-```java
-public ZonedDateTime minusNanos(long nanos) { // [!code focus]
-    return (nanos == Long.MIN_VALUE ? 
-            plusNanos(Long.MAX_VALUE).plusNanos(1) : 
-            plusNanos(-nanos));
-} // [!code focus]
-```
-
-* 在`当前时间戳（时刻）`基础上减少`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
-
-```java
-public ZonedDateTime minus(long amountToSubtract, TemporalUnit unit) { // [!code focus]
-    return (amountToSubtract == Long.MIN_VALUE ? 
-            plus(Long.MAX_VALUE, unit).plus(1, unit) : 
-            plus(-amountToSubtract, unit));
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.zonedatetime;
-
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-
-public class Test {
-    public static void main(String[] args) {
-        ZonedDateTime zonedDateTime = ZonedDateTime.now();
-        System.out.println("zonedDateTime = " + zonedDateTime);
-        // 减少年
-        ZonedDateTime zonedDateTime1 = zonedDateTime.minusYears(2024);
-        System.out.println("zonedDateTime1 = " + zonedDateTime1);
-        // 减少月
-        ZonedDateTime zonedDateTime2 = zonedDateTime.minusMonths(1);
-        System.out.println("zonedDateTime2 = " + zonedDateTime2);
-        // 减少日
-        ZonedDateTime zonedDateTime3 = zonedDateTime.minusDays(20);
-        System.out.println("zonedDateTime3 = " + zonedDateTime3);
-        // 减少小时
-        ZonedDateTime zonedDateTime4 = zonedDateTime.minusHours(1);
-        System.out.println("zonedDateTime4 = " + zonedDateTime4);
-        // 减少分钟
-        ZonedDateTime zonedDateTime5 = zonedDateTime.minusMinutes(1);
-        System.out.println("zonedDateTime5 = " + zonedDateTime5);
-        // 减少秒
-        ZonedDateTime zonedDateTime6 = zonedDateTime.minusSeconds(1);
-        System.out.println("zonedDateTime6 = " + zonedDateTime6);
-        // 减少毫秒
-        ZonedDateTime zonedDateTime7 = zonedDateTime.minus(1L, ChronoUnit.MILLIS);
-        System.out.println("zonedDateTime7 = " + zonedDateTime7);
-        // 减少纳秒
-        ZonedDateTime zonedDateTime8 = zonedDateTime.minusNanos(1);
-        System.out.println("zonedDateTime8 = " + zonedDateTime8);
-    }
-}
-```
-
-## 2.5 格式化（DateTimeFormatter）
-
-### 2.5.1 概述
-
-* `DateTimeFormatter` 和 `SimpleDateFormat` 类似，是 JDK8 新增的用于格式化时间的类。
-
-### 2.5.2 静态方法
-
-* 使用静态方法，获取一个 DateTimeFormatter 对象：
-
-```java
-public static DateTimeFormatter ofPattern(String pattern) { // [!code focus]
-    return new DateTimeFormatterBuilder().appendPattern(pattern).toFormatter();
-} // [!code focus]
-```
-
-> [!NOTE]
->
-> ::: details 点我查看 pattern 的具体含义
->
-> ![日期格式化规则](./assets/8.webp)
->
-> :::
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.format;
-
-import java.time.format.DateTimeFormatter;
-
-public class Test {
-    public static void main(String[] args) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-        System.out.println("df = " + df);
-    }
-}
-```
-
-### 2.5.3 常用 API
-
-#### 2.5.3.1 将日期对象格式化为字符串
-
-* 格式化（日期对象 --> 字符串）：
-
-```java
-public String format(TemporalAccessor temporal) { // [!code focus]
-    StringBuilder buf = new StringBuilder(32);
-    formatTo(temporal, buf);
-    return buf.toString();
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.format;
-
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-
-public class Test {
-    public static void main(String[] args) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        // 格式化
-        String format = df.format(ZonedDateTime.now());
-        // format = 2025-04-23 10:36:35
-        System.out.println("format = " + format);
-    }
-}
-```
-
-#### 2.5.3.2 将字符串解析为日期对象
-
-* 解析（字符串 --> 日期对象）：
-
-```java
-public TemporalAccessor parse(CharSequence text) { // [!code focus]
-    Objects.requireNonNull(text, "text");
-    try {
-        return parseResolved0(text, null);
-    } catch (DateTimeParseException ex) {
-        throw ex;
-    } catch (RuntimeException ex) {
-        throw createError(text, ex);
-    }
-} // [!code focus]
-```
-
-> [!CAUTION]
->
-> 如果给定的字符串内容和 DateTimeFormatter 对象中传递的 pattern 参数不匹配，将会报错！！！
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.format;
-
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-
-public class Test {
-    public static void main(String[] args) {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        // 格式化
-        String format = df.format(ZonedDateTime.now());
-        // format = 2025-04-23 10:36:35
-        System.out.println("format = " + format);
-        // 解析
-        TemporalAccessor parse = df.parse("2025-05-05 11:11:11");
-        LocalDateTime localDateTime = LocalDateTime.from(parse);
-        // localDateTime = 2025-05-05T11:11:11
-        System.out.println("localDateTime = " + localDateTime);
-    }
-}
-```
-
-## 2.6 日历类
-
-### 2.6.1 概述
-
-* 在 JDK 7 中，我们可以使用 Calendar 来对年、月、日、时、分、秒等进行操作（翻日历），也可以获取年、月、日、时、分、秒等。
-* 在 JDK 8 中新增了 LocalDate、LocalTime 和 LocalDateTime 就是对标 JDK7 中的 Calendar 。
-
-> [!CAUTION]
->
-> * ① LocalDate 只有`年、月、日`。
-> * ② LocalTime 只有`时、分、秒`。
-> * ③ LocalDateTime = LocalDate  + LocalTime ，既有`年、月、日`，也有`时、分、秒`。
-
-### 2.6.2 静态方法
-
-* 静态方法获取`当前`日期、时间或日期时间的对象：
-
-```java
-public static LocalDate now() { // [!code focus]
-    return now(Clock.systemDefaultZone());
-} // [!code focus]
-```
-
-```java
-public static LocalTime now() { // [!code focus]
-    return now(Clock.systemDefaultZone());
-} // [!code focus]
-```
-
-```java
-public static LocalDateTime now() { // [!code focus]
-    return now(Clock.systemDefaultZone());
-} // [!code focus]
-```
-
-* 静态方法获取`指定`日期、时间或日期时间的对象：
-
-```java
-public static LocalDate of(int year, int month, int dayOfMonth) { // [!code focus]
-    YEAR.checkValidValue(year);
-    MONTH_OF_YEAR.checkValidValue(month);
-    DAY_OF_MONTH.checkValidValue(dayOfMonth);
-    return create(year, month, dayOfMonth);
-} // [!code focus]
-```
-
-```java
-public static LocalTime of(int hour, int minute, int second) { // [!code focus]
-    HOUR_OF_DAY.checkValidValue(hour);
-    if ((minute | second) == 0) {
-        return HOURS[hour];  // for performance
-    }
-    MINUTE_OF_HOUR.checkValidValue(minute);
-    SECOND_OF_MINUTE.checkValidValue(second);
-    return new LocalTime(hour, minute, second, 0);
-} // [!code focus]
-```
-
-```java
-public static LocalDateTime of(int year, int month, int dayOfMonth, int hour, int minute) { // [!code focus]
-    LocalDate date = LocalDate.of(year, month, dayOfMonth);
-    LocalTime time = LocalTime.of(hour, minute);
-    return new LocalDateTime(date, time);
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.calendar;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
-public class Test {
-    public static void main(String[] args){
-        LocalDate now1 = LocalDate.now();
-        LocalTime now2 = LocalTime.now();
-        LocalDateTime now3 = LocalDateTime.now();
-        // now1 = 2025-04-23
-        System.out.println("now1 = " + now1); 
-        // now2 = 11:12:41.556228200
-        System.out.println("now2 = " + now2); 
-        // now3 = 2025-04-23T11:12:41.556228200
-        System.out.println("now3 = " + now3); 
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.calendar;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
-public class Test {
-    public static void main(String[] args) {
-        LocalDate now1 = LocalDate.of(2012, 12, 12);
-        LocalTime now2 = LocalTime.of(3, 5, 6);
-        LocalDateTime now3 = LocalDateTime.of(2012, 12, 12, 11, 11);
-        System.out.println("now1 = " + now1); // now1 = 2012-12-12
-        System.out.println("now2 = " + now2); // now2 = 03:05:06
-        System.out.println("now3 = " + now3); // now3 = 2012-12-12T11:11
-    }
-}
-```
-
-### 2.6.3 常用 API
-
-#### 2.6.3.1 获取日历中的某个字段信息
-
-* 获取年：
-
-```java
-public int getYear() { // [!code focus]
-    return date.getYear();
-} // [!code focus]
-```
-
-* 获取秒：
-
-```java
-public int getSecond() { // [!code focus]
-    return time.getSecond();
-} // [!code focus]
-```
-
-* 获取任意时间（年、月、日、时、分、秒、毫秒、纳秒）：
-
-```java
-public int get(TemporalField field) { // [!code focus]
-    if (field instanceof ChronoField chronoField) {
-        return (chronoField.isTimeBased() ? time.get(field) : date.get(field));
-    }
-    return ChronoLocalDateTime.super.get(field);
-} // [!code focus]
-```
-
-> [!CAUTION]
->
-> * ① LocalDate 只能获取`年、月、日`。
-> * ② LocalTime 只能获取`时、分、秒`。
-> * ③ LocalDateTime = LocalDate  + LocalTime ，既能获取`年、月、日`，也能获取`时、分、秒`。
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.calendar;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoField;
-
-public class Demo3 {
-    public static void main(String[] args) {
-        LocalDateTime now = LocalDateTime.now();
-        // 获取年
-        int year = now.getYear();
-        System.out.println("year = " + year);
-        // 获取月
-        int monthValue = now.getMonthValue();
-        System.out.println("monthValue = " + monthValue);
-        // 获取一个月的第几天
-        int dayOfMonth = now.getDayOfMonth();
-        System.out.println("dayOfMonth = " + dayOfMonth);
-        // 获取一年中的第几天
-        int dayOfYear = now.getDayOfYear();
-        System.out.println("dayOfYear = " + dayOfYear);
-        // 获取一周中的第几天
-        int dayOfWeek = now.getDayOfWeek().getValue();
-        System.out.println("dayOfWeek = " + dayOfWeek);
-        // 获取时
-        int hour = now.getHour();
-        System.out.println("hour = " + hour);
-        // 获取分钟
-        int minute = now.getMinute();
-        System.out.println("minute = " + minute);
-        // 获取秒
-        int second = now.getSecond();
-        System.out.println("second = " + second);
-        // 获取毫秒
-        int milliOfSecond = now.get(ChronoField.MILLI_OF_SECOND);
-        System.out.println("milliOfSecond = " + milliOfSecond);
-        // 获取纳秒
-        int nano = now.getNano();
-        System.out.println("nano = " + nano);
-    }
-}
-```
-
-#### 2.6.3.2 判断系列方法
-
-* 判断`当前时间`是否在`指定时间`之前：
-
-```java
-public boolean isBefore(ChronoLocalDateTime<?> other) { // [!code focus]
-    if (other instanceof LocalDateTime) {
-        return compareTo0((LocalDateTime) other) < 0;
-    }
-    return ChronoLocalDateTime.super.isBefore(other);
-} // [!code focus]
-```
-
-* 判断`当前时间`是否在`指定时间`之后：
-
-```java
-public boolean isAfter(ChronoLocalDateTime<?> other) { // [!code focus]
-    if (other instanceof LocalDateTime) {
-        return compareTo0((LocalDateTime) other) > 0;
-    }
-    return ChronoLocalDateTime.super.isAfter(other);
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.calendar;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-
-public class Test {
-    public static void main(String[] args) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime newLocalDateTime = LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault());
-
-        System.out.println(now.isBefore(newLocalDateTime)); // false
-        System.out.println(now.isAfter(newLocalDateTime)); // true
-    }
-}
-```
-
-#### 2.6.3.3 修改时间系列方法
-
-* 修改年：
-
-```java
-public LocalDateTime withYear(int year) { // [!code focus] 
-    return with(date.withYear(year), time);
-} // [!code focus]
-```
-
-* 修改秒：
-
-```java
-public LocalDateTime withSecond(int second) {  // [!code focus] 
-    LocalTime newTime = time.withSecond(second);
-    return with(date, newTime);
-}  // [!code focus] 
-```
-
-* 修改纳秒：
-
-```java
-public LocalDateTime withNano(int nanoOfSecond) { // [!code focus] 
-    LocalTime newTime = time.withNano(nanoOfSecond);
-    return with(date, newTime);
-} // [!code focus] 
-```
-
-* 修改任意时间（年、月、日、时、分、秒、毫秒、纳秒）：
-
-```java
-public LocalDateTime with(TemporalField field, long newValue) { // [!code focus] 
-    if (field instanceof ChronoField chronoField) {
-        if (chronoField.isTimeBased()) {
-            return with(date, time.with(field, newValue));
-        } else {
-            return with(date.with(field, newValue), time);
-        }
-    }
-    return field.adjustInto(this, newValue);
-} // [!code focus] 
-```
-
-> [!CAUTION]
->
-> * ① LocalDate 只能修改`年、月、日`。
-> * ② LocalTime 只能修改`时、分、秒`。
-> * ③ LocalDateTime = LocalDate  + LocalTime ，既能修改`年、月、日`，也能修改`时、分、秒`。
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.calendar;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoField;
-
-public class Test {
-    public static void main(String[] args) {
-        LocalDateTime now = LocalDateTime.now();
-        // 修改年
-        LocalDateTime localDateTime1 = now.withYear(2012);
-        System.out.println("localDateTime1 = " + localDateTime1);
-        // 修改月
-        LocalDateTime localDateTime2 = now.withMonth(1);
-        System.out.println("localDateTime2 = " + localDateTime2);
-        // 修改一个月的第几天
-        LocalDateTime localDateTime3 = now.withDayOfMonth(1);
-        System.out.println("localDateTime3 = " + localDateTime3);
-        // 修改一年中的第几天
-        LocalDateTime localDateTime4 = now.withDayOfYear(5);
-        System.out.println("localDateTime4 = " + localDateTime4);
-        // 修改一周中的第几天
-        LocalDateTime localDateTime5 = now.with(ChronoField.DAY_OF_WEEK, 2);
-        System.out.println("localDateTime5 = " + localDateTime5);
-        // 修改时
-        LocalDateTime localDateTime6 = now.withHour(5);
-        System.out.println("localDateTime6 = " + localDateTime6);
-        // 修改分钟
-        LocalDateTime localDateTime7 = now.withMinute(10);
-        System.out.println("localDateTime7 = " + localDateTime7);
-        // 修改秒
-        LocalDateTime localDateTime8 = now.withSecond(10);
-        System.out.println("localDateTime8 = " + localDateTime8);
-        // 修改毫秒
-        LocalDateTime localDateTime9 = now.with(ChronoField.MILLI_OF_SECOND, 2);
-        System.out.println("localDateTime9 = " + localDateTime9);
-        // 修改纳秒
-        LocalDateTime localDateTime10 = now.withNano(10);
-        System.out.println("localDateTime10 = " + localDateTime10);
-    }
-}
-
-```
-
-#### 2.6.3.4 增加时间系列方法
-
-* 在`当前时间`基础上增加`年`：
-
-```java
-public LocalDateTime plusYears(long years) { // [!code focus]
-    LocalDate newDate = date.plusYears(years);
-    return with(newDate, time);
-} // [!code focus]
-```
-
-* 在`当前时间`基础上增加`秒`：
-
-```java
-public LocalDateTime plusSeconds(long seconds) { // [!code focus]
-    return plusWithOverflow(date, 0, 0, seconds, 0, 1);
-} // [!code focus]
-```
-
-* 在`当前时间`基础上增加`纳秒`：
-
-```java
-public LocalDateTime plusNanos(long nanos) { // [!code focus]
-    return plusWithOverflow(date, 0, 0, 0, nanos, 1);
-} // [!code focus]
-```
-
-* 在`当前时间`基础上增加`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
-
-```java
-public LocalDateTime plus(long amountToAdd, TemporalUnit unit) { // [!code focus]
-    if (unit instanceof ChronoUnit chronoUnit) {
-        switch (chronoUnit) {
-            case NANOS: return plusNanos(amountToAdd);
-            case MICROS: return plusDays(amountToAdd / MICROS_PER_DAY).plusNanos((amountToAdd % MICROS_PER_DAY) * 1000);
-            case MILLIS: return plusDays(amountToAdd / MILLIS_PER_DAY).plusNanos((amountToAdd % MILLIS_PER_DAY) * 1000_000);
-            case SECONDS: return plusSeconds(amountToAdd);
-            case MINUTES: return plusMinutes(amountToAdd);
-            case HOURS: return plusHours(amountToAdd);
-            case HALF_DAYS: return plusDays(amountToAdd / 256).plusHours((amountToAdd % 256) * 12);  // no overflow (256 is multiple of 2)
-        }
-        return with(date.plus(amountToAdd, unit), time);
-    }
-    return unit.addTo(this, amountToAdd);
-} // [!code focus]
-```
-
-> [!CAUTION]
->
-> * ① LocalDate 只能增加`年、月、日`。
-> * ② LocalTime 只能增加`时、分、秒`。
-> * ③ LocalDateTime = LocalDate  + LocalTime ，既能增加`年、月、日`，也能增加`时、分、秒`。
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.calendar;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-
-public class Test {
-    public static void main(String[] args) {
-        LocalDateTime now = LocalDateTime.now();
-        // 增加年
-        LocalDateTime localDateTime1 = now.plusYears(2012);
-        System.out.println("localDateTime1 = " + localDateTime1);
-        // 增加月
-        LocalDateTime localDateTime2 = now.plusMonths(1);
-        System.out.println("localDateTime2 = " + localDateTime2);
-        // 增加几天
-        LocalDateTime localDateTime3 = now.plusDays(1);
-        System.out.println("localDateTime3 = " + localDateTime3);
-        // 增加时
-        LocalDateTime localDateTime6 = now.plusHours(5);
-        System.out.println("localDateTime6 = " + localDateTime6);
-        // 增加分钟
-        LocalDateTime localDateTime7 = now.plusMinutes(10);
-        System.out.println("localDateTime7 = " + localDateTime7);
-        // 增加秒
-        LocalDateTime localDateTime8 = now.plusSeconds(10);
-        System.out.println("localDateTime8 = " + localDateTime8);
-        // 增加毫秒
-        LocalDateTime localDateTime9 = now.plus(2, ChronoUnit.MILLIS);
-        System.out.println("localDateTime9 = " + localDateTime9);
-        // 增加纳秒
-        LocalDateTime localDateTime10 = now.plusNanos(10);
-        System.out.println("localDateTime10 = " + localDateTime10);
-    }
-}
-
-```
-
-#### 2.6.3.5 减少时间系列方法
-
-* 在`当前时间`基础上减少`年`：
-
-```java
-public LocalDateTime minusYears(long years) { // [!code focus]
-    return (years == Long.MIN_VALUE 
-            ? plusYears(Long.MAX_VALUE).plusYears(1) 
-            : plusYears(-years));
-} // [!code focus]
-```
-
-* 在`当前时间`基础上减少`秒`：
-
-```java
-public LocalDateTime minusSeconds(long seconds) { // [!code focus]
-    return plusWithOverflow(date, 0, 0, seconds, 0, -1);
-} // [!code focus]
-```
-
-* 在`当前时间`基础上减少`纳秒`：
-
-```java
-public LocalDateTime minusNanos(long nanos) { // [!code focus]
-    return plusWithOverflow(date, 0, 0, 0, nanos, -1);
-} // [!code focus]
-```
-
-* 在`当前时间`基础上减少`任意时间（年、月、日、时、分、秒、毫秒、纳秒）`：
-
-```java
-public LocalDateTime minus(long amountToSubtract, TemporalUnit unit) { // [!code focus]
-    return (amountToSubtract == Long.MIN_VALUE 
-            ? plus(Long.MAX_VALUE, unit).plus(1, unit) 
-            : plus(-amountToSubtract, unit));
-} // [!code focus]
-```
-
-> [!CAUTION]
->
-> * ① LocalDate 只能减少`年、月、日`。
-> * ② LocalTime 只能减少`时、分、秒`。
-> * ③ LocalDateTime = LocalDate  + LocalTime ，既能减少`年、月、日`，也能减少`时、分、秒`。
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.calendar;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-
-public class Test {
-    public static void main(String[] args) {
-        LocalDateTime now = LocalDateTime.now();
-        // 减少年
-        LocalDateTime localDateTime1 = now.minusYears(2012);
-        System.out.println("localDateTime1 = " + localDateTime1);
-        // 减少月
-        LocalDateTime localDateTime2 = now.minusMonths(1);
-        System.out.println("localDateTime2 = " + localDateTime2);
-        // 减少几天
-        LocalDateTime localDateTime3 = now.minusDays(1);
-        System.out.println("localDateTime3 = " + localDateTime3);
-        // 减少时
-        LocalDateTime localDateTime6 = now.minusHours(5);
-        System.out.println("localDateTime6 = " + localDateTime6);
-        // 减少分钟
-        LocalDateTime localDateTime7 = now.minusMinutes(10);
-        System.out.println("localDateTime7 = " + localDateTime7);
-        // 减少秒
-        LocalDateTime localDateTime8 = now.minusSeconds(10);
-        System.out.println("localDateTime8 = " + localDateTime8);
-        // 减少毫秒
-        LocalDateTime localDateTime9 = now.minus(2, ChronoUnit.MILLIS);
-        System.out.println("localDateTime9 = " + localDateTime9);
-        // 减少纳秒
-        LocalDateTime localDateTime10 = now.minusNanos(10);
-        System.out.println("localDateTime10 = " + localDateTime10);
-    }
-}
-```
-
-### 2.6.4 应用示例
-
-* 需求：判断今天是否是生日？
-
-> [!NOTE]
->
-> * ① 获取生日的 LocalDate 对象。
-> * ② 获取当前日期的 LocalDate 对象。
-> * ③ 将`生日的 LocalDate 对象`和`当前日期的 LocalDate 对象`都转换为 MonthDay 对象，然后再比较。
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.calendar;
-
-import java.time.LocalDate;
-import java.time.MonthDay;
-
-public class Test {
-    public static void main(String[] args) {
-        LocalDate birthDate = LocalDate.of(1999, 10, 1);
-        LocalDate now = LocalDate.now();
-
-        // MonthDay 只包含月和日
-        MonthDay birthMonthDay = MonthDay.of(birthDate.getMonth(), 
-                                             birthDate.getDayOfMonth());
-        MonthDay nowMonthDay = MonthDay.from(now);
-
-        if (birthMonthDay.equals(nowMonthDay)) {
-            System.out.println("今天是生日o(*￣︶￣*)o");
-        } else {
-            System.out.println("今天不是生日o(╥﹏╥)o");
-        }
-    }
-}
-```
-
-## 2.7 工具类
-
-### 2.7.1 Period 
-
-#### 2.7.1.1 概述
-
-* Period 侧重于计算`日期`的间隔，如：年、月、日。
-
-#### 2.7.1.2 常用 API
-
-* 静态方法获取 Period 对象：
-
-```java
-public static Period between(LocalDate startDateInclusive, LocalDate endDateExclusive) { // [!code focus]
-    return startDateInclusive.until(endDateExclusive);
-} // [!code focus]
-```
-
-* 获取区间相差的年份：
-
-```java
-public int getYears() { // [!code focus]
-    return years;
-} // [!code focus]
-```
-
-* 获取区间相差的月份：
-
-```java
-public int getMonths() { // [!code focus]
-    return months;
-} // [!code focus]
-```
-
-* 获取区间相差的天数：
-
-```java
-public int getDays() { // [!code focus]
-    return days;
-} // [!code focus]
-```
-
-* 获取区间相差总的月份：
-
-```java
-public long toTotalMonths() { // [!code focus]
-    return years * 12L + months;  // no overflow
-} // [!code focus]
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.utils;
-
-import java.time.LocalDate;
-import java.time.Period;
-
-public class Test {
-    public static void main(String[] args) {
-        LocalDate start = LocalDate.of(2000, 8, 10);
-        LocalDate end = LocalDate.now();
-
-        Period period = Period.between(start, end);
-
-        // 获取日期间隔 -- 年
-        int years = period.getYears();
-        // years = 24 即：（end 的 years）-（start 的 years）
-        System.out.println("years = " + years);
-
-        // 获取日期间隔 -- 月
-        int months = period.getMonths();
-        // months = 8 即：（end 的 months）-（start 的 months）
-        System.out.println("months = " + months);
-
-        // 获取日期间隔 -- 日
-        int days = period.getDays();
-        // days = 13 即：（end 的 days）-（start 的 days）
-        System.out.println("days = " + days);
-
-        // 获取日期间隔 -- 总月数
-        long totalMonths = period.toTotalMonths();
-        // totalMonths = 296 实际相差的月份
-        System.out.println("totalMonths = " + totalMonths);
-    }
-}
-```
-
-### 2.7.2 Duration 
-
-#### 2.7.2.1 概述
-
-* Duration 侧重于计算`时间`的间隔，如：时、分、秒等。此类以`秒`和`纳秒`为单位模拟时间量或时间量。
-
-#### 2.7.2.2 常用 API
-
-* 静态方法获取 Duration 对象：
-
-```java
-public static Duration between(Temporal startInclusive, Temporal endExclusive) { // [!code focus]
-    try {
-        return ofNanos(startInclusive.until(endExclusive, NANOS));
-    } catch (DateTimeException | ArithmeticException ex) {
-        long secs = startInclusive.until(endExclusive, SECONDS);
-        long nanos;
-        try {
-            nanos = endExclusive.getLong(NANO_OF_SECOND) 
-                - startInclusive.getLong(NANO_OF_SECOND);
-            if (secs > 0 && nanos < 0) {
-                secs++;
-            } else if (secs < 0 && nanos > 0) {
-                secs--;
+        public void remove() {
+            if (lastRet < 0)
+                throw new IllegalStateException();
+            checkForComodification();
+
+            try {
+                ArrayList.this.remove(lastRet);
+                cursor = lastRet;
+                lastRet = -1;
+                expectedModCount = modCount;
+            } catch (IndexOutOfBoundsException ex) {
+                throw new ConcurrentModificationException();
             }
-        } catch (DateTimeException ex2) {
-            nanos = 0;
         }
-        return ofSeconds(secs, nanos);
+
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            Objects.requireNonNull(action);
+            final int size = ArrayList.this.size;
+            int i = cursor;
+            if (i < size) {
+                final Object[] es = elementData;
+                if (i >= es.length)
+                    throw new ConcurrentModificationException();
+                for (; i < size && modCount == expectedModCount; i++)
+                    action.accept(elementAt(es, i));
+                // update once at end to reduce heap write traffic
+                cursor = i;
+                lastRet = i - 1;
+                checkForComodification();
+            }
+        }
+
+        final void checkForComodification() {
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+        }
     }
-} // [!code focus]
+    
+    ...
+}    
 ```
 
-* 获取相差的天数：
+#### 2.3.2.4 迭代器的细节
+
+##### 2.3.2.4.1 NoSuchElementException 异常
+
+* 当迭代器的指针已经指向了最后没有元素的位置，如果还强行调用 next() 方法，方法内部将会抛出 java.util.NoSuchElementException 异常，如下所示：
+
+![](./assets/5.svg)
+
+
+
+* 示例：
 
 ```java
-public long toDays() { // [!code focus]
-    return seconds / SECONDS_PER_DAY;
-} // [!code focus]
-```
+package com.github.collection;
 
-* 获取相差的小时：
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
-```java
-public long toHours() { // [!code focus]
-    return seconds / SECONDS_PER_HOUR;
-} // [!code focus]
-```
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合对象
+        Collection<String> col = new ArrayList<>();
+        // 向集合中添加元素
+        col.add("aa");
+        col.add("bb");
+        col.add("cc");
+        col.add("dd");
+        // 获取迭代器对象，默认指向集合的 0 索引处
+        Iterator<String> iterator = col.iterator();
+        // 利用循环不断地去获取集合中的每一个元素
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            System.out.println("next = " + next);
+        }
 
-* 获取相差的分钟：
-
-```java
-public long toMinutes() { // [!code focus]
-    return seconds / SECONDS_PER_MINUTE;
-} // [!code focus]
-```
-
-* 获取相差的秒：
-
-```java
-public long toSeconds() { // [!code focus]
-    return seconds;
-} // [!code focus]
-```
-
-* 获取相差的毫秒：
-
-```java
-public long toMillis() { // [!code focus]
-    long tempSeconds = seconds;
-    long tempNanos = nanos;
-    if (tempSeconds < 0) {
-        // change the seconds and nano value to
-        // handle Long.MIN_VALUE case
-        tempSeconds = tempSeconds + 1;
-        tempNanos = tempNanos - NANOS_PER_SECOND;
+        // ❌ 错误：会抛出 java.util.NoSuchElementException 异常
+        String next = iterator.next(); // [!code error]
+        System.out.println("next = " + next);
     }
-    long millis = Math.multiplyExact(tempSeconds, 1000);
-    millis = Math.addExact(millis, tempNanos / NANOS_PER_MILLI);
-    return millis;
-} // [!code focus]
+}
 ```
 
-* 获取相差的纳秒：
+##### 2.3.2.4.2 迭代器指针不会复位
+
+* 当迭代器遍历完毕之后，指针不会复位。换言之，如果还想使用迭代器遍历，需要获取一个新的迭代器。
+
+> [!NOTE]
+>
+> 推荐使用 for 循环来代替 while 循环，因为 for 循环对于初始化变量有作用域！！！
+
+
+
+* 示例：
 
 ```java
-public long toNanos() {  // [!code focus]
-    long tempSeconds = seconds;
-    long tempNanos = nanos;
-    if (tempSeconds < 0) {
-        // change the seconds and nano value to
-        // handle Long.MIN_VALUE case
-        tempSeconds = tempSeconds + 1;
-        tempNanos = tempNanos - NANOS_PER_SECOND;
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合对象
+        Collection<String> col = new ArrayList<>();
+        // 向集合中添加元素
+        col.add("aa");
+        col.add("bb");
+        col.add("cc");
+        col.add("dd");
+        // 获取迭代器对象，默认指向集合的 0 索引处
+        Iterator<String> iterator = col.iterator();
+        // 利用循环不断地去获取集合中的每一个元素
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            System.out.println("next = " + next);
+        }
+
+        // 获取一个新的迭代器对象
+        iterator = col.iterator(); // [!code highlight]
+        // 利用循环不断地去获取集合中的每一个元素
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            System.out.println("next = " + next);
+        }
     }
-    long totalNanos = Math.multiplyExact(tempSeconds, NANOS_PER_SECOND);
-    totalNanos = Math.addExact(totalNanos, tempNanos);
-    return totalNanos;
-}  // [!code focus]
+}
+```
+
+
+
+* 示例：
+
+```java {17,22}
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合对象
+        Collection<String> col = new ArrayList<>();
+        // 向集合中添加元素
+        col.add("aa");
+        col.add("bb");
+        col.add("cc");
+        col.add("dd");
+        // 使用 for 循环来改写 while 循环
+        for (Iterator<String> iterator = col.iterator(); iterator.hasNext(); ) {
+            String next = iterator.next();
+            System.out.println("next = " + next);
+        }
+        // 使用 for 循环来改写 while 循环
+        for (Iterator<String> iterator = col.iterator(); iterator.hasNext(); ) {
+            String next = iterator.next();
+            System.out.println("next = " + next);
+        }
+    }
+}
+```
+
+##### 2.3.2.4.3 循环中只能使用一次 next 方法
+
+* next 方法的作用，如下所示：
+  * ① 获取元素。
+  * ② 移动指针。
+* 如果在循环中调用了两次 next 方法，将会使得指针移动两次，可能会导致方法抛出 java.util.NoSuchElementException 异常。
+
+![](./assets/6.gif)
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合对象
+        Collection<String> col = new ArrayList<>();
+        // 向集合中添加元素
+        col.add("aa");
+        col.add("bb");
+        col.add("cc");
+        col.add("dd");
+        col.add("ee");
+        // 遍历集合中的元素
+        Iterator<String> iterator = col.iterator();
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            System.out.println(next);
+            // ❌ 错误：会抛出 java.util.NoSuchElementException 异常
+            next = iterator.next(); // [!code error]
+            System.out.println(next);
+        }
+    }
+}
+```
+
+##### 2.3.2.4.4 使用 Iterator 接口的删除方法
+
+* Iterator 接口提供了删除的方法：
+
+```java
+default void remove() {
+    throw new UnsupportedOperationException("remove");
+}
+```
+
+* 其实现类中实现了该方法，如下所示：
+
+```java {33-46}
+public class ArrayList<E> extends AbstractList<E>
+        implements List<E>, RandomAccess, Cloneable, java.io.Serializable {
+    
+	public Iterator<E> iterator() {
+        return new Itr();
+    }
+    
+    private class Itr implements Iterator<E> {
+        int cursor;       // index of next element to return
+        int lastRet = -1; // index of last element returned; -1 if no such
+        int expectedModCount = modCount;
+
+        // prevent creating a synthetic constructor
+        Itr() {}
+
+        public boolean hasNext() {
+            return cursor != size;
+        }
+
+        @SuppressWarnings("unchecked")
+        public E next() {
+            checkForComodification();
+            int i = cursor;
+            if (i >= size)
+                throw new NoSuchElementException();
+            Object[] elementData = ArrayList.this.elementData;
+            if (i >= elementData.length)
+                throw new ConcurrentModificationException();
+            cursor = i + 1;
+            return (E) elementData[lastRet = i];
+        }
+
+        public void remove() { 
+            if (lastRet < 0)
+                throw new IllegalStateException();
+            checkForComodification();
+
+            try {
+                ArrayList.this.remove(lastRet);
+                cursor = lastRet;
+                lastRet = -1;
+                expectedModCount = modCount;
+            } catch (IndexOutOfBoundsException ex) {
+                throw new ConcurrentModificationException();
+            }
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            Objects.requireNonNull(action);
+            final int size = ArrayList.this.size;
+            int i = cursor;
+            if (i < size) {
+                final Object[] es = elementData;
+                if (i >= es.length)
+                    throw new ConcurrentModificationException();
+                for (; i < size && modCount == expectedModCount; i++)
+                    action.accept(elementAt(es, i));
+                // update once at end to reduce heap write traffic
+                cursor = i;
+                lastRet = i - 1;
+                checkForComodification();
+            }
+        }
+
+        final void checkForComodification() {
+            if (modCount != expectedModCount)
+                throw new ConcurrentModificationException();
+        }
+    }
+    
+    ...
+}    
+```
+
+> [!CAUTION]
+>
+> * ① 在使用迭代器遍历集合元素的时候，如果调用 Collection 的 remove(xxx) 方法，将会抛出 java.util.ConcurrentModificationException 异常或出现其他不确定的行为。
+> * ② 在使用迭代器遍历集合元素的时候，如果要删除元素，使用迭代器的 remove() 方法。
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合对象
+        Collection<String> col = new ArrayList<>();
+        // 向集合中添加元素
+        col.add("aa");
+        col.add("bb");
+        col.add("cc");
+        col.add("dd");
+        col.add("ee");
+        // 遍历集合中的元素
+        Iterator<String> iterator = col.iterator();
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            if (next.equals("aa")) {
+                // ❌ 错误：会抛出 java.util.ConcurrentModificationException  异常
+                col.remove("aa"); // [!code error] 
+            } else {
+                System.out.println(next);
+            }
+        }
+    }
+}
 ```
 
 
@@ -2442,431 +1199,1263 @@ public long toNanos() {  // [!code focus]
 * 示例：
 
 ```java
-package com.github.jdk8.utils;
+package com.github.collection;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class Test {
     public static void main(String[] args) {
-        LocalDateTime start = LocalDateTime.now();
-        LocalDateTime end = LocalDateTime.now()
-                .plusYears(1)
-                .plusMonths(1)
-                .plusDays(1)
-                .plusHours(1)
-                .plusMonths(1)
-                .plusSeconds(1)
-                .plusNanos(1);
-
-        Duration period = Duration.between(start, end);
-
-        // 获取相差的天数
-        long days = period.toDays();
-        System.out.println("days = " + days);
-
-        // 获取相差的小时
-        long hours = period.toHours();
-        System.out.println("hours = " + hours);
-
-        // 获取相差的分钟
-        long minutes = period.toMinutes();
-        System.out.println("minutes = " + minutes);
-
-        // 获取相差的秒
-        long seconds = period.toSeconds();
-        System.out.println("seconds = " + seconds);
-
-        // 获取相差的毫秒
-        long millis = period.toMillis();
-        System.out.println("millis = " + millis);
-
-        // 获取相差的纳秒
-        long nanos = period.toNanos();
-        System.out.println("nanos = " + nanos);
+        // 创建集合对象
+        Collection<String> col = new ArrayList<>();
+        // 向集合中添加元素
+        col.add("aa");
+        col.add("bb");
+        col.add("cc");
+        col.add("dd");
+        col.add("ee");
+        // 遍历集合中的元素
+        Iterator<String> iterator = col.iterator();
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            if (next.equals("aa")) {
+                // ✅ 使用了 iterator 的 remove 方法
+                iterator.remove(); // [!code highlight]
+            } else {
+                System.out.println(next);
+            }
+        }
     }
 }
+
 ```
 
-### 2.7.3 ChronoUnit（推荐）
+### 2.3.3 增强 for 遍历
 
-#### 2.7.3.1 概述
+#### 2.3.3.1 概述
 
-* ChronoUnit 侧重于计算`日期时间`（所有时间单位）的间隔，如：年、月、日、时、分、秒等。
-
-#### 2.7.3.2 常用 API
-
-* 获取相差的年数：
+* 在 JDK1.4 之前，Collection 接口的源码，如下所示：
 
 ```java
-long num = ChronoUnit.YEARS.between(start, end);
-```
+package java.util;
 
-* 获取相差的天数：
+public interface Collection { 
 
-```java
-long num = ChronoUnit.DAYS.between(start, end);
-```
-
-
-
-* 示例：
-
-```java
-package com.github.jdk8.utils;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-
-public class Demo3 {
-    public static void main(String[] args) {
-        LocalDateTime start = LocalDateTime.now();
-        LocalDateTime end = LocalDateTime.now()
-                .plusYears(1)
-                .plusMonths(1)
-                .plusDays(1)
-                .plusHours(1)
-                .plusMonths(1)
-                .plusSeconds(1)
-                .plusNanos(1);
-
-        System.out.println("相差的年数：" + ChronoUnit.YEARS.between(start, end));
-        System.out.println("相差的月数：" + ChronoUnit.MONTHS.between(start, end));
-        System.out.println("相差的周数：" + ChronoUnit.WEEKS.between(start, end));
-        System.out.println("相差的天数：" + ChronoUnit.DAYS.between(start, end));
-        System.out.println("相差的时数：" + ChronoUnit.HOURS.between(start, end));
-        System.out.println("相差的分数：" + ChronoUnit.MINUTES.between(start, end));
-        System.out.println("相差的秒数：" + ChronoUnit.SECONDS.between(start, end));
-        System.out.println("相差的毫秒数：" + ChronoUnit.MILLIS.between(start, end));
-        System.out.println("相差的微妙数：" + ChronoUnit.MICROS.between(start, end));
-        System.out.println("相差的纳秒数：" + ChronoUnit.NANOS.between(start, end));
-        System.out.println("相差的半天数：" + ChronoUnit.HALF_DAYS.between(start, end));
-        System.out.println("相差的十年数：" + ChronoUnit.DECADES.between(start, end));
-        System.out.println("相差的世纪（百年）数：" + ChronoUnit.CENTURIES.between(start, end));
-        System.out.println("相差的千年数：" + ChronoUnit.MILLENNIA.between(start, end));
-        System.out.println("相差的纪元数：" + ChronoUnit.ERAS.between(start, end));
-    }
-}
-```
-
-
-
-# 第三章：包装类（⭐）
-
-## 3.1 概述
-
-* 在 Java 中，`包装类`就是`基本数据类型`对应的`引用数据类型`的`对象`。
-
-> [!NOTE]
->
-> 所谓的`包装类`就是将`基本数据类型`的`数据`变为一个`对象`！！！
-
-* Java 中的基本数据类型和包装类的对比表，如下所示：
-
-| 基本数据类型 | 包装类（java.lang 包） |
-| ------------ | ---------------------- |
-| byte         | Byte                   |
-| short        | Short                  |
-| `int`        | `Integer`              |
-| long         | Long                   |
-| float        | Float                  |
-| double       | Double                 |
-| `char`       | `Character`            |
-| boolean      | Boolean                |
-| void         | Void                   |
-
-> [!NOTE]
->
-> * ① Byte 、Short 、Integer 、Long 、Float 、Double 的父类是 Number 。
-> * ② 在实际开发中，最常用的包装类是 Integer 类，下面将以此类作为例子讲解！！！
-
-## 3.2 如何理解包装类？
-
-* 所谓的基本数据类型，在变量中记录的是真实的数据值，如下所示：
-
-```java
-public class Test {
-    public static void main(String[] args){
-        int num = 10; // [!code focus]
-        
-        System.out.println(num);
-    }
-}
-```
-
-* 其对应的内存图，如下所示：
-
-![基本数据类型的变量记录的是真实的数据值](./assets/13.png)
-
-* 基本数据类型 int 对应的包装类是 Integer，如下所示：
-
-```java
-public final class Integer extends Number
-        implements Comparable<Integer>, Constable, ConstantDesc {
-	
-    private final int value;
+	Iterator iterator();
     
     // 其余略
-    ...
+
+}
+```
+
+* 那么，我们遍历集合都需要使用迭代器的方式来遍历。但是，Java 官方认为这种方式太繁琐了，于是在 JDK1.5 之后增加了 Iterable 接口，如下所示：
+
+```java
+package java.lang;
+
+public interface Iterable<T> {
+  
+    Iterator<T> iterator();
+
+    // 其余略
+
+}
+```
+
+* 并且，Collection 接口继承了 Iterable 接口，如下所示：
+
+```java
+package java.util;
+
+public interface Collection<E> extends Iterable<E> {
+    
+    Iterator iterator();
+    
+    // 其余略
     
 }
 ```
 
-* 所谓的包装类（引用数据类型），在变量中记录的是对象的地址值，如下所示：
+* 我们从 Iterable 接口源码的注释中，可以看到这样的信息，如下所示：
 
 ```java
-public class Test {
-    public static void main(String[] args){
-        Integer i = new Integer(10); // [!code focus]
-        
-        System.out.println(i);
-    }
+package java.lang;
+
+/**
+* Implementing this interface allows an object to be the target of the enhanced
+* 实现此接口允许对象成为 enhanced for 语句（有时称为“for-each loop”语句）的目标
+*/
+public interface Iterable<T> {
+  
+    Iterator<T> iterator();
+
+    // 其余略
+
 }
 ```
 
-* 其对应的内存图，如下所示：
+#### 2.3.3.2 增强 for 语法
 
-![引用数据类型（包装类）的变量记录的是对象的地址值](./assets/14.png)
+* 语法：
+
+```java
+for(元素的数据类型 变量: 数组|Collection 集合){
+    ...
+}
+```
 
 > [!NOTE]
 >
-> 综上所述：包装类就是用一个`对象`将`基本数据类型`的`变量`（真实的数据值）包起来！！！
+> - ① 增强 for 循环（也称为 for-each 循环）是 JDK 5 之后出来的一个高级的 for 循环，专门用来遍历数组和集合。
+> - ② 只要某个类实现了 Iterable 接口，并重写了 iterator() 方法，就可以使用 for-each 循环。
+> - ③ 默认情况下，所有的单列集合（Collection 集合的子类）和数组可以使用 for-each 循环遍历。
+> - ④ for-each 循环只是语法糖而已，其底层还是会转换为`迭代器`对数组或集合进行遍历。
 
-## 3.3 为什么要学习包装类？
+> [!CAUTION]
+>
+> 和使用迭代器遍历集合元素一样，在使用 for-each 循环遍历数组或集合中的元素时，不可以对数组或集合中的元素进行增加、删除、替换等操作，否则将会抛出 ConcurrentModificationException 异常。
 
-* ① Java 是一个纯面向对象的编程语言，即：Java 中万物皆对象（可以将所有的东西都看做对象）。由于多态的存在，所有的对象都可以使用 Object 类表示，如：`Object o = new Student();`，如果此时我们设计如下的通用方法，假设没有包装类的存在，当我们调用方法的时候，传入基本数据类型的变量，程序就会报错：
+
+
+* 示例：
 
 ```java
+package com.github.collection;
+
 public class Test {
-    public static void main(String[] args){
-        
-        int num = 10;
-        
-        // ❌ 错误：Object o != num 
-        method(num); // [!code error]
-    }
-    
-    public static void method(Object o){
-        ...
+    public static void main(String[] args) {
+        // 创建数组
+        int[] arr = {1, 2, 3, 4, 5};
+        // 遍历数组
+        for (int i : arr) {
+            System.out.println("i = " + i);
+        }
     }
 }
 ```
 
-* ② 在集合中，是不能存储基本数据类型的，只能存储对象，即：当我们向集合中存储基本数据类型的变量的时候，也需要使用包装类，如下所示：
+
+
+* 示例：
 
 ```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合对象
+        Collection<String> col = new ArrayList<>();
+        // 向集合中添加元素
+        col.add("aa");
+        col.add("bb");
+        col.add("cc");
+        col.add("dd");
+        col.add("ee");
+        // 遍历集合中的元素
+        for (String str : col) {
+            System.out.println(str);
+        }
+    }
+}
+```
+
+### 2.3.4 Lambda 表达式遍历
+
+#### 2.3.4.1 概述
+
+* 为了简化单列集合（Collection 集合的子类）或数组的遍历方式，Java 在 Iterable 接口中提供了新的遍历方法：
+
+```java
+package java.lang;
+
+public interface Iterable<T> {
+   
+    Iterator<T> iterator();
+
+    default void forEach(Consumer<? super T> action) { // [!code highlight:6]
+        Objects.requireNonNull(action);
+        for (T t : this) {
+            action.accept(t);
+        }
+    }
+
+    default Spliterator<T> spliterator() {
+        return Spliterators.spliteratorUnknownSize(iterator(), 0);
+    }
+}
+```
+
+#### 2.3.4.2 forEach 方法
+
+* JDK8 新增了遍历单列集合（Collection 集合的子类）或数组的方法：
+
+```java
+default void forEach(Consumer<? super T> action) { 
+    Objects.requireNonNull(action);
+    for (T t : this) {
+        action.accept(t);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合对象
+        Collection<String> col = new ArrayList<>();
+        // 向集合中添加元素
+        col.add("aa");
+        col.add("bb");
+        col.add("cc");
+        col.add("dd");
+        // forEach 方法
+        col.forEach(s -> {
+            System.out.println(s);
+        });
+    }
+}
+```
+
+## 2.4 总结
+
+* Collection 是单列集合的顶级接口，其所有的方法都被 List 系列集合或 Set 系列集合共享。
+* Collection 集合遍历有三种方式：
+  * 迭代器：如果在遍历的过程中需要删除元素，请使用迭代器。
+  * 增强 for 、Lambda：如果仅仅想遍历，请使用增强 for 或 Lambda 表达式。
+
+
+
+# 第四章：List 接口（⭐）
+
+## 4.1 概述
+
+* 在实际开发中，由于数组存储数据的局限性，我们通常会使用 List 来代替。并且，List 接口是 Collection 接口的子接口。
+
+> [!NOTE]
+>
+> List 系列集合的特点：添加的元素是有序、可重复、有索引。
+>
+> * 有序：`存`和`取`的顺序是一样的，如：存数据是`张三、李四、王五`，那么取数据也是`张三、李四、王五`；和之前学习的`排序`（从小到大或从大到小）没有任何关系。
+> * 可重复：集合存储的元素是可以重复的。
+> * 有索引：可以通过索引去获取集合中的元素。
+
+```mermaid
+classDiagram
+    Collection <|-- List :extends
+    Collection <|-- Queue :extends
+    Collection <|-- Set :extends
+    List <|-- ArrayList :implements
+    List <|-- LinkedList :implements
+    List <|-- Vector :implements
+    note for Vector "已过时，不推荐使用"
+    Queue <|-- LinkedList :implements
+    Set <|-- HashSet :implements
+    Set <|-- TreeSet :implements
+    HashSet <|-- LinkedHashSet :extends
+    class Collection{
+        <<interface>>
+    }
+    class Queue{
+        <<interface>>
+    }
+    class List{
+        <<interface>>
+    }
+    class Set{
+        <<interface>>
+    }
+
+```
+
+* List  接口中常用的子类：ArrayList 和 LinkedList。 
+
+## 4.2 常用 API
+
+### 4.2.1 概述
+
+* 由于 List 接口是 Collection 接口的子接口，List 接口将继承 Collection 接口中的所有方法，所以我们可以在 List 接口中使用 Collection 接口中的所有方法。
+* 因为 List 系列集合有索引，所以 List 接口增加了许多操作索引的方法。
+
+### 4.2.2 添加元素
+
+* 在指定索引位置上添加元素：
+
+```java
+void add(int index, E element);
+```
+
+* 在指定的索引位置上添加另一个集合中的所有元素：
+
+```java
+boolean addAll(int index, Collection<? extends E> c);
+```
+
+> [!NOTE]
+>
+> 如果要添加的索引位置上有元素，那么该索引以及之后的元素将向后移动！！！
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Test {
-    public static void main(String[] args){
-        
+    public static void main(String[] args) {
+        // 创建集合
         List<Integer> list = new ArrayList<>();
+
+        // 添加元素
+        list.add(1);
+        list.add(2);
+        list.add(3);
+
+        // 打印集合元素
+        System.out.println(list); // [1, 2, 3]
+
+        // 在指定位置上添加元素
+        list.add(2, 5);
         
-        list.add(new Integer(10)); // [!code focus]
+        // 打印集合元素
+        System.out.println(list); // [1, 2, 5, 3]
     }
 
 }
 ```
 
-## 3.4 装箱和拆箱
 
-### 3.4.1 装箱（获取 Integer 对象，了解）
 
-* ~~根据传递的整数创建一个 Integer 对象（构造方法，JDK9 之后过时）：~~
+* 示例：
 
 ```java
-@Deprecated(since="9", forRemoval = true)
-public Integer(int value) { // [!code focus]
-    this.value = value;
-} // [!code focus]
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合
+        List<Integer> list1 = new ArrayList<>();
+
+        // 添加元素
+        list1.add(1);
+        list1.add(2);
+        list1.add(3);
+
+        // 打印集合元素
+        System.out.println(list1); // [1, 2, 3]
+
+        // 创建另一个集合
+        List<Integer> list2 = new ArrayList<>();
+        list2.add(4);
+        list2.add(5);
+
+        // 在指定位置上添加另一个集合的所有元素
+        list1.addAll(1, list2);
+
+        // 打印集合元素
+        System.out.println(list1); // [1, 4, 5, 2, 3]
+    }
+
+}
 ```
 
-* ~~根据传递的字符串创建一个 Integer 对象（构造方法，JDK9 之后过时）：~~
+### 4.2.3 删除元素
+
+* 根据索引删除元素，并返回被删除的元素：
 
 ```java
-@Deprecated(since="9", forRemoval = true)
-public Integer(String s) throws NumberFormatException { // [!code focus]
-    this.value = parseInt(s, 10);
-} // [!code focus]
-```
-
-* 根据传递的`整数`创建一个 Integer 对象（静态方法）：
-
-```java
-public static Integer valueOf(int i) {  // [!code focus]
-    if (i >= IntegerCache.low && i <= IntegerCache.high)
-        return IntegerCache.cache[i + (-IntegerCache.low)];
-    return new Integer(i);
-} // [!code focus]
-```
-
-* 根据传递的`字符串`创建一个 Integer 对象（静态方法）：
-
-```java
-public static Integer valueOf(String s) throws NumberFormatException { // [!code focus]
-    return Integer.valueOf(parseInt(s, 10));
-} // [!code focus]
-```
-
-* 根据传递的`字符串`和`进制`创建一个 Integer 对象（静态方法，不常用）：
-
-```java
-public static Integer valueOf(String s, int radix) throws NumberFormatException { // [!code focus]
-    return Integer.valueOf(parseInt(s,radix));
-} // [!code focus]
+E remove(int index);
 ```
 
 > [!NOTE]
 >
-> * 装箱的定义：将`基本数据类型`的`变量`转换为`包装类对象`。
-> * 装箱的目的：就是为了使用专门为对象设计的 API 和特性。
+> 在调用方法的时候，如果出现了方法重载现象，优先调用`形参和实现类型一致`的那个方法。
 
 
 
 * 示例：
 
 ```java
-package com.github.wrapper;
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Test {
     public static void main(String[] args) {
-        Integer i1 = Integer.valueOf(10);
-        System.out.println("i1 = " + i1); // i1 = 10
+        // 创建集合
+        List<String> list = new ArrayList<>();
 
-        Integer i2 = Integer.valueOf("10");
-        System.out.println("i2 = " + i2); // i2 = 10
+        // 添加元素
+        list.add("aa");
+        list.add("bb");
+        list.add("cc");
+        list.add("dd");
+        list.add("ee");
+
+        // 打印集合中的元素
+        System.out.println(list); // [aa, bb, cc, dd, ee]
+        
+        // 根据索引删除元素
+        String remove = list.remove(1);
+        System.out.println(remove); // bb
+
+        // 打印集合中的元素
+        System.out.println(list); // [aa, cc, dd, ee]
     }
 }
 ```
 
-### 3.4.2 拆箱（将 Integer 对象转换为基本数据类型，了解）
+### 4.2.4 替换元素
 
-* 将 Integer 对象转换为基本数据类型的变量：
+* 替换指定索引上的元素：
 
 ```java
-public int intValue() { // [!code focus]
-    return value;
-} // [!code focus]
+E set(int index, E element);
+```
+
+* 批量替换集合中的每一个元素<Badge type="danger" text="jdk8+" />：
+
+```java
+default void replaceAll(UnaryOperator<E> operator) {
+    Objects.requireNonNull(operator);
+    final ListIterator<E> li = this.listIterator();
+    while (li.hasNext()) {
+        li.set(operator.apply(li.next()));
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合
+        List<String> list = new ArrayList<>();
+
+        // 添加元素
+        list.add("aa");
+        list.add("bb");
+        list.add("cc");
+        list.add("dd");
+        list.add("ee");
+
+        // 打印集合中的元素
+        System.out.println(list); // [aa, bb, cc, dd, ee]
+
+        // 替换指定索引上的元素
+        list.set(4, "java");
+
+        // 打印集合中的元素
+        System.out.println(list); // [aa, bb, cc, dd, java]
+
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合
+        List<String> list = new ArrayList<>();
+
+        // 添加元素
+        list.add("aa");
+        list.add("bb");
+        list.add("cc");
+        list.add("dd");
+        list.add("ee");
+        list.add("aa");
+        list.add("bb");
+
+        // 打印集合中的元素
+        System.out.println(list); // [aa, bb, cc, dd, ee]
+
+        // 批量替换集合中的每一个元素
+        list.replaceAll(x -> x.toUpperCase());
+
+
+        // 打印集合中的元素
+        System.out.println(list); // [AA, BB, CC, DD, EE, AA, BB]
+
+    }
+}
+```
+
+### 4.2.5 获取元素
+
+* 获取指定索引上的元素：
+
+```java
+E get(int index);
+```
+
+* 根据开始索引和结束索引获取子 List 集合：
+
+```java
+List<E> subList(int fromIndex, int toIndex);
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合
+        List<String> list = new ArrayList<>();
+
+        // 添加元素
+        list.add("aa");
+        list.add("bb");
+        list.add("cc");
+        list.add("dd");
+        list.add("ee");
+        list.add("aa");
+        list.add("bb");
+
+        // 打印集合中的元素
+        System.out.println(list); // [aa, bb, cc, dd, ee]
+
+        // 获取指定索引上的元素
+        System.out.println(list.get(0)); // aa
+        System.out.println(list.get(1)); // bb
+        System.out.println(list.get(2)); // cc
+        System.out.println(list.get(3)); // dd
+        System.out.println(list.get(4)); // ee
+        System.out.println(list.get(5)); // aa
+        System.out.println(list.get(6)); // bb
+
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合
+        List<String> list = new ArrayList<>();
+
+        // 添加元素
+        list.add("aa");
+        list.add("bb");
+        list.add("cc");
+        list.add("dd");
+        list.add("ee");
+        list.add("aa");
+        list.add("bb");
+
+        // 打印集合中的元素
+        System.out.println(list); // [aa, bb, cc, dd, ee]
+
+        // 获取指定索引上的元素
+        List<String> list2 = list.subList(1, 3);
+
+        // 打印集合中的元素
+        System.out.println(list2); // [bb, cc]
+    }
+}
+```
+
+### 4.2.6 获取元素索引
+
+* 从前往后根据元素查找其索引，如果找到，返回该元素的索引；否则，返回 -1 ：
+
+```java
+int indexOf(Object o);
+```
+
+* 从后往前根据元素查找其索引，如果找到，返回该元素的索引；否则，返回 -1 ：
+
+```java
+int lastIndexOf(Object o);
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+
+        list.add("aa");
+        list.add("bb");
+        list.add("cc");
+        list.add("dd");
+        list.add("aa");
+
+        int index = list.indexOf("aa");
+        System.out.println("index = " + index); // index = 0
+
+        int index1 = list.indexOf("ee");
+        System.out.println("index1 = " + index1); // index1 = -1
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+
+        list.add("aa");
+        list.add("bb");
+        list.add("cc");
+        list.add("dd");
+        list.add("aa");
+
+        int index = list.lastIndexOf("aa");
+        System.out.println("index = " + index); // index = 4
+
+        int index1 = list.lastIndexOf("ff");
+        System.out.println("index1 = " + index1); // index1 = -1
+    }
+}
+```
+
+### 4.2.7 排序
+
+* 对列表中的元素进行排序<Badge type="danger" text="jdk8+" />：
+
+```java
+default void sort(Comparator<? super E> c) {
+    Object[] a = this.toArray();
+    Arrays.sort(a, (Comparator) c);
+    ListIterator<E> i = this.listIterator();
+    for (Object e : a) {
+        i.next();
+        i.set((E) e);
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合
+        List<String> list = new ArrayList<>();
+
+        // 添加元素
+        list.add("aa");
+        list.add("bb");
+        list.add("cc");
+        list.add("dd");
+        list.add("ee");
+        list.add("aa");
+        list.add("bb");
+
+        // 打印集合中的元素
+        System.out.println(list); // [aa, bb, cc, dd, ee]
+
+        // 对列表中的元素进行排序
+        list.sort((x1, x2) -> x2.compareTo(x1));
+
+
+        // 打印集合中的元素
+        System.out.println(list); // [ee, dd, cc, bb, bb, aa, aa]
+    }
+}
+```
+
+## 4.3 遍历方式
+
+### 4.3.1 概述
+
+* 由于 List 系列集合有索引，所以遍历方式在 Collection 集合的基础上增加了 2 种：
+
+| List  系列集合遍历方式                        | 应用场景                                                   |
+| --------------------------------------------- | ---------------------------------------------------------- |
+| 迭代器遍历                                    | 在遍历的过程中需要删除元素，请使用迭代器遍历               |
+| 列表迭代器遍历                                | 在遍历的过程中需要添加元素或修改元素，请使用列表迭代器遍历 |
+| 增强 for 遍历                                 | 仅仅想遍历，请使用增强 for 遍历或Lambda 表达式遍历         |
+| Lambda 表达式遍历                             | 仅仅想遍历，请使用增强 for 遍历或Lambda 表达式遍历         |
+| 普通 for 循环遍历（因为 List 系列集合有索引） | 如果遍历的时候想操作索引，请使用普通 for 循环遍历          |
+
+### 4.3.2 普通 for 循环遍历
+
+* 语法：
+
+```java
+for (int i = 0; i < list.size(); i++) {
+    Object s = list.get(i);
+    System.out.println(s);
+}
 ```
 
 > [!NOTE]
 >
-> * 拆箱的定义：将`包装类对象`转换为`基本数据类型`的`变量`。
-> * 拆箱的目的：一般是因为需要运算，Java 中的大多数的运算符都是为基本数据类型而设计的，比如：比较、算术等。
+> * ① 借助 Collection 的 size() 方法，可以获取集合中元素的个数。
+> * ② 借助 List 的 get(x) 方法，可以根据索引获取元素。
 
 
 
 * 示例：
 
 ```java
-package com.github.wrapper;
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Test {
     public static void main(String[] args) {
-        // 因为对象之间不能直接进行计算，所以需要拆箱
-        Integer i1 = Integer.valueOf(1);
-        Integer i2 = Integer.valueOf(2);
+        // 创建集合
+        List<String> list = new ArrayList<>();
 
-        // 将对象进行拆箱
-        int num1 = i1.intValue();
-        int num2 = i2.intValue();
+        // 添加元素
+        list.add("aa");
+        list.add("bb");
+        list.add("cc");
+        list.add("dd");
+        list.add("ee");
+        list.add("aa");
+        list.add("bb");
 
-        // 基本数据类型之间可以进行计算
-        int sum = num1 + num2;
+        // 打印集合中的元素
+        for (int i = 0; i < list.size(); i++) {
+            String str = list.get(i);
+            System.out.println(str);
+        }
+    }
+}
 
-        // 将得到的结果再次进行装箱
-        Integer result = Integer.valueOf(sum);
-        System.out.println("result = " + result);
+```
+
+### 4.3.3 列表迭代器遍历（了解）
+
+#### 4.3.3.1 概述
+
+* 之前，通过 Collection 接口的 iterator() 方法可以实现从前向后依次遍历集合中的元素：
+
+![](./assets/7.gif)
+
+* 但是，List 接口提供了 listIterator() 方法，可以实现从后向前依次遍历集合中的元素：
+
+![](./assets/8.gif)
+
+#### 4.3.3.2 常用 API
+
+* List 接口提供的获取 ListIterator 的方法：
+
+| 方法                                       | 描述                                                |
+| ------------------------------------------ | --------------------------------------------------- |
+| `ListIterator<E> listIterator();`          | 获取列表迭代器对象，需要自己手动移动迭代器          |
+| `ListIterator<E> listIterator(int index);` | 根据索引获取列表迭代器对象，即：index = list.size() |
+
+* listIterator 接口的常用方法：
+
+| 方法                     | 描述                                   |
+| ------------------------ | -------------------------------------- |
+| `boolean hasNext();`     | 判断当前索引位置上是否有元素           |
+| `E next();`              | 获取元素，并向后移动迭代器对象（指针） |
+| `boolean hasPrevious();` | 判断当前索引位置上是否有元素           |
+| `E previous();`          | 获取元素，并向前移动迭代器对象（指针） |
+| `void add(E e);`         | 迭代遍历过程中，新增元素               |
+| `void set(E e);`         | 迭代遍历过程中，修改元素               |
+| `void remove();`         | 迭代遍历过程中，删除元素               |
+
+
+
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合
+        List<String> list = new ArrayList<>();
+
+        // 添加元素
+        list.add("aa");
+        list.add("bb");
+        list.add("cc");
+        list.add("dd");
+        list.add("ee");
+        list.add("aa");
+        list.add("bb");
+
+        // 打印集合中的元素
+        ListIterator<String> iterator = list.listIterator();
+        while (iterator.hasNext()) {
+            iterator.next();
+        }
+        while (iterator.hasPrevious()) {
+            String str = iterator.previous();
+            System.out.println(str);
+        }
+
     }
 }
 ```
 
-### 3.4.3 自动装箱和拆箱
 
-* 在 JDK 5 之后，Java 提供一种机制：自动装箱和自动拆箱：
-  * 自动装箱：将`基本数据类型的变量`自动变为其对应的`包装类对象`。
-  * 自动拆箱：将`包装类对象`自动变为对应的`基本数据类型的变量`。
 
-> [!CAUTION]
+* 示例：
+
+```java
+package com.github.collection;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建集合
+        List<String> list = new ArrayList<>();
+
+        // 添加元素
+        list.add("aa");
+        list.add("bb");
+        list.add("cc");
+        list.add("dd");
+        list.add("ee");
+        list.add("aa");
+        list.add("bb");
+
+        // 打印集合中的元素
+        ListIterator<String> iterator = list.listIterator(list.size());
+        while (iterator.hasPrevious()) {
+            String str = iterator.previous();
+            System.out.println(str);
+        }
+    }
+}
+```
+
+
+
+# 第五章：常见的数据结构（⭐）
+
+## 5.1 引入
+
+* `数据结构`是计算机`存储数据`和`组织数据`的方式。
+
+> [!NOTE]
 >
-> * ① Java 是一种强类型语言，每种数据都有自己的数据类型。
-> * ② 在计算的时候，如果不是同一种数据类型，是无法直接计算的。
-> * ③ 基本数据类型的变量和自己对应的包装类之间才可以实现自动装箱和自动拆箱。
+> 数据结构在开发中非常常见，不同的场景我们采取不同的数据结构，会让数据的查找和存储更有效率。
 
+* 如果数据比较多，我们可能会选择`哈希查找`算法，如下所示：
 
+![哈希查找](./assets/9.png)
 
-* 示例：
+* 如果数据量比较少，我们会直接使用`数组`，如下所示：
 
-```java
-package com.github.wrapper;
+![数组](./assets/10.png)
 
-public class Test {
-    public static void main(String[] args) {
-        // 自动装箱，即：直接将基本类型的数据赋值给包装类类型
-        // 在底层依然会调用 Integer.valueof(xxx)得到一个 Integer 对象
-        // 对程序员是透明的，换言之，程序员无需关心
-        Integer i = 10;
-
-        System.out.println("i = " + i);
-    }
-}
-```
-
-
-
-* 示例：
-
-```java
-package com.github.wrapper;
-
-public class Test {
-    public static void main(String[] args) {
-        
-        Integer i = Integer.valueOf(10);
-        
-        // 自动拆箱，即：将包装类对象直接赋值给基本数据类型
-        // 在底层依然会调用 int.intvalue() 得到一个 int 变量
-        // 对程序员是透明的，换言之，程序员无需关心
-        int num = i;
-        
-        System.out.println("num = " + num);
-    }
-}
-```
-
-## 3.5 基本数据类型和 String 之间的转换
-
-* ① 基本数据类型 --> String ：
-  * 使用 `+ ` 拼接`""`，如：`String str = 5 + "";`。
-  * 使用 String 的静态方法`valueOf()`，如：`String str = String.valueOf(5)`。
-* ② String --> 基本数据类型：
-  * 通过包装类（除了 Character 类）的静态方法`parseXxx()`，如：`int i = Integer.parsetInt("12");`。
-  * 通过包装类的静态方法`valueOf()`，如：`int i = Integer.valueOf("12");`。
-
-
-> [!CAUTION]
+> [!NOTE]
 >
-> 在 String 转换为基本数据类型的时候，如果字符串参数的内容无法正确的转换为对应的基本数据类型，将会抛出`java.lang.NumberFormatException` 异常。
+> 总结：不同的业务场景下，需要选择不同的数据结构。
+
+* 在 List 接口下有 3 个实现类：ArrayList、LinkedList 以及 Vector，如下所示：
+
+```mermaid
+classDiagram
+    Collection <|-- List :extends
+    Collection <|-- Queue :extends
+    Collection <|-- Set :extends
+    List <|-- ArrayList :implements
+    List <|-- LinkedList :implements
+    List <|-- Vector :implements
+    note for Vector "已过时，不推荐使用"
+    Queue <|-- LinkedList :implements
+    Set <|-- HashSet :implements
+    Set <|-- TreeSet :implements
+    HashSet <|-- LinkedHashSet :extends
+    class Collection{
+        <<interface>>
+    }
+    class Queue{
+        <<interface>>
+    }
+    class List{
+        <<interface>>
+    }
+    class Set{
+        <<interface>>
+    }
+
+```
 
 
 
-* 示例：
+* 在这三个实现类中，Java 在底层采取了不同的数据结构。换言之，如果我们不会数据结构，我们根本不知道什么时候采用哪种集合。
+
+## 5.2 概述
+
+* `数据结构`是计算机`存储数据`和`组织数据`的方式。
+* `数据结构`是指数据相互之间以什么方式排列在一起的。
+* `数据结构`是为了更加方便地管理数据和使用数据，需要结合具体的业务场景来选择。
+
+> [!NOTE]
+>
+> * ① 一般情况下，精心选择的数据结构可以带来更高的运行效率或存储效率。
+> * ② 我们`暂时`不需要学习如何手写各种数据结构，只需要把握以下三点即可：
+>   * 每种数据结构长什么样子？
+>   * 如何添加数据？
+>   * 如何删除数据？
+
+* 我们暂时要学习的数据结构有：`栈`、`队列`、`数组`、`链表`、`二叉树`、`二叉查找树`、`平衡二叉树`以及`红黑树`，如下所示：
+
+![暂时要学习的数据结构](./assets/11.png)
+
+## 5.3 数据结构（栈）
+
+### 5.3.1 概述
+
+* `栈`的特点：`先进后出，后进先出`。
+
+### 5.3.2 演示
+
+* 栈其实是一个容器，它用来存储数据的，这个容器是`一端开头`，我们称之为`栈顶`，还有`一端封闭`，我们称之为`栈底`，如下所示：
+
+ ![栈顶和栈底](./assets/12.svg)
+
+
+
+* 假设现在有 4 个数据，那么它们是怎么存储到栈中，又是怎么从栈中取出的？
+
+![](./assets/3.svg)
+
+* 数据`进入`栈模型的过程，我们称之为`压栈`（进栈、入栈），如下所示：
+
+> [!NOTE]
+>
+> * ① 栈中最上面的元素，我们称之为栈顶元素。
+> * ② 栈中最下面的元素，我们称之为栈底元素。
+
+![压栈（进栈、入栈）](./assets/13.gif)
+
+* 数据`离开`栈模型的过程，我们称之为`弹栈`（出栈），如下所示：
+
+![弹栈（出栈）](./assets/14.gif)
+
+* 栈的完整动画，如下所示：
+
+![入栈和出栈](./assets/15.gif)
+
+### 5.3.3 应用场景
+
+* 在 Java 语言的内存结构中，有一块区域称为`栈`内存，就是用的`栈`思想，如下所示：
+
+> [!NOTE]
+>
+> * ① 方法调用的时候入栈。
+> * ② 方法调用完毕出栈。
+
+![栈内存](./assets/16.gif)
+
+
+
+## 5.4 数据结构（队列）
+
+### 5.4.1 概述
+
+* `队列`的特点：`先进先出，后进后出`。
+
+### 5.4.2 演示
+
+* 队列其实是一个容器，它用来存储数据的，这个容器是`两端开头`，其中`一端开头`，我们称之为`后端`，另`一端开头`，我们称之为`前端`，如下所示：
+
+![](./assets/7.svg)
+
+* 假设现在有 4 个数据，那么它们是怎么存储到队列中，又是怎么从队列中取出的？
+
+![](./assets/17.svg)
+
+* 数据从后端`进入`队列模型的过程，我们称之为`入队列`，如下所示：
+
+![入队列](./assets/18.gif)
+
+* 数据从前端`离开`队列模型的过程，我们称之为`出队列`，如下所示：
+
+![出队列](./assets/19.gif)
+
+### 5.4.3 应用场景
+
+* 现实生活中的`排队上公交`等场景，应用了`队列`的思想，如下所示：
+
+![排队上公交](./assets/20.gif)
+
+* 现实生活中的`排队买票`等场景，应用了`队列`的思想，如下所示：
+
+![排队买票](./assets/21.gif)
+
+## 5.5 数据结构（数组）
+
+### 5.5.1 概述
+
+* 数组的特点：`查询速度快`、`删除效率低`以及`添加效率低`。
+
+### 5.5.2 演示
+
+* 其中，`查询速度快`指的是在数组中查询数据是通过`地址值`和`索引`进行元素定位的，查询任意数据消耗的时间是相同的。
+
+> [!NOTE]
+>
+> 数组中的元素在内存中是连续存储的。
+
+![查询速度块](./assets/22.svg)
+
+* 其中，`删除效率低`指的是要将原始数据删除，同时需要将后面的每个数据前移。
+
+![删除效率低](./assets/23.gif)
+
+* 其中，`添加效率低`指的是添加位置后的每个元素后移，再添加元素。
+
+![添加效率低](./assets/24.gif)
+
+> [!NOTE]
+>
+> 总结：`数组`是一种`查询快`、`增删慢`的数据模型。
+
+## 5.6 数据结构（链表）
+
+### 5.6.1 概述
+
+* 链表的特点：`查询速度慢`、`删除效率快`以及`添加效率快`。
+
+### 5.6.2 专业术语
+
+* `结点`（节点，Node）：链表中的每一个元素，我们称之为结点。
+
+![结点，Node](./assets/25.svg)
+
+* `结点的存储位置`（地址）：每一个结点都是一个独立的对象，那么自身就会有一个地址值，表示结点在内存中的位置。
+
+![结点的存储位置(地址)](./assets/26.svg)
+
+* `结点中保存的信息`（具体的数据+下一个节点的地址值）：结点中会保存`具体的数据`以及`下一个节点的地址值`。
+
+![结点中保存的信息](./assets/27.svg)
+
+
+
+* `头结点`：在链表中第一个创建出来的结点。
+
+![头结点](./assets/28.svg)
+
+* `添加新的结点`：创建新的结点，并设置具体的数据，然后将该结点的地址保存到头结点中的地址属性中，依次类推，形成链表。
+
+![添加新的结点](./assets/29.svg)
+
+
+
+> [!NOTE]
+>
+> * ① 链表中的结点都是独立的对象，在内存中是不连续的，每个结点包含`数据值`和`下一个结点的地址`。
+> * ② 链表的查询慢，无论查询哪个数据都需要从头开始查找。
+> * ③ 链表的增删相对较快。
+
+### 5.6.3 演示
+
+* 链表的查询慢，无论查询哪个数据都需要从头开始查找，如下所示：
+
+![链表的查询慢](./assets/30.gif)
+
+* 链表增加相对较快，如下所示：
+
+![链表增加相对较快](./assets/31.gif)
+
+* 链表删除相对较快，如下所示：
+
+![链表删除相对较快](./assets/32.gif)
+
+> [!NOTE]
+>
+> 总结：`链表`是一种`查询慢`、`增删快`的数据模型。
+
+
+
+# 第六章：底层源码分析
+
+## 6.1 概述
+
+* List 接口中最常用的子类是 ArrayList 和 LinkedList ，我们将仔细分析这两个类的底层源码。
+
+## 6.2 ArrayList
+
+### 6.2.1 概述
+
+* ArrayList 满足基本 List 接口的特性：有序、重复、有索引。
+* ArrayList 集合底层的实现原理是数组，大小可变。 
+* ArrayList 的特点：查询速度快、增删慢。 
+* ArrayList 是线程不安全的集合，运行速度快。 
+
+### 6.2.2 底层原理
+
+* ① 利用空参创建的集合，其底层会创建一个默认长度为 0 的数组。
 
 ```java
-package com.wrapper.demo3;
-
-public class Test {
-    public static void main(String[] args) {
-        String str = "12";
-
-        int num = Integer.parseInt(str);
-
-        System.out.println("num = " + num);
-
-        num = Integer.valueOf(str);
-        
-        System.out.println("num = " + num);
-    }
-}
+List<String> list = new ArrayList<>();
 ```
+
+![](./assets/33.svg)
+
+
+
+* ② 当添加第一个元素的时候，底层会创建一个新的长度为 10 的数组。
+
+```java
+list.add("a");
+list.add("b");
+...
+list.add("j");    
+```
+
+![](./assets/34.gif)
+
+* ③ 如果数组已经存满，即：`size = elementData.length` ，此时就需要将数组进行扩容，扩容为原先的 1.5 倍，即：新数组的长度是 15 。
+
+```java
+list.add("k");
+```
+
+![](./assets/35.gif)
+
+* ④ 如果一次添加多个元素，1.5 倍还放不下，则新创建数组的长度以实际为准。
+
+![](./assets/36.svg)
+
+### 6.2.3 源码分析
+
+* ① 在 ArrayList 中添加第 1 个元素：
+
+![](./assets/37.jpg)
+
+* ② 在 ArrayList 中添加第 11 个元素：
+
+![](./assets/38.jpg)
+
+* ③ 在 ArrayList 中一次批量增加很多元素：
+
+> [!NOTE]
+>
+> 分为两种情况：
+>
+> * ① 一次新增很多很多数据，如：
+>
+> ```java
+> List<String> list = new ArrayList<>();
+> list.addAll(Arrays.asList("aaa", "bbb","",...,"zzz"));
+> ```
+>
+> * ② 一次新增一个数据，但是突然新增很多很多数据，如：
+>
+> ```java
+> List<String> list = new ArrayList<>();
+> list.add("a");
+> list.add("b");
+> ...
+> list.addAll(Arrays.asList("aaa", "bbb","",...,"zzz"));
+> ```
+
+![](./assets/39.jpg)
+
+## 6.3 LinkedList
+
+### 6.3.1 概述
+
+* LinkedList 底层数据结构是双链表，查询慢，增删快；但是，如果要操作的是首尾元素，速度也是极快的。
+
+![双向链表](./assets/40.png)
+
+* LinkedList 提供了很多直接操作首尾元素的特有 API：
+
+| LinkedList  特有 API         | 描述                           |
+| ---------------------------- | ------------------------------ |
+| public void addFirst(E e) {} | 在列表开头插入指定的元素       |
+| public void addLast(E e) {}  | 在列表末尾追加指定的元素       |
+| public E getFirst() {}       | 返回列表中的第一个元素         |
+| public E getLast() {}        | 返回列表中的最后一个元素       |
+| public E removeFirst() {}    | 从列表中删除第一个元素并返回   |
+| public E removeLast() {}     | 从列表中删除最后一个元素并返回 |
+
+> [!NOTE]
+>
+> 在实际开发中，使用上述 API 的场景并不是很多，我们通常会使用 List 接口中的方法。
+>
+
+### 6.3.2 源码分析
 
