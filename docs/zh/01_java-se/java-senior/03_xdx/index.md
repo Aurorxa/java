@@ -1883,7 +1883,76 @@ public class Test {
 
 # 第二章：数据结构（树）
 
+## 2.1 概述
 
+* 之前，我们就学过 Collection 集合的继承体系，如下所示：
+
+```mermaid
+classDiagram
+    Collection <|-- List :extends
+    Collection <|-- Queue :extends
+    Collection <|-- Set :extends
+    List <|-- ArrayList :implements
+    List <|-- LinkedList :implements
+    List <|-- Vector :implements
+    note for Vector "已过时，不推荐使用"
+    Queue <|-- LinkedList :implements
+    Set <|-- HashSet :implements
+    Set <|-- TreeSet :implements
+    HashSet <|-- LinkedHashSet :extends
+    class Collection{
+        <<interface>>
+    }
+    class Queue{
+        <<interface>>
+    }
+    class List{
+        <<interface>>
+    }
+    class Set{
+        <<interface>>
+    }
+
+```
+
+* 由于 Collection、List 和 Set 等都是接口（接口是不能实例化的），为了使用集合对象，我们都是通过多态进行实例化子类，如下所示：
+
+```java
+List<String> list = new ArrayList<>();
+```
+
+```java
+List<String> list = new LinkedList<>();
+```
+
+```java
+Set<String> set = new HashSet<>();
+```
+
+```java
+Set<String> set = new TreeSet<>();
+```
+
+```java
+Set<String> set = new LinkedHashSet<>();
+```
+
+* 其实，JDK 的开发人员在给上述的实现类命名的时候，都遵循了`见名知意`的规则，如下所示：
+
+![](./assets/7.svg)
+
+* 前面的`数组`和`链表`，我们已经非常熟悉了，下面将重点介绍`树`，以便更好地学习 Set 系列集合。
+
+## 2.2 树的概念
+
+* 树（Tree）和链表（Linked）没有什么不同，都是一种数据结构，如下所示：
+
+> [!NOTE]
+>
+> * ① 树中的每一个元素，都叫做节点（Node）。
+> * ② 每个节点都是一个独立的对象。
+
+![](./assets/8.svg)
 
 
 
