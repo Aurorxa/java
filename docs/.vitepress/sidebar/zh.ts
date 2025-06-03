@@ -82,9 +82,9 @@ export const zhSidebar: DefaultTheme.Sidebar = [
     text: '数据结构和算法',
     collapsed: true,
     items: [
+      {text: '初识数据结构和算法', link: `/02_java-ds/ds-amateur/`,},
       {
         text: '基础数据结构', items: [
-          {text: '初识数据结构和算法', link: `/02_java-ds/ds-basic/01_${commonDirectoryName}/`,},
           {text: '数组', link: `/02_java-ds/ds-basic/02_${commonDirectoryName}/`},
           {text: '链表', link: `/02_java-ds/ds-basic/03_${commonDirectoryName}/`},
           {text: '递归', link: `/02_java-ds/ds-basic/04_${commonDirectoryName}/`},
