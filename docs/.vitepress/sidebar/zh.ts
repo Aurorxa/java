@@ -54,7 +54,7 @@ export const zhSidebar: DefaultTheme.Sidebar = [
           {text: 'Java 常见 API（二）', link: `/01_java-se/java-leap/09_${commonDirectoryName}/`},
           {text: 'Java 正则表达式', link: `/01_java-se/java-leap/10_${commonDirectoryName}/`},
           {text: 'Java 时间和包装类', link: `/01_java-se/java-leap/11_${commonDirectoryName}/`},
-          {text: 'Java 算法', link: `/01_java-se/java-leap/02_${commonDirectoryName}/`},
+          {text: 'Java 算法', link: `/01_java-se/java-leap/12_${commonDirectoryName}/`},
           {text: 'Java 函数式编程（一）', link: `/01_java-se/java-leap/13_${commonDirectoryName}/`},
           {text: 'Java 函数式编程（二）', link: `/01_java-se/java-leap/14_${commonDirectoryName}/`},
           {text: 'Java 函数式编程（三）', link: `/01_java-se/java-leap/15_${commonDirectoryName}/`},
@@ -117,6 +117,29 @@ export const zhSidebar: DefaultTheme.Sidebar = [
     ]
   },
   {
+    text: 'Java 图形化界面编程',
+    collapsed: true,
+    items: [
+      {text: 'Java 图形化界面编程（一）', link: `/03_java-ui/01_${commonDirectoryName}/`},
+      {text: 'Java 图形化界面编程（二）', link: `/03_java-ui/02_${commonDirectoryName}/`},
+    ]
+  },
+  {
+    text: 'Java 多线程&并发编程',
+    collapsed: true,
+    items: [
+      {text: 'Java 多线程&并发编程（一）', link: `/04_java-cc/01_${commonDirectoryName}/`},
+      {text: 'Java 多线程&并发编程（二）', link: `/04_java-cc/02_${commonDirectoryName}/`},
+    ]
+  },
+  {
+    text: 'Java 设计模式',
+    collapsed: true,
+    items: [
+      {text: '初识设计模式', link: ``},
+    ]
+  },
+  {
     text: 'Java 语言补充',
     collapsed: true,
     items: [
@@ -149,20 +172,6 @@ export const zhSidebar: DefaultTheme.Sidebar = [
         collapsed: true,
         items: [
           {text: '初识 UML', link: ``},
-        ]
-      },
-      {
-        text: '设计模式',
-        collapsed: true,
-        items: [
-          {text: '初识设计模式', link: ``},
-        ]
-      },
-      {
-        text: 'Java 并发编程',
-        collapsed: true,
-        items: [
-          {text: '初识并发编程', link: ``},
         ]
       },
     ]
