@@ -88,8 +88,8 @@ export const zhSidebar: DefaultTheme.Sidebar = [
         text: 'Java 图形化界面编程',
         collapsed: true,
         items: [
-          {text: 'Java 图形化界面编程（一）', link: `/02_java-add/01_java-ui/01_${commonDirectoryName}/`},
-          {text: 'Java 图形化界面编程（二）', link: `/02_java-add/01_java-ui/02_${commonDirectoryName}/`},
+          {text: 'Java 图形化界面编程（一）', link: `/02_java-other/01_java-ui/01_${commonDirectoryName}/`},
+          {text: 'Java 图形化界面编程（二）', link: `/02_java-other/01_java-ui/02_${commonDirectoryName}/`},
         ]
       },
       {
@@ -127,35 +127,35 @@ export const zhSidebar: DefaultTheme.Sidebar = [
         text: '数据结构和算法',
         collapsed: true,
         items: [
-          {text: '初识数据结构和算法', link: `/02_java-add/03_java-ds/ds-amateur/`,},
+          {text: '初识数据结构和算法', link: `/02_java-other/03_java-ds/ds-amateur/`,},
           {
             text: '基础数据结构', items: [
-              {text: '数组', link: `/02_java-add/03_java-ds/ds-basic/02_${commonDirectoryName}/`},
-              {text: '链表', link: `/02_java-add/03_java-ds/ds-basic/03_${commonDirectoryName}/`},
-              {text: '递归', link: `/02_java-add/03_java-ds/ds-basic/04_${commonDirectoryName}/`},
-              {text: '队列', link: `/02_java-add/03_java-ds/ds-basic/05_${commonDirectoryName}/`},
-              {text: '栈', link: `/02_java-add/03_java-ds/ds-basic/06_${commonDirectoryName}/`},
-              {text: '双端队列', link: `/02_java-add/03_java-ds/ds-basic/07_${commonDirectoryName}/`},
-              {text: '优先级队列', link: `/02_java-add/03_java-ds/ds-basic/08_${commonDirectoryName}/`},
-              {text: '阻塞队列', link: `/02_java-add/03_java-ds/ds-basic/09_${commonDirectoryName}/`},
-              {text: '堆', link: `/02_java-add/03_java-ds/ds-basic/10_${commonDirectoryName}/`},
-              {text: '二叉树', link: `/02_java-add/03_java-ds/ds-basic/11_${commonDirectoryName}/`},
+              {text: '数组', link: `/02_java-other/03_java-ds/ds-basic/02_${commonDirectoryName}/`},
+              {text: '链表', link: `/02_java-other/03_java-ds/ds-basic/03_${commonDirectoryName}/`},
+              {text: '递归', link: `/02_java-other/03_java-ds/ds-basic/04_${commonDirectoryName}/`},
+              {text: '队列', link: `/02_java-other/03_java-ds/ds-basic/05_${commonDirectoryName}/`},
+              {text: '栈', link: `/02_java-other/03_java-ds/ds-basic/06_${commonDirectoryName}/`},
+              {text: '双端队列', link: `/02_java-other/03_java-ds/ds-basic/07_${commonDirectoryName}/`},
+              {text: '优先级队列', link: `/02_java-other/03_java-ds/ds-basic/08_${commonDirectoryName}/`},
+              {text: '阻塞队列', link: `/02_java-other/03_java-ds/ds-basic/09_${commonDirectoryName}/`},
+              {text: '堆', link: `/02_java-other/03_java-ds/ds-basic/10_${commonDirectoryName}/`},
+              {text: '二叉树', link: `/02_java-other/03_java-ds/ds-basic/11_${commonDirectoryName}/`},
             ]
           },
           {
             text: '基本算法', items: [
-              {text: '初识查找算法', link: `/02_java-add/03_java-ds/ds-leap/01_${commonDirectoryName}/`},
-              {text: '二叉搜索树', link: `/02_java-add/03_java-ds/ds-leap/02_${commonDirectoryName}/`},
-              {text: 'avl 树', link: `/02_java-add/03_java-ds/ds-leap/03_${commonDirectoryName}/`},
-              {text: '红黑树', link: `/02_java-add/03_java-ds/ds-leap/04_${commonDirectoryName}/`},
-              {text: 'B 树', link: `/02_java-add/03_java-ds/ds-leap/05_${commonDirectoryName}/`},
-              {text: '哈希表', link: `/02_java-add/03_java-ds/ds-leap/06_${commonDirectoryName}/`},
-              {text: '排序算法', link: `/02_java-add/03_java-ds/ds-leap/07_${commonDirectoryName}/`},
+              {text: '初识查找算法', link: `/02_java-other/03_java-ds/ds-leap/01_${commonDirectoryName}/`},
+              {text: '二叉搜索树', link: `/02_java-other/03_java-ds/ds-leap/02_${commonDirectoryName}/`},
+              {text: 'avl 树', link: `/02_java-other/03_java-ds/ds-leap/03_${commonDirectoryName}/`},
+              {text: '红黑树', link: `/02_java-other/03_java-ds/ds-leap/04_${commonDirectoryName}/`},
+              {text: 'B 树', link: `/02_java-other/03_java-ds/ds-leap/05_${commonDirectoryName}/`},
+              {text: '哈希表', link: `/02_java-other/03_java-ds/ds-leap/06_${commonDirectoryName}/`},
+              {text: '排序算法', link: `/02_java-other/03_java-ds/ds-leap/07_${commonDirectoryName}/`},
             ]
           },
           {
             text: '高级算法', items: [
-              {text: '图', link: `/02_java-add/03_java-ds/ds-senior/01_${commonDirectoryName}/`},
+              {text: '图', link: `/02_java-other/03_java-ds/ds-senior/01_${commonDirectoryName}/`},
             ]
           },
         ]
@@ -164,8 +164,8 @@ export const zhSidebar: DefaultTheme.Sidebar = [
         text: 'Java 多线程&并发编程',
         collapsed: true,
         items: [
-          {text: 'Java 多线程&并发编程（一）', link: `/02_java-add/04_java-cc/01_${commonDirectoryName}/`},
-          {text: 'Java 多线程&并发编程（二）', link: `/02_java-add/04_java-cc/02_${commonDirectoryName}/`},
+          {text: 'Java 多线程&并发编程（一）', link: `/02_java-other/04_java-cc/01_${commonDirectoryName}/`},
+          {text: 'Java 多线程&并发编程（二）', link: `/02_java-other/04_java-cc/02_${commonDirectoryName}/`},
         ]
       },
       {
