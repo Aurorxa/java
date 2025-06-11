@@ -1819,7 +1819,9 @@ public class Test {
 
 * 示例：
 
-```java
+::: code-group
+
+```java [Test.java]
 package com.github.collection3;
 
 import java.util.TreeMap;
@@ -1851,7 +1853,11 @@ public class Test {
 }
 ```
 
+```txt [cmd 控制台]
+a(5) b(4) c(3) d(2) e(1)
+```
 
+:::
 
 
 
