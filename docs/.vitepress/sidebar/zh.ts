@@ -82,7 +82,6 @@ export const zhSidebar: DefaultTheme.Sidebar = [
       },
     ]
   },
-
   {
     text: 'Java 语言补充',
     collapsed: true,
