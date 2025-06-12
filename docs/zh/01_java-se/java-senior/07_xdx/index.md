@@ -391,9 +391,23 @@ public class Test {
 }
 ```
 
+### 2.3.3 创建系列
 
 
-## 2.5 综合练习
+
+
+
+### 2.3.4 删除系列
+
+
+
+
+
+### 2.3.5 获取并遍历系列
+
+
+
+## 2.4 综合练习
 
 ```java
 package com.github.collection3;
