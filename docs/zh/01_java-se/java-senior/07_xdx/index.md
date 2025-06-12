@@ -384,7 +384,8 @@ public class Test {
 
         // 获取系列方法
         System.out.println(file.lastModified()); // 1723596528000
-        final LocalDateTime localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(file.lastModified()), ZoneId.systemDefault());
+        final LocalDateTime localDateTime = LocalDateTime.ofInstant(
+            Instant.ofEpochMilli(file.lastModified()), ZoneId.systemDefault());
         System.out.println(df.format(localDateTime)); // 2024-08-14 08:48:48
     }
 }
