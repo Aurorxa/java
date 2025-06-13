@@ -17,7 +17,7 @@ export default defineConfig({
     //   label: 'English',
     //   lang: 'en',
     //   link: '/en/',
-    //   title: 'C/C++',
+    //   title: '许大仙',
     //   ...enConfig
     // },
   },

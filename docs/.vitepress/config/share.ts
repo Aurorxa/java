@@ -154,7 +154,7 @@ export const sharedConfig = withMermaid(defineConfig({
           const token = tokens[idx];
           const info = token.info.trim();
 
-          // 判断是否为 md:render 类型的代码块
+          // 判断是否为 md:img 类型的代码块
           if (info.includes('md:img')) {
             // 只渲染图片，不再渲染为代码块
             return `<div class="rendered-md">${md.render(token.content)}</div>`;

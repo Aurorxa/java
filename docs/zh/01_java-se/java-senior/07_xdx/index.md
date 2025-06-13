@@ -226,7 +226,7 @@ public long length() {}
 public String getAbsolutePath() {}
 ```
 
-* 获取构造方法中的路径（没什么用）：
+* 获取构造方法中的路径：
 
 ```java
 public String getPath() {}
@@ -404,13 +404,29 @@ public boolean createNewFile() throws IOException {}
 > * ① 细节 1：
 >   * 如果当前路径表示的文件是不存在的，则创建成功，返回 true 。
 >   * 如果当前路径表示的文件是存在的，则创建失败，返回 false。
->   * 在实际开发中，我们并不会关心，该方法的返回值！！！
 > * ② 细节 2：如果当前路径的父路径是不存在的，方法会抛出 IOException 异常。
 > * ③ 细节 3：该方法只能创建文件，不能创建文件夹；如果路径中不包含后缀名，那么创建的就是一个没有后缀名的文件。
 
+* 创建单级文件夹（不常用）：
+
+```java
+public boolean mkdir() {}
+```
+
+> [!NOTE]
+>
+> * ① 细节 1：在 Windows 中，文件夹中是不能包含同名的文件或文件夹的。
+> * ② 细节 2：该方法只能创建单级文件夹，不能创建多级文件夹。
+
+* 创建多级文件夹（单级文件夹，常用）：
+
+```java
+public boolean mkdirs() {}
+```
 
 
-* 示例：如果当前路径表示的文件是不存在的，则创建成功，返回 true
+
+* 示例：如果当前路径表示的文件是不存在的，则 createNewFile() 创建成功，返回 true
 
 
 ::: code-group
@@ -438,23 +454,653 @@ public class Test {
 
 
 
+* 示例：如果当前路径表示的文件是不存在的，则 createNewFile() 创建失败，返回 false
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("a.txt");
+        boolean newFile = file.createNewFile();
+        System.out.println(newFile); // false
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/6.gif)
+```
+
+:::
 
 
 
+* 示例：如果当前路径中的父路径是不存在的，则 createNewFile() 会抛出异常
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("aaa/a.txt"); // [!code highlight]
+        // ❌ 由于父路径不存在，将会抛出异常
+        boolean newFile = file.createNewFile(); // [!code error]
+        System.out.println(newFile); // false
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/7.gif)
+```
+
+:::
+
+
+
+* 示例：createNewFile() 方法只能创建文件，不能创建文件夹
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 如果路径中不包含后缀名，那么创建的就是一个没有后缀名的文件
+        File file = new File("abc"); 
+        boolean newFile = file.createNewFile(); 
+        System.out.println(newFile); 
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/8.gif)
+```
+
+:::
+
+
+
+* 示例：mkdir() 方法只能创建单级文件夹
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+
+public class Test {
+    public static void main(String[] args) {
+        File file = new File("aaa");
+        boolean b = file.mkdir();
+        System.out.println(b);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/9.gif)
+```
+
+:::
+
+
+
+* 示例：mkdir() 方法不能创建多级文件夹
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+
+public class Test {
+    public static void main(String[] args) {
+        File file = new File("aaa/abc/ccc");
+        boolean b = file.mkdir();
+        System.out.println(b);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/10.gif)
+```
+
+:::
+
+
+
+* 示例：mkdirs() 可以创建多级文件夹
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+
+public class Test {
+    public static void main(String[] args) {
+        File file = new File("aaa/abc/ccc");
+        boolean b = file.mkdirs();
+        System.out.println(b);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/11.gif)
+```
+
+:::
 
 ### 2.3.4 删除系列
 
+* 删除文件（空文件夹）：
+
+```java
+public boolean delete() {}
+```
+
+> [!CAUTION]
+>
+> * ① delete 方法默认只能删除文件和空文件夹！！！
+> * ② delete 方法是直接删除，并不走回收站！！！
+> * ③ 如果想实现删除文件夹，需要从最里面的文件夹一层一层向外删除子文件夹中的所有内容，最后再删除自己（递归）！！！
 
 
 
+* 示例：删除文件
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("aaa");
+        boolean b = file.delete();
+        System.out.println(b);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/12.gif)
+```
+
+:::
+
+
+
+* 示例：删除空目录
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("abc/bca/ccc");
+        boolean b = file.delete();
+        System.out.println(b);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/12.gif)
+```
+
+:::
+
+
+
+* 示例：不能删除有内容的文件夹
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("abc");
+        boolean b = file.delete();
+        System.out.println(b);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/13.gif)
+```
+
+:::
 
 ### 2.3.5 获取并遍历系列
 
+* 获取当前路径下的所有内容（文件和文件夹）：
 
+```java
+public File[] listFiles() {}
+```
+
+> [!CAUTION]
+>
+> * 细节：
+>   * 当调用者 File 表示的路径不存在时，返回 null。
+>   * 当调用者 File 表示的路径是文件时，返回 null。
+>   * 当调用者 FIle 表示的路径是一个空文件时，返回一个长度为 0 的数组。
+>   * 当调用者 File 表示的路径是一个有内容的文件夹时，将里面所有文件（包含隐藏文件）和文件夹的路径放在 File 数组中并返回。
+>   * 当调用者 File 表示的路径需要访问权限时，返回 null。
+> * 解决 null 问题（空指针异常）：直接调用 `Objects.requireNonNullElse(files, new File[0])`方法，即：如果 files 返回 null ，就转换为一个长度为 0 的数组。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("abc");
+        boolean b = file.delete();
+        System.out.println(b);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/14.gif)
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("abc");
+        File[] files = file.listFiles();
+        for (File f : Objects.requireNonNullElse(files, new File[0])) {
+            System.out.println(f.getName());
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/15.gif)
+```
+
+:::
+
+### 2.3.6 所有获取并遍历系列
+
+* 列出可用的文件系统根：
+
+```java
+public static File[] listRoots() {}
+```
+
+> [!NOTE]
+>
+> * 对于 Windows 系统而言，所谓的文件系统根，就是盘符，如：C 盘、D 盘、E 盘等（有几个盘符就有几个文件系统根）。
+> * 对于 Linux 系统而言，所谓的文件系统根，就是 `/` 。
+
+* 获取当前路径下所有内容（文件和文件夹）的名称（不常用）：
+
+```java
+public String[] list() {}
+```
+
+* 利用文件名过滤器获取当前路径下所有内容（文件和文件夹）的名称（不常用）：
+
+```java
+public String[] list(FilenameFilter filter) {}
+```
+
+* 获取当前路径下所有内容（文件和文件夹，常用）：
+
+```java
+public File[] listFiles() {}
+```
+
+* 利用文件过滤器获取当前路径下所有内容（文件和文件夹，常用）：
+
+```java
+public File[] listFiles(FileFilter filter) {}
+```
+
+* 利用文件过滤名获取当前路径下所有内容（文件和文件夹，常用）：
+
+```java
+public File[] listFiles(FilenameFilter filter) {}
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        final File[] files = File.listRoots();
+        for (File file : files) {
+            System.out.println(file.getPath());
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/16.gif)
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("abc");
+
+        File[] files = file.listFiles(f -> f
+                .getName()
+                .endsWith(".jpg"));
+        for (File f : Objects.requireNonNullElse(files, new File[0])) {
+            System.out.println(f);
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/17.gif)
+```
+
+:::
 
 ## 2.4 综合练习
 
-```java
+### 2.4.1 综合练习一
+
+* 需求：在当前项目中的 aaa 文件夹下创建一个 a.txt 的文件。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("aaa/a.txt");
+        boolean newFile = file.createNewFile();
+        System.out.println(newFile ? "创建成功" : "创建失败");
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/18.gif)
+```
+
+:::
+
+### 2.4.2 综合练习二
+
+* 需求：定义一个方法，用于寻找某一个文件夹中，是否有以 avi 结尾的小电影。
+
+> [!NOTE]
+>
+> 暂时不需要考虑子文件夹，即：
+>
+> - [x] aaa
+> - [ ] ~~aaa/bbb~~
+> - [ ] ~~aaa/bbb/ccc~~
+
+
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("aaa/ccc");
+        System.out.println(isExistAVI(file) ? "存在" : "不存在");
+    }
+
+    public static boolean isExistAVI(File src) {
+        // 判断参数
+        if (null == src || !src.exists() || src.isFile()) {
+            return false;
+        }
+        // 获取当前路径下的所有内容
+        File[] files = src.listFiles();
+        // 遍历数组
+        for (File file : Objects.requireNonNullElse(files, new File[0])) {
+            if (file.isFile() && file.getName().endsWith(".avi")) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/19.gif)
+```
+
+:::
+
+### 2.4.3 综合练习三
+
+* 需求：定义一个方法，用于寻找某一个文件夹中，所有以 avi 结尾的小电影。
+
+> [!NOTE]
+>
+> 需要考虑子文件夹，即：
+>
+> - [x] aaa
+> - [x] aaa/bbb
+> - [x] aaa/bbb/ccc
+
+
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("aaa");
+        System.out.println(findAVI(file).size());
+    }
+
+    public static List<File> findAVI(File src) {
+        List<File> resultList = new ArrayList<>();
+        // 判断参数
+        if (null == src || !src.exists() || src.isFile()) {
+            return resultList;
+        }
+        // 获取当前路径下的所有内容
+        File[] files = src.listFiles();
+        // 遍历数组
+        for (File file : Objects.requireNonNullElse(files, new File[0])) {
+            // 如果是文件，并且是 avi 文件，则添加到结果列表中
+            if (file.isFile() && file.getName().endsWith(".avi")) {
+                resultList.add(file);
+            } else { 
+                // 如果是文件夹，则递归调用 findAVI 方法
+                // 再次调用本方法的时候，参数一定是 src 的次一级路径，即：file
+                resultList.addAll(findAVI(file));
+            }
+        }
+        return resultList;
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/20.gif)
+```
+
+:::
+
+### 2.4.4 综合练习四
+
+* 需求：定义一个方法，删除一个多级文件夹。
+
+> [!NOTE]
+>
+> 需要使用递归来实现！！！
+
+
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("aaa/bbb/eeee");
+        remove(file);
+    }
+
+    public static void remove(File src) {
+        // 判断参数
+        if (null == src || !src.exists() || src.isFile()) {
+            return;
+        }
+        // 获取当前路径下的所有内容
+        File[] files = src.listFiles();
+        // 遍历数组
+        for (File file : Objects.requireNonNullElse(files, new File[0])) {
+            // 如果是文件，就删除
+            if (file.isFile()) {
+                System.out.println(file.getPath());
+                file.delete();
+            } else { // 如果是文件夹，则递归调用 findAVI 方法
+                remove(file);
+            }
+        }
+        // 最后需要删除自己
+        src.delete();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/21.gif)
+```
+
+:::
+
+### 2.4.4 综合练习四
+
+* 需求：统计一个文件夹中每种文件的个数并打印。
+
+> [!NOTE]
+>
+> 需要使用递归来实现！！！
+
+
+
+::: code-group
+
+```java [Test.java]
 package com.github.collection3;
 
 import java.io.File;
@@ -505,4 +1151,14 @@ public class Test {
     
 }
 ```
+
+```md:img [cmd 控制台]
+![](./assets/22.gif)
+```
+
+:::
+
+
+
+
 
