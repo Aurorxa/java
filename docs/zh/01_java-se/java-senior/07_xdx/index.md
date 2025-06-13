@@ -18,13 +18,13 @@
 
 ![](./assets/3.png)
 
-* 这背后就涉及到了两个知识：
-  * 如何传输数据（如何将数据保存到文件中）？
-  * 文件的位置在哪里？
+* 这个背后就涉及到了两个知识点：
+  * 文件在哪里（文件的位置）？
+  * 如何传输数据（如何将数据保存到文件中，如何从文件中读取数据）？
 
 > [!NOTE]
 >
-> * ① 在 Java 中，如何传输数据，需要使用 IO 流技术。
+> * ① 在 Java 中，如何传输数据，需要使用 IO 流技术（存储和读取数据的解决方案）。
 > * ② 在 Java 中，文件的位置（文件的路径），需要使用到 File 类。
 
 ![](./assets/4.png)
@@ -49,7 +49,7 @@
 > * ① File 类是用于操作`本地文件系统`的资源（文件或目录），即：只能处理 `file://` 协议的 URI。
 > * ② File 类并不能处理网络上的资源，如：`https://xxx`。
 
-* File 类的对象表示的路径可以是存在的，也可以是不存在的。
+* File 类的对象表示的路径，可以是存在的，也可以是不存在的。
 
 ## 2.2 创建 File 对象
 
@@ -392,6 +392,51 @@ public class Test {
 ```
 
 ### 2.3.3 创建系列
+
+* 创建一个空的文件：
+
+```java
+public boolean createNewFile() throws IOException {}
+```
+
+> [!NOTE]
+>
+> * ① 细节 1：
+>   * 如果当前路径表示的文件是不存在的，则创建成功，返回 true 。
+>   * 如果当前路径表示的文件是存在的，则创建失败，返回 false。
+>   * 在实际开发中，我们并不会关心，该方法的返回值！！！
+> * ② 细节 2：如果当前路径的父路径是不存在的，方法会抛出 IOException 异常。
+> * ③ 细节 3：该方法只能创建文件，不能创建文件夹；如果路径中不包含后缀名，那么创建的就是一个没有后缀名的文件。
+
+
+
+* 示例：如果当前路径表示的文件是不存在的，则创建成功，返回 true
+
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("a.txt");
+        boolean newFile = file.createNewFile();
+        System.out.println(newFile); // true
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/5.gif)
+```
+
+:::
+
+
 
 
 

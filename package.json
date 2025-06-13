@@ -29,7 +29,8 @@
     "vitepress": "^1.6.3",
     "vitepress-demo-plugin": "^1.4.4",
     "vitepress-plugin-group-icons": "^1.5.5",
-    "vitepress-plugin-mermaid": "^2.0.17"
+    "vitepress-plugin-mermaid": "^2.0.17",
+    "vitepress-plugin-tabs": "^0.7.1"
   },
   "dependencies": {
     "@theojs/lumen": "5.4.6",
@@ -37,6 +38,7 @@
     "dayjs": "^2.0.0-alpha.4",
     "dotenv": "^16.5.0",
     "gsap": "^3.13.0",
+    "markdown-it-container": "^4.0.0",
     "markdown-it-task-checkbox": "^1.0.6",
     "medium-zoom": "^1.1.0",
     "nprogress-v2": "^1.1.10",

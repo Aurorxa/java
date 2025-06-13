@@ -16,10 +16,8 @@ import markdownItTaskCheckbox from 'markdown-it-task-checkbox'
 import path from 'path';
 const mode = process.env.NODE_ENV || 'development'
 const { VITE_BASE_URL } = loadEnv(mode, process.cwd())
-
 console.log('Mode:', process.env.NODE_ENV)
 console.log('VITE_BASE_URL:', VITE_BASE_URL)
-
 export const sharedConfig = withMermaid(defineConfig({
   rewrites: {
     'zh/:rest*': ':rest*'
@@ -121,8 +119,8 @@ export const sharedConfig = withMermaid(defineConfig({
         const defaultRender = md.render
         md.render = (...args) => {
           const [content, env] = args
-          const currentLang = env.localeIndex
-          const isHomePage = env.path === '/' || env.relativePath === 'index.md'  // 判断是否是首页
+          const currentLang = env?.localeIndex || 'root'
+          const isHomePage = env?.path === '/' || env?.relativePath === 'index.md'  // 判断是否是首页
 
           if (isHomePage) {
             return defaultRender.apply(md, args) // 如果是首页，直接渲染内容
@@ -147,6 +145,24 @@ export const sharedConfig = withMermaid(defineConfig({
           // 返回渲染的内容
           return defaultContent
         }
+
+        // 获取原始的 fence 渲染规则
+        const defaultFence = md.renderer.rules.fence?.bind(md.renderer.rules) ?? ((...args) => args[0][args[1]].content);
+
+        // 重写 fence 渲染规则
+        md.renderer.rules.fence = (tokens, idx, options, env, self) => {
+          const token = tokens[idx];
+          const info = token.info.trim();
+
+          // 判断是否为 md:render 类型的代码块
+          if (info.includes('md:img')) {
+            // 只渲染图片，不再渲染为代码块
+            return `<div class="rendered-md">${md.render(token.content)}</div>`;
+          }
+
+          // 其他代码块按默认规则渲染（如 java, js 等）
+          return defaultFence(tokens, idx, options, env, self);
+        };
       })
       md.use(timeline)
       md.use(groupIconMdPlugin) //代码组图标
