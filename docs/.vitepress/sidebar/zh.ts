@@ -19,7 +19,7 @@ export const zhSidebar: DefaultTheme.Sidebar = [
         ]
       },
       {
-        text: 'Java 语言基础',
+        text: 'Java 语言初级',
         collapsed: true,
         items: [
           {text: 'Java 基础知识', link: `/01_java-se/java-basic/01_${commonDirectoryName}/`},
