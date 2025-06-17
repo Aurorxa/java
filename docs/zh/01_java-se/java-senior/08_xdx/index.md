@@ -180,3 +180,118 @@
 
 # 第二章：字符集（⭐）
 
+## 2.1 概述
+
+* 之前，我们在学习字节流的时候，提过读取文件的时候，文件中的内容尽量是英文：
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建输入流对象
+        InputStream is = new FileInputStream("day23\\a.txt");
+        // 读取数据
+        // 一次读取一个字节，读取的数据是在 ASCII 码表上字符对应的数字
+        // 读取到文件末尾，返回 -1
+        int b;
+        while ((b = is.read()) != -1) {
+            System.out.println(Character.toChars(b));
+        }
+        // 释放资源
+        is.close();
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/14.gif)
+```
+
+:::
+
+* 但是，劳资不信这个邪，我就要在读取文件的时候，文件中的内容是中文：
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建输入流对象
+        InputStream is = new FileInputStream("day23\\a.txt");
+        // 读取数据
+        // 一次读取一个字节，读取的数据是在 ASCII 码表上字符对应的数字
+        // 读取到文件末尾，返回 -1
+        int b;
+        while ((b = is.read()) != -1) {
+            System.out.println(Character.toChars(b));
+        }
+        // 释放资源
+        is.close();
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/15.gif)
+```
+
+:::
+
+> [!IMPORTANT]
+>
+> 我们会发现结果是乱码，要解释这个原因，还需要学习`字符集`相关的知识！！！
+
+## 2.2 计算机的存储规则
+
+### 2.2.1 概述
+
+* 要学习字符集，我们有必要回顾之前学习过的`计算机的存储规则`。
+
+### 2.2.2 计算机的存储规则
+
+* 在计算机中，任意的数据都是以二进制的形式进行存储的，包括：数字、字符、图片、视频等。
+
+![](./assets/16.jpg)
+
+* 其实，所谓的二进制就是`0`或`1`，中文称为“比特”，英文称为 “bit ”。
+
+> [!NOTE]
+>
+> * ① 1 bit 只能存储 0 或 1 ，可以存储 2^1 个数字，即：可以表示 2 个数字。
+> * ② 计算机中最小的存储单元是 bit 。
+
+![](./assets/17.svg)
+
+* 但是，一个`bit`能存储的数据太少了，通常我们会将`8`个`bit`分为一组，中文称为“字节”，英文称为“Byte”。
+
+> [!NOTE]
+>
+> * ① 1 Byte 是 8 bit，可以存储 2^8 个数字，即：可以表示 256 个数字。
+> * ② 计算机中最基本的存储单元是 Byte 。
+
+![](./assets/18.svg)
+
+> [!IMPORTANT]
+>
+> * ① 计算机存储英文的时候，1 个字节就可以了，因为英文字母一共 26 个，就算大小写也只有 52 个。
+> * ② 计算机到底是如何存储英文的，就和要学习的`字符集`相关了。
+
+## 2.3 字符集
+
+
+
