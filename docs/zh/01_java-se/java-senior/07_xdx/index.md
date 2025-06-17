@@ -1353,13 +1353,21 @@ public class Test {
 
 ![IO 流体系](./assets/35.svg)
 
-## 3.3 FileOutputStream
 
-### 3.3.1 概述
+
+# 第四章：基本字节流（⭐）
+
+## 4.1 概述
+
+* 基本字节流有两种：FileOutputStream 和 FileInputStream。
+
+## 4.2 FileOutputStream
+
+### 4.2.1 概述
 
 * FileOutputStream 是操作本地文件的字节输出流，可以将程序中的数据写出到本地文件中。
 
-### 3.3.2 操作步骤
+### 4.2.2 操作步骤
 
 * ① 创建字节输出流对象。
 
@@ -1447,7 +1455,7 @@ public class Test {
 
 :::
 
-### 3.3.3 原理
+### 4.2.3 原理
 
 * 电脑硬盘中的的文件非常多，我们的程序是如何知道向那个文件中写入数据的？
 
@@ -1483,9 +1491,9 @@ os.close();
 
 ![](./assets/40.gif)
 
-### 3.3.4 细节
+### 4.2.4 细节
 
-#### 3.3.4.1 创建字节输出流对象的细节
+#### 4.2.4.1 创建字节输出流对象的细节
 
 * ① 参数是字符串表示的路径或者 File 对象都是可以的。
 
@@ -1590,7 +1598,7 @@ public class Test {
 
 :::
 
-#### 3.3.4.2 写数据的细节
+#### 4.2.4.2 写数据的细节
 
 * ① write 方法的参数是整数：
 
@@ -1693,7 +1701,7 @@ public class Test {
 
 :::
 
-#### 3.3.4.3 释放资源的细节
+#### 4.2.4.3 释放资源的细节
 
 * 每次使用完流之后，必须释放资源：
 
@@ -1750,7 +1758,7 @@ public class Test {
 
 :::
 
-### 3.3.5 写数据小问题（续写）
+### 4.2.5 写数据小问题（续写）
 
 * 如果本地文件中已经有数据了，如下所示：
 
@@ -1831,7 +1839,7 @@ public class Test {
 
 :::
 
-### 3.3.6 写数据小问题（换行写）
+### 4.2.6 写数据小问题（换行写）
 
 * 之前每调用一次 write 方法，都是数据的末尾接着写：
 
@@ -1889,7 +1897,7 @@ public class Test {
 
 :::
 
-### 3.3.7 补充
+### 4.2.7 补充
 
 * 有时，我们需要获取字符（'a'）在 ASCII 码表中的数字（97），Java 提供了 codePointAt 方法：
 
@@ -1941,13 +1949,13 @@ public class Test {
 }
 ```
 
-## 3.4 FileInputStream
+## 4.3 FileInputStream
 
-### 3.4.1 概述
+### 4.3.1 概述
 
 * FileInputStream 是操作本地文件的字节输入流，可以将本地文件中的数据读取到程序中。
 
-### 3.4.2 操作步骤
+### 4.3.2 操作步骤
 
 * ① 创建字节输出流对象。
 
@@ -2031,7 +2039,7 @@ public class Test {
 
 :::
 
-### 3.4.3 原理
+### 4.3.3 原理
 
 * 电脑硬盘中的的文件非常多，我们的程序是如何知道从那个文件中读取数据的？
 
@@ -2068,9 +2076,9 @@ is.close();
 
 ![](./assets/60.gif)
 
-### 3.4.4 细节
+### 4.3.4 细节
 
-#### 3.4.4.1 创建字节输入流细节
+#### 4.3.4.1 创建字节输入流细节
 
 * 如果文件不存在，就报错。
 
@@ -2126,7 +2134,7 @@ public class Test {
 
 :::
 
-#### 3.4.4.2 读数据的细节
+#### 4.3.4.2 读数据的细节
 
 * ① 一次读取一个字节，读取的是数据在 ASCII 码表上对应的数字：
 
@@ -2220,7 +2228,7 @@ public class Test {
 
 :::
 
-#### 3.4.4.3 释放资源的细节
+#### 4.3.4.3 释放资源的细节
 
 * 每次使用完流之后，必须释放资源：
 
@@ -2297,7 +2305,7 @@ public class Test {
 
 :::
 
-### 3.4.5 循环读取数据
+### 4.3.5 循环读取数据
 
 * ① 当我们创建字节输入流对象的时候，默认是指向第 1 个数据的：
 
@@ -2347,7 +2355,7 @@ public class Test {
 
 :::
 
-### 3.4.6 循环读取数据的细节
+### 4.3.6 循环读取数据的细节
 
 * 之前，我们是这样循环读取数据的，如下所示：
 
@@ -2431,16 +2439,16 @@ public class Test {
 
 ![](./assets/70.gif)
 
-## 3.5 拷贝文件
+## 4.4 拷贝文件
 
-### 3.5.1 概述
+### 4.4.1 概述
 
-* 拷贝文件：就是通过`字节输入流`将`源文件`中的`数据`读取到`程序`中，并通过`字节输出流`将`程序`中的`数据`写出到`目的地文件`中。
+* 拷贝文件：通过`字节输入流`将`源文件`的`数据`读取到`程序`中，并通过`字节输出流`将`程序`中的`数据`写出到`目的地文件`中。
 * 其动态示意图，如下所示：
 
 ![](./assets/71.gif)
 
-### 3.5.2 文件拷贝
+### 4.4.2 文件拷贝
 
 * 文件的拷贝（复制），其主要思想是：边读边写，并且先打开的流最后关闭。
 
@@ -2530,7 +2538,7 @@ public class Test {
 
 :::
 
-### 3.5.3 大文件的拷贝
+### 3.5.3 大文件拷贝
 
 #### 3.5.3.1 概述
 
@@ -2577,9 +2585,672 @@ public class Test {
 
 :::
 
-* 我们会发现速度非常慢，就是因为复制文件的时候，每次只读写了一个字节。
+> [!NOTE]
+>
+> 我们会发现速度非常慢，原因就在于复制文件的时候，每次只读写了一个字节！！！
+
+* 一般情况下，我们会将`要拷贝的文件`称为`数据源`，而将`文件拷贝到哪里去`称为`目的地`，并且`程序`是运行在`内存`中的。
+
+![](./assets/75.svg)
+
+* 当我们在代码中创建`字节输入流对象`和`字节输出流对象`的时候，`程序`就和`数据源`以及`目的地`建立了`传输数据`的`通道`：
+
+![](./assets/76.svg)
+
+* 当进行复制文件的时候（边读边写），我们是通过临时变量`b`来记录`当前读取的数据`：
+
+![](./assets/77.svg)
+
+* 在循环中，我们使用`read()`方法`读取数据`时，底层是将`读取到的数据`存储到临时变量`b`中：
+
+![](./assets/78.svg)
+
+* 在循环中，我们使用`write()`方法`写出数据`时，底层是将临时变量`b`中的数据`写到目的地`：
+
+![](./assets/79.svg)
+
+* 就这么不停的读、不停的写，直到拷贝完所有数据为止。
+
+> [!NOTE]
+>
+> * ① 最大的弊端就在于每次只读写一个字节，太慢了（性能的短板或瓶颈）。
+> * ② 如果一个文件是 30 MB，换算为字节是 `30*1024*1024=31457280B `，就需要循环`31457280`多次，能不慢吗？
+
+![](./assets/80.gif)
+
+#### 3.5.3.2 一次读取多个字节
+
+* 既然我们已经知道了性能的短板（瓶颈）就在于每次只读写一个字节，那么我们读写读写多个字节，不就可以提高文件拷贝的速度？
+* FileInputStream 提供了多个重载的 read() 方法：
+
+| 方法名称                                               | 描述                   |
+| ------------------------------------------------------ | ---------------------- |
+| `public abstract int read() throws IOException;`       | 一次读一个字节数据     |
+| `public int read(byte[] buffer) throws IOException {}` | 一次读一个字节数组数据 |
+
+> [!CAUTION]
+>
+> `read(byte[] buffer)`：一次读一个字节数组的数据，每次读取会`尽可能`将数组装满！！！
+>
+> * ① 如果数组的长度是 2 ，那么该方法一次会尽量读 2 个字节的数据。
+> * ② 如果数组的长度是 100 ，那么该方法一次会尽量读 100 个字节的数据。
+> * ③ ...
+> * ④ 由于数组也会占用内存空间，如果数组的长度很长很长，内存可能会直接溢出。
+> * ⑤ 通常情况下，我们都会设置 1024 的整数倍，如：`1024=1KB`、`1024*1024*5=5MB` 。
+
+* 我们可以先将数组（缓冲区）的长度设置为 2 ，来观察效果：
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.*;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建字节输入流对象
+        InputStream is = new FileInputStream("day23\\\\a.txt");
+
+        // 创建缓冲区
+        byte[] buffer = new byte[2]; // [!code highlight]
+        // 读取数据
+        // 一次读取多个字节数组，具体读多少，和数组的长度有关
+        // 返回值：本次读取到了多少个字节数据，如果返回 -1，表示没有数据了
+        int len = is.read(buffer);
+        System.out.println(len); // 2
+        System.out.println(new String(buffer)); // ab
+
+        // 关闭资源：先开的最后关闭
+        is.close();
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/81.gif)
+```
+
+:::
+
+* 多读几次数据，直接读取到文件末尾：
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建字节输入流对象
+        InputStream is = new FileInputStream("day23\\\\a.txt");
+
+        // 创建缓冲区
+        byte[] buffer = new byte[2]; // [!code highlight]
+        // 读取数据
+        // 一次读取多个字节数组，具体读多少，和数组的长度有关
+        // 返回值：本次读取到了多少个字节数据，如果返回 -1，表示没有数据了
+        int len = is.read(buffer);
+        System.out.println(len); // 2
+        System.out.println(new String(buffer)); // ab
+
+        len = is.read(buffer);
+        System.out.println(len); // 2
+        System.out.println(new String(buffer)); // cd
+
+        len = is.read(buffer);
+        System.out.println(len); // 1
+        System.out.println(new String(buffer)); // ???
+
+        // 关闭资源：先开的最后关闭
+        is.close();
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/82.gif)
+```
+
+:::
+
+> [!NOTE]
+>
+> 我们会发现最后一次数据，是不对的，至于原因是什么，接着往下看！！！
+
+* 当代码执行到`创建字节输入流对象`时，就意味着内存和数据源有了一个传输数据的通道：
+
+![](./assets/83.svg)
+
+* 当代码执行到创建缓冲区（字节数组）时，就意味着内存中已经创建了数组对象：
+
+![](./assets/84.svg)
+
+* 当代码执行到读取数据到缓冲区（数组）时：
+
+> [!NOTE]
+>
+> 底层做了以下两件事：
+>
+> * ① 将读取到的数据存储到缓冲区中，即：buffer 数组中是`'a'`和`'b'`。
+> * ② 读取到了 2 个字节的数据，那么长度 len 就等于 2 ，就意味着内存中有一个临时变量，其值是 2 。
+
+![](./assets/85.gif)
+
+* 同理，读取`'c'`和`'d'`到缓冲区时，也是相同的逻辑：
+
+> [!NOTE]
+>
+> 底层做了以下两件事：
+>
+> * ① 将读取到的数据存储到缓冲区中，即：buffer 数组中是`'c'`和`'d'`。
+> * ② 读取到了 2 个字节的数据，那么长度 len 就等于 2 ，就意味着内存中有一个临时变量，其值是 2 。
+
+![](./assets/86.gif)
+
+* 但是，当读取了`'e'`的时候，逻辑就和上面没有什么不同：
+
+> [!NOTE]
+>
+> 底层做了以下两件事：
+>
+> * ① 将读取到的数据存储到缓冲区中，即：buffer 数组中是`'e'`。
+> * ② 读取到了 1 个字节的数据，那么长度 len 就等于 1 ，就意味着内存中有一个临时变量，其值是 1 。
+
+![](./assets/87.gif)
+
+> [!IMPORTANT]
+>
+> 问题就在于实际只读取了 1 个字节的数据；但是，打印的时候，却将缓冲区中的数据全部输出！！！
+
+* 解决方案很简单，读取多少长度的数据，就从缓冲区到取多少长度的数据。
+
+::: code-group
+
+```java [Test.java] {19,23,27}
+package com.github.file;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建字节输入流对象
+        InputStream is = new FileInputStream("day23\\a.txt");
+
+        // 创建缓冲区
+        byte[] buffer = new byte[2];
+        // 读取数据
+        // 一次读取多个字节数组，具体读多少，和数组的长度有关
+        // 返回值：本次读取到了多少个字节数据，如果返回 -1，表示没有数据了
+        int len = is.read(buffer);
+        System.out.println(len); // 2
+        System.out.println(new String(buffer,0,len)); // ab 
+
+        len = is.read(buffer);
+        System.out.println(len); // 2
+        System.out.println(new String(buffer,0,len)); // cd
+
+        len = is.read(buffer);
+        System.out.println(len); // 1
+        System.out.println(new String(buffer,0,len)); // e
+
+        // 关闭资源：先开的最后关闭
+        is.close();
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/88.gif)
+```
+
+:::
+
+* 和之前一样，我们也可以使用`循环`来读取数据，如下所示：
+
+::: code-group
+
+```java [Test.java] {19,23,27}
+package com.github.file;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建字节输入流对象
+        InputStream is = new FileInputStream("day23\\a.txt");
+        // 创建缓冲区
+        byte[] buffer = new byte[2];
+        // 读取数据
+        int len;
+        while ((len = is.read(buffer)) != -1) {
+            System.out.println(new String(buffer, 0, len));
+        }
+        // 关闭资源：先开的最后关闭
+        is.close();
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/89.gif)
+```
+
+:::
+
+#### 3.5.3.3 大文件拷贝
+
+* 文件的拷贝（复制），其主要思想是：边读边写，并且先打开的流最后关闭。
+
+> [!NOTE]
+>
+> * ① 使用两种方式来进行文件拷贝。
+> * ② 需要统计耗时！！！
 
 
 
+* 示例：一次读取一个字节
+
+::: code-group
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.*;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+
+        Instant start = Instant.now();
+
+        // 创建字节输入流对象和字节输出流对象，以便关联源文件和目的地文件
+        InputStream is = new FileInputStream("D:\\movie.avi");
+        OutputStream os = new FileOutputStream("D:\\movie-copy.avi");
+
+        // 复制文件：边读边写
+        int b;
+        while ((b = is.read()) != -1) {
+            os.write(b);
+        }
+
+        // 关闭资源：先开的最后关闭
+        os.close();
+        is.close();
+
+        Instant now = Instant.now();
+        long between = ChronoUnit.MILLIS.between(start, now);
+        System.out.printf("耗时：%s ms", between); // 耗时：149844 ms
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/74.gif)
+```
+
+:::
 
 
+
+* 示例：一次读取多个字节
+
+::: code-group
+
+```java
+package com.github.file;
+
+import java.io.*;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建字节输入流对象
+        InputStream is = new FileInputStream("D:\\movie.avi");
+        OutputStream os = new FileOutputStream("D:\\movie-copy.avi");
+        // 创建缓冲区
+        byte[] buffer = new byte[1024 * 1024 * 5]; // [!code highlight]
+        // 读取数据
+        int len;
+        while ((len = is.read(buffer)) != -1) {
+            os.write(buffer, 0, len);
+        }
+        // 关闭资源：先开的最后关闭
+        os.close();
+        is.close();
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/90.gif)
+```
+
+:::
+
+## 4.5 异常处理
+
+### 4.5.1 概述
+
+* 之前，我们对于异常处理，都是采取的抛出的模型：
+
+```java
+package com.github.file;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException { // [!code highlight]
+        // 创建输出流对象（并指定文件的路径）
+        OutputStream os = new FileOutputStream("day23\\a.txt");
+        // 写出数据
+        os.write(Character.codePointAt("a", 0));
+        // 释放资源
+        os.close();
+    }
+}
+```
+
+> [!NOTE]
+>
+> 采取抛出异常的方式，如果程序出现了问题，就会直接终止！！！
+
+* 为了避免上述的情况，我们就需要手动处理异常，难道直接放到 try 语句块中？
+
+```java
+package com.github.file;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+public class Test {
+    public static void main(String[] args) {
+        try { // [!code highlight]
+            // 创建输出流对象（并指定文件的路径）
+            OutputStream os = new FileOutputStream("day23\\a.txt");
+            // 写出数据
+            os.write(Character.codePointAt("a", 0));
+            // 释放资源
+            os.close();
+        } catch (IOException e) { // [!code highlight]
+            e.printStackTrace();
+        } // [!code highlight]
+    }
+}
+```
+
+* 上面的方式是不对的，因为`创建流对象`和`写出数据`都有可能出现异常，导致不能释放资源：
+
+::: code-group
+
+```md:img [异常方式一]
+![](./assets/91.png)
+```
+
+```md:img [异常方式二]
+![](./assets/92.png)
+```
+
+:::
+
+### 4.5.2 异常处理
+
+* 针对上面的情况，我们可以使用 finally 块来解决：
+
+```java
+try {
+    
+}catch(异常类型 e){
+    
+}catch(异常类型2 e){
+    
+}catch(异常类型n e){
+    
+}finally {
+    
+}   
+```
+
+> [!NOTE]
+>
+> * ① finally 块中的内容一定会被执行，除非虚拟机停止。
+> * ② 有很多情况会导致虚拟机停止，如：使用`kill -9 pid`或者调用`System.exit(0)`。
+> * ③ 对于捕获到的异常，我们通常不会处理，而是将异常信息记录到日志中，然后直接向上抛（Spring 框架有全局异常处理器机制，能帮我们统一处理项目中出现的所有异常）；但是，资源必须关闭！！！
+
+
+
+* 示例：
+
+```java [Test.java]
+package com.github.file;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+public class Test {
+    public static void main(String[] args) {
+        OutputStream os = null;
+        try {
+            // 创建输出流对象（并指定文件的路径）
+            os = new FileOutputStream("day23\\a.txt");
+            // 写出数据
+            os.write(97);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // 释放资源
+            if (null != os) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+```
+
+### 4.5.3 异常处理新方案（JDK 7、JDK9）
+
+* JDK7 之前，我们需要手动释放资源：
+
+```java
+try {
+    // 可能出现的异常代码
+}catch(异常类名 变量名){
+    // 异常处理代码
+}finally {
+    // 执行所有的资源释放操作
+}
+```
+
+* JDK7 之后，Java 推出一个名为`AutoCloseable`的接口，这个接口非常有用！！！
+
+> [!NOTE]
+>
+> * ① 只要流实现了该接口，就可以在特定的情况下自动释放资源，即：不需要再手动释放资源了。
+> * ② 所谓的特定的情况：指的就是 try with resources 语法！！！
+
+```java
+try (创建流对象1;创建流对象2) {
+	 // 可能出现的异常代码
+} catch (异常类名 变量名) {
+    e.printStackTrace();
+}
+```
+
+* JDK9 之后，也可以将创建流对象的语句提取到 try 语句之前：
+
+```java
+创建流对象1;创建流对象2;
+try (流1;流2) {
+	 // 可能出现的异常代码
+} catch (异常类名 变量名) {
+    e.printStackTrace();
+}
+```
+
+
+
+* 示例：JDK7 的异常处理方案
+
+```java
+package com.github.file;
+
+import java.io.*;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建字节输入流对象
+        try (InputStream is = new FileInputStream("D:\\movie.avi");
+             OutputStream os = new FileOutputStream("D:\\movie-copy.avi")) {
+            // 创建缓冲区
+            byte[] buffer = new byte[1024 * 1024 * 5]; // [!code highlight]
+            // 读取数据
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                os.write(buffer, 0, len);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.file;
+
+import java.io.*;
+
+public class Test {
+    public static void main(String[] args) throws FileNotFoundException {
+        // 创建字节输入流对象
+        InputStream is = new FileInputStream("D:\\movie.avi");
+        OutputStream os = new FileOutputStream("D:\\movie-copy.avi");
+        try (is; os) {
+            // 创建缓冲区
+            byte[] buffer = new byte[1024 * 1024 * 5]; // [!code highlight]
+            // 读取数据
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                os.write(buffer, 0, len);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+```
+
+### 4.5.4 异常处理终究方案
+
+* 在实际开发中，我们会借助 Lombok 的`@Cleanup`注解和`@SneakyThrows`注解来进行异常处理。
+
+> [!NOTE]
+>
+> * ① `@Cleanup`注解会帮助我们自动进行资源管理，即：帮我们自动调用 close() 方法。
+> * ② `@SneakyThrows`注解会帮助我们抛出异常。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github;
+
+import lombok.Cleanup;
+import lombok.SneakyThrows;
+
+import java.io.*;
+
+public class Test {
+    @SneakyThrows // [!code highlight]
+    public static void main(String[] args) {
+        // 创建字节输入流对象
+        @Cleanup InputStream is = new FileInputStream("D:\\movie.avi"); // [!code highlight]
+        @Cleanup OutputStream os = new FileOutputStream("D:\\movie-copy.avi"); // [!code highlight]
+        // 创建缓冲区
+        byte[] buffer = new byte[1024 * 1024 * 5]; 
+        // 读取数据
+        int len;
+        while ((len = is.read(buffer)) != -1) {
+            os.write(buffer, 0, len);
+        }
+    }
+}
+```
+
+```java [GenerateTest.java]
+package com.github;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Collections;
+
+public class Test {
+    public static void main(String[] args) {
+        try {
+            InputStream is = new FileInputStream("D:\\movie.avi");
+
+            try {
+                OutputStream os = new FileOutputStream("D:\\movie-copy.avi");
+
+                try {
+                    byte[] buffer = new byte[5242880];
+
+                    int len;
+                    while((len = is.read(buffer)) != -1) {
+                        os.write(buffer, 0, len);
+                    }
+                } finally {
+                    if (Collections.singletonList(os).get(0) != null) {
+                        os.close();
+                    }
+
+                }
+            } finally {
+                if (Collections.singletonList(is).get(0) != null) {
+                    is.close();
+                }
+
+            }
+
+        } catch (Throwable $ex) {
+            throw $ex;
+        }
+    }
+}
+```
+
+:::
