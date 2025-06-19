@@ -1,6 +1,6 @@
 <template>
-  <div id="hero-text">
-    <span style="display: inline-block; position: relative" v-if="fm?.hero?.text">
+  <div id="hero-text" v-if="fm?.hero">
+    <span style="display: inline-block; position: relative">
       {{ fm?.hero?.text }}
       <svg
         fill="currentColor"
