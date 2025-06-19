@@ -547,6 +547,11 @@ public class Test {
 #### 2.3.5.3 总结
 
 * Unicode 是字符集，UTF-8 是Unicode 字符集中最常用的一种编码方式。
+
+> [!NOTE]
+>
+> 在实际开发中，我们通常不会区分的这么明显；很多时候，我们也会将 UTF-8 说成字符编码或字符集。
+
 * UTF-8 编码格式的规则：
 
 | 语言 | UTF-8 编码规则                                               |
@@ -562,4 +567,170 @@ public class Test {
 * 乱码出现的原因 2 ：编码和解码的方式不统一。
 
 ### 2.4.2 原因一
+
+* 假设有这样的字符串 `abb爱你`，其 UTF-8 编码是这样的，如下所示：
+
+![](./assets/37.svg)
+
+* 现在，使用字节流去读取数据（一次读取一个字节），就是这样的，如下所示：
+
+![](./assets/38.gif)
+
+### 2.4.3 原因二
+
+* 假设有这样的字符串 `abb爱你`，其 UTF-8 编码是这样的，如下所示：
+
+![](./assets/37.svg)
+
+* 但是，此时我使用 GBK 来解码，就是这样的，如下所示：
+
+![](./assets/39.gif)
+
+### 2.4.4 如何解决乱码？
+
+* 针对原因一的解决方案：不要使用字节流来读取文本。
+* 针对原因二的解决方案：编码和解码使用同一个编码规则（编码方式）。
+
+### 2.4.5 扩展
+
+* 【问】字节流读取中文会乱码，但是为什么拷贝文件不会乱码？
+
+```java
+package com.github.io;
+
+import java.io.*;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        InputStream is = new FileInputStream("d:/a.txt");
+        OutputStream os = new FileOutputStream("d:/b.txt");
+        int b;
+        while ((b = is.read()) != -1) {
+            os.write(b);
+        }
+        os.close();
+        is.close();
+    }
+}
+```
+
+* 【答】因为是一个字节一个字节的拷贝的，数据并没有丢失。
+
+![](./assets/40.gif)
+
+### 2.4.6 扩展
+
+* Java 提供了获取字符集的方法：
+
+| Charset 类                                                   | 描述                                   |
+| ------------------------------------------------------------ | -------------------------------------- |
+| `public static SortedMap<String,Charset> availableCharsets()` | 获取 Java 平台支持的所有字符集         |
+| `public static Charset defaultCharset() `                    | 获取当前默认的字符集                   |
+| `public static Charset forName(String charsetName) `         | 获取指定名称的字符集                   |
+| `public static boolean isSupported(String charsetName)`      | 判断当前 Java 平台是否支持指定的字符集 |
+
+* 对于标准的字符集，Java 也提供了常量定义：
+
+| StandardCharsets 类                                          | 描述                     |
+| ------------------------------------------------------------ | ------------------------ |
+| `public static final Charset US_ASCII = sun.nio.cs.US_ASCII.INSTANCE;` | ASCII 字符集             |
+| `public static final Charset ISO_8859_1 = sun.nio.cs.ISO_8859_1.INSTANCE;` | ISO_8859_1 字符集        |
+| `public static final Charset UTF_8 = sun.nio.cs.UTF_8.INSTANCE;` | UTF-8 编码（字符集）     |
+| `public static final Charset UTF_16BE = new sun.nio.cs.UTF_16BE();` | UTF_16BE 编码（字符集）  |
+| `public static final Charset UTF_16LE = new sun.nio.cs.UTF_16LE();` | UTF_16LE  编码（字符集） |
+| `public static final Charset UTF_16 = new sun.nio.cs.UTF_16();` | UTF_16 编码（字符集）    |
+
+
+
+* 示例：
+
+```java
+package com.github.io;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.SortedMap;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        SortedMap<String, Charset> stringCharsetSortedMap = Charset.availableCharsets();
+        System.out.println(stringCharsetSortedMap.size()); // 173
+
+        Charset charset = Charset.defaultCharset();
+        System.out.println(charset); // UTF-8
+
+        Charset charset2 = Charset.forName("GBK");
+        System.out.println(charset2); // GBK
+
+        System.out.println(Charset.isSupported("GBK")); // true
+    }
+}
+
+```
+
+
+
+* 示例：
+
+```java
+package com.github.io;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        System.out.println(StandardCharsets.US_ASCII);
+        System.out.println(StandardCharsets.UTF_8);
+        System.out.println(StandardCharsets.UTF_16);
+    }
+}
+
+```
+
+### 2.4.7 扩展
+
+* Java 提供了编码方法：
+
+| String 类中的编码方法                          | 描述                                            |
+| ---------------------------------------------- | ----------------------------------------------- |
+| `public byte[] getBytes() {}`                  | 使用默认的方式进行编码（IDEA 中，默认是 UTF-8） |
+| `public byte[] getBytes(Charset charset) {}`   | 使用指定的方式进行编码                          |
+| `public byte[] getBytes(String charsetName){}` | 使用指定的方式进行编码                          |
+|                                                |                                                 |
+
+* Java 提供了解码的方式：
+
+|                                                     | 描述                                            |
+| --------------------------------------------------- | ----------------------------------------------- |
+| `public String(byte[] bytes) {}`                    | 使用默认的方式进行解码（IDEA 中，默认是 UTF-8） |
+| `public String(byte bytes[], Charset charset) {}`   | 使用指定的方式进行解码                          |
+| `public String(byte bytes[], String charsetName){}` | 使用指定的方式进行解码                          |
+
+
+
+* 示例：
+
+```java
+package com.github.io;
+
+import java.io.IOException;
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 编码
+        String str = "abb我爱你";
+        byte[] bytes = str.getBytes();
+        // [97, 98, 98, -26, -120, -111, -25, -120, -79, -28, -67, -96]
+        System.out.println(Arrays.toString(bytes));
+
+        // 解码
+        String result = new String(bytes);
+        // abb我爱你
+        System.out.println(result);
+    }
+}
+
+```
 
