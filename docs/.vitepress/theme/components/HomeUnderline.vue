@@ -27,7 +27,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {onMounted} from "vue";
+import {onMounted,nextTick } from "vue";
 import { useData } from "vitepress";
 
 /**
@@ -43,28 +43,31 @@ console.log('fm',fm)
  * 将 `#hero-text` 元素移动到 `.VPHero .text` 元素内部。
  */
 onMounted( () => {
-  const p = document.querySelector(".VPHero .text") as HTMLElement | null;
-  const s = document.querySelector("#hero-text") as HTMLElement | null;
-  const vpHeroText = document.querySelector(
-      ".vp-doc.container #hero-text"
-  ) as HTMLElement | null;
+  nextTick(()=>{
+    const p = document.querySelector(".VPHero .text") as HTMLElement | null;
+    const s = document.querySelector("#hero-text") as HTMLElement | null;
+    const vpHeroText = document.querySelector(
+        ".vp-doc.container #hero-text"
+    ) as HTMLElement | null;
 
-  console.log('p',p)
-  console.log('s',s)
-  console.log('vpHeroText',vpHeroText)
+    console.log('p',p)
+    console.log('s',s)
+    console.log('vpHeroText',vpHeroText)
 
-  if (!p || !s) return;
+    if (!p || !s) return;
 
-  // 检查元素是否存在
-  if (p) {
-    // 移除 .text 元素下的所有子节点
-    while (p.firstChild) {
-      p.removeChild(p.firstChild);
-    }
-    vpHeroText?.parentNode?.removeChild(vpHeroText);
-  }
+    // // 检查元素是否存在
+    // if (p) {
+    //   // 移除 .text 元素下的所有子节点
+    //   while (p.firstChild) {
+    //     p.removeChild(p.firstChild);
+    //   }
+    //   vpHeroText?.parentNode?.removeChild(vpHeroText);
+    // }
+    p.innerHTML = '';
 
-  // 将 `#hero-text` 元素追加到 `.VPHero .text` 元素中
-  p.append(s);
+    // 将 `#hero-text` 元素追加到 `.VPHero .text` 元素中
+    p.append(s);
+  })
 });
 </script>
