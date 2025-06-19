@@ -43,31 +43,54 @@ console.log('fm',fm)
  * 将 `#hero-text` 元素移动到 `.VPHero .text` 元素内部。
  */
 onMounted( () => {
-  nextTick(()=>{
-    const p = document.querySelector(".VPHero .text") as HTMLElement | null;
-    const s = document.querySelector("#hero-text") as HTMLElement | null;
-    const vpHeroText = document.querySelector(
-        ".vp-doc.container #hero-text"
-    ) as HTMLElement | null;
+    // const p = document.querySelector(".VPHero .text") as HTMLElement | null;
+    // const s = document.querySelector("#hero-text") as HTMLElement | null;
+    //
+    // console.log('p',p)
+    // console.log('s',s)
+    //
+    // if (!p || !s) return;
+    //
+    // p.innerHTML = '';
+    // // 将 `#hero-text` 元素追加到 `.VPHero .text` 元素中
+    // p.append(s);
 
-    console.log('p',p)
-    console.log('s',s)
-    console.log('vpHeroText',vpHeroText)
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+
+  function moveHeroText() {
+    const p = document.querySelector(".VPHero .text") as HTMLElement | null;
+    const s = document.getElementById("hero-text");
 
     if (!p || !s) return;
 
-    // // 检查元素是否存在
-    // if (p) {
-    //   // 移除 .text 元素下的所有子节点
-    //   while (p.firstChild) {
-    //     p.removeChild(p.firstChild);
-    //   }
-    //   vpHeroText?.parentNode?.removeChild(vpHeroText);
-    // }
-    p.innerHTML = '';
+    while (p.firstChild) p.removeChild(p.firstChild);
+    p.appendChild(s);
+  }
 
-    // 将 `#hero-text` 元素追加到 `.VPHero .text` 元素中
-    p.append(s);
-  })
+  const existingTarget = document.querySelector(".VPHero .text");
+  if (existingTarget) {
+    moveHeroText();
+    return;
+  }
+
+  let timeoutId: number | null = null;
+
+  const observer = new MutationObserver(() => {
+    const p = document.querySelector(".VPHero .text");
+    if (p) {
+      observer.disconnect();
+      if (timeoutId) clearTimeout(timeoutId);
+      moveHeroText();
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  timeoutId = window.setTimeout(() => {
+    observer.disconnect();
+    console.warn("目标节点 .VPHero .text 超时未找到，放弃监听");
+  }, 5000);
 });
+
+
 </script>
