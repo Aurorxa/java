@@ -559,6 +559,74 @@ public class Test {
 | 英文 | 一个英文占 1 个字节，二进制第一位是 0，转成十进制是正数。    |
 | 中文 | 一个中文占 3 个字节，二进制第一位是1，第一个字节转成十进制是负数。 |
 
+### 2.3.6 Java 对字符集的支持
+
+* Java 提供了获取字符集的方法：
+
+| Charset 类                                                   | 描述                                   |
+| ------------------------------------------------------------ | -------------------------------------- |
+| `public static SortedMap<String,Charset> availableCharsets()` | 获取 Java 平台支持的所有字符集         |
+| `public static Charset defaultCharset() `                    | 获取当前默认的字符集                   |
+| `public static Charset forName(String charsetName) `         | 获取指定名称的字符集                   |
+| `public static boolean isSupported(String charsetName)`      | 判断当前 Java 平台是否支持指定的字符集 |
+
+* 对于标准的字符集，Java 也提供了常量定义：
+
+| StandardCharsets 类                                          | 描述                     |
+| ------------------------------------------------------------ | ------------------------ |
+| `public static final Charset US_ASCII = sun.nio.cs.US_ASCII.INSTANCE;` | ASCII 字符集             |
+| `public static final Charset ISO_8859_1 = sun.nio.cs.ISO_8859_1.INSTANCE;` | ISO_8859_1 字符集        |
+| `public static final Charset UTF_8 = sun.nio.cs.UTF_8.INSTANCE;` | UTF-8 编码（字符集）     |
+| `public static final Charset UTF_16BE = new sun.nio.cs.UTF_16BE();` | UTF_16BE 编码（字符集）  |
+| `public static final Charset UTF_16LE = new sun.nio.cs.UTF_16LE();` | UTF_16LE  编码（字符集） |
+| `public static final Charset UTF_16 = new sun.nio.cs.UTF_16();` | UTF_16 编码（字符集）    |
+
+
+
+* 示例：
+
+```java
+package com.github.io;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.SortedMap;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        SortedMap<String, Charset> stringCharsetSortedMap = Charset.availableCharsets();
+        System.out.println(stringCharsetSortedMap.size()); // 173
+
+        Charset charset = Charset.defaultCharset();
+        System.out.println(charset); // UTF-8
+
+        Charset charset2 = Charset.forName("GBK");
+        System.out.println(charset2); // GBK
+
+        System.out.println(Charset.isSupported("GBK")); // true
+    }
+}
+```
+
+
+
+* 示例：
+
+```java
+package com.github.io;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        System.out.println(StandardCharsets.US_ASCII);
+        System.out.println(StandardCharsets.UTF_8);
+        System.out.println(StandardCharsets.UTF_16);
+    }
+}
+```
+
 ## 2.4 乱码以及解决方案
 
 ### 2.4.1 概述
@@ -620,76 +688,6 @@ public class Test {
 
 ### 2.4.6 扩展
 
-* Java 提供了获取字符集的方法：
-
-| Charset 类                                                   | 描述                                   |
-| ------------------------------------------------------------ | -------------------------------------- |
-| `public static SortedMap<String,Charset> availableCharsets()` | 获取 Java 平台支持的所有字符集         |
-| `public static Charset defaultCharset() `                    | 获取当前默认的字符集                   |
-| `public static Charset forName(String charsetName) `         | 获取指定名称的字符集                   |
-| `public static boolean isSupported(String charsetName)`      | 判断当前 Java 平台是否支持指定的字符集 |
-
-* 对于标准的字符集，Java 也提供了常量定义：
-
-| StandardCharsets 类                                          | 描述                     |
-| ------------------------------------------------------------ | ------------------------ |
-| `public static final Charset US_ASCII = sun.nio.cs.US_ASCII.INSTANCE;` | ASCII 字符集             |
-| `public static final Charset ISO_8859_1 = sun.nio.cs.ISO_8859_1.INSTANCE;` | ISO_8859_1 字符集        |
-| `public static final Charset UTF_8 = sun.nio.cs.UTF_8.INSTANCE;` | UTF-8 编码（字符集）     |
-| `public static final Charset UTF_16BE = new sun.nio.cs.UTF_16BE();` | UTF_16BE 编码（字符集）  |
-| `public static final Charset UTF_16LE = new sun.nio.cs.UTF_16LE();` | UTF_16LE  编码（字符集） |
-| `public static final Charset UTF_16 = new sun.nio.cs.UTF_16();` | UTF_16 编码（字符集）    |
-
-
-
-* 示例：
-
-```java
-package com.github.io;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.SortedMap;
-
-public class Test {
-    public static void main(String[] args) throws IOException {
-        SortedMap<String, Charset> stringCharsetSortedMap = Charset.availableCharsets();
-        System.out.println(stringCharsetSortedMap.size()); // 173
-
-        Charset charset = Charset.defaultCharset();
-        System.out.println(charset); // UTF-8
-
-        Charset charset2 = Charset.forName("GBK");
-        System.out.println(charset2); // GBK
-
-        System.out.println(Charset.isSupported("GBK")); // true
-    }
-}
-
-```
-
-
-
-* 示例：
-
-```java
-package com.github.io;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-public class Test {
-    public static void main(String[] args) throws IOException {
-        System.out.println(StandardCharsets.US_ASCII);
-        System.out.println(StandardCharsets.UTF_8);
-        System.out.println(StandardCharsets.UTF_16);
-    }
-}
-
-```
-
-### 2.4.7 扩展
-
 * Java 提供了编码方法：
 
 | String 类中的编码方法                          | 描述                                            |
@@ -697,7 +695,6 @@ public class Test {
 | `public byte[] getBytes() {}`                  | 使用默认的方式进行编码（IDEA 中，默认是 UTF-8） |
 | `public byte[] getBytes(Charset charset) {}`   | 使用指定的方式进行编码                          |
 | `public byte[] getBytes(String charsetName){}` | 使用指定的方式进行编码                          |
-|                                                |                                                 |
 
 * Java 提供了解码的方式：
 
