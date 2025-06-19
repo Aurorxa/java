@@ -59,7 +59,7 @@ onMounted( () => {
 
   function moveHeroText() {
     const p = document.querySelector(".VPHero .text") as HTMLElement | null;
-    const s = document.getElementById("hero-text");
+    const s = document.querySelector("#hero-text") as HTMLElement | null;
 
     if (!p || !s) return;
 
