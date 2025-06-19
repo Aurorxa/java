@@ -2538,9 +2538,9 @@ public class Test {
 
 :::
 
-### 3.5.3 大文件拷贝
+### 4.4.3 大文件拷贝
 
-#### 3.5.3.1 概述
+#### 4.4.3.1 概述
 
 * 我们可以使用上述复制文件的代码来尝试拷贝大文件，如下所示：
 
@@ -2618,7 +2618,7 @@ public class Test {
 
 ![](./assets/80.gif)
 
-#### 3.5.3.2 一次读取多个字节
+#### 4.4.3.2 一次读取多个字节
 
 * 既然我们已经知道了性能的短板（瓶颈）就在于每次只读写一个字节，那么我们读写读写多个字节，不就可以提高文件拷贝的速度？
 * FileInputStream 提供了多个重载的 read() 方法：
@@ -2850,7 +2850,7 @@ public class Test {
 
 :::
 
-#### 3.5.3.3 大文件拷贝
+#### 4.4.3.3 大文件拷贝
 
 * 文件的拷贝（复制），其主要思想是：边读边写，并且先打开的流最后关闭。
 
@@ -2910,13 +2910,17 @@ public class Test {
 
 ::: code-group
 
-```java
+```java [Test.java]
 package com.github.file;
 
 import java.io.*;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 public class Test {
     public static void main(String[] args) throws IOException {
+        Instant start = Instant.now();
+        
         // 创建字节输入流对象
         InputStream is = new FileInputStream("D:\\movie.avi");
         OutputStream os = new FileOutputStream("D:\\movie-copy.avi");
@@ -2930,7 +2934,10 @@ public class Test {
         // 关闭资源：先开的最后关闭
         os.close();
         is.close();
-
+        
+		Instant now = Instant.now();
+        long between = ChronoUnit.MILLIS.between(start, now);
+        System.out.printf("耗时：%s ms", between); // 耗时：34 ms
     }
 }
 ```
