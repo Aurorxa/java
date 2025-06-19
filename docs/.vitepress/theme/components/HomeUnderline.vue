@@ -1,7 +1,7 @@
 <template>
   <div id="hero-text">
-    <span style="display: inline-block; position: relative" v-if="fm.hero.text">
-      {{ fm.hero.text }}
+    <span style="display: inline-block; position: relative" v-if="fm?.hero?.text">
+      {{ fm?.hero?.text }}
       <svg
         fill="currentColor"
         height="11"
