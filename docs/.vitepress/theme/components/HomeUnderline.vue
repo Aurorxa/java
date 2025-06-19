@@ -27,7 +27,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { onMounted } from "vue";
+import { onMounted, nextTick } from "vue";
 import { useData } from "vitepress";
 
 /**
@@ -36,15 +36,18 @@ import { useData } from "vitepress";
  */
 const { frontmatter: fm } = useData();
 
+console.log('fm',fm)
+
 /**
  * 在组件挂载后，移动指定的 DOM 元素。
  * 将 `#hero-text` 元素移动到 `.VPHero .text` 元素内部。
  */
-onMounted(() => {
+onMounted(async () => {
+  await nextTick();
   const p = document.querySelector(".VPHero .text") as HTMLElement | null;
   const s = document.querySelector("#hero-text") as HTMLElement | null;
   const vpHeroText = document.querySelector(
-    ".vp-doc.container #hero-text"
+      ".vp-doc.container #hero-text"
   ) as HTMLElement | null;
 
   if (!p || !s) return;
