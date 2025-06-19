@@ -1,6 +1,6 @@
 <template>
-  <div id="hero-text" v-if="fm?.hero">
-    <span style="display: inline-block; position: relative">
+  <div id="hero-text" >
+    <span style="display: inline-block; position: relative" v-show="fm.hero.text">
       {{ fm?.hero?.text }}
       <svg
         fill="currentColor"
@@ -27,7 +27,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, nextTick } from "vue";
+import {onMounted} from "vue";
 import { useData } from "vitepress";
 
 /**
@@ -37,18 +37,21 @@ import { useData } from "vitepress";
 const { frontmatter: fm } = useData();
 
 console.log('fm',fm)
-
+// 控制元素的显示
 /**
  * 在组件挂载后，移动指定的 DOM 元素。
  * 将 `#hero-text` 元素移动到 `.VPHero .text` 元素内部。
  */
-onMounted(async () => {
-  await nextTick();
+onMounted( () => {
   const p = document.querySelector(".VPHero .text") as HTMLElement | null;
   const s = document.querySelector("#hero-text") as HTMLElement | null;
   const vpHeroText = document.querySelector(
       ".vp-doc.container #hero-text"
   ) as HTMLElement | null;
+
+  console.log('p',p)
+  console.log('s',s)
+  console.log('vpHeroText',vpHeroText)
 
   if (!p || !s) return;
 
