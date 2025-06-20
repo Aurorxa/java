@@ -698,7 +698,7 @@ public class Test {
 
 * Java 提供了解码的方式：
 
-|                                                     | 描述                                            |
+| String 类中的解码方法                               | 描述                                            |
 | --------------------------------------------------- | ----------------------------------------------- |
 | `public String(byte[] bytes) {}`                    | 使用默认的方式进行解码（IDEA 中，默认是 UTF-8） |
 | `public String(byte bytes[], Charset charset) {}`   | 使用指定的方式进行解码                          |
@@ -766,5 +766,685 @@ public class Test {
 
 * 字符流的使用场景：对于纯文本文件进行读写操作，即：如果文件中有中文，不会出现乱码。
 
+* 基本字符流有两种：FileWriter 和 FileReader。
 
+## 3.3 FileReader
+
+### 3.3.1 概述
+
+* FileReader 是操作本地文件的字符输入流，可以将本地文件中的数据读取到程序中。
+
+### 3.3.2 操作步骤
+
+* ① 创建 FileReader 的对象：
+
+```java
+public class FileReader extends InputStreamReader {
+    
+    public FileReader(String fileName) throws FileNotFoundException {
+        ...
+    }
+    
+    public FileReader(File file) throws FileNotFoundException {
+        ...
+    }
+    
+    ...
+    
+}
+```
+
+> [!NOTE]
+>
+> 细节：如果文件不存在，则直接报错！！！
+
+* ② 读数据：
+
+```java
+public class FileReader extends InputStreamReader {
+    
+    // 读取数据，读到末尾返回 -1
+   	public int read() throws IOException {
+        ...
+    }
+    
+    // 读取数据，读到末尾返回 -1
+    public int read(char[] cbuf) throws IOException {
+       ...
+    }
+    
+    ...
+    
+}
+```
+
+> [!NOTE]
+>
+> 细节：
+>
+> * 按字节进行读取，如果遇到中文，一次读取多个字节，读取后解码，返回一个整数。
+> * 读到文件末尾，read 方法返回 -1 。
+
+* ③ 释放资源：
+
+```java
+public class FileReader extends InputStreamReader {
+    
+   	public void close() throws IOException {
+        ...
+    }
+    
+    ...
+    
+}
+```
+
+
+
+* 示例：一次读取一个字符
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建 FileReader 对象
+        Reader reader = new FileReader("day23\\a.txt");
+
+        // 读取数据
+        /*
+         * read() 方法默认是一个字节一个字节的读取；但是，遇到中文就会一次读取多个
+         * 读取之后，底层会进行解码并转换为十进制数字
+         * 
+         * read() ：读取数据，解码（需要自己转换）
+         */
+        int ch;
+        while ((ch = reader.read()) != -1) {
+            System.out.println(ch);
+            System.out.println(Arrays.toString(Character.toChars(ch)));
+        }
+
+        // 释放资源
+        reader.close();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/42.gif)
+```
+
+:::
+
+
+
+* 示例：一次读取多个字符
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建 FileReader 对象
+        Reader reader = new FileReader("day23\\a.txt");
+
+        // 读取数据
+        char[] buff = new char[1024];
+        int len;
+        // read(chars) ：读取数据，解码，强转三步合并
+        while ((len = reader.read(buff)) != -1) {
+            System.out.println(new String(buff, 0, len));
+        }
+
+        // 释放资源
+        reader.close();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/43.gif)
+```
+
+:::
+
+## 3.4 FileWriter
+
+### 3.4.1 概述
+
+* FileWriter 是操作本地文件的字符输出流，可以将程序中的数据写出到本地文件中。
+
+### 3.4.2 操作步骤
+
+* ① 创建 FileWriter 的对象：
+
+```java
+public class FileWriter extends OutputStreamWriter {
+    
+    // 创建字符输出流并关联本地文件
+    public FileWriter(String fileName) throws IOException {
+         ...
+    }
+    
+    // 创建字符输出流并关联本地文件
+    public FileWriter(File file) throws IOException {
+         ...
+    }
+    
+    // 创建字符输出流并关联本地文件，续写
+    public FileWriter(String fileName, boolean append) throws IOException {
+         ...
+    }
+    
+    // 创建字符输出流并关联本地文件，续写
+    public FileWriter(File file, boolean append) throws IOException {
+         ...
+    }
+    
+    ...
+    
+}
+```
+
+> [!NOTE]
+>
+> 细节：
+>
+> * 参数是字符串表示的路径或者 File 对象都是可以的。
+> * 如果文件不存在则会创建一个新的文件；但是，需要保证父级路径是存在的。
+> * 如果文件已经存在，则会清空文件；如果不想清空文件，可以打开续写开关。
+
+* ② 写数据：
+
+```java
+public class FileWriter extends OutputStreamWriter {
+    
+    // 写出一个字符
+    public void write(int c) throws IOException {
+        ...
+    }
+    
+    // 写出一个字符串
+    public void write(String str) throws IOException {
+        ...
+    }
+    
+    // 写出字符串的一部分
+    public void write(String str, int off, int len) throws IOException 
+        ...
+    }
+    
+    // 写出一个字符数组
+    public void write(char cbuf[]) throws IOException {
+        ...
+    }
+    
+    // 写出字符数组的一部分
+    public  void write(char cbuf[], int off, int len) throws IOException {
+        ...
+    }
+    
+    ...
+    
+}
+```
+
+> [!NOTE]
+>
+> 细节：如果 write 方法的参数是整数，会将其作为字符集上的数字，并进行编码，再写到本地文件中。
+
+* ③ 释放资源：
+
+```java
+public class FileWriter extends OutputStreamWriter {
+    
+    public void close() throws IOException {
+        ...
+    }
+    
+    ...
+    
+}
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建 FileReader 对象
+        Writer writer = new FileWriter("day23\\a.txt");
+
+        // 写出数据
+        writer.write(97);
+        writer.write(29233);
+
+        // 释放资源
+        writer.close();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/44.gif)
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建 FileReader 对象
+        Writer writer = new FileWriter("day23\\a.txt");
+
+        // 写出数据
+        writer.write("你好啊，i love you");
+
+        // 释放资源
+        writer.close();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/45.gif)
+```
+
+:::
+
+## 3.5 底层细节
+
+### 3.5.1 字符输入流
+
+#### 3.5.1.1 概述
+
+* 当我们创建字符输入流对象的时候，如下所示：
+
+```java
+Reader reader = new FileReader("a.txt");
+```
+
+* 其实，就相当于 Java 程序（内存）和文件之间建立了一个连接的通道：
+
+![](./assets/49.svg)
+
+* 其实，在底层会创建了一个长度为 8192 的字节数组（缓冲区）：
+
+![](./assets/50.svg)
+
+* 假设我们要读取字符的代码是这样的，如下所示：
+
+```java
+int ch;
+ch = reader.read();
+System.out.println((char) ch);
+ch = reader.read();
+System.out.println((char) ch);
+ch = reader.read();
+System.out.println((char) ch);
+ch = reader.read();
+System.out.println((char) ch);
+```
+
+* 当代码开始执行的时候，如下所示：
+
+```java
+int ch; // [!code highlight]
+ch = reader.read();
+System.out.println((char) ch);
+ch = reader.read();
+System.out.println((char) ch);
+ch = reader.read();
+System.out.println((char) ch);
+ch = reader.read();
+System.out.println((char) ch);
+```
+
+* 其会在内存中开辟一个临时的变量 ch ，如下所示：
+
+![](./assets/51.gif)
+
+* 代码继续执行，进行读取操作，如下所示：
+
+```java
+int ch; 
+ch = reader.read(); // [!code highlight]
+System.out.println((char) ch);
+ch = reader.read();
+System.out.println((char) ch);
+ch = reader.read();
+System.out.println((char) ch);
+ch = reader.read();
+System.out.println((char) ch);
+```
+
+* 其底层会从缓冲区中读取数据，但是会遇到两种情况：
+  * 如果缓冲区中没有数据，那么就从文件中读取数据，并尽可能的装满缓冲区。
+  * 如果缓冲区中有，直接从缓冲区中读取，并赋值给临时变量 ch 。
+
+> [!NOTE]
+>
+> * ① 如果每次都是从文件中读取数据（硬盘和内存的速度相对差太多，会导致频繁的 IO 操作），效率很低。
+> * ② 一旦有了缓冲之后，将大大降低硬盘和内存的 IO 次数，提高了效率。
+
+![](./assets/52.gif)
+
+#### 3.5.1.2 证明
+
+* ① 我们可以通过 IDEA 的 debug 功能来证明：
+
+![](./assets/53.gif)
+
+* ② 我们可以使用源码来证明：
+
+![](./assets/54.png)
+
+#### 3.5.1.3 总结
+
+* ① 创建字符流输入对象，其底层是关联对象，并创建缓冲区。
+
+> [!NOTE]
+>
+> 缓冲区是长度为 8192 的字节数组。
+
+* ② 读取数据，其底层会判断缓冲区中是否有数据可以读取。
+
+> [!NOTE]
+>
+> * 如果缓冲区中没有数据：就从文件中获取数据，并尽量装满缓冲区（如果文件中也没有数据，则返回 -1 ）。
+> * 如果缓冲区中有数据：就从缓冲区中读取。
+>   * 空参的 read() 方法：一次读取一个字节，遇到中文就读取多个字节，并将字节解码并转换成十进制返回。
+>   * 有参的 read() 方法：将读取字节、解码以及强转三步合并，强转之后的字符放到数组中。
+
+### 3.5.2 字符输出流
+
+#### 3.5.2.1 概述
+
+* 当我们创建字符输出流对象的时候，如下所示：
+
+```java
+Writer writer = new FileWriter("day23\\a.txt");
+```
+
+* 其实，就相当于 Java 程序（内存）和文件之间建立了一个连接的通道：
+
+![](./assets/55.svg)
+
+* 其实，在底层会创建了一个长度为 8192 的字节数组（缓冲区）：
+
+![](./assets/56.svg)
+
+* 假设我们要写出字符的代码是这样的，如下所示：
+
+```java
+writer.write("锄禾日当午");
+writer.write("汗滴禾下土");
+writer.write("谁知盘中餐");
+writer.write("粒粒皆辛苦");
+```
+
+* 当代码执行的时候，其会暂时保存到缓冲区中，如下所示：
+
+![保存到缓冲区，会根据 UTF-8 进行解码，图上是为了简化](./assets/57.gif)
+
+* 当满足以下条件时，将会将缓冲区中的数据刷新到本地文件中：
+  * ① 缓冲区满了，不需要我们做任何操作。
+  * ② 手动调用 `writer.flush()` 方法，刷新之后，还可以继续向文件中写出数据。
+  * ③ 释放资源，即：`writer.close()` 。
+
+| 成员方法              | 描述                                                       |
+| --------------------- | ---------------------------------------------------------- |
+| `public void flush()` | 将缓冲区中的数据刷新到本地文件，还可以继续向文件中写出数据 |
+| `public void close()` | 释放资源，即：断开通道，无法再往文件中写出数据             |
+
+![](./assets/58.gif)
+
+#### 3.5.2.2 证明
+
+* 可以通过 IDEA 的 debug 功能来证明：
+
+![](./assets/59.gif)
+
+
+
+# 第四章：综合练习
+
+## 4.1 概述
+
+* 字节流可以读取任意类型的文件，通常用于文件复制（拷贝）的场景。
+* 字符流只能读取纯文本文件。
+
+## 4.2 综合练习一
+
+* 需求：拷贝一个文件夹，需要考虑子文件夹。
+
+> [!NOTE]
+>
+> * ① 需要考虑子文件夹，就需要使用递归技术。
+> * ② 拷贝一个文件夹，就需要考虑字节流技术。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.*;
+import java.util.Objects;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建 File 对象表示数据源
+        File src = new File("D:\\test\\src");
+        // 创建 File 对象表示目的地
+        File dest = new File("D:\\test\\dest");
+        // 复制文件夹
+        copyDir(src, dest);
+    }
+
+
+    public static void copyDir(File src, File dest) throws IOException {
+        // 如果目的地文件夹不存在，则创建
+        if (!dest.exists()) {
+            dest.mkdirs();
+        }
+        // 进入数据源
+        File[] files = src.listFiles();
+        // 遍历
+        for (File file : Objects.requireNonNullElse(files, new File[0])) {
+            // 如果是文件，直接复制
+            if (file.isFile()) {
+                InputStream is = new FileInputStream(file);
+                OutputStream os = new FileOutputStream(
+                    new File(dest, file.getName()));
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = is.read(buf)) != -1) {
+                    os.write(buf, 0, len);
+                }
+                os.close();
+                is.close();
+            } else {
+                // 如果是目录，就递归
+                copyDir(file, new File(dest, file.getName()));
+            }
+
+        }
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/46.gif)
+```
+
+:::
+
+## 4.3 综合练习二
+
+* 需求：为了保证文件的安全性，需要对原始文件进行加密存储，使用的时候再进行解密处理。
+
+> [!NOTE]
+>
+> * 加密原理：对原始文件中的每一个字节数据进行更改，将更改后的数据存储到新文件中。
+> * 解密原理：读取加密后的文件，按照加密的规则反向操作，变成原始文件。
+> * 所谓的加密规则和解密规则，可以使用异或运算，即： a ^ b ^ b = a ^ 0 = a 。
+
+
+
+* 示例：
+
+ ::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File src = new File("day23\\a.txt");
+        File temp = new File("day23\\tmp.txt");
+        File dest = new File("day23\\b.txt");
+        encryptionAndDecryption(src, temp, "123");
+        encryptionAndDecryption(temp, dest, "123");
+    }
+
+
+    /**
+     * 加密和解密
+     */
+    public static void encryptionAndDecryption(File src, File dest, String salt) 
+        throws IOException {
+        
+        InputStream is = new FileInputStream(src);
+        OutputStream os = new FileOutputStream(dest);
+
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = is.read(buffer)) != -1) {
+            byte[] saltBytes = salt.getBytes(StandardCharsets.UTF_8);
+            for (int i = 0; i < len; i++) {
+                buffer[i] ^= saltBytes[i % saltBytes.length];
+            }
+            os.write(buffer, 0, len);
+        }
+        
+        os.close();
+        is.close();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/47.gif)
+```
+
+:::
+
+## 4.4 综合练习三
+
+* 需求：对文件中的数据进行排序。
+
+> [!NOTE]
+>
+> * ① 原来的数据是 2-1-9-4-7-8 ，转换之后应该是 1-2-4-7-8-9 。
+> * ② 先将数据从文件读取到 Java 中，然后进行转换之后，再写出到原来的文件。
+
+
+
+* 示例：
+
+ ::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.*;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File file = new File("day23\\a.txt");
+        sort(file);
+    }
+
+    /**
+     * 排序
+     */
+    public static void sort(File file) throws IOException {
+        // 将数据读取到 StringBuilder 对象中
+        Reader reader = new FileReader(file);
+        StringBuilder sb = new StringBuilder();
+        char[] buffer = new char[1024];
+        int len;
+        while ((len = reader.read(buffer)) != -1) {
+            sb.append(buffer, 0, len);
+        }
+        // 对 StringBuilder 对象中的数据进行排序
+        String result = Arrays
+                .stream(sb
+                        .toString()
+                        .split("-"))
+                .mapToInt(Integer::parseInt)
+                .sorted()
+                .mapToObj(Integer::toString)
+                .collect(Collectors.joining("-"));
+        System.out.println(result);
+        // 将排序后的数据写入到文件中
+        Writer writer = new FileWriter(file);
+        writer.write(result);
+        writer.flush();
+        writer.close();
+    }
+}
+
+```
+
+```md:img [cmd 控制台]
+![](./assets/48.gif)
+```
+
+:::
 
