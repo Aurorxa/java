@@ -269,5 +269,4 @@ const vitePressSidebarOptions = [
   })
 ]
 
-
 export const sharedConfig = withSidebar(vitePressOptions, vitePressSidebarOptions)
