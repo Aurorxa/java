@@ -14,16 +14,13 @@ import MouseClick from "./components/MouseClick.vue"
 import MouseFollower from "./components/MouseFollower.vue"
 import { NProgress } from 'nprogress-v2/dist/index.js'
 import {
-  NolebaseGitChangelogPlugin
-} from '@nolebase/vitepress-plugin-git-changelog/client'
-import {
   NolebaseInlineLinkPreviewPlugin,
 } from '@nolebase/vitepress-plugin-inline-link-preview/client'
 import '@nolebase/vitepress-plugin-inline-link-preview/client/style.css'
 import '@nolebase/vitepress-plugin-git-changelog/client/style.css'
 import 'nprogress-v2/dist/index.css'
 import "vitepress-markdown-timeline/dist/theme/index.css"
-import 'virtual:group-icons.css' //代码组样式
+import 'virtual:group-icons.css'
 import './style/index.css'
 import xgplayer from "./components/Xgplayer.vue"
 
@@ -40,8 +37,8 @@ export default {
     app.component('MouseClick', MouseClick) //鼠标跟随组件
     app.component('MouseFollower', MouseFollower) //鼠标跟随组件
     app.component('xgplayer', xgplayer) //鼠标跟随组件
-    app.use(NolebaseGitChangelogPlugin)
     app.use(NolebaseInlineLinkPreviewPlugin)
+
     if (inBrowser) {
       NProgress.configure({ showSpinner: false })
       // 手动定义 onBeforeRouteChange

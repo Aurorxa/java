@@ -33,7 +33,7 @@ hero:
       link: "/"      
     - theme: alt
       text: "🎉快速开始"
-      link: "/01_java-se/java-amateur/01_xdx/"          
+      link: "01.Java语言基础/01.Java语言入门/01.计算机常识科普/index.md"          
 
 # 按钮下方的描述
 features:

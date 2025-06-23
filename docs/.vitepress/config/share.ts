@@ -14,11 +14,13 @@ import {
 import { vitepressDemoPlugin } from 'vitepress-demo-plugin';
 import markdownItTaskCheckbox from 'markdown-it-task-checkbox'
 import path from 'path';
+import {VitePressSidebarOptions} from "vitepress-sidebar/types";
+import {withSidebar} from "vitepress-sidebar";
 const mode = process.env.NODE_ENV || 'development'
 const { VITE_BASE_URL } = loadEnv(mode, process.cwd())
 console.log('Mode:', process.env.NODE_ENV)
 console.log('VITE_BASE_URL:', VITE_BASE_URL)
-export const sharedConfig = withMermaid(defineConfig({
+const vitePressOptions =  withMermaid(defineConfig({
   rewrites: {
     'zh/:rest*': ':rest*'
   },
@@ -176,11 +178,6 @@ export const sharedConfig = withMermaid(defineConfig({
   },
   themeConfig: { // 主题设置
     logo: '/logo.svg',  // 左上角logo
-    // 编辑链接
-    editLink: {
-      pattern: 'https://github.com/Aurorxa/java/edit/master/docs/:path',
-      text: 'Edit this page on GitHub'
-    },
     //社交链接
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Aurorxa/java' },
@@ -239,3 +236,38 @@ export const sharedConfig = withMermaid(defineConfig({
     },
   }
 }))
+
+const vitePressSidebarOption: VitePressSidebarOptions | VitePressSidebarOptions[] = {
+  documentRootPath: 'docs',
+  debugPrint: true,
+  basePath: `${VITE_BASE_URL}`,
+  collapsed: true,
+  excludePattern: ['assets', 'public', 'index.md', 'about'],
+  includeDotFiles: true,
+  includeRootIndexFile: false,
+  includeEmptyFolder: true,
+  includeFolderIndexFile: false,
+  removePrefixAfterOrdering: true,
+  prefixSeparator: '.',
+  useFolderLinkFromIndexFile: true,
+  useTitleFromFrontmatter: true,
+  folderLinkNotIncludesFileName: true,
+  keepMarkdownSyntaxFromTitle: true
+}
+
+const rootLocale = 'zh'
+const supportedLocales = [rootLocale, 'en'];
+
+const vitePressSidebarOptions = [
+  ...supportedLocales.map((lang) => {
+    return {
+      ...vitePressSidebarOption,
+      ...(rootLocale === lang ? {} : {basePath: `/${lang}/`}), // If using `rewrites` option
+      documentRootPath: `/docs/${lang}`,
+      resolvePath: rootLocale === lang ? '/' : `/${lang}/`,
+    };
+  })
+]
+
+
+export const sharedConfig = withSidebar(vitePressOptions, vitePressSidebarOptions)
