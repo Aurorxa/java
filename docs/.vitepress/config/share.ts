@@ -114,7 +114,7 @@ const vitePressOptions =  withMermaid(defineConfig({
       // 开启图片懒加载
       lazyLoading: true
     },
-    // 组件插入h1标题下
+    // md 配置
     config: (md) => {
       // 创建 markdown-it 插件
       md.use((md) => {
