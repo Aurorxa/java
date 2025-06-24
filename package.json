@@ -17,6 +17,7 @@
     "@nolebase/vitepress-plugin-enhanced-readabilities": "^2.17.1",
     "@nolebase/vitepress-plugin-highlight-targeted-heading": "^2.17.1",
     "@nolebase/vitepress-plugin-inline-link-preview": "^2.17.1",
+    "@rollup/plugin-terser": "^0.4.4",
     "@shikijs/vitepress-twoslash": "^3.7.0",
     "@types/animejs": "^3.1.13",
     "@types/canvas-confetti": "^1.9.0",
@@ -53,11 +54,6 @@
     "vitepress-plugin-permalink": "^1.1.2",
     "xgplayer": "^3.0.22"
   },
-  "include": [
-    "**/.vitepress/**/*.ts",
-    "**/.vitepress/**/*.mts",
-    "**/.vitepress/**/*.vue"
-  ],
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.34.9"
   }

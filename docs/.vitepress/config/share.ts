@@ -4,21 +4,21 @@ import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepre
 import { figure } from '@mdit/plugin-figure'
 import { loadEnv } from 'vite'
 import { withMermaid } from 'vitepress-plugin-mermaid'
-import Permalink from "vitepress-plugin-permalink";
+import Permalink from "vitepress-plugin-permalink"
 import {
   InlineLinkPreviewElementTransform
 } from '@nolebase/vitepress-plugin-inline-link-preview/markdown-it'
-import { vitepressDemoPlugin } from 'vitepress-demo-plugin';
+import terser from '@rollup/plugin-terser'
+import { vitepressDemoPlugin } from 'vitepress-demo-plugin'
 import markdownItTaskCheckbox from 'markdown-it-task-checkbox'
-import path from 'path';
-import {VitePressSidebarOptions} from "vitepress-sidebar/types";
-import {withSidebar} from "vitepress-sidebar";
-import removeConsole from "vite-plugin-remove-console";
+import path from 'path'
+import { VitePressSidebarOptions } from "vitepress-sidebar/types"
+import { withSidebar } from "vitepress-sidebar"
 const mode = process.env.NODE_ENV || 'development'
 const { VITE_BASE_URL } = loadEnv(mode, process.cwd())
 console.log('Mode:', process.env.NODE_ENV)
 console.log('VITE_BASE_URL:', VITE_BASE_URL)
-const vitePressOptions =  withMermaid(defineConfig({
+const vitePressOptions = withMermaid(defineConfig({
   rewrites: {
     'zh/:rest*': ':rest*'
   },
@@ -49,7 +49,7 @@ const vitePressOptions =  withMermaid(defineConfig({
   lastUpdated: true, // 上次更新
   vite: {
     build: {
-      chunkSizeWarningLimit: 1600,
+      chunkSizeWarningLimit: 2000
     },
     ssr: {
       noExternal: [
@@ -67,8 +67,7 @@ const vitePressOptions =  withMermaid(defineConfig({
       ],
     },
     plugins: [
-      Permalink(),
-      removeConsole(),
+      terser(),
       //代码组图标
       (groupIconVitePlugin({
         customIcon: {
@@ -79,7 +78,8 @@ const vitePressOptions =  withMermaid(defineConfig({
           'cmd': 'vscode-icons:file-type-shell',
           'powershell': 'vscode-icons:file-type-powershell'
         }
-      }) as import('vite').Plugin),
+      }) as any),
+      Permalink(),
     ],
     server: {
       port: 10089
@@ -137,22 +137,22 @@ const vitePressOptions =  withMermaid(defineConfig({
         }
 
         // 获取原始的 fence 渲染规则
-        const defaultFence = md.renderer.rules.fence?.bind(md.renderer.rules) ?? ((...args) => args[0][args[1]].content);
+        const defaultFence = md.renderer.rules.fence?.bind(md.renderer.rules) ?? ((...args) => args[0][args[1]].content)
 
         // 重写 fence 渲染规则
         md.renderer.rules.fence = (tokens, idx, options, env, self) => {
-          const token = tokens[idx];
-          const info = token.info.trim();
+          const token = tokens[idx]
+          const info = token.info.trim()
 
           // 判断是否为 md:img 类型的代码块
           if (info.includes('md:img')) {
             // 只渲染图片，不再渲染为代码块
-            return `<div class="rendered-md">${md.render(token.content)}</div>`;
+            return `<div class="rendered-md">${md.render(token.content)}</div>`
           }
 
           // 其他代码块按默认规则渲染（如 java, js 等）
-          return defaultFence(tokens, idx, options, env, self);
-        };
+          return defaultFence(tokens, idx, options, env, self)
+        }
       })
       md.use(timeline)
       md.use(groupIconMdPlugin) //代码组图标
@@ -161,7 +161,7 @@ const vitePressOptions =  withMermaid(defineConfig({
       md.use(markdownItTaskCheckbox)
       md.use(vitepressDemoPlugin, {
         demoDir: path.resolve(__dirname, '../demos'),
-      });
+      })
     }
   },
   themeConfig: { // 主题设置
@@ -244,16 +244,16 @@ const vitePressSidebarOption: VitePressSidebarOptions | VitePressSidebarOptions[
 }
 
 const rootLocale = 'zh'
-const supportedLocales = [rootLocale, 'en'];
+const supportedLocales = [rootLocale, 'en']
 
 const vitePressSidebarOptions = [
   ...supportedLocales.map((lang) => {
     return {
       ...vitePressSidebarOption,
-      ...(rootLocale === lang ? {} : {basePath: `/${lang}/`}), // If using `rewrites` option
+      ...(rootLocale === lang ? {} : { basePath: `/${lang}/` }), // If using `rewrites` option
       documentRootPath: `/docs/${lang}`,
       resolvePath: rootLocale === lang ? '/' : `/${lang}/`,
-    };
+    }
   })
 ]
 
