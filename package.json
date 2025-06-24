@@ -27,6 +27,7 @@
     "cross-env": "^7.0.3",
     "markdown-it-mathjax3": "^4.3.2",
     "rollup-plugin-visualizer": "^6.0.3",
+    "vite-plugin-compression": "^0.5.1",
     "vite-plugin-remove-console": "^2.2.0",
     "vitepress": "^1.6.3",
     "vitepress-demo-plugin": "^1.4.5",

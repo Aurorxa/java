@@ -5,7 +5,7 @@ import { figure } from '@mdit/plugin-figure'
 import { loadEnv } from 'vite'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 import Permalink from "vitepress-plugin-permalink";
-import { visualizer } from 'rollup-plugin-visualizer';
+import viteCompression from "vite-plugin-compression";
 import {
   InlineLinkPreviewElementTransform
 } from '@nolebase/vitepress-plugin-inline-link-preview/markdown-it'
@@ -51,18 +51,6 @@ const vitePressOptions =  withMermaid(defineConfig({
   vite: {
     build: {
       chunkSizeWarningLimit: 2000,
-      rollupOptions: {
-        output: {
-          manualChunks(id) {
-            if (id.includes('node_modules')) {
-              return id
-                .toString()
-                .split('node_modules/')[1]
-                .split('/')[0]; // 把每个第三方库拆成一个 chunk
-            }
-          }
-        }
-      }
     },
     ssr: {
       noExternal: [
@@ -80,12 +68,19 @@ const vitePressOptions =  withMermaid(defineConfig({
       ],
     },
     plugins: [
-      visualizer({
-        gzipSize: true,
-        brotliSize: true,
-        emitFile: false,
-        // filename: "test.html", // 分析图生成的文件名
-        // open: false // 如果存在本地服务端口，将在打包后自动展示
+      viteCompression({
+        verbose: true,
+        disable: false,
+        threshold: 10240,
+        algorithm: "gzip",
+        ext: ".gz",
+      }),
+      viteCompression({
+        verbose: true,
+        disable: false,
+        threshold: 10240,
+        algorithm: "brotliCompress",
+        ext: ".br",
       }),
       Permalink(),
       removeConsole(),
@@ -100,17 +95,6 @@ const vitePressOptions =  withMermaid(defineConfig({
           'powershell': 'vscode-icons:file-type-powershell'
         }
       }) as import('vite').Plugin),
-      // GitChangelog({
-      //   // 填写在此处填写您的仓库链接
-      //   repoURL: () => 'https://github.com/Aurorxa/java',
-      // }),
-      // GitChangelogMarkdownSection({
-      //   exclude: (id) => id.endsWith("index.md"),
-      //   sections: {
-      //     disableChangelog: true,
-      //     disableContributors: true,
-      //   },
-      // }),
     ],
     server: {
       port: 10089
