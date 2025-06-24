@@ -5,7 +5,6 @@ import { figure } from '@mdit/plugin-figure'
 import { loadEnv } from 'vite'
 import { withMermaid } from 'vitepress-plugin-mermaid'
 import Permalink from "vitepress-plugin-permalink";
-import viteCompression from "vite-plugin-compression";
 import {
   InlineLinkPreviewElementTransform
 } from '@nolebase/vitepress-plugin-inline-link-preview/markdown-it'
@@ -68,20 +67,6 @@ const vitePressOptions =  withMermaid(defineConfig({
       ],
     },
     plugins: [
-      viteCompression({
-        verbose: true,
-        disable: false,
-        threshold: 10240,
-        algorithm: "gzip",
-        ext: ".gz",
-      }),
-      viteCompression({
-        verbose: true,
-        disable: false,
-        threshold: 10240,
-        algorithm: "brotliCompress",
-        ext: ".br",
-      }),
       Permalink(),
       removeConsole(),
       //代码组图标
