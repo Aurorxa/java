@@ -1,21 +1,22 @@
-import { defineConfig } from 'vitepress'
+import {defineConfig} from 'vitepress'
 import timeline from "vitepress-markdown-timeline"
-import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepress-plugin-group-icons'
-import { figure } from '@mdit/plugin-figure'
-import { loadEnv } from 'vite'
-import { withMermaid } from 'vitepress-plugin-mermaid'
+import {groupIconMdPlugin, groupIconVitePlugin, localIconLoader} from 'vitepress-plugin-group-icons'
+import {figure} from '@mdit/plugin-figure'
+import {loadEnv} from 'vite'
+import {withMermaid} from 'vitepress-plugin-mermaid'
 import Permalink from "vitepress-plugin-permalink"
 import {
   InlineLinkPreviewElementTransform
 } from '@nolebase/vitepress-plugin-inline-link-preview/markdown-it'
 import terser from '@rollup/plugin-terser'
-import { vitepressDemoPlugin } from 'vitepress-demo-plugin'
+import {vitepressDemoPlugin} from 'vitepress-demo-plugin'
 import markdownItTaskCheckbox from 'markdown-it-task-checkbox'
 import path from 'path'
-import { VitePressSidebarOptions } from "vitepress-sidebar/types"
-import { withSidebar } from "vitepress-sidebar"
+import {VitePressSidebarOptions} from "vitepress-sidebar/types"
+import {withSidebar} from "vitepress-sidebar"
+
 const mode = process.env.NODE_ENV || 'development'
-const { VITE_BASE_URL } = loadEnv(mode, process.cwd())
+const {VITE_BASE_URL} = loadEnv(mode, process.cwd())
 console.log('Mode:', process.env.NODE_ENV)
 console.log('VITE_BASE_URL:', VITE_BASE_URL)
 const vitePressOptions = withMermaid(defineConfig({
@@ -28,21 +29,24 @@ const vitePressOptions = withMermaid(defineConfig({
   titleTemplate: "Hi，终于等到你", // 网页标题
   description: "许大仙、前端、Java、大数据、云原生", // 站点描述
   head: [ // favicon.ico 图标等
-    ['link', { rel: "shortcut icon", href: `${VITE_BASE_URL || '/'}logo.svg` }],
+    ['link', {rel: "shortcut icon", href: `${VITE_BASE_URL || '/'}logo.svg`}],
     // 网站 favicon.ico 图标
-    ['link', { rel: "icon", href: `${VITE_BASE_URL || '/'}logo.svg`, type: "image/svg+xml" }],
+    ['link', {rel: "icon", href: `${VITE_BASE_URL || '/'}logo.svg`, type: "image/svg+xml"}],
     // 引入 Google Fonts
-    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
-    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
-    ['link', { href: 'https://fonts.googleapis.com/css?family=Roboto+Slab:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback', rel: 'stylesheet' }],
+    ['link', {rel: 'preconnect', href: 'https://fonts.googleapis.com'}],
+    ['link', {rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: ''}],
+    ['link', {
+      href: 'https://fonts.googleapis.com/css?family=Roboto+Slab:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback',
+      rel: 'stylesheet'
+    }],
     // 网页视口
     ['meta', {
       name: "viewport",
       content: "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,shrink-to-fit=no"
     }],
     // 关键词和描述
-    ['meta', { name: "keywords", content: "许大仙、Java、C、C++、大数据、前端、云原生、Go、Python" }],
-    ['meta', { charset: 'UTF-8' }],
+    ['meta', {name: "keywords", content: "许大仙、Java、C、C++、大数据、前端、云原生、Go、Python"}],
+    ['meta', {charset: 'UTF-8'}],
   ],
   appearance: true, // 主题模式，默认浅色且开启切换
   base: VITE_BASE_URL,
@@ -157,7 +161,7 @@ const vitePressOptions = withMermaid(defineConfig({
       md.use(timeline)
       md.use(groupIconMdPlugin) //代码组图标
       md.use(InlineLinkPreviewElementTransform)
-      md.use(figure, { figcaption: 'alt', copyAttrs: '^class$', lazy: true })
+      md.use(figure, {figcaption: 'alt', copyAttrs: '^class$', lazy: true})
       md.use(markdownItTaskCheckbox)
       md.use(vitepressDemoPlugin, {
         demoDir: path.resolve(__dirname, '../demos'),
@@ -168,8 +172,12 @@ const vitePressOptions = withMermaid(defineConfig({
     logo: '/logo.svg',  // 左上角logo
     //社交链接
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Aurorxa/java' },
+      {icon: 'github', link: 'https://github.com/Aurorxa/java'},
     ],
+    editLink: {
+      pattern: 'https://github.com/Aurorxa/java/edit/master/docs/:path',
+      text: 'Edit this page on GitHub'
+    },
     externalLinkIcon: true,
     search: {
       provider: 'algolia',
@@ -250,7 +258,7 @@ const vitePressSidebarOptions = [
   ...supportedLocales.map((lang) => {
     return {
       ...vitePressSidebarOption,
-      ...(rootLocale === lang ? {} : { basePath: `/${lang}/` }), // If using `rewrites` option
+      ...(rootLocale === lang ? {} : {basePath: `/${lang}/`}), // If using `rewrites` option
       documentRootPath: `/docs/${lang}`,
       resolvePath: rootLocale === lang ? '/' : `/${lang}/`,
     }

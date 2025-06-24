@@ -1,10 +1,10 @@
-import { zhNav } from '../navbar'
+import {zhNav} from '../navbar'
 import dayjs from 'dayjs'
-import type { DefaultTheme, LocaleSpecificConfig } from 'vitepress'
+import type {DefaultTheme, LocaleSpecificConfig} from 'vitepress'
 
 export const zhConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
   themeConfig: { // 主题设置
-    lastUpdated:{
+    lastUpdated: {
       text: '上次更新',
       formatOptions: {
         year: 'numeric',
