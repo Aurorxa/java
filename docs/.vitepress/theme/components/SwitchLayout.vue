@@ -39,7 +39,6 @@ import DefaultTheme from "vitepress/theme";
 import {nextTick, provide} from "vue";
 import {ShareButton} from "@theojs/lumen";
 import MouseClick from "./MouseClick.vue";
-// import MouseFollower from "./MouseFollower.vue";
 import Confetti from "./Confetti.vue";
 import TypeIt from "./TypeIt.vue";
 import HomeUnderline from "./HomeUnderline.vue";
