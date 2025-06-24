@@ -19,7 +19,6 @@
       <NolebaseEnhancedReadabilitiesScreenMenu/>
     </template>
     <template #layout-top>
-      <!-- <MouseFollower /> -->
       <MouseClick/>
     </template>
     <template #home-features-after>
