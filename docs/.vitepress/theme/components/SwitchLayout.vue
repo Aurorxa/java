@@ -56,7 +56,7 @@ import "@nolebase/vitepress-plugin-enhanced-readabilities/client/style.css";
 
 const {isDark,theme} = useData();
 
-console.log('@@@',theme.value.sidebar)
+console.log('@@@',theme.value)
 
 const enableTransitions = () =>
     "startViewTransition" in document &&

@@ -1,5 +1,6 @@
 ---
 title: '计算机常识科普'
+permalink: /guide
 ---
 
 # 第一章：软件设计架构

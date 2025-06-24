@@ -4,6 +4,8 @@ import { groupIconMdPlugin, groupIconVitePlugin, localIconLoader } from 'vitepre
 import { figure } from '@mdit/plugin-figure'
 import { loadEnv } from 'vite'
 import { withMermaid } from 'vitepress-plugin-mermaid'
+import Permalink from "vitepress-plugin-permalink";
+import { visualizer } from 'rollup-plugin-visualizer';
 import {
   GitChangelog,
   GitChangelogMarkdownSection,
@@ -16,6 +18,7 @@ import markdownItTaskCheckbox from 'markdown-it-task-checkbox'
 import path from 'path';
 import {VitePressSidebarOptions} from "vitepress-sidebar/types";
 import {withSidebar} from "vitepress-sidebar";
+import removeConsole from "vite-plugin-remove-console";
 const mode = process.env.NODE_ENV || 'development'
 const { VITE_BASE_URL } = loadEnv(mode, process.cwd())
 console.log('Mode:', process.env.NODE_ENV)
@@ -42,7 +45,6 @@ const vitePressOptions =  withMermaid(defineConfig({
       name: "viewport",
       content: "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,shrink-to-fit=no"
     }],
-    // ['meta', { 'http-equiv': 'Permissions-Policy', content: 'interest-cohort=(), user-id=()' }],
     // 关键词和描述
     ['meta', { name: "keywords", content: "许大仙、Java、C、C++、大数据、前端、云原生、Go、Python" }],
     ['meta', { charset: 'UTF-8' }],
@@ -52,7 +54,19 @@ const vitePressOptions =  withMermaid(defineConfig({
   lastUpdated: true, // 上次更新
   vite: {
     build: {
-      chunkSizeWarningLimit: 1600
+      chunkSizeWarningLimit: 2000,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              return id
+                .toString()
+                .split('node_modules/')[1]
+                .split('/')[0]; // 把每个第三方库拆成一个 chunk
+            }
+          }
+        }
+      }
     },
     ssr: {
       noExternal: [
@@ -70,6 +84,15 @@ const vitePressOptions =  withMermaid(defineConfig({
       ],
     },
     plugins: [
+      visualizer({
+        gzipSize: true,
+        brotliSize: true,
+        emitFile: false,
+        filename: "test.html", // 分析图生成的文件名
+        open:true // 如果存在本地服务端口，将在打包后自动展示
+      }),
+      Permalink(),
+      removeConsole(),
       (groupIconVitePlugin({
         customIcon: {
           'c': localIconLoader(import.meta.url, '../../public/iconify/c.svg'),
