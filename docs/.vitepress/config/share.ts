@@ -7,10 +7,6 @@ import { withMermaid } from 'vitepress-plugin-mermaid'
 import Permalink from "vitepress-plugin-permalink";
 import { visualizer } from 'rollup-plugin-visualizer';
 import {
-  GitChangelog,
-  GitChangelogMarkdownSection,
-} from '@nolebase/vitepress-plugin-git-changelog/vite'
-import {
   InlineLinkPreviewElementTransform
 } from '@nolebase/vitepress-plugin-inline-link-preview/markdown-it'
 import { vitepressDemoPlugin } from 'vitepress-demo-plugin';
@@ -88,11 +84,12 @@ const vitePressOptions =  withMermaid(defineConfig({
         gzipSize: true,
         brotliSize: true,
         emitFile: false,
-        filename: "test.html", // 分析图生成的文件名
-        open:true // 如果存在本地服务端口，将在打包后自动展示
+        // filename: "test.html", // 分析图生成的文件名
+        // open: false // 如果存在本地服务端口，将在打包后自动展示
       }),
       Permalink(),
       removeConsole(),
+      //代码组图标
       (groupIconVitePlugin({
         customIcon: {
           'c': localIconLoader(import.meta.url, '../../public/iconify/c.svg'),
@@ -103,18 +100,17 @@ const vitePressOptions =  withMermaid(defineConfig({
           'powershell': 'vscode-icons:file-type-powershell'
         }
       }) as import('vite').Plugin),
-      //代码组图标
-      GitChangelog({
-        // 填写在此处填写您的仓库链接
-        repoURL: () => 'https://github.com/Aurorxa/java',
-      }),
-      GitChangelogMarkdownSection({
-        exclude: (id) => id.endsWith("index.md"),
-        sections: {
-          disableChangelog: true,
-          disableContributors: true,
-        },
-      }),
+      // GitChangelog({
+      //   // 填写在此处填写您的仓库链接
+      //   repoURL: () => 'https://github.com/Aurorxa/java',
+      // }),
+      // GitChangelogMarkdownSection({
+      //   exclude: (id) => id.endsWith("index.md"),
+      //   sections: {
+      //     disableChangelog: true,
+      //     disableContributors: true,
+      //   },
+      // }),
     ],
     server: {
       port: 10089
