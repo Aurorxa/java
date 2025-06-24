@@ -49,7 +49,7 @@ const vitePressOptions =  withMermaid(defineConfig({
   lastUpdated: true, // 上次更新
   vite: {
     build: {
-      chunkSizeWarningLimit: 2000,
+      chunkSizeWarningLimit: 1600,
     },
     ssr: {
       noExternal: [
