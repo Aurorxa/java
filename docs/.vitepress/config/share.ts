@@ -1,4 +1,4 @@
-import {defineConfig} from 'vitepress'
+import {defineConfig, type UserConfig} from 'vitepress'
 import timeline from "vitepress-markdown-timeline"
 import {groupIconMdPlugin, groupIconVitePlugin, localIconLoader} from 'vitepress-plugin-group-icons'
 import {figure} from '@mdit/plugin-figure'
@@ -14,7 +14,6 @@ import markdownItTaskCheckbox from 'markdown-it-task-checkbox'
 import path from 'path'
 import {VitePressSidebarOptions} from "vitepress-sidebar/types"
 import {withSidebar} from "vitepress-sidebar"
-
 const mode = process.env.NODE_ENV || 'development'
 const {VITE_BASE_URL} = loadEnv(mode, process.cwd())
 console.log('Mode:', process.env.NODE_ENV)

@@ -38,6 +38,7 @@
     "vitepress-sidebar": "^1.31.1"
   },
   "dependencies": {
+    "@nolebase/vitepress-plugin-breadcrumbs": "^2.17.2",
     "@theojs/lumen": "5.4.6",
     "animejs": "^3.2.2",
     "dayjs": "^2.0.0-alpha.4",
@@ -49,6 +50,7 @@
     "nprogress-v2": "^1.1.10",
     "typeit": "^8.8.7",
     "vitepress-markdown-timeline": "^1.2.2",
+    "vitepress-plugin-breadcrumb": "^1.0.12",
     "vitepress-plugin-comment-with-giscus": "^1.1.15",
     "vitepress-plugin-pagefind": "^0.4.13",
     "vitepress-plugin-permalink": "^1.1.2",
