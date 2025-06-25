@@ -983,7 +983,7 @@ public class FileWriter extends OutputStreamWriter {
     }
     
     // 写出字符串的一部分
-    public void write(String str, int off, int len) throws IOException 
+    public void write(String str, int off, int len) throws IOException {
         ...
     }
     
