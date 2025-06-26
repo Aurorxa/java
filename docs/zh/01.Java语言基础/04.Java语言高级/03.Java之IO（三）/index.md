@@ -232,7 +232,7 @@ public class BufferedOutputStream extends FilterOutputStream {
 
 * 创建`字节缓冲输入流`或`字节缓冲输出流`的对象：
 
-| 方法名称                                           | 描述                                       |
+| 构造方法                                           | 描述                                       |
 | -------------------------------------------------- | ------------------------------------------ |
 | `public BufferedInputStream(InputStream in){}`     | 将基本流包装为高级流，提高了读取数据的性能 |
 | `public BufferedOutputStream(OutputStream out) {}` | 将基本流包装为高级流，提高了写出数据的性能 |
@@ -1172,17 +1172,898 @@ public class Test {
 
 # 第四章：序列化流
 
+## 4.1 概述
+
+* 序列化流也是高级流，其是用来包装基本流的，并且序列化流是字节流的一种。
+
+> [!NOTE]
+>
+> * ① 序列化流负责输出数据，即：将 Java 中的对象（内存中的数据）写出到本地文件中。
+> * ② 反序列化流负责读取数据，即：将本地文件中的数据读取为 Java 中的对象（内存中的数据）。
+
+```mermaid
+classDiagram
+    字节流 <|-- InputStream
+    字节流 <|-- OutputStream
+    InputStream <|-- ObjectInputStream :extends
+    note for ObjectInputStream "反序列化流"
+    OutputStream <|-- ObjectOutputStream :extends
+    note for ObjectOutputStream "序列化流"
+```
+
+## 4.2 序列化流
+
+### 4.2.1 概述
+
+* 序列化流可以将 Java 中的对象（内存中的数据）写到本地文件中。
+
+![](./assets/18.svg)
+
+> [!NOTE]
+>
+> 实现序列化流的前提条件：JavaBean 需要实现 `java.io.Serializable` 接口。
+>
+
+### 4.2.2 步骤
+
+* ① 创建序列化流对象：
+
+| 构造方法                                         | 描述                 |
+| ------------------------------------------------ | -------------------- |
+| `public ObjectOutputStream(OutputStream out) {}` | 将基本流包装成高级流 |
+
+* ② 写出数据：
+
+| 成员方法                                       | 描述                       |
+| ---------------------------------------------- | -------------------------- |
+| `public final void writeObject(Object obj){} ` | 将对象序列化后写出到文件中 |
+
+* ③ 关闭流：
+
+| 成员方法                  | 描述     |
+| ------------------------- | -------- |
+| `public void close()  {}` | 释放资源 |
 
 
 
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.io;
+
+import java.io.Serializable;
+
+public class Student implements Serializable { // [!code highlight]
+
+    private String name;
+
+    private int age;
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+
+```
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建对象
+        Student stu = new Student("张三", 18);
+
+        // 创建流对象
+        ObjectOutputStream os = new ObjectOutputStream(
+            new FileOutputStream("day23\\stu.txt"));
+
+        // 写出数据
+        os.writeObject(stu);
+
+        // 释放资源
+        os.close();
+
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/19.gif)
+```
+
+:::
+
+## 4.3 反序列化流
+
+### 4.3.1 概述
+
+* 反序列化流可以将序列化到本地文件中的对象，读取到程序中。
+
+![](./assets/21.svg)
+
+### 4.3.2 步骤
+
+* ① 创建反序列化流对象：
+
+| 构造方法                                       | 描述                 |
+| ---------------------------------------------- | -------------------- |
+| `public ObjectInputStream(InputStream in)  {}` | 将基本流包装成高级流 |
+
+* ② 写出数据：
+
+| 成员方法                              | 描述                                   |
+| ------------------------------------- | -------------------------------------- |
+| `public final Object readObject() {}` | 序列化到本地文件中的对象，读取到程序中 |
+
+* ③ 关闭流：
+
+| 成员方法                  | 描述     |
+| ------------------------- | -------- |
+| `public void close()  {}` | 释放资源 |
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.io;
+
+import java.io.Serializable;
+
+public class Student implements Serializable { // [!code highlight]
+
+    private String name;
+
+    private int age;
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+```
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        // 创建流对象
+        ObjectInputStream oi = new ObjectInputStream(
+            new FileInputStream("day23\\stu.txt"));
+
+        // 写出数据
+        Student student = (Student) oi.readObject();
+        System.out.println(student);
+
+        // 释放资源
+        oi.close();
+
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/21.gif)
+```
+
+:::
+
+## 4.4 细节
+
+### 4.4.1 细节一
+
+* `JavaBean`不实现`java.io.Serializable`接口，会出现`NotSerializableException`异常。
+
+> [!NOTE]
+>
+> 解决方案：让`JavaBean`实现`java.io.Serializable`接口！！！
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.io;
+
+
+public class Student  { // [!code highlight]
+
+    private String name;
+
+    private int age;
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+
+```
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建对象
+        Student stu = new Student("张三", 18);
+
+        // 创建流对象
+        ObjectOutputStream os = new ObjectOutputStream(
+            new FileOutputStream("day23\\stu.txt"));
+
+        // 写出数据
+        os.writeObject(stu);
+
+        // 释放资源
+        os.close();
+
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/20.gif)
+```
+
+:::
+
+### 4.4.2 细节二
+
+* 如果一个类实现了`Serializable`接口，就表明这个类的对象是可序列化的：
+
+```java
+public class Student implements Serializable { // [!code highlight]
+
+    private String name;
+
+    private int age;
+	
+    ...
+}   
+```
+
+* Java 在底层会根据类的信息，如：类名、包名、成员变量、静态变量、构造方法等生成一个 `serialVersionUID`，在序列化对象的时候，JVM 会将`serialVersionUID` 和类的其他元数据一同写入本地文件中，这个过程是自动的。
+
+![](./assets/22.svg)
+
+* 在反序列化的时候，Java 底层也会将本地文件中的`serialVersionUID`和当前类的字节码文件计算出来的`serialVersionUID`进行比较，如果不匹配，将会报错。
+
+![](./assets/23.svg)
+
+* 我们可以通过`serialver`命令来计算出对应的`serialVersionUID`：
+
+::: code-group
+
+```bash
+serialver -classpath D:\project\java-base\out\production\day23 com.github.io.Student
+```
+
+```md:img [cmd 控制台]
+![](./assets/24.png)
+```
+
+:::
+
+* 我们可以通过反序列化来读取文件中的`serialVersionUID`：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectStreamClass;
+
+public class Test {
+    public static void main(String[] args) throws Exception {
+        // 创建流对象
+        ObjectInputStream oi = new ObjectInputStream(
+            new FileInputStream("day23\\stu.txt"));
+
+        // 读取数据
+        Object obj = oi.readObject();
+
+        ObjectStreamClass lookup = ObjectStreamClass.lookup(obj.getClass());
+        System.out.println(lookup); // 6233301834653560958L
+
+        // 释放资源
+        oi.close();
+
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/25.png)
+```
+
+:::
+
+* 换言之，只要我们修改了类的信息，Java 底层就会自动计算`serialVersionUID`：
+
+![](./assets/26.png)
+
+* 在实际开发中，随着业务的发展，我们绝对有可能去修改类的信息，为了避免文件中的版本号和JavaBean中的版本号不匹配而引发错误，我们只需要在类中显示声明`serialVersionUID`，Java 就不会在自动计算，而使用我们自己提供的值。
+
+> [!NOTE]
+>
+> * ① 如果没有显示声明`serialVersionUID`，Java 会自动计算并存储一个`serialVersionUID`，这个值是基于类的字节码的。
+> * ② 如果已经显示声明`serialVersionUID`，Java 就不会自动计算它，只会使用我们提供的值。
+
+::: code-group
+
+```java [Student.java]
+package com.github.io;
+
+import java.io.Serializable;
+
+public class Student implements Serializable {
+
+    private static final long serialVersionUID = 1L; // [!code highlight]
+
+    private String name;
+
+    private int age;
+
+    private String sex;
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+
+```
+
+```md:img [cmd 控制台]
+![](./assets/27.png)
+```
+
+:::
+
+* 我们可以开启快速生成`serialVersionUID` 的功能：
+
+![](./assets/28.png)
+
+* 这样，我们在写代码的时候，就可以让 IDEA 帮我们计算`serialVersionUID`了：
+
+![](./assets/29.gif)
+
+## 4.5 综合练习
+
+* 需求：将多个自定义对象序列到文件中，并进行反序列化。
+
+> [!NOTE]
+>
+> 使用 List 集合存储多个自定义对象，并将 List 集合进行序列化到文件中；同理，反序列化就是相反操作。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.io;
+
+import java.io.Serializable;
+
+public class Student implements Serializable {
+
+    private String name;
+
+    private int age;
+
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
+}
+
+```
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) throws Exception {
+        List<Student> list = new ArrayList<>();
+        list.add(new Student("张三", 18));
+        list.add(new Student("李四", 19));
+        list.add(new Student("王五", 20));
+
+        serializable(list);
+
+        List<Student> list2 = deserializable();
+        list2.forEach(System.out::println);
+    }
+
+    public static void serializable(List<Student> list) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+            new FileOutputStream("student.txt"))) {
+            // 将list写入文件
+            oos.writeObject(list);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Student> deserializable() {
+        try (ObjectInputStream ois = new ObjectInputStream(
+            new FileInputStream("student.txt"))) {
+            return (List<Student>) ois.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/30.gif)
+```
+
+:::
+
+## 4.6 展望
+
+* 由于以下原因，在实际开发中，我们并不建议使用 Java 内置的序列化。
+  * ① `安全性差`：Java 序列化允许任意类型反序列化，容易被攻击。
+  * ② `性能差`：序列化后的体积大，效率低。
+  * ③ `不可控、脆弱`：一个类结构稍微变动就可能导致反序列化失败。
+  * ④ `黑盒机制`：对开发者几乎是不可见的魔法，难以调试和管理。
+
+* 我们可以使用其他替代方案：
+
+| 替代方案               | 特点                                            |
+| ---------------------- | ----------------------------------------------- |
+| Jackson / Gson（JSON） | 简单、可读、安全，适合 Web 应用                 |
+| Kryo                   | 高性能二进制序列化，适用于分布式系统，如：Spark |
+| Protobuf               | Google 出品，结构清晰、高压缩率、跨语言支持强   |
 
 
 
 # 第五章：打印流（⭐）
 
+## 5.1 概述
+
+* 打印流是高级流，其是用来保证基本流的；但是，打印流只能写，不能读。
+
+> [!NOTE]
+>
+> 打印流只能是输出流！！！
+
+```mermaid
+classDiagram
+    IO 流体系 <|-- 字节流 
+    IO 流体系 <|-- 字符流 
+    字节流 <|-- InputStream 
+    字节流 <|-- OutputStream 
+    字符流 <|-- Reader 
+    字符流 <|-- Writer 
+    OutputStream <|-- PrintStream
+    note for PrintStream "字节打印流"
+    Writer <|-- PrintWriter
+    note for PrintWriter "字符打印流"
+    class InputStream{
+        <<Abstract>>
+    }
+    class OutputStream{
+        <<Abstract>>
+    }
+    class Reader{
+        <<Abstract>>
+    }
+    class Writer{
+        <<Abstract>>
+    }
+
+```
+
+* 其实，我们之前经常使用的`打印语句`就是`字节打印流`：
+
+```java
+public final class System {
+    
+    public static final PrintStream out = null;
+    
+}
+```
+
+## 5.2 特点
+
+* ① 打印流只能操作文件的目的地，不能操作数据源。
+
+* ② 特有的写出方法可以实现，数据原样输出，即：print() 方法或 println() 方法。
+
+* ③ 特有的写出方法，可以实现自动刷新，自动换行，即：println() 方法
+
+## 5.3 字节打印流
+
+* 创建字节打印流对象：
+
+| 构造方法                                                     | 描述                           |
+| ------------------------------------------------------------ | ------------------------------ |
+| `public PrintStream(OutputStream/File/String) {}`            | 关联字节输出流、文件、文件路径 |
+| `public PrintStream(String fileName, Charset charset){}`     | 指定字符编码                   |
+| `public PrintStream(OutputStream out, boolean autoFlush) {}` | 自动刷新                       |
+| `public PrintStream(OutputStream out, boolean autoFlush, Charset charset) {}` | 指定字符编码且自动刷新         |
+
+> [!NOTE]
+>
+> 字节流底层没有缓冲区，开不开自动刷新都一样！！！
+
+* 写出数据：
+
+| 成员方法                                                     | 描述                                       |
+| ------------------------------------------------------------ | ------------------------------------------ |
+| `public void write(int b) {}`                                | 常规方法：规则和之前一样，将指定的字节写出 |
+| `public void println(XXX x) {}`                              | 特有方法：打印任意数据，自动刷新，自动换行 |
+| `public void print(Xxx b) {}`                                | 特有方法：打印任意数据，不换行             |
+| `public PrintStream printf(String format, Object...args) {}` | 特有方法：带有占位符的打印语句，不换行     |
+
+* 关闭流：
+
+| 成员方法                  | 描述     |
+| ------------------------- | -------- |
+| `public void close()  {}` | 释放资源 |
 
 
 
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
+public class Test {
+    public static void main(String[] args) throws FileNotFoundException {
+        // 创建打印流对象
+        PrintStream ps = new PrintStream(
+                new FileOutputStream("day23\\a.txt"));
+
+        // 写出数据
+        ps.write(97);
+        ps.println(97);
+        ps.print(true);
+        ps.println("hello world");
+        ps.printf("%s", "呵呵哒");
+
+        // 释放资源
+        ps.close();
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/31.gif)
+```
+
+:::
+
+## 5.4 字符打印流
+
+* 创建字节打印流对象：
+
+| 构造方法                                                     | 描述                           |
+| ------------------------------------------------------------ | ------------------------------ |
+| `public PrintWriter(Writer/File/String) {}`                  | 关联字符输出流、文件、文件路径 |
+| `public PrintWriter(String fileName, Charset charset){}`     | 指定字符编码                   |
+| `public PrintWriter(Writer out, boolean autoFlush) {}`       | 自动刷新                       |
+| `public PrintWriter(Writer out, boolean autoFlush, Charset charset) {}` | 指定字符编码且自动刷新         |
+
+> [!NOTE]
+>
+> 字符流底层有缓冲区，开不开自动刷新不一样！！！
+
+* 写出数据：
+
+| 成员方法                                                     | 描述                                       |
+| ------------------------------------------------------------ | ------------------------------------------ |
+| `public void write(int b) {}`                                | 常规方法：规则和之前一样，将指定的字节写出 |
+| `public void println(XXX x) {}`                              | 特有方法：打印任意数据，自动刷新，自动换行 |
+| `public void print(Xxx b) {}`                                | 特有方法：打印任意数据，不换行             |
+| `public PrintStream printf(String format, Object...args) {}` | 特有方法：带有占位符的打印语句，不换行     |
+
+* 关闭流：
+
+| 成员方法                  | 描述     |
+| ------------------------- | -------- |
+| `public void close()  {}` | 释放资源 |
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建打印流对象
+        PrintWriter ps = new PrintWriter(
+                new FileWriter("day23\\a.txt"), true);
+
+        // 写出数据
+        ps.write(97);
+        ps.println(97);
+        ps.println('a');
+        ps.print(true);
+        ps.println("hello world");
+        ps.printf("%s", "你是谁");
+
+        // 释放资源
+        ps.close();
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/32.gif)
+```
+
+:::
+
+## 5.5 打印流的应用场景
+
+* 我们之前都是这样使用打印语句的，如下所示：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.IOException;
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        System.out.println("abc");
+        System.out.println(123);
+        System.out.println(true);
+        System.out.println(Arrays.asList(1, 2, 3));
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/33.gif)
+```
+
+:::
+
+* 其实，之前我们采用的是链式编程，本来应该这样，如下所示：
+
+```java
+package com.github.io;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+
+        // 获取打印流的对象，此打印流在 JVM 启动的时候，由 JVM 创建，默认指向控制台
+        // 这是一个特殊的打印流，我们通常称为 标准输出流
+        PrintStream ps = System.out;
+
+        // 写出数据，自动换行，自动刷新
+        ps.println("abc");
+        ps.println(123);
+        ps.println(true);
+        ps.println(Arrays.asList(1, 2, 3));
+    }
+}
+```
+
+* 需要注意的是，这个流是不需要关闭的；如果关闭了，就不能再写出了。
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Arrays;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+
+        // 获取打印流的对象，此打印流在 JVM 启动的时候，由 JVM 创建，默认指向控制台
+        // 这是一个特殊的打印流，我们通常称为 标准输出流
+        PrintStream ps = System.out;
+
+        ps.println("abc");
+        ps.println(123);
+        ps.println(true);
+        ps.println(Arrays.asList(1, 2, 3));
+
+        ps.close();
+
+        ps.println("我有谁");
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/34.gif)
+```
+
+:::
 
 
 
