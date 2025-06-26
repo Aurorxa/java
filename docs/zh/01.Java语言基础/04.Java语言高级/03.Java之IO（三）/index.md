@@ -1,4 +1,4 @@
-# 第一章：IO 流体系
+# 第一章：IO 流体系（⭐）
 
 ## 1.1 概述
 
@@ -88,7 +88,7 @@ classDiagram
 
 
 
-# 第二章：缓冲流
+# 第二章：缓冲流（⭐）
 
 ## 2.1 概述
 
@@ -904,11 +904,269 @@ public class Test {
 
 
 
-# 第三章：转换流
+# 第三章：转换流（⭐）
 
 ## 3.1 概述
 
+* `转换流`也是一种`高级流`，其是用来包装基本流的，并且转换流也有输入和输出之分。
 
+```mermaid
+classDiagram
+    字符流 <|-- Reader
+    字符流 <|-- Writer
+    Reader <|-- InputStreamReader :extends
+    note for InputStreamReader "转换输入流"
+    Writer <|-- OutputStreamWriter :extends
+    note for OutputStreamWriter "转换输出流"
+```
+
+* 当我们创建转换流对象用来读取数据时，如下所示：
+
+```java
+InputStreamReader reader = new InputStreamReader(new FileInputStream("?"));
+```
+
+* 其底层是将字节输入流转换为字符输入流（解码）。
+
+> [!NOTE]
+>
+> * ① 读取数据不会乱码。
+> * ② 可以根据指定的字符集一次读取多个字节。
+
+![](./assets/12.svg)
+
+* 当我们创建转换流对象用来写出数据时，如下所示：
+
+```java
+OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream("?"));
+```
+
+* 其底层是将字符输出流转换为字节输出流（编码）。
+
+> [!NOTE]
+>
+> * ① 写出数据不会乱码。
+> * ② 可以根据指定的字符集一次写出多个字节。
+
+![](./assets/13.svg)
+
+* 其实，字符流的基本流 FileReader 和 FileWriter 的底层就是转换流：
+
+::: code-group
+
+```java [FileReader.java]
+public class FileReader extends InputStreamReader {
+    ...
+}
+```
+
+```java [FileWriter.java]
+public class FileWriter extends OutputStreamWriter {
+    ...
+}
+```
+
+:::
+
+## 3.2 应用场景
+
+* 转换流的应用场景：
+  * ① 指定字符集进行读写。
+  * ② 字节流想要使用字符流中的方法。
+
+> [!NOTE]
+>
+> 转化流的作用已经不是那么重要了，有如下的几个方面：
+>
+> * ① 在实际开发中，我们会统一使用 UTF-8 编码来进行开发，如：Tomcat（早期有过一段时间使用 ISO8859-1 编码；但是，现在都统一为 UTF-8 编码）、SpringBoot 等。
+> * ② 在 JDK11 的时候，FileReader 和 FileWriter 也增加了指定字符集来进行读写的功能。
+> * ③ 在 JDK18 的时候，FileReader 和 FileWriter 不再使用本地字符集（Windows 简体中文，默认是 GBK）来进行读写，而统一采取 UTF-8 来进行读写。
+
+## 3.3 综合练习
+
+### 3.3.1 综合练习一
+
+* 需求：将一个 GBK 编码的文件读取到内存中，不能出现乱码。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建转换流对象
+        InputStreamReader reader = new InputStreamReader(
+            new FileInputStream("day23\\gbk.txt"), Charset.forName("GBK"));
+        // 读取数据
+        char[] chars = new char[1024];
+        int len;
+        while ((len = reader.read(chars)) != -1) {
+            System.out.println(new String(chars, 0, len));
+        }
+        // 释放资源
+        reader.close();
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/14.gif)
+```
+
+:::
+
+### 3.3.2 综合练习二
+
+* 需求：将一段中文按照 GBK 的方式写到本地文件中。
+
+
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建转换流对象
+        OutputStreamWriter writer = new OutputStreamWriter(
+                new FileOutputStream("day23\\b.txt"), Charset.forName("GBK"));
+        // 写出数据
+        writer.write("锄禾日当午");
+        writer.write("汗滴禾下土");
+        writer.write("谁知盘中餐");
+        writer.write("粒粒皆辛苦");
+        // 释放资源
+        writer.close();
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/15.gif)
+```
+
+:::
+
+### 3.3.3 综合练习三
+
+* 需求：将本地文件中的 GBK 文件，转换成 UTF-8 文件。
+
+
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 读取数据并保存到内存中
+        List<String> result = new ArrayList<>();
+        InputStreamReader reader = new InputStreamReader(
+                new FileInputStream("day23\\gbk.txt"), Charset.forName("GBK"));
+        char[] chars = new char[1024];
+        int len;
+        while ((len = reader.read(chars)) != -1) {
+            result.add(new String(chars, 0, len));
+        }
+        reader.close();
+
+        // 将内存中的数据，写出到文件中
+        OutputStreamWriter writer = new OutputStreamWriter(
+                new FileOutputStream("day23\\utf8.txt"), StandardCharsets.UTF_8);
+        for (String s : result) {
+            writer.write(s);
+            writer.write(System.lineSeparator());
+        }
+        writer.close();
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/16.gif)
+```
+
+:::
+
+### 3.3.4 综合练习四
+
+* 需求：利用字节流读取文件中的数据，每次读取一整行，而且不能出现乱码。
+
+> [!NOTE]
+>
+> * ① 利用字节流读取文件中的数据，并且不能出现乱码，就可以联想到 InputStreamReader。
+> * ② 每次读取一整行，就可以联想到 BufferedReader。
+
+
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 读取数据并保存到内存中
+        List<String> result = new ArrayList<>();
+        InputStreamReader reader = new InputStreamReader(
+                new FileInputStream("day23\\gbk.txt"), Charset.forName("GBK"));
+        char[] chars = new char[1024];
+        int len;
+        while ((len = reader.read(chars)) != -1) {
+            result.add(new String(chars, 0, len));
+        }
+        reader.close();
+
+        // 将内存中的数据，写出到文件中
+        OutputStreamWriter writer = new OutputStreamWriter(
+                new FileOutputStream("day23\\utf8.txt"), StandardCharsets.UTF_8);
+        for (String s : result) {
+            writer.write(s);
+            writer.write(System.lineSeparator());
+        }
+        writer.close();
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/17.gif)
+```
+
+:::
 
 
 
@@ -920,7 +1178,7 @@ public class Test {
 
 
 
-# 第五章：打印流
+# 第五章：打印流（⭐）
 
 
 
@@ -928,7 +1186,7 @@ public class Test {
 
 
 
-# 第六章：压缩流和解压缩流
+# 第六章：压缩流和解压缩流（⭐）
 
 
 

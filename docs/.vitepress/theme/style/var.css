@@ -164,3 +164,11 @@ html {
     background-size: cover;
     margin-right: 4px;  /* 图标与文字间距 */
 }
+
+.VPFeatures .items .item:hover {
+    cursor: pointer;
+    transform: translateY(-5px);
+}
+.VPFeatures .items .item {
+    transition: transform .3s;
+}
