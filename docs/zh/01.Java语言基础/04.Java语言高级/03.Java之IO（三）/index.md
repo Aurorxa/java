@@ -2028,7 +2028,7 @@ public class Test {
 }
 ```
 
-* 需要注意的是，这个流是不需要关闭的；如果关闭了，就不能再写出了。
+* 需要注意的是，这个流是不需要关闭的；如果关闭了，就不能再写出数据了。
 
 ::: code-group
 
@@ -2069,17 +2069,474 @@ public class Test {
 
 # 第六章：压缩流和解压缩流（⭐）
 
+## 6.1 概述
+
+* 在现实生活中，如果在网络中我们要传输的数据太大，此时我们就可以先压缩再传输。
+
+![压缩](./assets/35.svg)
+
+* 同理，如果我们接收到一个压缩包，还需要解压（解压缩）才能使用。
+
+![解压缩（解压）](./assets/36.svg)
+
+## 6.2 IO 体系
+
+* `解压缩流`主要是读取压缩包中的内容，所以它属于`读`，即：输入流。
+* `压缩流`主要是将文件中的数据写到压缩包中，属于它属于`写`，即：输出流。
+
+```mermaid
+classDiagram
+    IO 流体系 <|-- 字节流 
+    字节流 <|-- InputStream 
+    字节流 <|-- OutputStream 
+    InputStream <|-- ZipInputStream
+    note for ZipInputStream "解压缩流"
+    OutputStream <|-- ZipOutputStream
+    note for ZipOutputStream "压缩流"
+    class InputStream{
+        <<Abstract>>
+    }
+    class OutputStream{
+        <<Abstract>>
+    }
+```
+
+## 6.3 概念区别
+
+* 我们平常所说的`文件压缩`是这样的：右键一个文件 --> 添加到`zip`压缩文件 --> 生成`.zip`文件。
+
+![](./assets/37.gif)
+
+* 其实，在程序中的关注点可能有所不同，对于`文件压缩`我们可以这么理解：
+
+![](./assets/38.svg)
 
 
 
+* 我们平常所说的`文件解压`是这样的：右键一个`zip`压缩文件 --> 解压到指定目录 --> 得到新的文件夹。
+
+![](./assets/39.gif)
+
+* 其实，在程序中的关注点可能有所不同，对于`文件解压`我们可以这么理解：
+
+![](./assets/40.svg)
+
+## 6.4 解压缩流
+
+* 对于 Java 的解压缩流而言，压缩包中的每个文件或文件夹本质上都是 ZipEntry 对象：
+
+```txt
+├─📦 test.zip --------------- # zip 压缩包
+│  ├─📁 a-------------------- # ZipEntry 对象
+│  │  ├─📄 a.txt------------- # ZipEntry 对象
+│  │  ├─📄 aa.txt------------ # ZipEntry 对象
+│  │  └─📄aaa.txt----------- # ZipEntry 对象
+│  ├─📁 b-------------------- # ZipEntry 对象
+│  │  ├─📄 b.txt------------- # ZipEntry 对象
+│  │  └─📄 bbb.txt----------- # ZipEntry 对象
+│  ├─📄 wallpaper_10642.webp # ZipEntry 对象
+│  ├─📄 wallpaper_18158.webp # ZipEntry 对象
+│  └─📄 wallpaper_18555.webp # ZipEntry 对象
+```
+
+* 那么，解压的本质：`将每个 ZipEntry 对象，按照层级结构，拷贝到本地另一个文件夹中`。
 
 
 
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建一个 File 对象表示压缩包
+        File zip = new File("D:\\", "test.zip");
+        // 创建一个 File 对象表示解压的目录
+        File dir = new File("D:\\", "test");
+
+        unzip(zip, dir);
+    }
+
+    /**
+     * 解压的本质就是将压缩包中的每个文件或文件夹取出来，按照层次拷贝到目的地目录中
+     *
+     * @param zip 压缩包
+     * @param dir 解压路径
+     */
+    public static void unzip(File zip, File dir) throws IOException {
+        // 创建目的地目录，防止路径不存在
+        dir.mkdirs();
+
+        // 创建一个解压流用来读取压缩包中的内容
+        ZipInputStream zis = new ZipInputStream(new FileInputStream(zip));
+
+        // 获取压缩流中的每个压缩文件或文件夹，即：ZipEntry 对象
+        ZipEntry zipEntry;
+
+        while ((zipEntry = zis.getNextEntry()) != null) {
+            // 判断是否是目录还是文件
+            if (zipEntry.isDirectory()) {
+                // 创建一个目录
+                File subDir = new File(dir, zipEntry.getName());
+                subDir.mkdirs();
+            } else {
+                // 复制文件到目的地目录中
+                File subFile = new File(dir, zipEntry.getName());
+                FileOutputStream fos = new FileOutputStream(subFile);
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = zis.read(buffer)) != -1) {
+                    fos.write(buffer, 0, len);
+                }
+                fos.close();
+                // 表示压缩包的文件处理完毕
+            	zis.closeEntry();
+            }
+            
+        }
+        zis.close();
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/41.gif)
+```
+
+:::
+
+## 6.5 压缩流
+
+* 对于 Java 的压缩流而言，每个文件或文件夹本质上都应该是 ZipEntry 对象。
+
+```txt
+├─📦 test.zip --------------- # zip 压缩包
+│  ├─📁 a-------------------- # ZipEntry 对象
+│  │  ├─📄 a.txt------------- # ZipEntry 对象
+│  │  ├─📄 aa.txt------------ # ZipEntry 对象
+│  │  └─📄aaa.txt----------- # ZipEntry 对象
+│  ├─📁 b-------------------- # ZipEntry 对象
+│  │  ├─📄 b.txt------------- # ZipEntry 对象
+│  │  └─📄 bbb.txt----------- # ZipEntry 对象
+│  ├─📄 wallpaper_10642.webp # ZipEntry 对象
+│  ├─📄 wallpaper_18158.webp # ZipEntry 对象
+│  └─📄 wallpaper_18555.webp # ZipEntry 对象
+```
+
+* 那么，压缩的本质：将每一个文件或文件夹看成是 ZipEntry 对象，然后放入到压缩包中。
 
 
-# 第七章：常用工具包
+
+* 示例：压缩单个文件
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建一个 File 对象表示需要压缩的目录
+        File src = new File("D:\\", "test\\a\\a.txt");
+        // 创建一个 File 对象表示压缩文件的位置
+        File zip = new File("D:\\");
+        // 压缩单个文件
+        toZip(src, zip);
+    }
+
+    /**
+     * 压缩单个文件
+     *
+     * @param src 文件
+     * @param zip 压缩包位置
+     */
+    public static void toZip(File src, File zip) throws IOException {
+        // 创建一个压缩流表示压缩包
+        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(new File(zip, "a.zip")));
+        // 创建一个 ZipEntry 对象，表示压缩包中的一个文件
+        // 如果 ZipEntry 中包含路径，就会一直创建多层目录，如：aaa\a.txt 
+        ZipEntry entry = new ZipEntry(src.getName()); 
+        // 将文件写入压缩包
+        zos.putNextEntry(entry);
+        // 创建一个 FileInputStream 对象，用于读取文件
+        FileInputStream fis = new FileInputStream(src);
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = fis.read(buf)) != -1) {
+            zos.write(buf, 0, len);
+        }
+        // 表示压缩包的文件处理问题
+        zos.closeEntry();
+        // 关闭流
+        zos.close();
+    }
+
+}
+
+```
+
+```md:img [cmd 控制台]
+![](./assets/42.gif)
+```
+
+:::
+
+
+
+* 示例：压缩目录
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建一个 File 对象表示需要压缩的目录
+        File src = new File("D:\\", "test");
+        // 创建一个 File 对象表示压缩文件的位置
+        File zip = new File(src.getParentFile(), src.getName() + ".zip");
+        System.out.println(zip);
+        // 压缩目录
+        toZip(src, zip);
+    }
+
+    /**
+     * 压缩目录
+     *
+     * @param src 目录
+     * @param zip 压缩包位置
+     */
+    public static void toZip(File src, File zip) throws IOException {
+        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zip));
+        zipDirectory(src, zos, src.getName());
+        zos.close();
+    }
+
+    /**
+     * 作用：获取 src 里面的每一个文件，变成 ZipEntry 对象，放入到压缩包当中
+     * 参数一：数据源
+     * 参数二：压缩流
+     * 参数三：压缩包内部的路径（文件的相对路径）
+     */
+    private static void zipDirectory(File src, ZipOutputStream zos, String name) throws IOException {
+        File[] files = src.listFiles();
+        for (File file : Objects.requireNonNullElse(files, new File[0])) {
+            if (file.isFile()) {
+                ZipEntry entry = new ZipEntry(name + File.separator + file.getName());
+                zos.putNextEntry(entry);
+                FileInputStream fis = new FileInputStream(file);
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = fis.read(buffer)) != -1) {
+                    zos.write(buffer, 0, len);
+                }
+                fis.close();
+                zos.closeEntry();
+            } else {
+                zipDirectory(file, zos, name + File.separator + file.getName());
+            }
+        }
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/43.gif)
+```
+
+:::
+
+
+
+# 第七章：常用工具包（Apache Commons）
 
 ## 7.1 概述
 
+* [Commons](https://commons.apache.org/) 是 Apache 开源基金组织提供的工具包，里面有帮助我们提高开发效率的 API 。
+* 目前，比较流行的 Commons 工具包，如下所示：
+
+| 工具类名称          | 功能简介                   | 所属 Apache Commons  库 |
+| ------------------- | -------------------------- | ----------------------- |
+| StringUtils         | 字符串处理工具类           | commons-lang3           |
+| NumberUtils         | 数字处理工具类             | commons-lang3           |
+| ArrayUtils          | 数组处理工具类             | commons-lang3           |
+| RandomUtils         | 随机数生成工具类           | commons-lang3           |
+| DateUtils           | 日期处理工具类             | commons-lang3           |
+| StopWatch           | 计时器工具类，用于性能测试 | commons-lang3           |
+| ClassUtils          | 类与反射相关操作工具类     | commons-lang3           |
+| SystemUtils         | 系统属性与环境变量工具类   | commons-lang3           |
+| MapUtils            | Map 集合操作工具类         | commons-collections4    |
+| BeanUtils           | JavaBean 属性操作工具类    | commons-beanutils       |
+| IOUtils / FileUtils | 文件、流、I/O 处理工具类   | commons-io              |
+
+## 7.2 Commons-io
+
+### 7.2.1 概述
+
+* [Commons-io](https://commons.apache.org/proper/commons-io/) 是 Apache 开源基金组织提供的一组有关 IO 操作的开源工具包。
+* 如果我们使用 Maven 或 Gradle ，可以复制对应的坐标到项目中：
+
+::: code-group
+
+```xml [Maven]
+<dependency>
+    <groupId>commons-io</groupId>
+    <artifactId>commons-io</artifactId>
+    <version>2.19.0</version>
+</dependency>
+```
+
+```groovy [Gradle]
+implementation 'commons-io:commons-io:2.19.0'
+```
+
+:::
+
+### 7.2.2 文件（文件夹）常用方法
+
+* 文件（文件夹）常用方法：
+
+| FileUtils 类（文件/文件夹相关）                              | 描述                       |
+| ------------------------------------------------------------ | -------------------------- |
+| `public static void copyFile(File srcFile, File destFile){}` | 复制文件                   |
+| `public static void copyDirectory(File srcDir, File destDir) {}` | 复制文件夹                 |
+| `public  static void copyDirectoryToDirectory(File srcDir, File destDir) {}` | 复制文件夹                 |
+| `public static void deleteDirectory(File directory) {}`      | 删除文件夹                 |
+| `public static void cleanDirectory(File directory) {}`       | 清空文件夹                 |
+| `public static String readFileTostring(File file, Charset encoding){}` | 读取文件中的数据变为字符串 |
+| `public  static void write(File file, CharSequence data, String encoding) {}` | 写出数据                   |
 
 
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File src = new File("day23\\a.txt");
+        File dest = new File("day23\\b.txt");
+        FileUtils.copyFile(src, dest);
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/44.gif)
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File src = new File("day23\\a.txt");
+
+        String str = FileUtils.readFileToString(src, StandardCharsets.UTF_8);
+        System.out.println(str);
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/45.gif)
+```
+
+:::
+
+### 7.2.3 流相关常用方法
+
+* 流相关常用方法：
+
+| IoUtils类（流相关）                                          | 描述       |
+| ------------------------------------------------------------ | ---------- |
+| `public static int copy(InputStream input, OutputStream output){}` | 复制文件   |
+| `public static int copylarge(Reader input, Writer output){}` | 复制大文件 |
+| `public static String readlines(Reader input){}`             | 读取数据   |
+| `public static void write(String data, OutputStream output){}` | 写出数据   |
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.io;
+
+
+import org.apache.commons.io.IOUtils;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        File src = new File("day23\\a.txt");
+        File dest = new File("day23\\b.txt");
+
+        IOUtils.copy(new FileInputStream(src), new FileOutputStream(dest));
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/46.gif)
+```
+
+:::
