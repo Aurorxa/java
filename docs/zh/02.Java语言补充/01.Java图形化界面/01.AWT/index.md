@@ -173,6 +173,7 @@ public class Test {
 >
 > * ① Panel 等内嵌容器是可以包含其他容器的。
 > * ② Panel 等内嵌容器是不能独立存在的，必须依附于 Window 窗口容器。
+> * ③ AWT 出现的时候太早了，那个时候并没有过多的考虑中文；我们在 IDEA 中默认使用的编码是 UTF-8，但是 AWT 是运行在 Windows 操作系统上的（简体中文版，默认的编码是 GBK），可能会造成乱码；其解决方案就是增加一个 JVM 参数`-Dfile.encoding=GBK` 。
 
 ![](./assets/6.png)
 
