@@ -552,7 +552,7 @@ int main() { // 定义主函数
 
 ![Java 微服务解决方案：SpringBoot + SpringCloud](./assets/29.svg)
 
-* ③ 移动应用开发，如：andriod（虽然现在 Kotlin 逐渐成为安卓开发的主流语言，但 Java 仍然广泛用于安卓开发）、医疗设备。
+* ③ 移动应用开发，如：Andriod（虽然现在 Kotlin 逐渐成为安卓开发的主流语言，但 Java 仍然广泛用于安卓开发）、医疗设备。
 
 ![WhatsApp：台湾版微信](./assets/30.png)
 
