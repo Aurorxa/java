@@ -143,80 +143,119 @@ man ascii
 
 * 查看 WSL2 的 Linux 发行版的默认编码：
 
-```shell
+::: code-group
+
+```shell [shell 命令]
 echo $LANG
 ```
 
+```md:img [cmd 控制台]
 ![查看 WSL2 的 Linux 发行版的默认编码](./assets/11.gif)
+```
 
-> [!NOTE]
->
-> `C.UTF-8` 是一种字符编码设置，结合了 `C` 区域设定和 `UTF-8` 字符编码。
->
-> * ① **C 区域设定**：这是一个标准的、最小化的区域设置，通常用于系统默认的语言环境。`C` 区域设定下，所有字符都被认为是 ASCII 字符集的一部分，这意味着仅支持基本的英文字符和符号。在 `C` 区域设定中，字符串的排序和比较是基于简单的二进制值比较，这与本地化的语言设置相比相对简单。
-> * ② **UTF-8 编码**：UTF-8 是一种变长的字符编码方式，可以编码所有的 Unicode 字符。它是一种广泛使用的字符编码，能够支持多种语言和符号。每个 UTF-8 字符可以由1到4个字节表示，这使得它兼容 ASCII（对于标准 ASCII 字符，UTF-8 只使用一个字节）。
->
-> 因此，`C.UTF-8` 结合了 `C` 区域设定和 UTF-8 字符编码的优势。使用 `C.UTF-8` 时，系统默认语言环境保持简单和高效，同时支持更广泛的字符集，特别是多语言和非英语字符。这样可以在需要兼容性的同时，提供对全球化字符的支持。
+:::
 
 ## 2.2 AlmaLinux9 设置默认编码
 
 * ① 搜索中文语言包：
 
-```shell
+::: code-group
+
+```shell [shell 命令]
 dnf search locale zh
 ```
 
+```md:img [cmd 控制台]
 ![搜索中文语言包](./assets/12.gif)
+```
+
+:::
 
 * ② 安装中文语言包：
 
-```shell
+::: code-group
+
+```shell [shell 命令]
 dnf -y install glibc-langpack-zh
 ```
 
+```md:img [cmd 控制台]
 ![安装中文语言包](./assets/13.gif)
+```
+
+:::
 
 * ③ 切换语言环境为中文：
 
-```shell
+::: code-group
+
+```shell [shell 命令]
 localectl set-locale LANG=zh_CN.UTF-8
 ```
 
+```md:img [cmd 控制台]
 ![切换语言环境为中文](./assets/14.gif)
+```
+
+:::
 
 * ④ 手动加载配置文件，使其生效：
 
-```shell
+::: code-group
+
+```shell [shell 命令]
 source /etc/locale.conf
 ```
 
+```md:img [cmd 控制台]
 ![手动加载配置文件，使其生效](./assets/15.gif)
+```
+
+:::
 
 ## 2.3 Ubuntu 22.04 设置默认编码
 
 * ① 安装中文语言包：
 
-```shell
+::: code-group
+
+```shell [shell 命令]
 apt update -y && apt install language-pack-zh-hans -y
 ```
 
+```md:img [cmd 控制台]
 ![安装中文语言包](./assets/16.gif)
+```
+
+:::
 
 * ② 切换环境为中文：
 
-```shell
+::: code-group
+
+```shell [shell 命令]
 update-locale LANG=zh_CN.UTF-8 LANGUAGE=zh_CN:zh
 ```
 
+```md:img [cmd 控制台]
 ![切换环境为中文](./assets/17.gif)
+```
+
+:::
 
 * ③ 手动加载配置文件，使其生效：
 
-```shell
+::: code-group
+
+```shell [shell 命令]
 source /etc/default/locale
 ```
 
+```md:img [cmd 控制台]
 ![手动加载配置文件，使其生效](./assets/18.gif)
+```
+
+:::
 
 
 

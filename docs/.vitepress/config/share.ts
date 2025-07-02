@@ -82,7 +82,10 @@ const vitePressOptions = withMermaid(defineConfig({
           'powershell': 'vscode-icons:file-type-powershell',
           'maven': 'vscode-icons:file-type-apache',
           'gradle': 'vscode-icons:file-type-light-gradle',
-          'git': 'vscode-icons:file-type-git'
+          'git': 'vscode-icons:file-type-git',
+          'bash': 'vscode-icons:file-type-gnu',
+          'shell': 'vscode-icons:file-type-gnu',
+          'sh': 'vscode-icons:file-type-gnu',
         }
       }) as any),
       Permalink(),

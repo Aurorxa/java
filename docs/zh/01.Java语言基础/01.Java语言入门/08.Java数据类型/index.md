@@ -299,7 +299,11 @@ public class IntDemo3 {
 
 ### 3.4.1 使用 BigInteger 或 BigDecimal（推荐）
 
-* Java 提供了 `BigInteger` 和 `BigDecimal` 类来处理超出 `int` 和 `long` 范围的整数或浮动数字。
+* Java 提供了`BigInteger`和`BigDecimal`类来处理超出`int`和`long`范围的整数或浮动数字。
+
+> [!IMPORTANT]
+>
+> 这些类支持任意精度的数值运算，可以防止数据溢出！！!
 
 ::: code-group
 
@@ -332,8 +336,6 @@ public class BigDecimal extends Number
 ```
 
 :::
-
-* 这些类支持任意精度的数值运算，可以防止溢出。
 
 
 
@@ -371,6 +373,10 @@ public class IntDemo4 {
 
 * 在某些情况下，我们不希望将基本数据类型（如：int 等）转换为 `BigInteger` 来进行处理，此时就可以使用 Java 提供的 `Math` 类中的 `addExact()`、`subtractExact()` 或 `multiplyExact()` 等静态方法，如下所示：
 
+> [!IMPORTANT]
+>
+> 在使用上述方法的时候，如果发生数据溢出就会抛出 `ArithmeticException` 异常。
+
 ```java [Math.java]
 public final class Math { 
     // 加法
@@ -382,8 +388,6 @@ public final class Math {
     ...
 }
 ```
-
-* 在使用上述方法的时候，如果发生溢出就会抛出 `ArithmeticException` 异常。
 
 
 
@@ -941,10 +945,12 @@ public class StringDemo2 {
 
 * ② String 类型是不能强制类型转换为其他类型的。
 
-```java
+::: code-group
+
+```java [StringError.java]
 package com.github;
 
-public class StringDemo1 {
+public class StringError {
     public static void main(String[] args) {
 
         String str = "123";
@@ -957,10 +963,10 @@ public class StringDemo1 {
 }
 ```
 
-```java
+```java [StringRight.java]
 package com.github;
 
-public class StringDemo1 {
+public class StringRight {
     public static void main(String[] args) {
 
         String str = "123";
@@ -973,7 +979,7 @@ public class StringDemo1 {
 }
 ```
 
-
+:::
 
 # 第九章：作业
 
@@ -988,7 +994,7 @@ public class StringDemo1 {
 
 ## 9.2 代码题
 
-### 9.2.1 题目 1
+### 9.2.1 综合练习一
 
 * 需求：定义字符串类型的变量 name、字符串类型的变量 birthday、整数类型的变量 age  以及 float 类型的变量 money 。
 
@@ -1022,7 +1028,7 @@ public class VariableTest3 {
 }
 ```
 
-### 9.2.2 题目 2
+### 9.2.2 综合练习二
 
 * 需求：使用变量描述一个人的信息，如：姓名、年龄、性别、身高、体重等。
 

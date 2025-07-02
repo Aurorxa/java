@@ -12,6 +12,8 @@
 
 > [!NOTE]
 >
+> ::: details 点我查看 具体细节
+>
 > * ① 当我们在 cmd 窗口中输入某些命令的时候，操作系统首先会在当前目录中查找该命令：
 >   * 如果找到了该命令，就立即执行。
 >   * 如果没有找到，就会去 `PATH` 环境变量对应的路径中去查找：
@@ -20,6 +22,8 @@
 > * ② 其对应的流程，如下所示：
 >
 > ![](./assets/49.svg)
+>
+> :::
 
 * ② `配置文件和系统设置`：环境变量可以存储应用程序和操作系统的配置信息，应用程序可以读取这些变量来调整其行为。
 
@@ -32,29 +36,30 @@
 > ::: code-group
 >
 > ```properties [.env]
-> # 默认的环境设置，所有环境都会加载
+># 默认的环境设置，所有环境都会加载
 > VITE_APP_NAME=mall
 > ```
->
+> 
 > ```properties [.env.development]
-> # 开发环境的配置
+># 开发环境的配置
 > VITE_API_URL=https://api.dev.com
 > ```
->
+> 
 > ```properties [.env.production]
-> # 生产环境的配置
+># 生产环境的配置
 > VITE_API_URL=https://api.prod.com
 > ```
->
+> 
 > :::
 >
 > * ② 在代码中使用环境变量，如下所示：
 >
 > ```js
-> // main.js
+>// main.js
 > console.log(import.meta.env.VITE_API_URL); 
 > console.log(import.meta.env.VITE_APP_NAME); 
 > ```
+> 
 
 * ③ ...
 
@@ -62,45 +67,75 @@
 
 * ① 在 cmd 中切换到 QQ 的安装目录：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 cd C:\Program Files (x86)\Tencent\QQ\Bin
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/50.gif)
+```
+
+:::
 
 * ② 启动 QQ：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 qq.exe
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/51.gif)
+```
+
+:::
 
 ## 1.4 在 cmd 中的任意目录启动 QQ
 
 * ① 在 cmd 中的任意目录不能启动 QQ（每次都需要指定的安装目录，太麻烦）：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 qq.exe
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/52.gif)
+```
+
+:::
 
 * ② 将 QQ 的安装目录配置到 PATH 环境变量中：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 PATH=C:\Program Files (x86)\Tencent\QQ\Bin;$PATH
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/53.gif)
+```
+
+:::
 
 * ③ 在 cmd 中的任意目录启动 QQ：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 qq.exe
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/54.gif)
+```
+
+:::
 
 
 
@@ -117,7 +152,7 @@ qq.exe
 
 ![C 语言 VS Java 语言](./assets/1.svg)
 
-* 虽然 C 语言和 Java 语言有很多相似之处，但在设计理念、运行环境、内存管理等方面有显著差异。
+* C 语言和 Java 语言有很多相似之处，但在设计理念、运行环境、内存管理等方面有显著差异。
 
 > [!NOTE]
 >
@@ -150,7 +185,14 @@ qq.exe
 
 ###  2.2.1 JDK
 
-* JDK（Java Development Kit，Java 开发工具包）是用于开发 Java 应用程序的。JDK 是由 JRE（Java Runtime Environment，Java 运行时环境）、编译器（javac）、解释器（java）、调试工具（jdb）以及内存分析工具（jhat）等组成。JDK 负责编译、调试和执行。JDK 和平台相关，应为每个平台都需要不同的 JDK。
+* JDK（Java Development Kit，Java 开发工具包）是用于开发 Java 应用程序的。
+
+> [!NOTE]
+>
+> * JDK 是由 JRE（Java Runtime Environment，Java 运行时环境）、编译器（javac）、解释器（java）、调试工具（jdb）以及内存分析工具（jhat）等组成。
+> * JDK 负责编译、调试和执行。
+> * JDK 和平台相关，应为每个平台都需要不同的 JDK。
+
 * JDK 的工作原理，如下所示：
 
 > [!NOTE]
@@ -191,12 +233,12 @@ qq.exe
 ![JVM](./assets/4.jpg)
 
 * JVM 的工作流程：
-  * ① `加载（Loading）`：加载涉及将类的字节码引入内存，这是在 JVM 中执行的第一步。
-  * ② `链接（Linking）`：在这里，进行字节码验证。类文件由 JVM 解析，并分为方法、字段等基本元素。验证字节码以防止未经授权的访问并确保内存安全非常重要。
-    * `验证（Verification）`：它验证并确保字节码符合 JVM 安全性的结构规则。检查正确的数据类型处理和对对象的有效引用等规则。
-    * `准备（Preparation）`：将内存分配给静态字段，并使用默认值初始化它们。它确保可以使用类的静态数据。
-    * `解析（Resolution）`：它用于将符号引用解析为具体引用
-  * ③ `初始化（Initialization）`：在初始化期间，static 初始值设定项和 static 字段的执行顺序遵循它们在代码中定义的顺序。这是为了确保在投入使用之前正确初始化这些类。
+
+| JVM 的工作流程           | 描述                                                         |
+| ------------------------ | ------------------------------------------------------------ |
+| 加载（Loading）          | 加载涉及将类的字节码引入内存，这是在 JVM 中执行的第一步。    |
+| 链接（Linking）          | 在这里，进行字节码验证。类文件由 JVM 解析，并分为方法、字段等基本元素。验证字节码以防止未经授权的访问并确保内存安全非常重要。 |
+| 初始化（Initialization） | 在初始化期间，static 初始值设定项和 static 字段的执行顺序遵循它们在代码中定义的顺序。这是为了确保在投入使用之前正确初始化这些类。 |
 
 ### 2.2.4 总结
 
@@ -248,11 +290,17 @@ qq.exe
 
 * ③ 测试是否安装或配置成功：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 javac -version
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/18.gif)
+```
+
+:::
 
 * ④ 去除默认配置的环境变量：
 
@@ -273,45 +321,75 @@ javac -version
 
 * ⑦ 测试是否安装或配置成功：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 javac -version
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/22.gif)
+```
+
+:::
 
 ### 2.3.2 自动版
 
 * ① 创建安装的目录：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 mkdir d:\develop\java\jdk-17
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/23.gif)
+```
+
+:::
 
 * ② 查询 JDK 的版本：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 winget search jdk
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/24.gif)
+```
+
+:::
 
 * ③ 安装到指定的目录：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 winget install --id Oracle.JDK.17 -l d:\develop\java\jdk-17
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/25.gif)
+```
+
+:::
 
 * ④ 查看本地是否安装成功：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 winget list jdk
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/26.gif)
+```
+
+:::
 
 * ⑤ 去除默认配置的环境变量：
 
@@ -323,6 +401,11 @@ winget list jdk
 ![](./assets/27.gif)
 
 * ⑤ 配置环境变量：
+
+> [!CAUTION]
+>
+> * ① 使用下述命令设置环境变量时，虽然会立即生效，但是仅对新的 cmd 或 powershell 生效，当前打开的 cmd 窗口或 powershell 窗口是不会立即看到更新的环境变量的。
+> * ② 请另开一个新的 cmd 窗口或 powershell 窗口去验证是否生效。
 
 ::: code-group
 
@@ -340,6 +423,14 @@ setx JAVA_HOME "D:\develop\java\jdk-17" /M
 setx Path ^%JAVA_HOME^%"\bin;%Path%" /M
 ```
 
+```md:img [cmd 控制台]
+![](./assets/28.gif)
+```
+
+:::
+
+::: code-group
+
 ```powershell [powershell 设置用户环境变量]
 [System.Environment]::SetEnvironmentVariable('JAVA_HOME', 'D:\develop\java\jdk-17', [System.EnvironmentVariableTarget]::User)
 $env:Path += ";%JAVA_HOME%\bin"
@@ -352,22 +443,25 @@ $env:Path += ";%JAVA_HOME%\bin"
 [System.Environment]::SetEnvironmentVariable('Path', $env:Path, [System.EnvironmentVariableTarget]::Machine)
 ```
 
-:::
-
-> [!CAUTION]
->
-> * ① 使用上述命令设置环境变量时，虽然会立即生效，但是仅对新的 cmd 或 powershell 生效，当前打开的 cmd 窗口或 powershell 窗口是不会立即看到更新的环境变量的。
-> * ② 请另开一个新的 cmd 窗口或 powershell 窗口去验证是否生效。
-
+```md:img [cmd 控制台]
 ![](./assets/28.gif)
+```
+
+:::
 
 * ⑥ 测试是否安装或配置成功：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 javac -version
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/29.gif)
+```
+
+:::
 
 ## 2.4 JDK17 的目录结构说明
 
@@ -465,33 +559,53 @@ javac -version
 
 * ① 查询 Notepad++ ：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 winget search notepadplus
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/42.gif)
+```
+
+:::
 
 * ② 安装 Notepad++ ：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 winget install --id Notepad++.Notepad++
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/43.gif)
+```
+
+:::
 
 * ③ 查询本地是否安装成功：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 winget list notepadplus
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/44.gif)
+```
+
+:::
 
 ## 3.3 HelloWorld（入门程序）
 
 * ① 使用 `Notepad++` 新建 `HelloWorld.java`文件，并在该文件中编写入门程序：
 
-```java
+::: code-group
+
+```java [HelloWorld.java]
 public class HelloWorld {
 	public static void main(String[] args){
 		System.out.println("Hello World!!!");
@@ -499,23 +613,39 @@ public class HelloWorld {
 }
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/45.gif)
+```
+
+:::
 
 * ② 使用 `javac` 命令编译 Java 源程序：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 javac HelloWorld.java
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/46.gif)
+```
+
+:::
 
 * ③ 使用 java 命令执行字节码文件：
 
-```cmd
+::: code-group
+
+```cmd [cmd 命令]
 java HelloWorld
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/47.gif)
+```
+
+:::
 
 ## 3.4 Java 中的注释
 
@@ -559,7 +689,11 @@ public class HelloWorld {
 */
 ```
 
-* 功能：多行注释用于注释掉多行代码。它的语法是使用 `/*` 开始，`*/` 结束，注释内容位于这两个符号之间。
+* 功能：多行注释用于注释掉多行代码。
+
+> [!NOTE]
+>
+> 多行注释的语法是使 `/*`开始，`*/`结束，注释内容位于这两个符号之间。
 
 
 
@@ -590,12 +724,13 @@ public class HelloWorld {
  */
 ```
 
-* 功能：文档注释用于生成 API 文档，通常用于类、方法或字段的注释。它的语法是使用 `/**` 开始，`*/` 结束，通常用于为方法或类提供详细描述。
+* 功能：文档注释用于生成 API 文档，通常用于类、方法或字段的注释。
 
 > [!NOTE]
 >
 > * ① 文档注释通常与 `Javadoc` 工具一起使用。
 > * ② `Javadoc` 会自动解析这些文档注释并生成 HTML 格式的 API 文档。
+> * ③ 文档注释的语法是使用 `/**` 开始，`*/` 结束，通常用于为方法或类提供详细描述。
 
 
 
@@ -686,7 +821,7 @@ public class HelloWorld {
 
 * 我们可以使用文档注释来对 HelloWorld （入门程序）进行解析。
 
-> [!CAUTION]
+> [!IMPORTANT]
 >
 > * ① 如果类是使用 public 修饰的，类名需要和 Java 源文件的名称保持一致。
 > * ② 程序中的标点符号必须是英文的。
@@ -742,18 +877,40 @@ class HelloWorld {
 ```
 
 * ② 一个源文件中是否可以有多个类；但是，一个源文件中有且只能有一个 pubilc 修饰的类。
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Zi zi = new Zi();
+    }
+}
+
+
+class Fu {}
+
+class Zi extends Fu {}
+```
+
 * ③ main 方法必须写在带 public 的类中。
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        Zi zi = new Zi();
+    }
+}
+```
 
 ## 3.7 println 方法和 print 方法的异同点
 
 ### 3.7.1 概述
 
-* 在 Java 中，`println()` 和 `print()` 都是 `System.out` 对象的方法，常用于输出信息到控制台。
+* 在 Java 中，`println()`和`print()`都是`System.out`对象的方法，常用于输出信息到控制台。
 
 ### 3.7.2 相同点
 
 * ① 输出内容：两者都可以输出任何类型的数据（字符串、数字、对象等）。它们会将指定的内容打印到控制台。
-* ② 都是 `System.out` 的方法：这两个方法都属于 `System.out`，`System.out` 是一个 `PrintStream` 对象，提供了多种输出方法。
+* ② 都是`System.out`的方法：这两个方法都属于`System.out`，`System.out`是一个`PrintStream`对象，提供了多种输出方法。
 
 ### 3.7.3 不同点
 
@@ -776,14 +933,18 @@ class HelloWorld {
 > * ① 在实际开发中，其实 `println()` 并不会应用于打印日志，因为我们会使用日志框架，如：Log4j 等，并不会在系统中，直接使用 `println()` 。
 > * ② 并且，我们也会搭建日志平台，会通过日志框架将业务过程中产生的日志，定期同步到日志平台中，以便日后分析！！！
 
+### 3.7.4 综合练习
+
+* 需求：演示`print`和`println`的异同点。
+
 
 
 * 示例：
 
 ::: code-group
 
-```java [HelloWorld.java]
-public class HelloWorld {
+```java [Test.java]
+public class Test {
 	public static void main(String[] args){
 		System.out.print("Hello, ");
 		System.out.print("World! ");
@@ -793,7 +954,7 @@ public class HelloWorld {
 }
 ```
 
-```txt [输出结果]
+```[cmd 控制台]
 Hello, World! This is on a new line.
 This is the second line.
 ```
@@ -842,8 +1003,3 @@ This is the second line.
 > * ① 这些都是程序，它们都由一系列指令组成，计算机根据这些指令执行不同的任务。
 > * ② 操作系统负责管理硬件资源，Chrome 浏览器提供网络浏览功能，安卓或苹果 app 提供各种功能，而电脑病毒则是恶意程序，可能用于破坏或篡改计算机的正常操作。
 
-## 1.3 操作题
-
-* ① 安装和配置 JDK：[略](./#_2-3-jdk-的安装和配置)。
-* ② 安装 Notepad++ ：[略](./#_3-2-安装-notepad)。
-* ③ 编写 HelloWorld 程序：[略](./#_3-3-helloworld-入门程序)。

@@ -1,6 +1,6 @@
 > [!IMPORTANT]
 >
-> * ① JDK 的版本是 `JDK17` ，IDEA 的版本是 `2024.1+`。
+> * ① JDK 的版本是 `17` ，IDEA 的版本是 `2024.1+`。
 > * ② 前置知识：HTML 、CSS 以及 JavaScript 。
 
 # 第一章：Java 图形化界面
@@ -357,23 +357,26 @@ public class Test {
 >
 > 其实，AWT 中的布局和 CSS 中的布局，本质上是一样的！！！
 
-### 2.3.2 FlowLayout
+### 2.3.2 FlowLayout（流式布局）
 
 #### 2.3.2.1 概述
 * FlowLayout 是 AWT 中最基本、最常用的布局管理器之一，其特点类似于 CSS 中的正常文档流，即：`元素从左到右自动排列、满则换行、不改变组件大小`，适用于快速简单布局。
 * FlowLayout 的主要特点，如下所示：
-  * ① `按照顺序从左到右排列组件`：添加的组件会从左向右依次排列。
-  * ② `容器宽度不足时自动换行`：如果当前行放不下组件，会自动换到下一行。
-  * ③ `组件保持原始大小` ：不会自动拉伸组件大小，默认显示组件的 `preferredSize`。
-  * ④ `对齐方式可选`：可以设置为左对齐、居中（默认）、右对齐。
-  * ⑤ `组件之间可设置间距`：支持水平间距（`hgap`）和垂直间距（`vgap`）设置。
-  * ⑥ `适合简单、快速布局` ：非常适合排一排按钮、标签等控件。
+
+| 特点                           | 说明                                                   |
+| ------------------------------ | ------------------------------------------------------ |
+| ✅ **按照顺序从左到右排列组件** | 添加的组件会从左向右依次排列。                         |
+| ✅ **容器宽度不足时自动换行**   | 如果当前行放不下组件，会自动换到下一行。               |
+| ✅ **组件保持原始大小**         | 不会自动拉伸组件大小，默认显示组件的 `preferredSize`。 |
+| ✅ **对齐方式可选**             | 可以设置为左对齐、居中（默认）、右对齐。               |
+| ✅ **组件之间可设置间距**       | 支持水平间距（`hgap`）和垂直间距（`vgap`）设置。       |
+| ✅ **适合简单、快速布局**       | 非常适合排一排按钮、标签等控件。                       |
+| ❌ **不适合复杂布局**           | 无法精确控制行和列位置，缺乏灵活性。                   |
 
 > [!NOTE]
 >
-> * ① FlowLayout 不适合复杂布局，无法精确控制行和列位置，缺乏灵活性。
-> * ② FlowLayout = 从左到右 + 自动换行 + 不改变组件大小，适用于快速布局简单控件。
-> * ③ FlowLayout 的`对齐方式`：当一行中的组件没有占满整行空间时，这行组件在水平方向上应该如何摆放。
+> * ① FlowLayout = 从左到右 + 自动换行 + 不改变组件大小，适用于快速布局简单控件。
+> * ② FlowLayout 的`对齐方式`：当一行中的组件没有占满整行空间时，这行组件在水平方向上应该如何摆放。
 
 #### 2.3.2.2 构造方法
 
@@ -538,7 +541,7 @@ public class Test {
 
 :::
 
-### 2.3.3 BorderLayout
+### 2.3.3 BorderLayout（边界布局）
 
 #### 2.3.3.1 概述
 
@@ -547,11 +550,14 @@ public class Test {
 ![](./assets/15.svg)
 
 * BorderLayout 的主要特点，如下所示：
-  * ① `划分为五个区域`：`NORTH`（北）、`SOUTH`（南）、`WEST`（西）、`EAST`（东）、`CENTER`（中间）。
-  * ② `每个区域最多放一个组件`：同一区域再次添加组件会覆盖之前的。
-  * ③ `中间区域最重要、最灵活`：`CENTER` 区域会自动填满剩余空间。
-  * ④ `区域大小随窗口变化自动调整`：窗口变大的时候，`CENTER`区域会横向拉伸和纵向拉伸，`NORTH`区域和`SOUTH`区域会横向拉伸，`WEST`区域和`EAST`区域会纵向拉伸。
-  * ⑤ `适合构建经典三栏/五区布局`：类似于网页的头部、侧边栏和内容区结构。
+
+| 特点                             | 说明                                                         |
+| -------------------------------- | ------------------------------------------------------------ |
+| ✅ **划分为五个区域**             | `North`（上）、`South`（下）、`West`（左）、`East`（右）、`Center`（中） |
+| ✅ **每个区域最多放一个组件**     | 同一区域再次添加组件会覆盖之前的                             |
+| ✅**中间区域最重要、最灵活**      | `Center` 会自动扩展填满剩余空间                              |
+| ✅ **区域大小随窗口变化自动调整** | 比如窗口变大时 `Center` 区域会变大，`North/South` 会横向拉伸 |
+| ✅ **适合构建经典三栏/五区布局**  | 类似网页的头部、侧边栏、内容区结构                           |
 
 > [!NOTE]
 >
@@ -712,27 +718,359 @@ public class Test {
 
 :::
 
-### 2.3.4 GridLayout
+### 2.3.4 GridLayout（网格布局）
 
 #### 2.3.4.1 概述
 
+* GridLayout 是 AWT 中的一种布局管理器，它将容器划分成`规则的网格（行 × 列）`，然后将组件依次填入每一个格子中。
+* GridLayout 的主要特点：
+
+| 特点                           | 说明                                                 |
+| ------------------------------ | ---------------------------------------------------- |
+| ✅ **将容器划分成固定的行和列** | 每个单元格大小相同                                   |
+| ✅ **组件按顺序填充每个格子**   | 从左到右，从上到下                                   |
+| ✅ **组件会自动拉伸填满单元格** | 所有组件尺寸一致（取决于网格）                       |
+| ✅ **适合均匀排列组件**         | 布局整齐、均匀，适合排列按钮、表格、数字键盘等结构。 |
+| ❌ **不支持合并单元格**         | 没有 rowspan、colspan的功能                          |
+| ❌ **不适合复杂布局**           | 不能自由控制组件大小或位置                           |
+
+> [!NOTE]
+>
+> * ① GridLayout 类似于 CSS 中的 `display: grid`。
+> * ② GridLayout 不适合复杂布局，即：不能自由控制组件大小和位置。
+
+#### 2.3.4.2 构造方法
+
+* 默认构造方法，1 行 0 列 ，横向间距和纵向间距都是 0 （不太常用）。
+
+```java
+public GridLayout() {
+    this(1, 0, 0, 0);
+}
+```
+
+* 设置指定的行和列；但是，横向间距和纵向间距默认都是 0 ：
+
+```java
+public GridLayout(int rows, int cols) {
+    this(rows, cols, 0, 0);
+}
+```
+
+* 设置指定的行、列、横向间距和纵向间距：
+
+```java
+public GridLayout(int rows, int cols, int hgap, int vgap) {
+    if ((rows == 0) && (cols == 0)) {
+        throw new IllegalArgumentException("rows and cols cannot both be zero");
+    }
+    this.rows = rows;
+    this.cols = cols;
+    this.hgap = hgap;
+    this.vgap = vgap;
+}
+```
 
 
 
+* 示例：设置 6 行 6 列，横向间距和纵向间距都是 10 的网格
 
-### 2.3.5 GridBagLayout
+::: code-group
+
+```java [Test.java]
+package com.github.awt.layout.grid;
+
+import java.awt.*;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Frame 对象
+        Frame frame = new Frame("GridLayout");
+        // 设置 Frame 的布局管理器
+        GridLayout gridLayout = new GridLayout(6, 6, 10, 10);
+        frame.setLayout(gridLayout);
+
+        for (int i = 0; i < gridLayout.getRows(); i++) {
+            for (int j = 0; j < gridLayout.getColumns(); j++) {
+                frame.add(new Button("(" + i + "," + j + ")"));
+            }
+        }
+
+        // 设置窗口的大小（单位是像素，px）
+        frame.setLocation(580, 320);
+        // 设置窗口的位置（单位是像素，px）
+        frame.setSize(577, 500);
+
+        // 设置可见性
+        frame.setVisible(true);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/19.gif)
+```
+
+:::
+
+
+
+* 示例：设置计算器
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.layout.grid;
+
+import java.awt.*;
+
+public class Test2 {
+    public static void main(String[] args) {
+        // 创建 Frame 对象
+        Frame frame = new Frame("计算器");
+        // 创建 Panel 对象，用来存放 TextField 组件
+        Panel panel = new Panel();
+        panel.add(new TextField(35));
+        frame.add(panel, BorderLayout.NORTH);
+        // 创建 Panel 对象，用来存放计算器内容，并设置布局管理器为 GridLayout
+        Panel panel2 = new Panel();
+        panel2.setLayout(new GridLayout(3, 5, 5, 5));
+        for (int i = 0; i < 10; i++) {
+            panel2.add(new Button(i + ""));
+        }
+        panel2.add(new Button("+"));
+        panel2.add(new Button("-"));
+        panel2.add(new Button("*"));
+        panel2.add(new Button("/"));
+        panel2.add(new Button("%"));
+        frame.add(panel2, BorderLayout.CENTER);
+        // 设置窗口的位置（单位是像素，px）
+        frame.setLocation(580, 320);
+        // 设置窗口的大小（单位是像素，px）
+        frame.setSize(305, 223);
+
+        // 设置可见性
+        frame.setVisible(true);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/20.gif)
+```
+
+:::
+
+### 2.3.5 GridBagLayout（网格包布局，了解）
 
 #### 2.3.5.1 概述
 
+* GridBagLayout 是 Java AWT 中最强大且最灵活的布局管理器之一。与 GridLayout 不同，GridBagLayout 允许更精细的控制组件的位置和大小，它可以在一个网格中精确地放置组件，并允许组件跨越多个单元格。
+* GridBagLayout 的主要特点：
+
+| 特点                     | 说明                                                         |
+| ------------------------ | ------------------------------------------------------------ |
+| ✅ **精细控制组件的布局** | 可以设置每个组件的起始位置、宽度、高度以及它们在单元格中的分布比例 |
+| ✅ **支持跨行跨列**       | 组件可以跨越多个行或列（`gridwidth`, `gridheight`）          |
+| ✅ **组件大小可调整**     | 组件可以根据容器的变化自动调整大小，或者固定大小             |
+| ✅ **支持组件的对齐方式** | 可以设置组件在单元格中的对齐方式（如：上对齐、居中对齐）     |
+| ✅ **灵活的填充方式**     | 允许组件在其单元格内填充或拉伸                               |
+| ❌ **使用复杂**           | 配置项多，代码复杂，调试较为困难                             |
+| ❌ **性能开销较大**       | 由于灵活性强，性能可能不如简单布局管理器                     |
+
+* 由于在 GridBagLayout 布局中，每个组件可以占用多个网格。此时，我们往容器中添加组件的时候，就需要具体的控制每个组件占用多少个网格，Java 提供的 GridBagConstaints 类，与特定的组件绑定，可以完成具体大小和跨越性的设置。
+
+* GridBagConstraints 类的常用 API，如下所示：
+
+| 字段       | 作用描述                           | 常用取值/示例                                 |
+| ---------- | ---------------------------------- | --------------------------------------------- |
+| gridx      | 网格中的列索引（位置 x）           | 0, 1, 2, ...                                  |
+| gridy      | 网格中的行索引（位置 y）           | 0, 1, 2, ...                                  |
+| gridwidth  | 跨越的列数                         | 1（默认），2，GridBagConstraints.REMAINDER 等 |
+| gridheight | 跨越的行数                         | 1（默认），2，GridBagConstraints.REMAINDER 等 |
+| weightx    | 水平方向额外空间分配权重           | 0.0（默认），0.5，1.0                         |
+| weighty    | 垂直方向额外空间分配权重           | 0.0（默认），0.5，1.0                         |
+| fill       | 填充方式                           | NONE（默认），HORIZONTAL，VERTICAL，BOTH      |
+| anchor     | 对齐方式（组件小于单元格时的定位） | CENTER（默认），NORTH，SOUTH，EAST，WEST，等  |
+| insets     | 外边距（单元格内的边距）           | new Insets(top, left, bottom, right)          |
+| ipadx      | 组件内部横向填充（增加宽度）       | 0（默认），像素值                             |
+| ipady      | 组件内部纵向填充（增加高度）       | 0（默认），像素值                             |
+
+> [!CAUTION]
+>
+> * ① GridBagLayout = 灵活多变、精确控制位置和大小，适用于需要精细布局和复杂界面的场景。它为开发者提供了最大的自由度，能够满足几乎所有布局需求，但也需要更多的配置和代码量。
+> * ② 在 Swing 中，有更强大的布局管理器来代替 GridBagLayout ；所以，了解即可！！！
+
+#### 2.3.5.2 使用步骤
+
+* ① 创建 GridBagLaout 布局管理器对象，并给容器设置该布局管理器对象。
+* ② 创建 GridBagConstraints 对象，并设置该对象的控制属性：
+  * gridx：用于指定组件在网格中所处的横向索引。
+  * gridy：用于执行组件在网格中所处的纵向索引。
+  * gridwidth：用于指定组件横向跨越多少个网格。
+  * gridheight：用于指定组件纵向跨越多少个网格。
+* ③ 调用 GridBagLayout 对象的 `setConstraints(Component c,GridBagConstraints gbc )`方法，把即将要添加到容器中的组件 `c` 和 `GridBagConstraints` 对象关联起来。
+* ④ 把组件添加到容器中。
+
+#### 2.3.5.3 综合练习
+
+* 需求：使用 Frame 容器，设置 GridBagLayout 布局管理器。
 
 
-### 2.3.6 CardLayout
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.layout.gridbag;
+
+import java.awt.*;
+
+public class Test {
+    public static void main(String[] args) {
+        Frame frame = new Frame("GridBagLayout");
+        frame.setLayout(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL; // 使按钮水平拉伸
+
+        Button btn1 = new Button("按钮 1");
+        gbc.gridx = 0; // 第 1 列
+        gbc.gridy = 0; // 第 1 行
+        frame.add(btn1, gbc);
+
+        Button btn2 = new Button("按钮 2");
+        gbc.gridx = 1; // 第 2 列
+        gbc.gridy = 0; // 第 1 行
+        frame.add(btn2, gbc);
+
+        Button btn3 = new Button("按钮 3");
+        gbc.gridx = 0; // 第 1 列
+        gbc.gridy = 1; // 第 2 行
+        gbc.gridwidth = 2; // 跨越两列
+        frame.add(btn3, gbc);
+
+        frame.setSize(400, 300);
+        frame.setVisible(true);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/21.gif)
+```
+
+:::
+
+### 2.3.6 CardLayout（卡片布局）
 
 #### 2.3.6.1 概述
 
+* CardLayout 是 AWT 中的一种布局管理器，适用于`界面切换`的场景。
+
+![轮播图](./assets/22.gif)
+
+* CardLayout 的主要特点：
+
+| 特点                  | 说明                                             |
+| --------------------- | ------------------------------------------------ |
+| ✅ 只显示一个组件      | 每次只显示一个“卡片”，其余组件自动隐藏，视图清晰 |
+| ✅ 支持命名切换        | 每个卡片可以通过名称注册，方便精准切换           |
+| ✅切换方法灵活         | 提供 `next`、`previous`、`show` 等方法切换视图   |
+| ✅ 非常适合多页面场景  | 适用于“向导页”、“步骤流程”、“登录/注册切换”等    |
+| ✅ 易于与事件系统结合  | 通常配合按钮、菜单等进行视图跳转                 |
+| ❌ 不支持复杂布局嵌套  | 本身布局只控制“卡片层”，卡片内部布局需额外处理   |
+| ❌无法同时显示多个视图 | 每次只能显示一个组件，不能并列展示多个卡片       |
+
+#### 2.3.6.2 常用 API
+
+* 构造方法：
+
+| 构造方法                                   | 描述                                                         |
+| ------------------------------------------ | ------------------------------------------------------------ |
+| `public CardLayout() {}`                   | 创建默认的 CardLayout 布局管理器                             |
+| `public CardLayout(int hgap, int vgap) {}` | 创建 CardLayout 布局管理器，并指定卡片和容器之间的间距（左右、上下） |
+
+* 成员方法：
+
+| 成员方法                                             | 描述                             |
+| ---------------------------------------------------- | -------------------------------- |
+| `public void first(Container target) {}`             | 显示 target 容器中的第一张卡片   |
+| `public void last(Container target) {}`              | 显示 target 容器中的最后一张卡片 |
+| `public void previous(Container target) {}`          | 显示 target 容器中的前一张卡片   |
+| `public void next(Container target) {}`              | 显示 target 容器中的后一张卡片   |
+| `public void show(Container target, String name) {}` | 显示 target 容器中指定名字的卡片 |
 
 
-### 2.3.7 BoxLayout
+
+* 示例：轮播图
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.layout.card;
+
+import java.awt.*;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) {
+        Frame frame = new Frame("cardLayout");
+
+        // 创建 Panel 对象，并设置 CardLayout 布局
+        CardLayout cardLayout = new CardLayout();
+        Panel panel = new Panel(cardLayout);
+        List<String> names = List.of(
+            "第一张", "第二张", "第三张", "第四张", "第五张");
+        for (String name : names) {
+            panel.add(name, new Button(name));
+        }
+        // 将 panel 对象添加到 Frame 对象中
+        frame.add(panel, BorderLayout.CENTER);
+
+        // 创建 Panel 对象，用来存放按钮
+        Panel panel2 = new Panel();
+        panel2.setLayout(new FlowLayout(FlowLayout.CENTER));
+        List<String> btnStrList = List.of(
+            "上一张", "下一张", "第一张", "最后一张", "第三张");
+        List<Button> btnList = btnStrList
+                .stream()
+                .map(Button::new)
+                .toList();
+        for (Button btn : btnList) {
+            btn.addActionListener(e -> {
+                String actionCommand = e.getActionCommand();
+                switch (actionCommand) {
+                    case "上一张" -> cardLayout.previous(panel);
+                    case "下一张" -> cardLayout.next(panel);
+                    case "第一张" -> cardLayout.first(panel);
+                    case "最后一张" -> cardLayout.last(panel);
+                    case "第三张" -> cardLayout.show(panel, "第三张");
+                }
+            });
+            panel2.add(btn);
+        }
+         // 将 panel2 对象添加到 Frame 对象中
+        frame.add(panel2, BorderLayout.SOUTH);
+
+        // 设置窗口的位置（单位是像素，px）
+        frame.setLocation(580, 320);
+        // 设置窗口的大小（单位是像素，px）
+        frame.setSize(400, 300);
+        // 设置可见性
+        frame.setVisible(true);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/23.gif)
+```
+
+:::
+
+### 2.3.7 BoxLayout（盒子布局）
 
 #### 2.3.7.1 概述
 
@@ -752,8 +1090,8 @@ public class Test {
 | BorderLayout  | 边界布局                               | 分为五个区域：North、South、East、West、Center | Frame 默认布局           | 控件分区明显，Center 自动填充剩余空间                |
 | GridLayout    | 网格布局                               | 均匀划分成若干行列的格子，所有格子大小相等     | 表格布局、数字键盘       | 所有组件大小一致，无法控制对齐方式                   |
 | GridBagLayout | 网格包布局                             | 类似 GridLayout，但更灵活                      | 复杂界面、表单布局       | 最强大但最复杂，可控制位置、行列跨度、对齐方式等     |
-| CardLayout    | 卡片式布局                             | 一次只显示一个组件，通过 show() 切换           | 向导界面、分页切换       | 实现组件之间的切换，适合多页表单、步骤界面           |
-| BoxLayout     | 盒式布局，组件按水平或垂直方向顺序排列 | 水平或垂直排列                                 | 垂直按钮组、表单控件排列 | 支持组件间距，排列灵活，适合竖排或横排组件           |
+| CardLayout    | 卡片布局                               | 一次只显示一个组件，通过 show() 切换           | 向导界面、分页切换       | 实现组件之间的切换，适合多页表单、步骤界面           |
+| BoxLayout     | 盒子布局，组件按水平或垂直方向顺序排列 | 水平或垂直排列                                 | 垂直按钮组、表单控件排列 | 支持组件间距，排列灵活，适合竖排或横排组件           |
 | Null Layout   | 不使用布局管理器                       | 需要 setBounds() 设置组件位置和大小            | 游戏界面、定制化窗口     | 最大自由度，但不适配大小变化，不推荐用于标准界面布局 |
 
 ## 2.4 常用组件

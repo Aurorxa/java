@@ -95,51 +95,53 @@ public class IOTest {
 
 ## 2.3 标准输入
 
+### 2.3.1 概述
+
 * 在 Java 中，通过 `Scanner` 对象的 `nextXxx()` 方法来接收键盘录入的数据（标准输入）。
 
-* 其步骤如下：
+### 2.3.2 使用步骤
 
-  * ① 导包：目的就是为了让 Java 知道 Scanner 类在哪里。
+* ① 导包：目的就是为了让 Java 知道 Scanner 类在哪里。
 
-  ```java
-  // 导包的动作必须在类定义的上边
-  import java.util.Scanner; 
-  ```
+```java
+// 导包的动作必须在类定义的上边
+import java.util.Scanner; 
+```
 
-  * ② 创建对象：目的就是为了使用 Scanner 类。
+* ② 创建对象：目的就是为了使用 Scanner 类。
 
-  ```java
-  // sc 是对象名，只要符合标识符的强制规则和规范即可。
-  Scanner sc = new Scanner(System.in);
-  ```
+```java
+// sc 是对象名，只要符合标识符的强制规则和规范即可。
+Scanner sc = new Scanner(System.in);
+```
 
-  * ③ 接收数据：
+* ③ 接收数据：
 
-  ```java
-  int num = sc.nextInt(); // 获取整数
-  ```
+```java
+int num = sc.nextInt(); // 获取整数
+```
 
-  ```java
-  String name = sc.next(); // 获取字符串，遇到空格和换行就结束录入
-  ```
+```java
+String name = sc.next(); // 获取字符串，遇到空格和换行就结束录入
+```
 
-  ```java
-  String name = sc.nextLine(); // 获取字符串，遇到换行就结束录入
-  ```
+```java
+String name = sc.nextLine(); // 获取字符串，遇到换行就结束录入
+```
 
-  ```java
-  double height = sc.nextDouble(); // 获取小数
-  ```
+```java
+double height = sc.nextDouble(); // 获取小数
+```
 
-  ```java
-  ...
-  ```
+```java
+...
+```
 
-  * ④ 关闭资源：
+* ④ 关闭资源：
 
-  ```java
-  sc.close(); // 因为 sc 是流对象，需要关闭
-  ```
+```java
+sc.close(); // 因为 sc 是流对象，需要关闭
+```
 
 
 
@@ -2227,7 +2229,7 @@ public class SwitchTest {
 
 ## 7.3 循环语句
 
-### 7.3.1 题目 1 
+### 7.3.1 综合练习一
 
 * 需求：键盘录入两个数字 num1 和 num2 表示一个范围，求这个范围之内的数字和。
 
@@ -2263,7 +2265,7 @@ public class ForTest {
 }
 ```
 
-### 7.3.2 题目 2
+### 7.3.2 综合练习二
 
 * 需求：键盘录入两个数字，表示一个范围，统计这个范围中，既能被 3 整除，又能被 5 整除数字有多少个？
 

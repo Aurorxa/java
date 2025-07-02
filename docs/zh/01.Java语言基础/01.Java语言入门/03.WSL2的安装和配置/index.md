@@ -45,69 +45,103 @@
 
 * ③ 启用适用于 Linux 的 Windows 子系统：
 
-```powershell
+> [!IMPORTANT]
+>
+> 以管理员身份打开 PowerShell 并运行，执行完上述命令之后，如果提示需要重启计算机，那就重启计算机！！！
+
+::: code-group
+
+```powershell [powershell 命令]
 dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
 ```
 
-> [!IMPORTANT]
->
-> 以管理员身份打开 PowerShell 并运行，执行完上述命令之后，如果提示需要重启计算机，那就重启计算机！！！
-
-
-
+```md:img [cmd 控制台]
 ![](./assets/4.gif)
+```
+
+:::
 
 * ④ 启用虚拟机功能：
 
-```powershell
-dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
-```
-
 > [!IMPORTANT]
 >
 > 以管理员身份打开 PowerShell 并运行，执行完上述命令之后，如果提示需要重启计算机，那就重启计算机！！！
 
+::: code-group
+
+```powershell [powershell 命令]
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+```
+
+```md:img [cmd 控制台]
 ![](./assets/5.gif)
+```
+
+:::
 
 * ⑤ 更新 Linux 内核包：
 
-```powershell
-wsl --update
-```
-
-> [!NOTE]
+> [!IMPORTANT]
 >
 > wsl2 的最新 Linux 内核包托管在 GitHub 上，某些国家可能会污染 Github 相关的域名，那么就需要手动下载，然后安装即可，下载地址在[这里](https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi)。
 
+::: code-group
+
+```powershell [powershell 命令]
+wsl --update
+```
+
+```md:img [cmd 控制台]
 ![](./assets/6.gif)
+```
+
+:::
 
 * ⑥ 将 wsl2 设置为默认版本：
 
-```powershell
+::: code-group
+
+```powershell [powershell 命令]
 wsl --set-default-version 2
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/7.gif)
+```
+
+:::
 
 * ⑦ 查看官方在线支持的 Linux 版本：
 
-```powershell
+::: code-group
+
+```powershell [powershell 命令]
 wsl --list --online
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/8.gif)
+```
+
+:::
 
 * ⑧ 安装指定版本的 Linux ：
 
-```powershell
-wsl --install Ubuntu-24.04
-```
-
-> [!NOTE]
+> [!IMPORTANT]
 >
 > 官方支持的 Linux 版本，托管在 Github 上，某些国家可能会污染 Github 的域名；此时，要么使用`科学上网`，要么在 `Microsoft Store` 中搜索并安装。
 
+::: code-group
+
+```powershell [powershell 命令]
+wsl --install Ubuntu-24.04
+```
+
+```md:img [cmd 控制台]
 ![](./assets/9.gif)
+```
+
+:::
 
 * ⑨ 在 Microsoft Store 中搜索并安装（可选）：
 
@@ -115,11 +149,17 @@ wsl --install Ubuntu-24.04
 
 * ⑩ 查询本地安装的 Linux 版本：
 
-```powershell
+::: code-group
+
+```powershell [powershell 命令]
 wsl --list
 ```
 
-![126](./assets/11.gif)
+```md:img [cmd 控制台]
+![](./assets/11.gif)
+```
+
+:::
 
 ## 2.2 WSL2 解决代理问题
 
@@ -129,7 +169,9 @@ wsl --list
 
 * 那么，只需要修改 `%USERPROFILE%\.wslconfig`文件，内容如下：
 
-```txt
+::: code-group
+
+```txt [.wslconfig]
 [wsl2]
 networkingMode=mirrored
 dnsTunneling=true
@@ -142,15 +184,25 @@ bestEffortDnsParsing=true
 useWindowsDnsCache=true
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/13.png)
+```
+
+:::
 
 * 在命令行中，执行如下的命令：
 
-```shell
+::: code-group
+
+```cmd [cmd 命令]
 wsl --shutdown
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/14.gif)
+```
+
+:::
 
 * 此时，再打开终端，就没有这种提示了：
 
@@ -171,46 +223,83 @@ wsl --shutdown
 
 * 检查进程树，判断 systemd 是否正在运行：
 
-```shell
+::: code-group
+
+```bash [bash 命令]
 ps -p 1 -o comm= # 如果显示 systemd ，则表示 systemd 正在运行
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/16.gif)
+```
+
+:::
 
 ### 2.3.2 操作步骤
 
 * ① 查询 WSL2 的版本，确保 WSL2 的版本为 `0.67.6` 或更高版本：
 
-```shell
+::: code-group
+
+```cmd [cmd 命令]
 # 如果未满足要求，则使用 wsl --update 更新 WSL2 版本
 wsl --version # 在 win 中的 cmd 或 PowerShell 执行该命令
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/17.png)
+```
+
+:::
+
+
 
 * ② 向 `/etc/wsl.conf` 配置文件中写入以下内容：
 
-```shell
+::: code-group
+
+```bash [bash 命令]
 cat <<EOF | tee /etc/wsl.conf 
 [boot]
 systemd=true
 EOF
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/18.gif)
+```
+
+:::
+
+
 
 * ③ 重启 WSL 实例：
 
-```shell
-wsl --shutdown # 在 win 中的 cmd 或 PowerShell 
+::: code-group
+
+```cmd [cmd 命令]
+# 如果未满足要求，则使用 wsl --update 更新 WSL2 版本
+wsl --shutdown # 在 win 中的 cmd 或 PowerShell 执行该命令
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/19.gif)
+```
+
+:::
+
+
 
 * ④ 查看是否启用成功：
 
-```shell
+::: code-group
+
+```bash [bash 命令]
 ps -p 1 -o comm=
 ```
 
+```md:img [cmd 控制台]
 ![](./assets/20.png)
+```
+
+:::

@@ -172,3 +172,8 @@ html {
 .VPFeatures .items .item {
     transition: transform .3s;
 }
+
+/* 扩展表格 */
+.vp-doc th {
+    white-space: nowrap;
+}
