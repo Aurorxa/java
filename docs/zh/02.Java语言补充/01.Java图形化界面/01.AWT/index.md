@@ -1074,11 +1074,198 @@ public class Test {
 
 #### 2.3.7.1 概述
 
+* 为了简化开发，Swing 中引入了 BoxLayout 布局管理器。其可以让组件在垂直方向或水平方向摆放。
+* BoxLayout 的构造方法：
+
+| 构造方法                                          | 描述                                                         |
+| ------------------------------------------------- | ------------------------------------------------------------ |
+| `public BoxLayout(Container target, int axis) {}` | 创建基于 target 容器的 BoxLayout 布局管理器，该布局管理器里的组件按 axis 方向排列。 |
+
+> [!NOTE]
+>
+> axis 的取值：
+>
+> * BoxLayout.X_AXIS：横向排列。
+> *  BoxLayout.Y _AXIS：纵向排列。
+
+* BoxLayout 的主要特点：
+
+| 特点                     | 说明                                                         |
+| ------------------------ | ------------------------------------------------------------ |
+| ✅ 支持单一方向排列       | 可设置为水平（X_AXIS）或垂直（Y_AXIS）排列组件               |
+| ✅ 排列顺序受控           | 组件按照添加顺序依次排列，排列直观                           |
+| ✅ 可与间隔组件结合使用   | 可使用 `Box.createRigidArea`、`Box.createGlue` 等调整间距和对齐 |
+| ✅ 适合表单、按钮组等结构 | 适合一列按钮、一行字段、垂直面板等 UI 场景                   |
+| ✅支持组件拉伸和对齐      | 可通过 `setAlignmentX/Y` 设置对齐方式                        |
+| ❌ 不支持复杂布局         | 无法实现网格、分区、跨列等复杂布局需求                       |
+| ❌ 对新手不太直观         | 初学者可能对 `Box`、对齐方式等机制不太熟悉                   |
 
 
 
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.layout.box;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Frame 对象
+        Frame frame = new Frame("BoxLayout");
+
+        // 创建 BoxLayout 布局管理其，并设置布局管理器的方向
+        BoxLayout boxLayout = new BoxLayout(frame, BoxLayout.Y_AXIS);
+        frame.setLayout(boxLayout);
+
+        // 向 Frame 对象中添加按钮
+        frame.add(new Button("按钮1"));
+        frame.add(new Button("按钮2"));
+
+        // 设置窗口的大小（单位是像素，px）
+        frame.setLocation(580, 320);
+        // 设置窗口的位置（单位是像素，px）
+        frame.setSize(577, 500);
+
+        // 设置可见性
+        frame.setVisible(true);
+    }
+}
+
+```
+
+```md:img [cmd 控制台]
+![](./assets/24.gif)
+```
+
+:::
+
+#### 2.3.7.2 简化
+
+* 在 Swing 中，提供了一个新的容器 Box，该容器的默认布局管理器就是 BorderLayout ：
+
+```java
+public class Box extends JComponent implements Accessible {
+    
+	public Box(int axis) {
+        super();
+        super.setLayout(new BoxLayout(this, axis)); // [!code highlight]
+    }
+
+}
+```
+
+* 并且，Box 容器提供了静态方法，用来创建水平或垂直方向排列的容器：
+
+| 静态方法                                     | 描述                               |
+| -------------------------------------------- | ---------------------------------- |
+| `public static Box createHorizontalBox() {}` | 创建一个水平排列组件的 Box 容器 。 |
+| `public static Box createVerticalBox() {}`   | 创建一个垂直排列组件的 Box 容器 。 |
+
+> [!NOTE]
+>
+> 在实际开发中，我们可以使用 Box 容器去容纳很多组件，再将 Box 容器作为一个组件，添加到其他容器中，从而形成整体的窗口布局！！！
 
 
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.layout.box;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class Test2 {
+    public static void main(String[] args) {
+        // 创建 Frame 对象
+        Frame frame = new Frame("BoxLayout");
+
+        // 通过 Box 添加组件，其布局管理器是 BoxLayout
+        Box box = Box.createVerticalBox();
+        // 向 Box 容器中添加组件
+        box.add(new Button("按钮1"));
+        box.add(new Button("按钮2"));
+        // 将 Box 容器作为组件，添加到 Frame 容器中
+        frame.add(box);
+
+        // 设置窗口的大小（单位是像素，px）
+        frame.setLocation(580, 320);
+        // 设置窗口的位置（单位是像素，px）
+        frame.setSize(577, 500);
+
+        // 设置可见性
+        frame.setVisible(true);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/25.gif)
+```
+
+:::
+
+#### 2.3.7.3 简化二
+
+* 通过 Box 容器管理其它组件，虽然很方便；但是，Box 容器内部的组件是没有间隔的，可以通过如下的方法设置：
+
+| 方法                                                         | 描述                                                 |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| `public static Component createHorizontalGlue() {}`          | 创建一条水平间隔组件（可以在两个方向上同时拉伸间距） |
+| `public static Component createHorizontalStrut(int width) {}` | 创建一条水平间隔组件（宽度固定，高度可以拉伸）       |
+| `public static Component createVerticalGlue() {}`            | 创建一条垂直间隔组件（可以在两个方向上同时拉伸间距） |
+| `public static Component createVerticalStrut(int height) {}` | 创建一条垂直间隔组件（高度固定，宽度可以拉伸）       |
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.layout.box;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class Test2 {
+    public static void main(String[] args) {
+        // 创建 Frame 对象
+        Frame frame = new Frame("BoxLayout");
+
+        // 通过 Box 添加组件，其布局管理器是 BoxLayout
+        Box vbox = Box.createVerticalBox();
+        // 向 Box 容器中添加组件
+        vbox.add(new Button("垂直按钮1"));
+        vbox.add(Box.createVerticalGlue());
+        vbox.add(new Button("垂直按钮2"));
+        vbox.add(Box.createVerticalStrut(10));
+        vbox.add(new Button("垂直按钮3"));
+        // 将 Box 容器作为组件，添加到 Frame 容器中
+        frame.add(vbox);
+
+        // 设置窗口的大小（单位是像素，px）
+        frame.setLocation(580, 320);
+        // 设置窗口的位置（单位是像素，px）
+        frame.setSize(577, 500);
+
+        // 设置可见性
+        frame.setVisible(true);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/26.gif)
+```
+
+:::
 
 ### 2.3.8 总结
 
@@ -1095,6 +1282,16 @@ public class Test {
 | Null Layout   | 不使用布局管理器                       | 需要 setBounds() 设置组件位置和大小            | 游戏界面、定制化窗口     | 最大自由度，但不适配大小变化，不推荐用于标准界面布局 |
 
 ## 2.4 常用组件
+
+### 2.4.1 基本组件
+
+
+
+
+
+
+
+### 2.4.2 对话框
 
 
 
