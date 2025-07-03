@@ -1271,29 +1271,370 @@ public class Test2 {
 
 * AWT 中常用布局管理器的对比：
 
-| 布局管理器    | 简介                                   | 布局方式                                       | 典型用法                 | 特点                                                 |
-| ------------- | -------------------------------------- | ---------------------------------------------- | ------------------------ | ---------------------------------------------------- |
-| FlowLayout    | 流式布局                               | 从左到右排列，排满一行换行                     | Panel 中的简单组件排列   | 简单易用，适合快速排布按钮等组件                     |
-| BorderLayout  | 边界布局                               | 分为五个区域：North、South、East、West、Center | Frame 默认布局           | 控件分区明显，Center 自动填充剩余空间                |
-| GridLayout    | 网格布局                               | 均匀划分成若干行列的格子，所有格子大小相等     | 表格布局、数字键盘       | 所有组件大小一致，无法控制对齐方式                   |
-| GridBagLayout | 网格包布局                             | 类似 GridLayout，但更灵活                      | 复杂界面、表单布局       | 最强大但最复杂，可控制位置、行列跨度、对齐方式等     |
-| CardLayout    | 卡片布局                               | 一次只显示一个组件，通过 show() 切换           | 向导界面、分页切换       | 实现组件之间的切换，适合多页表单、步骤界面           |
-| BoxLayout     | 盒子布局，组件按水平或垂直方向顺序排列 | 水平或垂直排列                                 | 垂直按钮组、表单控件排列 | 支持组件间距，排列灵活，适合竖排或横排组件           |
-| Null Layout   | 不使用布局管理器                       | 需要 setBounds() 设置组件位置和大小            | 游戏界面、定制化窗口     | 最大自由度，但不适配大小变化，不推荐用于标准界面布局 |
+| 布局管理器    | 简介             | 布局方式                                       | 典型用法                 | 特点                                                 |
+| ------------- | ---------------- | ---------------------------------------------- | ------------------------ | ---------------------------------------------------- |
+| FlowLayout    | 流式布局         | 从左到右排列，排满一行换行                     | Panel 中的简单组件排列   | 简单易用，适合快速排布按钮等组件                     |
+| BorderLayout  | 边界布局         | 分为五个区域：North、South、East、West、Center | Frame 默认布局           | 组件分区明显，Center 自动填充剩余空间                |
+| GridLayout    | 网格布局         | 均匀划分成若干行列的格子，所有格子大小相等     | 表格布局、数字键盘       | 所有组件大小一致，无法控制对齐方式                   |
+| GridBagLayout | 网格包布局       | 类似 GridLayout，但更灵活                      | 复杂界面、表单布局       | 最强大但最复杂，可控制位置、行列跨度、对齐方式等     |
+| CardLayout    | 卡片布局         | 一次只显示一个组件，通过 show() 切换           | 向导界面、分页切换       | 实现组件之间的切换，适合多页表单、步骤界面           |
+| BoxLayout     | 盒子布局         | 组件按水平或垂直方向顺序排列                   | 垂直按钮组、表单控件排列 | 支持组件间距，排列灵活，适合竖排或横排组件           |
+| Null Layout   | 不使用布局管理器 | 需要 setBounds() 设置组件位置和大小            | 游戏界面、定制化窗口     | 最大自由度，但不适配大小变化，不推荐用于标准界面布局 |
 
 ## 2.4 常用组件
 
 ### 2.4.1 基本组件
 
+* AWT 中的基本组件有很多，如下所示：
+
+| 基本组件      | 描述                                                         |
+| ------------- | ------------------------------------------------------------ |
+| Button        | 按钮                                                         |
+| Canvas        | 用于绘图的画布                                               |
+| Checkbox      | 复选框                                                       |
+| CheckboxGroup | 用于将多个 Checkbox 组件组合成一组， 一组 Checkbox 组件将只有一个可以被选中，即：单选框 |
+| Choice        | 下拉选择框                                                   |
+| Frame         | 窗口，在 GUI 程序里通过该类创建窗口                          |
+| Label         | 标签，用于存放提示性文本                                     |
+| List          | 多选框组件，可以添加多项条目                                 |
+| Panel         | 面板，嵌入容器，可以容纳很多组件；但是，必须放到其他容器中   |
+| TextArea      | 多行文本框                                                   |
+| TextField     | 单行文本框                                                   |
 
 
 
+* 示例：
 
+::: code-group
 
+```java [FormFrame.java]
+package com.github.awt.component;
+
+import java.awt.*;
+
+public class FormFrame extends Frame {
+
+    public FormFrame() throws HeadlessException {
+        this("登录表单");
+    }
+
+    public FormFrame(String title) throws HeadlessException {
+        super(title);
+        initFrame();
+        initForm();
+        // 让界面显示出来
+        this.setVisible(true);
+    }
+
+    /**
+     * 初始化表单
+     */
+    private void initForm() {
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(2, 2, 2, 2);
+
+        initUsernamePanel(gbc);
+        initPasswordPanel(gbc);
+        initGenderPanel(gbc);
+        initInterestPanel(gbc);
+        initNativePanel(gbc);
+        initTourismPanel(gbc);
+        initMarkPanel(gbc);
+        initSubmitButton(gbc);
+    }
+
+    /**
+     * 用户名：输入框
+     */
+    private void initUsernamePanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(new Label("用户名："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(new TextField(30), gbc);
+    }
+
+    /**
+     * 密码：输入框
+     */
+    private void initPasswordPanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(new Label("密码："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(new TextField(30), gbc);
+    }
+
+    /**
+     * 性别：单选框
+     */
+    private void initGenderPanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(new Label("性别："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        CheckboxGroup group = new CheckboxGroup();
+        Panel p = new Panel(new FlowLayout(FlowLayout.LEFT));
+        p.add(new Checkbox("男", group, true));
+        p.add(new Checkbox("女", group, false));
+        add(p, gbc);
+    }
+
+    /**
+     * 兴趣：多选框
+     */
+    private void initInterestPanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(new Label("兴趣："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        Panel p = new Panel(new FlowLayout(FlowLayout.LEFT));
+        p.add(new Checkbox("打篮球", true));
+        p.add(new Checkbox("踢足球", false));
+        p.add(new Checkbox("玩游戏", false));
+        add(p, gbc);
+    }
+
+    /**
+     * 籍贯：下拉选择框
+     */
+    private void initNativePanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        add(new Label("籍贯："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        Choice choice = new Choice();
+        choice.add("河北省");
+        choice.add("山西省");
+        choice.add("辽宁省");
+        choice.add("吉林省");
+        choice.add("黑龙江省");
+        choice.add("广东省");
+        choice.add("江苏省");
+        choice.add("安徽省");
+        choice.add("...");
+        add(choice, gbc);
+    }
+
+    /**
+     * 城市：多选
+     */
+    private void initTourismPanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        add(new Label("城市："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        List list = new List(5, true);
+        list.add("北京");
+        list.add("上海");
+        list.add("广州");
+        list.add("深圳");
+        list.add("杭州");
+        add(list, gbc);
+    }
+
+    /**
+     * 备注：文本框
+     */
+    private void initMarkPanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        add(new Label("备注："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(new TextArea(5, 30), gbc);
+    }
+
+    /**
+     * 提交按钮
+     */
+    private void initSubmitButton(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.NONE;
+
+        Button submitButton = new Button("提交");
+        add(submitButton, gbc);
+    }
+
+    /**
+     * 初始化边框
+     */
+    private void initFrame() {
+        // 设置宽高
+        this.setSize(500, 500);
+        // 设置居中显示
+        this.setLocationRelativeTo(null);
+        // 设置界面置顶
+        this.setAlwaysOnTop(true);
+    }
+}
+```
+
+```java [Test.java]
+package com.github.awt.component;
+
+public class Test {
+    public static void main(String[] args) {
+        new FormFrame();
+    }
+}
+
+```
+
+```md:img [cmd 控制台]
+![](./assets/27.gif)
+```
+
+:::
 
 ### 2.4.2 对话框
 
+* Dialog 的中文翻译就是`对话框`，如下所示：
 
+![](./assets/28.gif)
+
+* Dialog 和 Frame 一样，都是 Window 的子类，其也是一个容器类，可以用来存放其它的组件。
+
+![](./assets/3.png)
+
+* Dialog 的构造方法，如下所示：
+
+```java
+/**
+* @param owner 当前对话框的父窗口
+* @param title 对话框的标题
+* @param modal 是否是模式对话框
+*/
+public Dialog(Frame owner, String title, boolean modal) {}
+
+/**
+* @param owner 当前对话框的父窗口
+* @param title 对话框的标题
+* @param modal 是否是模式对话框
+*/
+public Dialog(Dialog owner, String title, boolean modal) {}
+```
+
+> [!NOTE]
+>
+> * ① 虽然 Dialog 可以独立存在；但是，我们经常让其依赖于其他窗口，即：需要一个父窗口。
+> * ② 对话框有非模式（non-modal）和模式（modal）两种，区别如下：
+>
+> | 对话框       | 描述                                                         |
+> | ------------ | ------------------------------------------------------------ |
+> | 非模式对话框 | 当某个对话框被打开后，该对话框总是位于它的父窗口之上。<br>如果该对话框是非模式对话框，在该对话框被关闭前，父窗口可以获取焦点。 |
+> | 模式对话框   | 当某个对话框被打开后，该对话框总是位于它的父窗口之上。<br/>如果该对话框是模式对话框，在该对话框被关闭前，父窗口无法获取焦点。 |
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.dialog;
+
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+public class Test {
+    public static void main(String[] args) {
+        Frame frame = new Frame("Frame");
+
+        // 创建对话框
+        Dialog d1 = new Dialog(frame, "非模式对话框", false);
+        d1.setSize(200, 200);
+        // 设置居中显示
+        d1.setLocationRelativeTo(null);
+        // 设置界面置顶
+        d1.setAlwaysOnTop(true);
+
+        // 创建对话框
+        Dialog d2 = new Dialog(frame, "模式对话框", true);
+        d2.setSize(200, 200);
+        // 设置居中显示
+        d2.setLocationRelativeTo(null);
+        // 设置界面置顶
+        d2.setAlwaysOnTop(true);
+
+        Panel panel = new Panel(new FlowLayout(FlowLayout.CENTER));
+        Button btn1 = new Button("非模式对话框");
+        // 给按钮添加点击事件
+        btn1.addActionListener(e -> d1.setVisible(true));
+        Button btn2 = new Button("模式对话框");
+        // 给按钮添加点击事件
+        btn2.addActionListener(e -> d2.setVisible(true));
+        panel.add(btn1);
+        panel.add(btn2);
+        Button btn = new Button("按钮");
+        btn.addActionListener(e -> System.out.println("点击了按钮"));
+        panel.add(btn);
+
+        // 将 Panel 添加到 frame 中
+        frame.add(panel, BorderLayout.CENTER);
+
+        // 设置关闭操作
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                // 退出 JVM
+                System.exit(0);
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // 关闭窗口
+                frame.dispose();
+                // 退出 JVM
+                System.exit(0);
+            }
+        });
+
+        // 设置窗口属性
+        // 设置宽高
+        frame.setSize(500, 500);
+        // 设置居中显示
+        frame.setLocationRelativeTo(null);
+        // 设置界面置顶
+        frame.setAlwaysOnTop(true);
+        // 显示窗口
+        frame.setVisible(true);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/29.gif)
+```
+
+:::
+
+### 2.4.3 文件对话框
 
 
 
