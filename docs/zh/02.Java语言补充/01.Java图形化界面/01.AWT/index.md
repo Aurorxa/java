@@ -1636,13 +1636,294 @@ public class Test {
 
 ### 2.4.3 文件对话框
 
+* 在实际开发中，我们经常会需要上传和下载（保存），如下所示：
+
+![](./assets/30.gif)
+
+* 此时，就需要使用到 FileDialog ，即：文件对话框，用来打开（上传）文件或保存（下载）文件。
+
+> [!NOTE]
+>
+> FileDialog 无法指定模态或非模态，因为其是依赖于平台的实现，即：
+>
+> * 如果平台的文件对话框是模态的，则 FileDialog 是模态的。
+> * 如果平台的文件对话框是非模态的，则 FileDialog 是非模态的。
+
+* FileDialog 常见的 API，如下所示：
+
+| FileDialog 常见 API                                          | 描述                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `public FileDialog(Frame parent, String title, int mode) {}` | 创建文件对话框，指定父窗口，对话框标题和类型<br>mode = FileDialog.LOAD 表示打开文件<br/>mode = FileDialog.SAVE 表示保存文件 |
+| `public String getDirectory() {}`                            | 获取被打开文件或保存文件的绝对路径                           |
+| `public String getFile() {}`                                 | 获取被打开文件或保存文件的文件名                             |
 
 
 
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.dialog;
+
+import java.awt.*;
+
+public class Test {
+    public static void main(String[] args) {
+        Frame frame = new Frame("Frame");
+
+        // 创建文件对话框
+        FileDialog d1 = new FileDialog(
+            frame, "选择需要加载的文件", FileDialog.LOAD);
+        d1.setSize(200, 200);
+        // 设置居中显示
+        d1.setLocationRelativeTo(null);
+        // 设置界面置顶
+        d1.setAlwaysOnTop(true);
+
+        // 创建文件对话框
+        FileDialog d2 = new FileDialog(
+            frame, "选择需要保存的文件", FileDialog.SAVE);
+        d2.setSize(200, 200);
+        // 设置居中显示
+        d2.setLocationRelativeTo(null);
+        // 设置界面置顶
+        d2.setAlwaysOnTop(true);
+
+        Panel panel = new Panel(new FlowLayout(FlowLayout.CENTER));
+        Button btn1 = new Button("打开文件");
+        // 给按钮添加点击事件
+        btn1.addActionListener(e -> {
+            // 显示文件对话框
+            d1.setVisible(true);
+            // 打印文件信息
+            String directory = d1.getDirectory();
+            System.out.println("用户选择的文件路径" + directory);
+            String file = d1.getFile();
+            System.out.println("用户选择的文件名称" + file);
+        });
+        Button btn2 = new Button("保存文件");
+        // 给按钮添加点击事件
+        btn2.addActionListener(e -> {
+            d2.setVisible(true);
+            // 打印文件信息
+            String directory = d2.getDirectory();
+            System.out.println("用户保存的文件路径" + directory);
+            String file = d2.getFile();
+            System.out.println("用户保存的文件名称" + file);
+        });
+        panel.add(btn1);
+        panel.add(btn2);
+
+        // 将 Panel 添加到 frame 中
+        frame.add(panel, BorderLayout.CENTER);
+
+        // 设置窗口属性
+        // 设置宽高
+        frame.setSize(500, 500);
+        // 设置居中显示
+        frame.setLocationRelativeTo(null);
+        // 设置界面置顶
+        // frame.setAlwaysOnTop(true);
+        // 显示窗口
+        frame.setVisible(true);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/31.gif)
+```
+
+:::
 
 ## 2.5 事件处理
 
+### 2.5.1 概述
 
+* 之前已经学习过了 AWT 中的常用组件，以及如何将这些组件进行布局；但是，之前的 GUI 是无法响应用户的一些操作。
+
+> [!NOTE]
+>
+> * ① 点击`提交`按钮，没有任何反应！！！
+> * ② 点击`关闭`按钮，没有任何反应！！！
+
+![](./assets/32.gif)
+
+> [!NOTE]
+>
+> 在 GUI 编程中，所有用户操作，都涉及到事件处理机制；Frame 以及 AWT 的各个组件本身并没有事件处理能力！！！
+
+### 2.5.2 事件处理机制
+
+* 事件处理机制：当在`某个组件`上发生`某些操作`的时候，会`自动触发一段代码`的执行。
+* 事件处理机制的三大核心要素：
+
+| 组成                         | 说明                                                         | 例子                             |
+| ---------------------------- | ------------------------------------------------------------ | -------------------------------- |
+| 事件源（Event Source）       | 触发事件的对象，通常指的是某个组件（容器）                   | 按钮、文本框、窗口等             |
+| 事件对象（Event Object）     | 在事件源上发生的操作可以叫做事件，GUI 会把事件都封装到一个 Event 对象中，如果需要知道该事件的详细信息，就可以通过 Event 对象来获取，即：描述事件发生的详细信息 | ActionEvent、MouseEvent 等       |
+| 事件监听器（Event Listener） | 当在某个事件源上发生了某个事件，事件监听器就可以对这个事件进行处理，即：负责处理事件的接口或类 | ActionListener、MouseListener 等 |
+
+> [!NOTE]
+>
+> * ① 可以这么理解事件处理机制：用户做了某件事（点击按钮），系统会生成一个“事件对象”，传递给对应的“监听器”，由监听器负责处理这个事件。
+> * ② 注册监听：把某个事件监听器 (A) 通过某个事件 (B) 绑定到某个事件源 (C) 上，当在事件源 C 上发生了事件 B 之后，那么事件监听器 A 的代码就会自动执行。
+
+* 事件处理机制的动态图，如下所示：
+
+![](./assets/33.svg)
+
+### 2.5.3 事件处理的步骤
+
+* 事件处理的步骤：
+
+```mermaid
+stateDiagram-v2
+    [*] --> s1
+    state "① 创建事件源组件对象，即：各种组件（容器）" as s1
+    s1 --> s2
+    state "② 自定义类，实现 XxxListener 接口，重写对应的方法，即：事件监听器" as s2
+    s2 --> s3
+    state "③ 创建事件监听器对象" as s3
+    s3 --> s4
+    state "④ 通过事件源对象的addXxxListener(???)方法完成注册监听" as s4
+    s4 --> [*]
+```
+
+
+
+* 示例：传统写法
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.event.event1;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.concurrent.atomic.AtomicLong;
+
+public class Test {
+
+    private static final AtomicLong counter = new AtomicLong();
+
+    public static void main(String[] args) {
+        Frame frame = new Frame("事件监听");
+
+        Box vbox = Box.createVerticalBox();
+
+        TextField tf = new TextField();
+        tf.setColumns(20);
+        vbox.add(tf);
+
+        // ① 创建事件源对象
+        Button btn = new Button("点我+1");
+
+        // ③ 创建事件监听器对象
+        MyListener myListener = new MyListener(counter, tf);
+
+        // ④ 注册监听
+        btn.addActionListener(myListener);
+
+        vbox.add(btn);
+
+        frame.add(vbox);
+        // 设置窗口属性
+        // 设置宽高
+        frame.setSize(500, 120);
+        // 设置居中显示
+        frame.setLocationRelativeTo(null);
+        // 设置界面置顶
+        // frame.setAlwaysOnTop(true);
+        // 显示窗口
+        frame.setVisible(true);
+    }
+}
+
+// ② 自定义类，实现 ActionListener，并重写方法
+class MyListener implements ActionListener {
+
+    private final AtomicLong counter;
+    private final TextField tf;
+
+    public MyListener(AtomicLong counter, TextField tf) {
+        this.counter = counter;
+        this.tf = tf;
+    }
+
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        long count = counter.addAndGet(1);
+        tf.setText(String.valueOf(count));
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/34.gif)
+```
+
+:::
+
+
+
+* 示例：简化写法
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.event.event1;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.concurrent.atomic.AtomicLong;
+
+public class Test {
+
+    private static final AtomicLong counter = new AtomicLong();
+
+    public static void main(String[] args) {
+        Frame frame = new Frame("事件监听");
+
+        Box vbox = Box.createVerticalBox();
+
+        TextField tf = new TextField();
+        tf.setColumns(20);
+        vbox.add(tf);
+
+        // ① 创建事件源对象
+        Button btn = new Button("点我+1");
+
+        // ② 注册监听
+        btn.addActionListener(e -> tf.setText(
+            String.valueOf(counter.getAndAdd(1)))
+        );
+
+        vbox.add(btn);
+
+        frame.add(vbox);
+        // 设置窗口属性
+        // 设置宽高
+        frame.setSize(500, 120);
+        // 设置居中显示
+        frame.setLocationRelativeTo(null);
+        // 设置界面置顶
+        // frame.setAlwaysOnTop(true);
+        // 显示窗口
+        frame.setVisible(true);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/35.gif)
+```
+
+:::
 
 
 
