@@ -1925,6 +1925,322 @@ public class Test {
 
 :::
 
+### 2.5.4 常见事件和事件监听器
+
+#### 2.5.4.1 概述
+
+* 事件监听器必须实现事件监听器接口， AWT 提供了大量的事件监听器接口用于实现不同类型的事件监听器，用于监听不同类型的事件。
+* AWT 中提供了丰富的事件类，用于封装不同组件上所发生的特定操作， AWT 的事件类都是 AWTEvent 类的子类 ， AWTEvent 是 EventObject 的子类。
+
+#### 2.5.4.2 事件
+
+* AWT 将事件两个大类：
+  * 低级事件：这类事件是基于某个特定动作的事件，如：进入、点击、拖放等动作的鼠标事件，得到焦点和失去焦点等焦点事件。
+  * 高级事件：这类事件并不会基于某个特定动作，而是根据功能含义定义的事件。
+* 其中，低级事件的详细信息，如下所示：
+
+| 事件           | 触发时机                                                     |
+| -------------- | ------------------------------------------------------------ |
+| ComponentEvent | 组件事件，当组件尺寸发生变化、位置发生移动、显示/隐藏状态发生改变时触发该事件。 |
+| ContainerEvent | 容器事件，当容器里发生添加组件、删除组件时触发该事件 。      |
+| WindowEvent    | 窗口事件，当窗口状态发生改变 ( 打开、关闭、最大化、最 小化)时触发该事件 。 |
+| FocusEvent     | 焦点事件，当组件得到焦点或失去焦点 时触发该事件 。           |
+| KeyEvent       | 键盘事件，当按键被按下、松开、单击时触发该事件。             |
+| MouseEvent     | 鼠标事件，当进行单击、按下、松开、移动鼠标等动作 时触发该事件。 |
+| PaintEvent     | 组件绘制事件，该事件是一个特殊的事件类型，当 GUI 组件调用 update/paint 方法来呈现自身时触发该事件，该事件并非专用于事件处理模型 。 |
+
+* 其中，高级事件的详细信息，如下所示：
+
+| 事件           | 触发时机                                                     |
+| -------------- | ------------------------------------------------------------ |
+| ActionEvent    | 动作事件，当按钮、菜单项被单击，在 TextField 中按 Enter 键时触发 |
+| AjustmentEvent | 调节事件，在滑动条上移动滑块以调节数值时触发该事件。         |
+| ltemEvent      | 选项事件，当用户选中某项， 或取消选中某项时触发该事件 。     |
+| TextEvent      | 文本事件，当文本框、文本域里的文本发生改变时触发该事件。     |
+
+#### 2.5.4.3 事件监听器
+
+* 不同的事件需要使用不同的监听器监听，不同的监听器需要实现不同的监听器接口， 当指定事件发生后 ， 事件监听器就会调用所包含的事件处理器(实例方法)来处理事件 。
+* 其中，事件监听器的详细信息，如下所示：
+
+| 事件类别        | 描述信息                 | 监听器接口名        |
+| --------------- | ------------------------ | ------------------- |
+| ActionEvent     | 激活组件                 | ActionListener      |
+| ItemEvent       | 选择了某些项目           | ItemListener        |
+| MouseEvent      | 鼠标移动                 | MouseMotionListener |
+| MouseEvent      | 鼠标点击等               | MouseListener       |
+| KeyEvent        | 键盘输入                 | KeyListener         |
+| FocusEvent      | 组件收到或失去焦点       | FocusListener       |
+| AdjustmentEvent | 移动了滚动条等组件       | AdjustmentListener  |
+| ComponentEvent  | 对象移动缩放显示隐藏等   | ComponentListener   |
+| WindowEvent     | 窗口收到窗口级事件       | WindowListener      |
+| ContainerEvent  | 容器中增加删除了组件     | ContainerListener   |
+| TextEvent       | 文本字段或文本区发生改变 | TextListener        |
+
+### 2.5.5 综合练习
+
+#### 2.5.5.1 综合练习一
+
+* 需求：给登录表单关闭按钮 X ，注册事件监听。
+
+> [!NOTE]
+>
+> * ① 当用户点击了关闭按钮 X，关闭当前窗口！！！
+> * ② 需要 WindowEvent 事件以及 WindowListener 监听器！！！
+
+
+
+* 示例：
+
+::: code-group
+
+```java [FormFrame.java]
+package com.github.awt.component;
+
+import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+public class FormFrame extends Frame implements WindowListener { // [!code highlight]
+
+    public FormFrame() throws HeadlessException {
+        this("登录表单");
+    }
+
+    public FormFrame(String title) throws HeadlessException {
+        super(title);
+        initFrame();
+        initForm();
+        // 注册事件监听
+        this.addWindowListener(this); // [!code highlight]
+        // 让界面显示出来
+        this.setVisible(true);
+    }
+
+    /**
+     * 初始化表单
+     */
+    private void initForm() {
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(2, 2, 2, 2);
+
+        initUsernamePanel(gbc);
+        initPasswordPanel(gbc);
+        initGenderPanel(gbc);
+        initInterestPanel(gbc);
+        initNativePanel(gbc);
+        initTourismPanel(gbc);
+        initMarkPanel(gbc);
+        initSubmitButton(gbc);
+    }
+
+    /**
+     * 用户名：输入框
+     */
+    private void initUsernamePanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(new Label("用户名："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(new TextField(30), gbc);
+    }
+
+    /**
+     * 密码：输入框
+     */
+    private void initPasswordPanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(new Label("密码："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(new TextField(30), gbc);
+    }
+
+    /**
+     * 性别：单选框
+     */
+    private void initGenderPanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(new Label("性别："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        CheckboxGroup group = new CheckboxGroup();
+        Panel p = new Panel(new FlowLayout(FlowLayout.LEFT));
+        p.add(new Checkbox("男", group, true));
+        p.add(new Checkbox("女", group, false));
+        add(p, gbc);
+    }
+
+    /**
+     * 兴趣：多选框
+     */
+    private void initInterestPanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(new Label("兴趣："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        Panel p = new Panel(new FlowLayout(FlowLayout.LEFT));
+        p.add(new Checkbox("打篮球", true));
+        p.add(new Checkbox("踢足球", false));
+        p.add(new Checkbox("玩游戏", false));
+        add(p, gbc);
+    }
+
+    /**
+     * 籍贯：下拉选择框
+     */
+    private void initNativePanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        add(new Label("籍贯："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        Choice choice = new Choice();
+        choice.add("河北省");
+        choice.add("山西省");
+        choice.add("辽宁省");
+        choice.add("吉林省");
+        choice.add("黑龙江省");
+        choice.add("广东省");
+        choice.add("江苏省");
+        choice.add("安徽省");
+        choice.add("...");
+        add(choice, gbc);
+    }
+
+    /**
+     * 城市：多选
+     */
+    private void initTourismPanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        add(new Label("城市："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        List list = new List(5, true);
+        list.add("北京");
+        list.add("上海");
+        list.add("广州");
+        list.add("深圳");
+        list.add("杭州");
+        add(list, gbc);
+    }
+
+    /**
+     * 备注：文本框
+     */
+    private void initMarkPanel(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        add(new Label("备注："), gbc);
+
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(new TextArea(5, 30), gbc);
+    }
+
+    /**
+     * 提交按钮
+     */
+    private void initSubmitButton(GridBagConstraints gbc) {
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.NONE;
+
+        Button submitButton = new Button("提交");
+        add(submitButton, gbc);
+    }
+
+    /**
+     * 初始化边框
+     */
+    private void initFrame() {
+        // 设置宽高
+        this.setSize(500, 500);
+        // 设置居中显示
+        this.setLocationRelativeTo(null);
+        // 设置界面置顶
+        this.setAlwaysOnTop(true);
+    }
+
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+        System.out.println("windowOpened");
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+        System.out.println("windowOpened");
+        // 关闭虚拟机
+        System.exit(0); // [!code highlight]
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+        System.out.println("windowClosed");
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+
+    }
+}
+```
+
+```java [Test.java]
+package com.github.awt.component;
+
+public class Test {
+    public static void main(String[] args) {
+        new FormFrame();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/36.gif)
+```
+
+:::
+
+
+
 
 
 ## 2.6 菜单组件
