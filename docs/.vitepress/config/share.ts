@@ -78,7 +78,7 @@ const vitePressOptions = withMermaid(defineConfig({
           'java': 'vscode-icons:file-type-java',
           'winget': 'vscode-icons:file-type-shell',
           'choco': localIconLoader(import.meta.url, '../../public/iconify/choco.svg'),
-          "cmd 控制台":localIconLoader(import.meta.url, '../../public/iconify/terminal.svg'),
+          "控制台":localIconLoader(import.meta.url, '../../public/iconify/terminal.svg'),
           'cmd': 'vscode-icons:file-type-shell',
           'powershell': 'vscode-icons:file-type-powershell',
           'maven': 'vscode-icons:file-type-apache',

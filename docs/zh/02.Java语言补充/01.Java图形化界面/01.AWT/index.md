@@ -1953,7 +1953,7 @@ public class Test {
 
 | 事件           | 触发时机                                                     |
 | -------------- | ------------------------------------------------------------ |
-| ActionEvent    | 动作事件，当按钮、菜单项被单击，在 TextField 中按 Enter 键时触发 |
+| ActionEvent    | 动作事件，当按钮、菜单项被单击，在 TextField 中按 Enter 键时触发。 |
 | AjustmentEvent | 调节事件，在滑动条上移动滑块以调节数值时触发该事件。         |
 | ltemEvent      | 选项事件，当用户选中某项， 或取消选中某项时触发该事件 。     |
 | TextEvent      | 文本事件，当文本框、文本域里的文本发生改变时触发该事件。     |
@@ -2239,9 +2239,97 @@ public class Test {
 
 :::
 
+#### 2.5.5.2 综合练习二
+
+* 需求：给 Frame 关闭按钮 X ，注册事件监听。
+
+> [!NOTE]
+>
+> * ① 当用户点击了关闭按钮 X，关闭当前窗口！！！
+> * ② 需要 WindowEvent 事件以及 WindowListener 监听器！！！
 
 
 
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.component.component2;
+
+
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+public class Test {
+    public static void main(String[] args) {
+        Frame frame = new Frame("测试");
+
+        // 注册监听
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
+
+        frame.setSize(500, 500);
+        frame.setLocationRelativeTo(null);
+        frame.setAlwaysOnTop(true);
+        frame.setVisible(true);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/37.gif)
+```
+
+:::
+
+#### 2.5.5.3 综合练习三
+
+* 需求：文本输入框注册监听，以获取用户输入的内容。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.awt.component.component3;
+
+import java.awt.*;
+
+public class Test {
+    public static void main(String[] args) {
+        Frame frame = new Frame("测试");
+
+        TextField textField = new TextField(30);
+
+        // 注册监听
+        textField.addTextListener(e -> {
+            TextField text = (TextField) e.getSource();
+            System.out.println(text.getText());
+        });
+
+        frame.add(textField);
+
+        frame.setSize(500, 500);
+        frame.setLocationRelativeTo(null);
+        frame.setAlwaysOnTop(true);
+        frame.setVisible(true);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/38.gif)
+```
+
+:::
 
 ## 2.6 菜单组件
 
