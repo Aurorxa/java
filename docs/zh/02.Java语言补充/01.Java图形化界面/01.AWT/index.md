@@ -2333,13 +2333,634 @@ public class Test {
 
 ## 2.6 菜单组件
 
+### 2.6.1 概述
+
+* 之前，学习的 GUI 组件，可以按照指定的布局方式摆放到`内容区`，如下所示：
+
+![内容区](./assets/39.png)
+
+* 但是，很多桌面应用程序都会涉及到`菜单栏`，如下所示：
+
+![菜单栏](./assets/40.png)
+
+* 当然，有些桌面应用程序还会涉及到`工具栏`（不一定都有），如下所示：
+
+![工具栏](./assets/41.png)
+
+* 甚至，有些桌面应用程序还有`弹出菜单`的功能，如下所示：
+
+> [!NOTE]
+>
+> 弹出菜单：一种在计算机屏幕上显示的菜单，通常在用户右键单击某个对象或区域时出现，提供与该对象或区域相关的操作选项。
+
+![弹出菜单](./assets/42.gif)
+
+### 2.6.2 菜单栏、菜单和菜单项
+
+* `菜单栏`通常位于窗口的顶部横向显示，是一个容器可以容纳多个`菜单`，是用户访问应用功能的主要入口：
+
+![](./assets/43.png)
+
+* `菜单`是`菜单栏`中的一个项，是一个容器可以容纳多个`菜单项`，将相关的操作或命令归类，便于用户查找和操作。
+
+> [!NOTE]
+>
+> `菜单`本身也可以作为`菜单项`，即：`菜单`中包含`菜单`！！！
+
+![](./assets/45.png)
+
+* `菜单项`是`菜单`中的`具体选项`，执行具体的操作或命令，是用户实际点击后产生功能的地方。
+
+![](./assets/44.png)
+
+### 2.6.3 AWT 中的菜单组件
+
+* 在 AWT 中，除了提供在内容区的组件之外，也提供了菜单相关的组件。
+
+![](./assets/46.gif)
+
+* AWT 中常见的菜单组件，如下所示：
+
+| AWT 中常见的菜单组件 | 描述                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| MenuBar              | 菜单栏，是菜单的容器                                         |
+| Menu                 | 菜单组件，是菜单项的容器，是 MenuItem 的子类（可以作为菜单项使用） |
+| MenuItem             | 菜单项组件                                                   |
+| PopupMenu            | 弹出菜单（右键菜单组件）                                     |
+| CheckboxMenuItem     | 复选框菜单组件                                               |
+
+* AWT 中常见菜单组件的继承体系，如下所示：
+
+![](./assets/47.png)
+
+### 2.6.4 菜单组件使用步骤
+
+* `菜单组件`的使用步骤：
+
+```mermaid
+stateDiagram-v2
+    [*] --> s1
+    state "① 准备菜单项组件，可以是 MenuItem 及其子类对象。" as s1
+    s1 --> s2
+    state "② 准备菜单组件 Menu ，将第 ① 步中准备好的菜单项组件添加进来。" as s2
+    s2 --> s3
+    state "③ 准备菜单栏组件 MenuBar，将第 ② 步中准备好的菜单组件添加进来。" as s3
+    s3 --> s4
+    state "④ 将第 ③ 步中的菜单栏组件添加到窗口对象中。" as s4
+    s4 --> [*]
+```
+
+> [!NOTE]
+>
+> * ① 如果要在某个菜单的菜单项之间添加分隔线，只需要添加一个带有`-`的菜单项即可：
+>
+> ```java
+> menu.add(new MenuItem("-"));
+> ```
+>
+> * ② 如果要给某个菜单项关联快捷键功能，只需要在创建菜单项对象的时候设置即可：
+>
+> ```java
+> new MenuItem("菜单项名字",new MenuShortcut(KeyEvent.VK_Q,true);
+> ```
+
+
+
+* 示例：
+
+::: code-group
+
+```java [IdeaFrame.java]
+package com.github.awt.menu.menu1;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+
+public class IdeaFrame extends Frame {
+
+    private final MenuBar menuBar = new MenuBar();
+
+    private final Menu fileMenu = new Menu("文件");
+
+    private final Menu editMenu = new Menu("编辑");
+
+    private final Menu formatMenu = new Menu("格式");
+
+    private final TextArea textArea = new TextArea(6, 40);
+
+    public IdeaFrame() throws HeadlessException {
+        this("IDEA");
+    }
+
+    public IdeaFrame(String title) throws HeadlessException {
+        super(title);
+        initFrame();
+        this.setSize(480, 400);
+        this.setLocationRelativeTo(null);
+        this.setAlwaysOnTop(true);
+        this.setVisible(true);
+    }
+
+    private void initFrame() {
+        // 添加文件菜单
+        addFileMenu();
+        // 添加编辑菜单
+        addEditMenu();
+        // 添加格式菜单
+        addFormatMenu();
+        // 添加多行文本域
+        addTextArea();
+        // 递归遍历菜单项，添加事件监听
+        processMenuItems(menuBar);
+        // 将菜单栏添加到窗体中
+        this.setMenuBar(menuBar);
+    }
+
+    private void addTextArea() {
+        this.add(textArea);
+    }
+
+    /**
+     * 添加格式菜单
+     */
+    private void addFormatMenu() {
+        // 添加菜单项
+        formatMenu.add(
+            new MenuItem("注释", new MenuShortcut(KeyEvent.VK_Q, true)));
+        formatMenu.add(new MenuItem("取消注释"));
+        // 编辑菜单添加格式菜单，将格式菜单看做菜单项
+        editMenu.add(formatMenu);
+    }
+
+    /**
+     * 添加编辑菜单
+     */
+    private void addEditMenu() {
+        // 添加菜单项
+        editMenu.add(new MenuItem("自动换行"));
+        editMenu.add(new MenuItem("复制"));
+        editMenu.add(new MenuItem("粘贴"));
+        editMenu.add(new MenuItem("-"));
+        // 添加菜单
+        menuBar.add(editMenu);
+    }
+
+    /**
+     * 添加文件菜单
+     */
+    private void addFileMenu() {
+        // 添加菜单项
+        fileMenu.add(new MenuItem("新建"));
+        fileMenu.add(new MenuItem("打开"));
+        fileMenu.add(new MenuItem("保存"));
+        fileMenu.add(new MenuItem("退出"));
+        // 添加菜单
+        menuBar.add(fileMenu);
+    }
+
+    private void processMenuItems(MenuBar menuBar) {
+        for (int i = 0; i < menuBar.getMenuCount(); i++) {
+            processMenu(menuBar.getMenu(i));
+        }
+    }
+
+    private void processMenu(Menu menu) {
+        for (int j = 0; j < menu.getItemCount(); j++) {
+            MenuItem item = menu.getItem(j);
+            if (item instanceof Menu) {
+                // 如果是子菜单，递归处理
+                processMenu((Menu) item);
+            } else {
+                // 如果是菜单项，添加监听器
+                item.addActionListener(e -> 
+                  textArea.setText("您点击了【" + e.getActionCommand() + "】功能"));
+            }
+        }
+    }
+}
+```
+
+```java [Test.java]
+package com.github.awt.menu.menu1;
+
+public class Test {
+    public static void main(String[] args) {
+        new IdeaFrame();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/48.gif)
+```
+
+:::
+
+### 2.6.5 弹出菜单组件使用步骤
+
+* `弹出菜单组件`的使用步骤：
+
+```mermaid
+stateDiagram-v2
+    [*] --> s1
+    state "① 准备菜单项目组件，可以是 MenuItem 及其子类对象。" as s1
+    s1 --> s2
+    state "② 准备弹出菜单组件 PopubMenu，将第 ① 步中准备好的菜单项组件添加进来。" as s2
+    s2 --> s3
+    state "③ 将弹出菜单组件 PopubMenu 添加到目标容器中。" as s3
+    s3 --> s4
+    state "④ 为目标容器中添加鼠标监听事件，当监听到用户释放鼠标右键时，弹出菜单。" as s4
+    s4 --> [*]
+```
 
 
 
 
 
+* 示例：
+
+::: code-group
+
+```java [IdeaFrame.java]
+package com.github.awt.menu.menu2;
+
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+
+public class IdeaFrame extends Frame {
+
+    private final Panel panel = new Panel();
+
+    private final PopupMenu popupMenu = new PopupMenu();
+
+    private final TextArea textArea = new TextArea(6, 60);
+
+    public IdeaFrame() throws HeadlessException {
+        this("IDEA");
+    }
+
+    public IdeaFrame(String title) throws HeadlessException {
+        super(title);
+        initFrame();
+        this.setSize(480, 400);
+        this.setLocationRelativeTo(null);
+        this.setAlwaysOnTop(true);
+        this.setVisible(true);
+    }
+
+    private void initFrame() {
+        addTextArea();
+        addPanel();
+    }
+
+    private void addTextArea() {
+        this.add(textArea);
+    }
+
+    private void addPanel() {
+        // 弹出菜单添加菜单项
+        popupMenu.add(new MenuItem("复制"));
+        popupMenu.add(new MenuItem("保存"));
+        popupMenu.add(new MenuItem("注释"));
+        popupMenu.add(new MenuItem("取消注释"));
+        // 添加到 Panel 中
+        panel.add(popupMenu);
+        // popupMenu 注册监听
+        popupMenu.addActionListener(e -> {
+            String actionCommand = e.getActionCommand();
+            textArea.setText(actionCommand);
+        });
+        // 设置 panel 大小
+        panel.setPreferredSize(new Dimension(300, 100));
+        // panel 注册监听
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popupMenu.show(panel, e.getX(), e.getY());
+                }
+            }
+        });
+        // 将 Panel 添加到 Frame 中
+        this.add(panel, BorderLayout.SOUTH);
+    }
+
+}
+```
+
+```java [Test.java]
+package com.github.awt.menu.menu2;
+
+public class Test {
+    public static void main(String[] args) {
+        new IdeaFrame();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/49.gif)
+```
+
+:::
 
 ## 2.7 绘图
 
+### 2.7.1 概述
+
+* 早期，很多游戏程序需要在窗口中绘制各种图形，此时就需要使用 AWT 的绘图功能。
+
+![](./assets/20.png)
+
+### 2.7.2 组件绘制原理
+
+* 之前，我们学习过很多组件，如：Button、Frame 以及 Checkbox 等，这些不同的组件展示出来的图形是不一样的，其实是利用 AWT 的绘图来完成的。
+* 在 AWT 中，真正提供绘图功能的是 Graphics 对象；AWT 中的组件（容器）都是 Component 类的子类对象，并且在 Component 类中提供了以下三个方法来完成组件的绘制和刷新：
+
+| 方法                                | 描述                                         |
+| ----------------------------------- | -------------------------------------------- |
+| `public void paint(Graphics g) {}`  | 绘制组件的外观                               |
+| `public void update(Graphics g) {}` | 内部调用组件的 paint() 方法，刷新组件的外观  |
+| `public void repaint() {}`          | 内部调用组件的 udpate() 方法，刷新组件的外观 |
+
+* 其原理是这样的，如下所示：
+
+> [!NOTE]
+>
+> * ① 在实际开发中，paint() 方法和 update() 方法是由 AWT 系统负责调用。
+> * ② 在实际开发中，如果希望系统重绘组件，程序员可以手动调用 repaint() 方法来完成对应功能。
+
+![](./assets/50.svg)
+
+### 2.7.3 Graphics 类的使用
+
+#### 2.7.3.1 概述
+
+* 在现实生活中，如果需要画图，我们需要准备一张纸，然后拿一支笔，并配合一些颜料，就可以在纸上会出各种各样的图形，如：圆形、矩形等。
+
+![](./assets/51.jpeg)
+
+* 在程序中也是如此，也需要画布（纸）、画笔和颜料等。AWT 中提供的 Canvas 类（Component）就可以当做画布，提供的 Graphics 类来充当画笔，通过调用 Graphics 对象的 setColor() 方法可以给画笔设置颜色。
+
+#### 2.7.3.2 画图步骤
+
+* AWT 中的画图步骤，如下所示：
+  * ① 自定义类继承 Canvas  类，并重写 `paint(Graphics g)` 方法。
+  * ② 在 paint() 方法内部，需要先调用 Graphics 对象的 setColor()、setFont() 等方法设置画笔的颜色以及字体等属性。
+  * ② 在 paint() 方法内部，再调用 Graphics 对象 drawXxx() 或 fillXxx() 方法开始画图。
+* Graphics 类的常见 API ：
+
+| 方法名称           | 方法功能               |
+| ------------------ | ---------------------- |
+| setColor(Color c)  | 设置颜色               |
+| setFont(Font font) | 设置字体               |
+| drawLine()         | 绘制直线               |
+| drawRect()         | 绘制矩形               |
+| drawRoundRect()    | 绘制圆角矩形           |
+| drawOval()         | 绘制椭圆形             |
+| drawPolygon()      | 绘制多边形             |
+| drawArc()          | 绘制圆弧               |
+| drawPolyline()     | 绘制折线               |
+| fillRect()         | 填充矩形区域           |
+| fillRoundRect()    | 填充圆角矩形区域       |
+| fillOval()         | 填充椭圆区域           |
+| fillPolygon()      | 填充多边形区域         |
+| fillArc()          | 填充圆弧对应的扇形区域 |
+| drawImage()        | 绘制位图               |
 
 
+
+* 示例：
+
+::: code-group
+
+```java [MyCanvas.java]
+package com.github.awt.canvas.demo1;
+
+import java.awt.*;
+
+public class MyCanvas extends Canvas {
+
+    private Boolean isRect;
+
+    public void setRect(Boolean rect) {
+        isRect = rect;
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        int x = (getSize().width - 100) / 2;
+        int y = (getSize().height - 100) / 2;
+
+        if (Boolean.TRUE.equals(isRect)) {
+            // 设置颜色
+            g.setColor(Color.red);
+            // 画图
+            g.drawRect(x, y, 100, 100);
+        } else if (Boolean.FALSE.equals(isRect)) {
+            // 设置颜色
+            g.setColor(Color.PINK);
+            // 画图
+            g.fillOval(x, y, 100, 100);
+        }
+
+    }
+}
+```
+
+```java [MyFrame.java]
+package com.github.awt.canvas.demo1;
+
+import java.awt.*;
+
+public class MyFrame extends Frame {
+
+    private final Canvas canvas;
+
+    private final Button drawRectBtn = new Button("绘制矩形");
+    private final Button drawOvalBtn = new Button("绘制椭圆");
+
+    public MyFrame(Canvas canvas) throws HeadlessException {
+        this("绘图", canvas);
+    }
+
+    public MyFrame(String title, Canvas canvas) {
+        super(title);
+        this.canvas = canvas;
+        initFrame();
+        this.setSize(480, 400);
+        this.setLocationRelativeTo(null);
+        this.setAlwaysOnTop(true);
+        this.setVisible(true);
+    }
+
+    private void initFrame() {
+        drawRectBtn.addActionListener(e -> {
+            if (canvas != null && canvas instanceof MyCanvas myCanvas) {
+                myCanvas.setRect(true);
+                // 重绘
+                canvas.repaint();
+            }
+        });
+
+        drawOvalBtn.addActionListener(e -> {
+            if (canvas != null && canvas instanceof MyCanvas myCanvas) {
+                myCanvas.setRect(false);
+                // 重绘
+                canvas.repaint();
+            }
+        });
+
+        canvas.setBackground(Color.LIGHT_GRAY);
+
+        // 将画图添加到中间位置
+        this.add(canvas);
+
+        Panel panel = new Panel();
+        panel.add(drawRectBtn);
+        panel.add(drawOvalBtn);
+        // 将画图添加到南部位置
+        this.add(panel, BorderLayout.SOUTH);
+    }
+}
+```
+
+```java [Test.java]
+package com.github.awt.canvas.demo1;
+
+public class Test {
+    public static void main(String[] args) {
+        new MyFrame(new MyCanvas());
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/52.gif)
+```
+
+:::
+
+#### 2.7.3.3 综合练习
+
+* 需求：实现弹球游戏。
+
+> [!NOTE]
+>
+> * ① AWT 也可以开发一些动画，所谓的动画就是每隔一定的时间（通常小于 0.1s）重新绘制图像，两次绘制的图像之间的差异较小，让人的肉眼感觉不到，就形成了动画。
+> * ② 为了实现每隔一定的时间就重新调用 canvas 的 repaint() 方法，可以借助 Swing 提供的 Timer 类，其是一个定时器。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [MyCanvas.java]
+package com.github.awt.canvas.demo1;
+
+import java.awt.*;
+
+public class MyCanvas extends Canvas {
+
+    private Boolean isRect;
+
+    public void setRect(Boolean rect) {
+        isRect = rect;
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        int x = (getSize().width - 100) / 2;
+        int y = (getSize().height - 100) / 2;
+
+        if (Boolean.TRUE.equals(isRect)) {
+            // 设置颜色
+            g.setColor(Color.red);
+            // 画图
+            g.drawRect(x, y, 100, 100);
+        } else if (Boolean.FALSE.equals(isRect)) {
+            // 设置颜色
+            g.setColor(Color.PINK);
+            // 画图
+            g.fillOval(x, y, 100, 100);
+        }
+
+    }
+}
+```
+
+```java [MyFrame.java]
+package com.github.awt.canvas.demo1;
+
+import java.awt.*;
+
+public class MyFrame extends Frame {
+
+    private final Canvas canvas;
+
+    private final Button drawRectBtn = new Button("绘制矩形");
+    private final Button drawOvalBtn = new Button("绘制椭圆");
+
+    public MyFrame(Canvas canvas) throws HeadlessException {
+        this("绘图", canvas);
+    }
+
+    public MyFrame(String title, Canvas canvas) {
+        super(title);
+        this.canvas = canvas;
+        initFrame();
+        this.setSize(480, 400);
+        this.setLocationRelativeTo(null);
+        this.setAlwaysOnTop(true);
+        this.setVisible(true);
+    }
+
+    private void initFrame() {
+        drawRectBtn.addActionListener(e -> {
+            if (canvas != null && canvas instanceof MyCanvas myCanvas) {
+                myCanvas.setRect(true);
+                // 重绘
+                canvas.repaint();
+            }
+        });
+
+        drawOvalBtn.addActionListener(e -> {
+            if (canvas != null && canvas instanceof MyCanvas myCanvas) {
+                myCanvas.setRect(false);
+                // 重绘
+                canvas.repaint();
+            }
+        });
+
+        canvas.setBackground(Color.LIGHT_GRAY);
+
+        // 将画图添加到中间位置
+        this.add(canvas);
+
+        Panel panel = new Panel();
+        panel.add(drawRectBtn);
+        panel.add(drawOvalBtn);
+        // 将画图添加到南部位置
+        this.add(panel, BorderLayout.SOUTH);
+    }
+}
+```
+
+```java [Test.java]
+package com.github.awt.canvas.demo1;
+
+public class Test {
+    public static void main(String[] args) {
+        new MyFrame(new MyCanvas());
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/52.gif)
+```
+
+:::
