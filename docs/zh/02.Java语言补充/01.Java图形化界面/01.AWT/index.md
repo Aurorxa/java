@@ -1,7 +1,7 @@
 > [!IMPORTANT]
 >
 > * ① JDK 的版本是 `17` ，IDEA 的版本是 `2024.1+`。
-> * ② 前置知识：HTML 、CSS 以及 JavaScript 。
+> * ② 前置知识：`HTML`、`CSS`、`JavaScript`以及`SpringBoot`。
 
 # 第一章：Java 图形化界面
 
@@ -2858,109 +2858,513 @@ public class Test {
 
 ::: code-group
 
-```java [MyCanvas.java]
-package com.github.awt.canvas.demo1;
-
-import java.awt.*;
-
-public class MyCanvas extends Canvas {
-
-    private Boolean isRect;
-
-    public void setRect(Boolean rect) {
-        isRect = rect;
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        int x = (getSize().width - 100) / 2;
-        int y = (getSize().height - 100) / 2;
-
-        if (Boolean.TRUE.equals(isRect)) {
-            // 设置颜色
-            g.setColor(Color.red);
-            // 画图
-            g.drawRect(x, y, 100, 100);
-        } else if (Boolean.FALSE.equals(isRect)) {
-            // 设置颜色
-            g.setColor(Color.PINK);
-            // 画图
-            g.fillOval(x, y, 100, 100);
-        }
-
-    }
-}
-```
-
 ```java [MyFrame.java]
-package com.github.awt.canvas.demo1;
+package com.github.awt.canvas.demo2;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 public class MyFrame extends Frame {
 
-    private final Canvas canvas;
+    // 面板的宽度和高度
+    private final int TABLE_WIDTH = 350;
+    private final int TABLE_HEIGHT = 500;
+    // 球拍的宽度和高度
+    private final int RACKET_WIDTH = 60;
+    private final int RACKET_HEIGHT = 20;
+    // 小球的大小
+    private final int BALL_SIZE = 16;
+    // 创建画布
+    private final MyCanvas canvas = new MyCanvas();
+    // 定义变量，球拍的坐标
+    private final int RACKET_Y = 340;
+    // 定义变量，记录球拍在 x  方向的速度
+    private final int speedRacketX = 10;
+    // 添加按键状态标记
+    private boolean leftPressed = false;
+    private boolean rightPressed = false;
+    // 定义变量，记录小球在 x 或 y 方向的速度
+    private int speedBallX = 10;
+    private int speedBallY = 5;
+    // 定义变量，球拍的坐标
+    private int racketX = 120;
+    // 定义变量，记录小球的坐标
+    private int ballX = 120;
+    private int ballY = 20;
+    // 定义变量，用来标识当前游戏是否继续
+    private boolean isOver = false;
+    private Timer timer;
 
-    private final Button drawRectBtn = new Button("绘制矩形");
-    private final Button drawOvalBtn = new Button("绘制椭圆");
-
-    public MyFrame(Canvas canvas) throws HeadlessException {
-        this("绘图", canvas);
+    public MyFrame() throws HeadlessException {
+        this("弹球游戏");
     }
 
-    public MyFrame(String title, Canvas canvas) {
+    public MyFrame(String title) {
         super(title);
-        this.canvas = canvas;
         initFrame();
-        this.setSize(480, 400);
+        this.setSize(TABLE_WIDTH, TABLE_HEIGHT);
         this.setLocationRelativeTo(null);
         this.setAlwaysOnTop(true);
         this.setVisible(true);
     }
 
     private void initFrame() {
-        drawRectBtn.addActionListener(e -> {
-            if (canvas != null && canvas instanceof MyCanvas myCanvas) {
-                myCanvas.setRect(true);
-                // 重绘
+        // 注册定时器
+        timer = new Timer(100, (e) -> {
+            // 如果小球碰到了左右边框
+            if (ballX <= 0 || ballX >= TABLE_WIDTH - BALL_SIZE) {
+                speedBallX = -speedBallX;
+            }
+            // 如果小球横向在球拍范围内，且到达球拍位置或者到达顶端位置，则小球反弹
+            if (ballY <= 0 || (ballY >= RACKET_Y - BALL_SIZE && (ballX >= racketX && ballX <= racketX + RACKET_WIDTH))) {
+                speedBallY = -speedBallY;
+            }
+            // 小球的高度超出了球拍的位置，且横向不在球拍范围内，则游戏结束
+            if (ballY > RACKET_Y && (ballX < racketX || ballX > racketX + RACKET_WIDTH)) {
+                // 结束定时器
+                timer.stop();
+                // 把游戏结束的标记设置为 true
+                isOver = true;
+                // 重绘界面
                 canvas.repaint();
             }
-        });
+            // 根据按键状态更新球拍位置
+            updateRacketPosition();
 
-        drawOvalBtn.addActionListener(e -> {
-            if (canvas != null && canvas instanceof MyCanvas myCanvas) {
-                myCanvas.setRect(false);
-                // 重绘
-                canvas.repaint();
+            // 更新小球的坐标
+            ballX += speedBallX;
+            ballY += speedBallY;
+            // 重绘画布
+            canvas.repaint();
+        });
+        // 启动定时器
+        timer.start();
+
+        // 监听球拍坐标的变化
+        KeyListener keyListener = new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // 按键被按下时设置状态为 true
+                final int keyCode = e.getKeyCode();
+                switch (keyCode) {
+                    case KeyEvent.VK_LEFT -> leftPressed = true;
+                    case KeyEvent.VK_RIGHT -> rightPressed = true;
+                }
             }
-        });
 
-        canvas.setBackground(Color.LIGHT_GRAY);
+            @Override
+            public void keyReleased(KeyEvent e) {
+                // 按键被释放时设置状态为 false
+                final int keyCode = e.getKeyCode();
+                switch (keyCode) {
+                    case KeyEvent.VK_LEFT -> leftPressed = false;
+                    case KeyEvent.VK_RIGHT -> rightPressed = false;
+                }
+            }
+        };
+
+        // 注册监听
+        this.canvas.addKeyListener(keyListener);
+
+        // 确保Canvas可以接收焦点
+        this.canvas.setFocusable(true);
+        this.canvas.requestFocus();
 
         // 将画图添加到中间位置
         this.add(canvas);
+    }
 
-        Panel panel = new Panel();
-        panel.add(drawRectBtn);
-        panel.add(drawOvalBtn);
-        // 将画图添加到南部位置
-        this.add(panel, BorderLayout.SOUTH);
+    /**
+     * 根据按键状态更新球拍位置
+     */
+    private void updateRacketPosition() {
+        if (leftPressed && racketX > 0) {
+            racketX -= speedRacketX;
+        }
+        if (rightPressed && racketX < TABLE_WIDTH - RACKET_WIDTH) {
+            racketX += speedRacketX;
+        }
+    }
+
+    private class MyCanvas extends Canvas {
+        @Override
+        public void paint(Graphics g) {
+            if (isOver) {
+                g.setColor(Color.BLUE);
+                g.setFont(new Font("微软雅黑", Font.BOLD, 30));
+                // 获取 Canvas 组件的宽度和高度
+                int canvasWidth = getWidth();
+                int canvasHeight = getHeight();
+                // 计算字符串的宽度和高度
+                FontMetrics fontMetrics = g.getFontMetrics();
+                int stringWidth = fontMetrics.stringWidth("游戏结束");
+                int stringHeight = fontMetrics.getHeight();
+                // 计算居中位置
+                int x = (canvasWidth - stringWidth) / 2;
+                int y = (canvasHeight - stringHeight) / 2 + fontMetrics.getAscent();
+                g.drawString("游戏结束", x, y);
+            } else {
+                // 绘制小球
+                g.setColor(Color.RED);
+                g.fillOval(ballX, ballY, BALL_SIZE, BALL_SIZE);
+                // 绘制球拍
+                g.setColor(Color.PINK);
+                g.fillRect(racketX, RACKET_Y, RACKET_WIDTH, RACKET_HEIGHT);
+            }
+        }
     }
 }
 ```
 
 ```java [Test.java]
-package com.github.awt.canvas.demo1;
+package com.github.awt.canvas.demo2;
 
 public class Test {
     public static void main(String[] args) {
-        new MyFrame(new MyCanvas());
+        new MyFrame();
     }
 }
 ```
 
 ```md:img [cmd 控制台]
-![](./assets/52.gif)
+![](./assets/53.gif)
+```
+
+:::
+
+### 2.7.4 处理位图
+
+#### 2.7.4.1 概述
+
+* 之前是直接在组件上使用 Graphics 对象进行绘制几何图形，这些图形比较固定，如：矩形、圆形等。
+
+![](./assets/54.gif)
+
+* 但是，有的时候，我们希望绘制复杂的图形，就需要使用`位图`技术，即：在内存中绘制图像，然后一次性的渲染到屏幕中。
+
+![](./assets/55.png)
+
+#### 2.7.4.2 使用步骤
+
+* ① 创建 BufferedImage 对象，即：在内存中生成一张图片。
+
+```java
+/**
+* @param width 指定位图的宽度
+* @param height 指定位图的高度
+* @param imageType 指定位图的类型
+*/
+public BufferedImage(int width,int height,int imageType) {
+    ...
+}
+```
+
+* ② 通过 BufferedImage 对象的 getGraphics() 方法获取画笔，此时就可以在内存中向这个图片上绘图了。
+
+```java
+public java.awt.Graphics getGraphics() {
+    return createGraphics();
+}
+```
+
+* ③ 调用组件的 drawImage() 方法，一次性的将 BufferedImage 对象绘制到特定的组件上。
+
+```java
+private class MyCanvas extends Canvas {
+
+    @Override
+    public void paint(Graphics g) {
+        g.drawImage(image, 0, 0, this);
+    }
+}
+```
+
+#### 2.7.4.3 综合练习
+
+* 需求：完成一个手写程序。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [MyFrame.java]
+package com.github.awt.canvas.demo3;
+
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+
+public class MyFrame extends Frame {
+
+    private final int WIDTH = 500;
+    private final int HEIGHT = 400;
+
+    // 弹出菜单
+    private final PopupMenu popupMenu = new PopupMenu();
+    // 弹出菜单项
+    private final MenuItem redItem = new MenuItem("红色");
+    private final MenuItem greenItem = new MenuItem("绿色");
+    private final MenuItem blueItem = new MenuItem("蓝色");
+    private final MenuItem clearItem = new MenuItem("清空");
+    // 画图对象
+    private final MyCanvas canvas = new MyCanvas();
+    // 创建位图对象
+    private final BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+    // 画图对象
+    private final Graphics graphics = image.getGraphics();
+    // 默认颜色
+    private final Color DEFAULT_COLOR = Color.WHITE;
+    // 当前颜色
+    private Color currentColor = DEFAULT_COLOR;
+    // 之前的横坐标
+    private int prevX = -1;
+    // 之前的纵坐标
+    private int prevY = -1;
+
+    public MyFrame() throws HeadlessException {
+        this("手绘程序");
+    }
+
+    public MyFrame(String title) {
+        super(title);
+        initFrame();
+        this.setSize(500, 400);
+        this.setLocationRelativeTo(null);
+        this.setAlwaysOnTop(true);
+        this.setVisible(true);
+    }
+
+    private void initFrame() {
+        // 为每个菜单项添加点击事件
+        ActionListener actionListener = e -> {
+            switch (e.getActionCommand()) {
+                case "红色" -> currentColor = Color.RED;
+                case "绿色" -> currentColor = Color.GREEN;
+                case "蓝色" -> currentColor = Color.BLUE;
+            }
+        };
+        redItem.addActionListener(actionListener);
+        greenItem.addActionListener(actionListener);
+        blueItem.addActionListener(actionListener);
+        clearItem.addActionListener(e -> {
+            graphics.setColor(DEFAULT_COLOR);
+            graphics.fillRect(0, 0, WIDTH, HEIGHT);
+            canvas.repaint();
+        });
+        // 弹出菜单添加菜单项
+        popupMenu.add(redItem);
+        popupMenu.add(greenItem);
+        popupMenu.add(blueItem);
+        popupMenu.add(new MenuItem("-"));
+        popupMenu.add(clearItem);
+        // 将 image 图片背景设置为白色
+        graphics.setColor(DEFAULT_COLOR);
+        graphics.fillRect(0, 0, WIDTH, HEIGHT);
+        // 画布注册鼠标移动事件
+        canvas.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (prevX >= 0 && prevY >= 0) {
+                    graphics.setColor(currentColor);
+                    // 绘制线条
+                    graphics.drawLine(prevX, prevY, e.getX(), e.getY());
+                }
+                prevX = e.getX();
+                prevY = e.getY();
+
+                canvas.repaint();
+            }
+        });
+
+        // 画布注册鼠标点击事件
+        canvas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                // 如果是右键，就弹出菜单
+                if (e.isPopupTrigger()) {
+                    popupMenu.show(canvas, e.getX(), e.getY());
+                }
+
+                prevX = -1;
+                prevY = -1;
+            }
+        });
+        // 将弹出菜单添加到画布中
+        canvas.add(popupMenu);
+        // 将画布添加到 Frame 中
+        this.add(canvas);
+    }
+
+    private class MyCanvas extends Canvas {
+
+        @Override
+        public void paint(Graphics g) {
+            g.drawImage(image, 0, 0, this);
+        }
+    }
+}
+```
+
+```java [Test.java]
+package com.github.awt.canvas.demo3;
+
+public class Test {
+    public static void main(String[] args) {
+        new MyFrame();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/56.gif)
+```
+
+:::
+
+### 2.7.5 ImageIO 的使用
+
+* 很多桌面程序都支持打开磁盘中的文件，以及将磁盘中的文件保存到本地，AWT 提供了 ImageIo 类就实现了这样的功能。
+* 常用 API ：
+
+| 方法名称                                                     | 描述                     |
+| ------------------------------------------------------------ | ------------------------ |
+| `public static BufferedImage read(File input) throws IOException {}` | 读取本地磁盘中的文件     |
+| `public static BufferedImage read(InputStream input) throws IOException {}` | 读取本地磁盘中的文件     |
+| `public static boolean write(RenderedImage im, String formatName, ImageOutputStream output) throws IOException {}` | 往本地磁盘中输出图片文件 |
+
+
+
+* 示例：
+
+::: code-group
+
+```java [MyFrame.java]
+package com.github.awt.canvas.demo4;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+public class MyFrame extends Frame {
+
+    private final MenuBar menuBar = new MenuBar();
+    private final Menu menu = new Menu("文件");
+    private final MenuItem openMenuItem = new MenuItem("打开");
+    private final MenuItem saveMenuItem = new MenuItem("另存为");
+    private final MyCanvas canvas = new MyCanvas();
+    private BufferedImage buf;
+
+    public MyFrame() throws HeadlessException {
+        this("图片查看器");
+    }
+
+    public MyFrame(String title) {
+        super(title);
+        initFrame();
+        this.setSize(500, 400);
+        this.setLocationRelativeTo(null);
+        this.setVisible(true);
+    }
+
+    private void initFrame() {
+
+        openMenuItem.addActionListener(e -> {
+            FileDialog dialog = new FileDialog(this, "打开文件", FileDialog.LOAD);
+            dialog.setVisible(true);
+            String directory = dialog.getDirectory();
+            String fileName = dialog.getFile();
+            File file = new File(directory, fileName);
+
+            try {
+                buf = ImageIO.read(file);
+                canvas.repaint();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        saveMenuItem.addActionListener(e -> {
+            FileDialog dialog = new FileDialog(this, "保存文件", FileDialog.SAVE);
+            dialog.setVisible(true);
+            String directory = dialog.getDirectory();
+            String fileName = dialog.getFile();
+            if (buf != null) {
+                try {
+                    String suffix = fileName.contains(".") ? fileName.split("\\.")[1] : "";
+                    System.out.println(suffix);
+                    ImageIO.write(buf, suffix, new File(directory, fileName));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+
+        menu.add(openMenuItem);
+        menu.add(saveMenuItem);
+        menuBar.add(menu);
+
+        this.setMenuBar(menuBar);
+
+        this.add(canvas);
+    }
+
+    private class MyCanvas extends Canvas {
+
+        @Override
+        public void paint(Graphics g) {
+            if (buf != null) {
+                g.drawImage(buf, 0, 0, buf.getWidth(), buf.getHeight(), this);
+            }
+        }
+    }
+}
+```
+
+```java [Test.java]
+package com.github.awt.canvas.demo4;
+
+public class Test {
+    public static void main(String[] args) {
+        new MyFrame();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/57.gif)
+```
+
+:::
+
+## 2.8 综合练习
+
+* 需求：实现五子棋。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [MyFrame.java]
+
+```
+
+```java [Test.java]
+
+```
+
+```md:img [cmd 控制台]
+![](./assets/57.gif)
 ```
 
 :::
