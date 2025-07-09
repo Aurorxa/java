@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, computed } from "vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 
 const showBackTop = ref(false); // 初始状态设为false
 const scrollProgress = ref(0);
@@ -36,9 +36,8 @@ const updateScrollProgress = () => {
 };
 
 const handleScroll = throttle(() => {
-  // 当滚动超过100px时显示，否则隐藏
-  const shouldShow = window.scrollY > 100;
-  showBackTop.value = shouldShow;
+  // 当滚动超过 100px 时显示，否则隐藏
+  showBackTop.value = window.scrollY > 100;
   updateScrollProgress();
 });
 
