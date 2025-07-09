@@ -3345,26 +3345,3 @@ public class Test {
 
 :::
 
-## 2.8 综合练习
-
-* 需求：实现五子棋。
-
-
-
-* 示例：
-
-::: code-group
-
-```java [MyFrame.java]
-
-```
-
-```java [Test.java]
-
-```
-
-```md:img [cmd 控制台]
-![](./assets/57.gif)
-```
-
-:::
