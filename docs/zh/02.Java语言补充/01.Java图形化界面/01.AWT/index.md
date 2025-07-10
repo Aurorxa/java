@@ -2706,7 +2706,7 @@ public class Test {
 
 #### 2.7.3.1 概述
 
-* 在现实生活中，如果需要画图，我们需要准备一张纸，然后拿一支笔，并配合一些颜料，就可以在纸上会出各种各样的图形，如：圆形、矩形等。
+* 在现实生活中，如果需要画图，我们需要准备一张纸，然后拿一支笔，并配合一些颜料，就可以在纸上画出各种各样的图形，如：圆形、矩形等。
 
 ![](./assets/51.jpeg)
 
@@ -2744,59 +2744,22 @@ public class Test {
 
 ::: code-group
 
-```java [MyCanvas.java]
-package com.github.awt.canvas.demo1;
-
-import java.awt.*;
-
-public class MyCanvas extends Canvas {
-
-    private Boolean isRect;
-
-    public void setRect(Boolean rect) {
-        isRect = rect;
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        int x = (getSize().width - 100) / 2;
-        int y = (getSize().height - 100) / 2;
-
-        if (Boolean.TRUE.equals(isRect)) {
-            // 设置颜色
-            g.setColor(Color.red);
-            // 画图
-            g.drawRect(x, y, 100, 100);
-        } else if (Boolean.FALSE.equals(isRect)) {
-            // 设置颜色
-            g.setColor(Color.PINK);
-            // 画图
-            g.fillOval(x, y, 100, 100);
-        }
-
-    }
-}
-```
-
 ```java [MyFrame.java]
 package com.github.awt.canvas.demo1;
 
 import java.awt.*;
 
 public class MyFrame extends Frame {
-
-    private final Canvas canvas;
-
+    private final MyCanvas canvas = new MyCanvas();
     private final Button drawRectBtn = new Button("绘制矩形");
     private final Button drawOvalBtn = new Button("绘制椭圆");
 
-    public MyFrame(Canvas canvas) throws HeadlessException {
-        this("绘图", canvas);
+    public MyFrame() throws HeadlessException {
+        this("绘图");
     }
 
-    public MyFrame(String title, Canvas canvas) {
+    public MyFrame(String title) {
         super(title);
-        this.canvas = canvas;
         initFrame();
         this.setSize(480, 400);
         this.setLocationRelativeTo(null);
@@ -2806,19 +2769,15 @@ public class MyFrame extends Frame {
 
     private void initFrame() {
         drawRectBtn.addActionListener(e -> {
-            if (canvas != null && canvas instanceof MyCanvas myCanvas) {
-                myCanvas.setRect(true);
-                // 重绘
-                canvas.repaint();
-            }
+            canvas.setRect(true);
+            // 重绘
+            canvas.repaint();
         });
 
         drawOvalBtn.addActionListener(e -> {
-            if (canvas != null && canvas instanceof MyCanvas myCanvas) {
-                myCanvas.setRect(false);
-                // 重绘
-                canvas.repaint();
-            }
+            canvas.setRect(false);
+            // 重绘
+            canvas.repaint();
         });
 
         canvas.setBackground(Color.LIGHT_GRAY);
@@ -2832,7 +2791,38 @@ public class MyFrame extends Frame {
         // 将画图添加到南部位置
         this.add(panel, BorderLayout.SOUTH);
     }
+
+    private static class MyCanvas extends Canvas {
+
+        // 是否是矩形
+        private Boolean isRect = true;
+
+        public void setRect(Boolean rect) {
+            isRect = rect;
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            // 获取当前组件的宽度和高度
+            int width = getWidth();
+            int height = getHeight();
+            // 计算中心位置
+            int x = (width - 100) / 2;
+            int y = (height - 100) / 2;
+
+            if (Boolean.TRUE.equals(isRect)) {
+                g.setColor(Color.red);
+                g.drawRect(x, y, 100, 100);
+            }
+
+            if (Boolean.FALSE.equals(isRect)) {
+                g.setColor(Color.PINK);
+                g.fillOval(x, y, 100, 100);
+            }
+        }
+    }
 }
+
 ```
 
 ```java [Test.java]
@@ -3078,7 +3068,7 @@ public java.awt.Graphics getGraphics() {
 }
 ```
 
-* ③ 调用组件的 drawImage() 方法，一次性的将 BufferedImage 对象绘制到特定的组件上。
+* ③ 调用组件的 drawImage() 方法，一次性将 BufferedImage 对象绘制到特定的组件上。
 
 ```java
 private class MyCanvas extends Canvas {
