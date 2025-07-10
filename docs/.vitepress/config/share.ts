@@ -14,6 +14,7 @@ import markdownItTaskCheckbox from 'markdown-it-task-checkbox'
 import path from 'path'
 import {VitePressSidebarOptions} from "vitepress-sidebar/types"
 import {withSidebar} from "vitepress-sidebar"
+
 const mode = process.env.NODE_ENV || 'development'
 const {VITE_BASE_URL} = loadEnv(mode, process.cwd())
 console.log('Mode:', process.env.NODE_ENV)
@@ -78,7 +79,7 @@ const vitePressOptions = withMermaid(defineConfig({
           'java': 'vscode-icons:file-type-java',
           'winget': 'vscode-icons:file-type-shell',
           'choco': localIconLoader(import.meta.url, '../../public/iconify/choco.svg'),
-          "控制台":localIconLoader(import.meta.url, '../../public/iconify/terminal.svg'),
+          "控制台": localIconLoader(import.meta.url, '../../public/iconify/terminal.svg'),
           'cmd': 'vscode-icons:file-type-shell',
           'powershell': 'vscode-icons:file-type-powershell',
           'maven': 'vscode-icons:file-type-apache',
@@ -87,6 +88,7 @@ const vitePressOptions = withMermaid(defineConfig({
           'bash': 'vscode-icons:file-type-gnu',
           'shell': 'vscode-icons:file-type-gnu',
           'sh': 'vscode-icons:file-type-gnu',
+          'cpu': localIconLoader(import.meta.url, '../../public/iconify/cpu.svg'),
         }
       }) as any),
       Permalink(),
