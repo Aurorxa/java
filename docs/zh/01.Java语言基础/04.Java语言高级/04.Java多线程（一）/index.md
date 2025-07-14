@@ -457,11 +457,12 @@ make run-test-tier1
 
 ### 2.3.1 概述
 
-* Java 创建线程有三种方式，如下所示：
+* Java 创建线程很多方式，如下所示：
   * ① `继承 Thread 类的方式创建线程`。
   * ② `实现 Runnable 接口的方式创建线程`。
   * ③ `利用 Callable 接口和 Future 接口的方式创建线程`。
   * ④ `通过线程池的方式创建线程`。
+  * ⑤ ...
 
 > [!NOTE]
 >
@@ -730,7 +731,7 @@ int main() {
 
 ![](./assets/39.png)
 
-#### 2.3.3.2 Java 代码创建线程的底层分析
+#### 2.3.3.2 Java 创建线程的底层分析
 
 * 当我们在 Java 代码中，这样创建线程线程的时候，如下所示：
 
@@ -915,7 +916,7 @@ JavaThread::JavaThread(ThreadFunction entry_point, size_t stack_sz) : JavaThread
 
 * 点击 `os::create_thread(this, thr_type, stack_sz);` 的时候，会跳转到 `os_linux.cpp` 中：
 
-```cpp
+```cpp [os_linux.cpp]
 ...
     
 bool os::create_thread(Thread* thread, ThreadType thr_type,
@@ -1198,6 +1199,8 @@ void Thread::call_run() {
 
 ...
 ```
+
+## 2.4 线程有哪些实现方式？
 
 
 
