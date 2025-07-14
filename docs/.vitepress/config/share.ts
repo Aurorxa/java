@@ -76,6 +76,8 @@ const vitePressOptions = withMermaid(defineConfig({
       (groupIconVitePlugin({
         customIcon: {
           'c': localIconLoader(import.meta.url, '../../public/iconify/c.svg'),
+          'h': localIconLoader(import.meta.url, '../../public/iconify/c.svg'),
+          'cpp': localIconLoader(import.meta.url, '../../public/iconify/cpp.svg'),
           'java': 'vscode-icons:file-type-java',
           'winget': 'vscode-icons:file-type-shell',
           'choco': localIconLoader(import.meta.url, '../../public/iconify/choco.svg'),

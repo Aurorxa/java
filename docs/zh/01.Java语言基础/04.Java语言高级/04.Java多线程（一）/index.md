@@ -144,11 +144,9 @@
 ### 1.4.5 多核 CPU
 
 * 虽然，`多 CPU`可以在同一时刻，执行多条指令。但是，会有以下的问题：
-
   * ① 个人计算机只有一个 CPU 插槽，实现不了同一时刻，执行多条指令。
   * ② 服务器虽然有多个 CPU 插槽，但也不能无休止的安装 CPU ，总有极限。
-
-  * 于是，出现了`多核 CPU`，即：一个物理 CPU 内部，封装了多个物理核心，如下所示：
+* 于是，出现了`多核 CPU`，即：一个物理 CPU 内部，封装了多个`物理核心`，如下所示：
 
 > [!NOTE]
 >
@@ -404,7 +402,7 @@ git clone git@github.com:openjdk/jdk17u.git --depth=1
 
 ```bash
 cd jdk17u 
-bash configure
+bash configure --with-jvm-variants=server --build=x86_64-unknown-linux-gnu
 ```
 
 ```md:img [cmd 控制台]
@@ -454,3 +452,754 @@ make run-test-tier1
 ```
 
 :::
+
+## 2.3 Java 创建线程的使用方式
+
+### 2.3.1 概述
+
+* Java 创建线程有三种方式，如下所示：
+  * ① `继承 Thread 类的方式创建线程`。
+  * ② `实现 Runnable 接口的方式创建线程`。
+  * ③ `利用 Callable 接口和 Future 接口的方式创建线程`。
+  * ④ `通过线程池的方式创建线程`。
+
+> [!NOTE]
+>
+> * ① 在 Java 中，Thread 类的对象就是一个线程；换言之，如果我们要创建线程，就需要继承 Thread 类，即：Thread 类的子类，并创建 Thread 子类的对象。
+> * ② 仅仅创建 Thread 类的子类对象还不行，因为其只是在堆内存空间中创建了对象，还需要调用 start() 方法，才会真正的创建线程。
+
+![](./assets/32.png)
+
+* 但是，目前只会演示第一种方式创建线程，步骤如下：
+  * ① `自己定义一个类继承 Thread 类`。
+  * ② `重写 run 方法`。
+  * ③ `创建子类的对象，调用 start() 方法启动线程`。
+* 其代码，如下所示：
+
+::: code-group
+
+```java [MyThread.java]
+package com.github.thread.demo1;
+
+public class MyThread extends Thread {
+    @Override
+    public void run() {
+        final String name = Thread.currentThread().getName();
+        for (int i = 0; i < 100; i++) {
+            System.out.println(name + i);
+        }
+    }
+}
+```
+
+```java [Test.java]
+package com.github.thread.demo1;
+
+public class Test {
+    public static void main(String[] args) {
+        /*
+         * Java 中实现线程的第一种方式：
+         * 1. 创建一个继承 Thread 类的子类。
+         * 2. 重写 run 方法，在 run 方法中编写线程的逻辑
+         * 3. 然后创建该子类的实例，调用 start 方法启动线程
+         *
+         * 注意：start 方法会调用 run 方法，但是 start 方法是异步执行的，run 方法是同步执行的
+         * 注意：run 方法中不能抛出异常，否则会导致线程终止
+         * 注意：run 方法中不能调用 yield 方法，否则会导致线程调度器无法调度该线程
+         * */
+        MyThread t = new MyThread();
+        t.start();
+
+        for (int i = 0; i < 100; i++) {
+            System.out.println("主线程：" + i);
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/33.gif)
+```
+
+:::
+
+### 2.3.2 面向接口编程
+
+#### 2.3.2.1 概述
+
+* 在实际开发中，我们非常推崇`面向接口编程`的思维方式，即：通过依赖抽象（接口）而不是具体实现，以增强代码的灵活性和可扩展性。
+
+> [!NOTE]
+>
+> ::: details 点我查看 生活中的例子
+>
+> - 在生活中，最为常见的就是笔记本电脑上的 USB 接口了，其是一种规范，即：不同的版本有不同的要求，如：USB 2.1 、USB 3 等）。
+> - 如果某种设备（键盘、U 盘、鼠标等）实现了 USB 接口（USB 2.1），那么该设备就可以插入到电脑上的 USB 接口（USB 2.1）上使用。
+>
+> :::
+
+#### 2.3.2.2 Java 语言中面向接口编程
+
+* `面向接口编程` 是 Java 编程中的一种设计原则，强调使用接口来定义系统中的行为规范，而不是依赖具体实现类。
+
+> [!NOTE]
+>
+> 其核心思想是“面向抽象，而非面向具体编程”！！！
+
+![](./assets/34.svg)
+
+
+
+* 示例：
+
+::: code-group
+
+```java [USB.java]
+// 定义 USB 接口
+public interface USB {
+    void connect();  // 连接 USB 设备
+    void disconnect(); // 断开 USB 设备
+}
+```
+
+```java [Keyboard.java]
+// 实现 USB 接口：键盘
+public class Keyboard implements USB {
+    @Override
+    public void connect() {
+        System.out.println("Keyboard connected.");
+    }
+
+    @Override
+    public void disconnect() {
+        System.out.println("Keyboard disconnected.");
+    }
+}
+```
+
+```java [FlashDrive.java]
+// 实现 USB 接口：U盘
+public class FlashDrive implements USB {
+    @Override
+    public void connect() {
+        System.out.println("FlashDrive connected.");
+    }
+
+    @Override
+    public void disconnect() {
+        System.out.println("FlashDrive disconnected.");
+    }
+}
+```
+
+```java [Computer.java]
+// 模拟电脑类
+public class Computer {
+    // 模拟插入 USB 设备
+    public void plugInUSB(USB device) {
+        device.connect();  // 调用设备的 connect 方法
+    }
+
+    // 模拟拔出 USB 设备
+    public void unplugUSB(USB device) {
+        device.disconnect(); // 调用设备的 disconnect 方法
+    }
+}
+```
+
+```java [Test.java]
+// 测试类
+public class Test {
+    public static void main(String[] args) {
+        Computer computer = new Computer();
+
+        // 创建键盘设备
+        USB keyboard = new Keyboard();
+        computer.plugInUSB(keyboard);  // 连接键盘
+        computer.unplugUSB(keyboard); // 断开键盘
+
+        System.out.println();
+
+        // 创建 U盘设备
+        USB flashDrive = new FlashDrive();
+        computer.plugInUSB(flashDrive);  // 连接 U盘
+        computer.unplugUSB(flashDrive); // 断开 U盘
+    }
+}
+```
+
+:::
+
+#### 2.3.2.3 C 语言中的面向接口编程
+
+* 在 C 语言中，并没有 `interface` 等关键字。但是，在 C 语言中，`头文件`就是一个`接口`。
+
+```txt
+├─📁 include/---- # 头文件目录
+│ └─📄 add.h
+├─📁 module/----- # 函数实现目录
+│ └─📄 add.c
+└─📄 main.c------ # 主函数
+```
+
+![](./assets/35.svg)
+
+
+
+* 示例：
+
+::: code-group
+
+```c [include/add.h]
+#ifndef ADD_H
+#define ADD_H
+
+// 函数原型
+int add(int a, int b);
+
+#endif // ADD_H
+```
+
+```c [module/add.c]
+#include "./include/add.h" // 导入自定义函数的头文件
+
+// 函数声明或函数实现
+int add(int a,int b) {
+  return a + b;
+}
+```
+
+```c [main.c]
+#include <stdio.h> // 导入标准库函数的头文件
+#include "./include/add.h" // 导入自定义函数的头文件
+
+int main() {
+
+    int a = 5;
+    int b = 10;
+
+    int result = add(a, b);
+    printf("%d + %d = %d\n", a, b, result);
+
+    return 0;
+}
+```
+
+:::
+
+### 2.3.3 Java 底层是如何创建线程的？
+
+#### 2.3.3.1 概述
+
+* Java 本身并没有实现线程，我们可以通过源码证明：
+
+> [!NOTE]
+>
+> * ① 当我们通过 Thread 的子类对象，调用 `start()` 方法的时候，其内部是调用了 `start0` 这个方法。
+> * ② `start0` 这个方法的定义是这样的：`private native void start0();`，该方法是一个本地方法，并且没有具体的实现。
+
+![](./assets/36.gif)
+
+* 对于 Windows/Linux/MacOS 而言，其系统编程语言是 C/C++，这些编程语言是可以直接调用操作系统提供的 API ，因为这些操作系统本身就是通过 C/C++ 开发的；所以，提供 C/C++ 的 API 是理所当然的事情。
+
+> [!NOTE]
+>
+> * ① 近年来，Rust、Swift 有望进入系统编程语言的行列。
+> * ② 在 Linux 中，对于线程提供的 API 是 `pthread.h` 头文件。 
+
+![](./assets/37.gif)
+
+* 对于 Java 语言而言，其底层是没有实现线程的，这也是 `start0` 方法是一个本地方法的原因，即：底层是通过 JNI 来调用操作系统提供的 C/C++ 的 API 接口，即：`pthread.h` 头文件。
+
+> [!NOTE]
+>
+> Java 本身并不创建线程，而是通过操作系统的库函数创建线程！！！
+
+![JNI](./assets/38.jpg)
+
+* 之前，在构建自己的 OpenJDK 的时候，我们提及过：
+
+> [!NOTE]
+>
+> OpenJDK  是用 `Java` 和 `C/C++` 混合编写的大型项目:
+>
+> * `Java 层` ：`java.lang`, `java.util` 等核心类库是用 Java 写的。
+> * `C/C++ 层` ：HotSpot 虚拟机、JNI 实现、平台相关代码等是用 C/C++ 写的。
+
+* 此时，我们将 OpenJDK 的源码导入到 [CLion](https://www.jetbrains.com/clion/) 中，来研究 Java 底层是否自己创建了线程：
+
+![](./assets/39.png)
+
+#### 2.3.3.2 Java 代码创建线程的底层分析
+
+* 当我们在 Java 代码中，这样创建线程线程的时候，如下所示：
+
+```java [Test.java]
+MyThread t = new MyThread();
+t.start();
+```
+
+* 在 Java 底层，最终会调用 `start0` 本地方法，如下所示：
+
+```java [Thread.java]
+public class Thread implements Runnable {
+    
+    ...
+        
+	public synchronized void start() {
+        
+        if (threadStatus != 0)
+            throw new IllegalThreadStateException();
+
+       
+        group.add(this);
+
+        boolean started = false;
+        try {
+            start0(); // [!code highlight]
+            started = true;
+        } finally {
+            try {
+                if (!started) {
+                    group.threadStartFailed(this);
+                }
+            } catch (Throwable ignore) {
+                
+            }
+        }
+    }
+
+    private native void start0(); // [!code highlight]
+}
+```
+
+* 在 CLion 中的完整调用流程示意图，如下所示：
+
+![](./assets/41.gif)
+
+* `start0` 是个本地方法，其方法的实现体是由 C 来实现的（其源码是 `Thread.c`），如下所示：
+
+```c [Thread.c]
+#define THD "Ljava/lang/Thread;"
+#define OBJ "Ljava/lang/Object;"
+#define STE "Ljava/lang/StackTraceElement;"
+#define STR "Ljava/lang/String;"
+
+#define ARRAY_LENGTH(a) (sizeof(a)/sizeof(a[0]))
+
+static JNINativeMethod methods[] = {
+    {"start0",           "()V",        (void *)&JVM_StartThread}, // [!code highlight]
+    {"stop0",            "(" OBJ ")V", (void *)&JVM_StopThread},
+    {"suspend0",         "()V",        (void *)&JVM_SuspendThread},
+    {"resume0",          "()V",        (void *)&JVM_ResumeThread},
+    {"setPriority0",     "(I)V",       (void *)&JVM_SetThreadPriority},
+    {"yield",            "()V",        (void *)&JVM_Yield},
+    {"sleep",            "(J)V",       (void *)&JVM_Sleep},
+    {"currentThread",    "()" THD,     (void *)&JVM_CurrentThread},
+    {"interrupt0",       "()V",        (void *)&JVM_Interrupt},
+    {"holdsLock",        "(" OBJ ")Z", (void *)&JVM_HoldsLock},
+    {"getThreads",        "()[" THD,   (void *)&JVM_GetAllThreads},
+    {"dumpThreads",      "([" THD ")[[" STE, (void *)&JVM_DumpThreads},
+    {"setNativeName",    "(" STR ")V", (void *)&JVM_SetNativeThreadName},
+};
+
+...
+```
+
+* 我们点击`JVM_StartThread`的时候，会发现其跳转到 `jvm.h` 头文件：
+
+> [!NOTE]
+>
+> C 语言中的头文件类似于 Java 中的接口！！！
+
+```c [jvm.h]
+...
+JNIEXPORT void JNICALL
+
+JVM_StartThread(JNIEnv *env, jobject thread); // [!code highlight]
+
+...
+```
+
+* 既然跳转到` jvm.h` 头文件，必须有对应的函数实现 `jvm.cpp`：
+
+```cpp [jvm.cpp]
+...
+    
+JVM_ENTRY(void, JVM_StartThread(JNIEnv* env, jobject jthread))
+  JavaThread *native_thread = NULL;
+
+  
+  bool throw_illegal_thread_state = false;
+  {
+    
+    MutexLocker mu(Threads_lock);
+
+    
+    if (java_lang_Thread::thread(JNIHandles::resolve_non_null(jthread)) != NULL) {
+      throw_illegal_thread_state = true;
+    } else {
+     
+      jlong size =
+             java_lang_Thread::stackSize(JNIHandles::resolve_non_null(jthread));
+    
+      NOT_LP64(if (size > SIZE_MAX) size = SIZE_MAX;)
+      size_t sz = size > 0 ? (size_t) size : 0;
+      // 创建本地线程
+      native_thread = new JavaThread(&thread_entry, sz); // [!code highlight]
+
+      if (native_thread->osthread() != NULL) {
+       
+        native_thread->prepare(jthread);
+      }
+    }
+  }
+
+  if (throw_illegal_thread_state) {
+    THROW(vmSymbols::java_lang_IllegalThreadStateException());
+  }
+
+  assert(native_thread != NULL, "Starting null thread?");
+
+  if (native_thread->osthread() == NULL) {
+    ResourceMark rm(thread);
+    log_warning(os, thread)("Failed to start the native thread for java.lang.Thread \"%s\"",
+                            JavaThread::name_for(JNIHandles::resolve_non_null(jthread)));
+    // No one should hold a reference to the 'native_thread'.
+    native_thread->smr_delete();
+    if (JvmtiExport::should_post_resource_exhausted()) {
+      JvmtiExport::post_resource_exhausted(
+        JVMTI_RESOURCE_EXHAUSTED_OOM_ERROR | JVMTI_RESOURCE_EXHAUSTED_THREADS,
+        os::native_thread_creation_failed_msg());
+    }
+    THROW_MSG(vmSymbols::java_lang_OutOfMemoryError(),
+              os::native_thread_creation_failed_msg());
+  }
+
+#if INCLUDE_JFR
+  if (Jfr::is_recording() && EventThreadStart::is_enabled() &&
+      EventThreadStart::is_stacktrace_enabled()) {
+    JfrThreadLocal* tl = native_thread->jfr_thread_local();
+    // skip Thread.start() and Thread.start0()
+    tl->set_cached_stack_trace_id(JfrStackTraceRepository::record(thread, 2));
+  }
+#endif
+
+  Thread::start(native_thread);
+
+JVM_END
+
+...    
+```
+
+* 点击 `native_thread = new JavaThread(&thread_entry, sz);` 的时候，会跳转到 `thread.cpp` 中：
+
+```cpp [thread.cpp]
+...
+
+JavaThread::JavaThread(ThreadFunction entry_point, size_t stack_sz) : JavaThread() {
+  _jni_attach_state = _not_attaching_via_jni;
+  set_entry_point(entry_point);
+  // Create the native thread itself.
+  // %note runtime_23
+  os::ThreadType thr_type = os::java_thread;
+  thr_type = entry_point == &CompilerThread::thread_entry ? os::compiler_thread :
+                                                            os::java_thread;
+  // 创建操作系统线程  
+  os::create_thread(this, thr_type, stack_sz); // [!code highlight]
+ 
+}    
+    
+...    
+```
+
+* 点击 `os::create_thread(this, thr_type, stack_sz);` 的时候，会跳转到 `os_linux.cpp` 中：
+
+```cpp
+...
+    
+bool os::create_thread(Thread* thread, ThreadType thr_type,
+                       size_t req_stack_size) {
+  assert(thread->osthread() == NULL, "caller responsible");
+
+  // Allocate the OSThread object
+  OSThread* osthread = new OSThread(NULL, NULL);
+  if (osthread == NULL) {
+    return false;
+  }
+
+  // set the correct thread state
+  osthread->set_thread_type(thr_type);
+
+  // Initial state is ALLOCATED but not INITIALIZED
+  osthread->set_state(ALLOCATED);
+
+  thread->set_osthread(osthread);
+
+  // init thread attributes
+  pthread_attr_t attr;
+  pthread_attr_init(&attr);
+  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+  
+  size_t stack_size = os::Posix::get_initial_stack_size(thr_type, req_stack_size);
+  size_t guard_size = os::Linux::default_guard_size(thr_type);
+
+
+  pthread_attr_setguardsize(&attr, guard_size);
+
+
+  size_t stack_adjust_size = 0;
+  if (AdjustStackSizeForTLS) {
+    // Adjust the stack_size for on-stack TLS - see get_static_tls_area_size().
+    stack_adjust_size += get_static_tls_area_size(&attr);
+  } else if (os::Linux::adjustStackSizeForGuardPages()) {
+    stack_adjust_size += guard_size;
+  }
+
+  stack_adjust_size = align_up(stack_adjust_size, os::vm_page_size());
+  if (stack_size <= SIZE_MAX - stack_adjust_size) {
+    stack_size += stack_adjust_size;
+  }
+  assert(is_aligned(stack_size, os::vm_page_size()), "stack_size not aligned");
+
+  if (THPStackMitigation) {
+   
+    if (HugePages::thp_pagesize() > 0 &&
+        is_aligned(stack_size, HugePages::thp_pagesize())) {
+      stack_size += os::vm_page_size();
+    }
+  }
+
+  int status = pthread_attr_setstacksize(&attr, stack_size);
+  if (status != 0) {
+  
+    assert_status(status == EINVAL, status, "pthread_attr_setstacksize");
+    log_warning(os, thread)("The %sthread stack size specified is invalid: " SIZE_FORMAT "k",
+                            (thr_type == compiler_thread) ? "compiler " : ((thr_type == java_thread) ? "" : "VM "),
+                            stack_size / K);
+    thread->set_osthread(NULL);
+    delete osthread;
+    return false;
+  }
+
+  ThreadState state;
+
+  {
+    ResourceMark rm;
+    pthread_t tid;
+    int ret = 0;
+    int limit = 3;
+    do {
+      // 调用 Linux 系统的线程创建函数，创建线程，调用线程执行的方法是thread_native_entry，参数是 thread
+      ret = pthread_create(&tid, &attr, (void* (*)(void*)) thread_native_entry, thread); // [!code highlight]
+    } while (ret == EAGAIN && limit-- > 0);
+
+    char buf[64];
+    if (ret == 0) {
+      log_info(os, thread)("Thread \"%s\" started (pthread id: " UINTX_FORMAT ", attributes: %s). ",
+                           thread->name(), (uintx) tid, os::Posix::describe_pthread_attr(buf, sizeof(buf), &attr));
+
+      // Print current timer slack if override is enabled and timer slack value is available.
+      // Avoid calling prctl otherwise for extra safety.
+      if (TimerSlack >= 0) {
+        int slack = prctl(PR_GET_TIMERSLACK);
+        if (slack >= 0) {
+          log_info(os, thread)("Thread \"%s\" (pthread id: " UINTX_FORMAT ") timer slack: %dns",
+                               thread->name(), (uintx) tid, slack);
+        }
+      }
+    } else {
+      log_warning(os, thread)("Failed to start thread \"%s\" - pthread_create failed (%s) for attributes: %s.",
+                              thread->name(), os::errno_name(ret), os::Posix::describe_pthread_attr(buf, sizeof(buf), &attr));
+      // Log some OS information which might explain why creating the thread failed.
+      log_info(os, thread)("Number of threads approx. running in the VM: %d", Threads::number_of_threads());
+      LogStream st(Log(os, thread)::info());
+      os::Posix::print_rlimit_info(&st);
+      os::print_memory_info(&st);
+      os::Linux::print_proc_sys_info(&st);
+      os::Linux::print_container_info(&st);
+    }
+
+    pthread_attr_destroy(&attr);
+
+    if (ret != 0) {
+      // Need to clean up stuff we've allocated so far
+      thread->set_osthread(NULL);
+      delete osthread;
+      return false;
+    }
+
+    // Store pthread info into the OSThread
+    osthread->set_pthread_id(tid);
+
+    // Wait until child thread is either initialized or aborted
+    {
+      Monitor* sync_with_child = osthread->startThread_lock();
+      MutexLocker ml(sync_with_child, Mutex::_no_safepoint_check_flag);
+      while ((state = osthread->get_state()) == ALLOCATED) {
+        sync_with_child->wait_without_safepoint_check();
+      }
+    }
+  }
+
+  // The thread is returned suspended (in state INITIALIZED),
+  // and is started higher up in the call chain
+  assert(state == INITIALIZED, "race condition");
+  return true;
+}
+    
+...    
+```
+
+* `pthread_create` 是 Linux 系统的线程创建函数，如下所示：
+
+![](./assets/40.png)
+
+* 在调用 Linux 线程库函数创建线程的同时，还执行了 `thread_native_entry` 函数：
+
+```cpp [os_linux.cpp]
+...
+    
+static void *thread_native_entry(Thread *thread) {
+
+  thread->record_stack_base_and_size();
+
+#ifndef __GLIBC__
+  // Try to randomize the cache line index of hot stack frames.
+  // This helps when threads of the same stack traces evict each other's
+  // cache lines. The threads can be either from the same JVM instance, or
+  // from different JVM instances. The benefit is especially true for
+  // processors with hyperthreading technology.
+  // This code is not needed anymore in glibc because it has MULTI_PAGE_ALIASING
+  // and we did not see any degradation in performance without `alloca()`.
+  static int counter = 0;
+  int pid = os::current_process_id();
+  int random = ((pid ^ counter++) & 7) * 128;
+  void *stackmem = alloca(random != 0 ? random : 1); // ensure we allocate > 0
+  // Ensure the alloca result is used in a way that prevents the compiler from eliding it.
+  *(char *)stackmem = 1;
+#endif
+
+  thread->initialize_thread_current();
+
+  OSThread* osthread = thread->osthread();
+  Monitor* sync = osthread->startThread_lock();
+
+  osthread->set_thread_id(os::current_thread_id());
+
+  if (UseNUMA) {
+    int lgrp_id = os::numa_get_group_id();
+    if (lgrp_id != -1) {
+      thread->set_lgrp_id(lgrp_id);
+    }
+  }
+  // initialize signal mask for this thread
+  PosixSignals::hotspot_sigmask(thread);
+
+  // initialize floating point control register
+  os::Linux::init_thread_fpu_state();
+
+  // handshaking with parent thread
+  {
+    MutexLocker ml(sync, Mutex::_no_safepoint_check_flag);
+
+    // notify parent thread
+    osthread->set_state(INITIALIZED);
+    sync->notify_all();
+
+    // wait until os::start_thread()
+    while (osthread->get_state() == INITIALIZED) {
+      sync->wait_without_safepoint_check();
+    }
+  }
+
+  log_info(os, thread)("Thread is alive (tid: " UINTX_FORMAT ", pthread id: " UINTX_FORMAT ").",
+    os::current_thread_id(), (uintx) pthread_self());
+
+  assert(osthread->pthread_id() != 0, "pthread_id was not set as expected");
+
+  if (DelayThreadStartALot) {
+    os::naked_short_sleep(100);
+  }
+
+  // call one more level start routine
+  // TODO  run 方法
+  thread->call_run(); // [!code highlight]
+
+  // Note: at this point the thread object may already have deleted itself.
+  // Prevent dereferencing it from here on out.
+  thread = NULL;
+
+  log_info(os, thread)("Thread finished (tid: " UINTX_FORMAT ", pthread id: " UINTX_FORMAT ").",
+    os::current_thread_id(), (uintx) pthread_self());
+
+  return 0;
+}
+
+...
+```
+
+* 最终执行了 `thread->call_run();`，如下所示：
+
+```cpp [thread.cpp]
+...
+    
+void Thread::call_run() {
+  DEBUG_ONLY(_run_state = CALL_RUN;)
+
+  // At this point, Thread object should be fully initialized and
+  // Thread::current() should be set.
+
+  assert(Thread::current_or_null() != NULL, "current thread is unset");
+  assert(Thread::current_or_null() == this, "current thread is wrong");
+
+  // Perform common initialization actions
+
+  MACOS_AARCH64_ONLY(this->init_wx());
+
+  register_thread_stack_with_NMT();
+
+  JFR_ONLY(Jfr::on_thread_start(this);)
+
+  log_debug(os, thread)("Thread " UINTX_FORMAT " stack dimensions: "
+    PTR_FORMAT "-" PTR_FORMAT " (" SIZE_FORMAT "k).",
+    os::current_thread_id(), p2i(stack_end()),
+    p2i(stack_base()), stack_size()/1024);
+
+  // Perform <ChildClass> initialization actions
+  DEBUG_ONLY(_run_state = PRE_RUN;)
+  this->pre_run();
+
+  // Invoke <ChildClass>::run()
+  DEBUG_ONLY(_run_state = RUN;)
+  
+  // 调用了 run 方法中的代码    
+  this->run();  // [!dode highlight]
+  // Returned from <ChildClass>::run(). Thread finished.
+
+  // Perform common tear-down actions
+
+  assert(Thread::current_or_null() != NULL, "current thread is unset");
+  assert(Thread::current_or_null() == this, "current thread is wrong");
+
+  // Perform <ChildClass> tear-down actions
+  DEBUG_ONLY(_run_state = POST_RUN;)
+  this->post_run();
+
+  // Note: at this point the thread object may already have deleted itself,
+  // so from here on do not dereference *this*. Not all thread types currently
+  // delete themselves when they terminate. But no thread should ever be deleted
+  // asynchronously with respect to its termination - that is what _run_state can
+  // be used to check.
+
+  assert(Thread::current_or_null() == NULL, "current thread still present");
+}
+
+...
+```
+
+
+
+
+
