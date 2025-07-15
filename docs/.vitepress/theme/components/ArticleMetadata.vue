@@ -1,7 +1,7 @@
 <template>
   <div class="word">
     <p>
-      <span>🔥更新：{{ dayjs(date.toLocaleDateString()).format("YYYY-MM-DD") }}</span>
+      <span>🔥更新：{{ formattedDate }}</span>
       <span>📝字数: {{ wordCount }} 字</span>
       <span>⏰时长: {{ readTime }} 分钟</span>
     </p>
@@ -11,15 +11,17 @@
 <script lang="ts" setup>
 import dayjs from "dayjs";
 import { useData } from "vitepress";
-import { computed, ref, onMounted, watch } from "vue";
+import { computed, ref, onMounted, watch, nextTick } from "vue";
 import { countWord } from "../utils/functions";
 import { useRoute } from "vitepress";
 
-// 使用 vitepress 提供的 useRoute
 const route = useRoute();
-
 const { page } = useData();
-const date = computed(() => new Date(page.value.lastUpdated!));
+
+const formattedDate = computed(() => {
+  if (!page.value.lastUpdated) return '';
+  return dayjs(page.value.lastUpdated).format("YYYY-MM-DD");
+});
 
 const wordCount = ref(0);
 const imageCount = ref(0);
@@ -43,28 +45,39 @@ const readTime = computed(() => {
 });
 
 function analyze() {
-  document.querySelectorAll(".meta-des").forEach((v) => v.remove());
-  const docDomContainer = window.document.querySelector("#VPContent");
-  const imgs = docDomContainer?.querySelectorAll<HTMLImageElement>(
-    ".content-container .main img"
-  );
-  imageCount.value = imgs?.length || 0;
-  const words =
-    docDomContainer?.querySelector(".content-container .main")?.textContent || "";
-  wordCount.value = countWord(words);
+  // Wait for next tick to ensure DOM is fully rendered
+  nextTick(() => {
+    // Clean up any existing meta-des elements
+    document.querySelectorAll(".meta-des").forEach((v) => v.remove());
+
+    const docDomContainer = window.document.querySelector("#VPContent");
+    if (!docDomContainer) return;
+
+    const imgArr = docDomContainer.querySelectorAll<HTMLImageElement>(
+        ".content-container .main img"
+    );
+    imageCount.value = imgArr?.length || 0;
+
+    const contentContainer = docDomContainer.querySelector(".content-container .main");
+    const words = contentContainer?.textContent || "";
+    wordCount.value = countWord(words);
+  });
 }
 
+// Use onMounted with nextTick to ensure DOM is ready
 onMounted(() => {
-  // 初始化时执行一次
-  analyze();
+  nextTick(() => {
+    analyze();
+  });
 });
 
-// 监听路由变化，当路径变化时重新检查
+// Watch route changes with immediate: false to avoid initial duplicate execution
 watch(
-  () => route.path,
-  () => {
-    analyze();
-  }
+    () => route.path,
+    () => {
+      analyze();
+    },
+    { flush: 'post' } // Execute after DOM updates
 );
 </script>
 

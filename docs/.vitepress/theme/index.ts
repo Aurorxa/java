@@ -28,6 +28,13 @@ export default {
     return h(SwitchLayout)
   },
   enhanceApp({ app, router }: EnhanceAppContext) {
+
+    // 开启详细的水合错误信息
+    app.config.warnHandler = (msg, instance, trace) => {
+      console.warn('[Vue warn]:', msg)
+      console.warn('Component trace:', trace)
+    }
+
     app.component('ArticleMetadata', ArticleMetadata)
     app.component('Confetti', Confetti)
     app.component('HomeUnderline', HomeUnderline)

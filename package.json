@@ -6,7 +6,7 @@
   "scripts": {
     "docs:dev": "cross-env NODE_OPTIONS=--max-old-space-size=8192 vitepress dev docs --mode development",
     "docs:build": "vitepress build docs --mode production",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs --port 8098"
   },
   "keywords": [],
   "author": "",

@@ -57,6 +57,7 @@ const vitePressOptions = withMermaid(defineConfig({
     },
     ssr: {
       noExternal: [
+        'dayjs',
         '@nolebase/vitepress-plugin-enhanced-readabilities',
         '@nolebase/ui',
         '@nolebase/vitepress-plugin-highlight-targeted-heading',
