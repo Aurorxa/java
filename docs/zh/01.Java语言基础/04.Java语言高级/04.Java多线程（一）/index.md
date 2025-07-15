@@ -270,7 +270,7 @@ $$
 
 
 
-# 第二章：多线程的概念
+# 第二章：多线程的概念（⭐）
 
 ## 2.1 进程和线程
 
@@ -475,7 +475,7 @@ make run-test-tier1
   * ① `自己定义一个类继承 Thread 类`。
   * ② `重写 run 方法`。
   * ③ `创建子类的对象，调用 start() 方法启动线程`。
-* 其代码，如下所示：
+* 其实现代码，如下所示：
 
 ::: code-group
 
@@ -1202,7 +1202,581 @@ void Thread::call_run() {
 
 ## 2.4 线程有哪些实现方式？
 
+### 2.4.1 概述
+
+* 线程的实现方式主要有如下的三种方式：
+  * ① 内核线程实现。
+  * ② 用户线程实现。
+  * ③ 用户线程 + 内核线程混合实现。
+
+### 2.4.2 内核线程
+
+#### 2.4.2.1 概述
+
+* 内核线程（Kernel-Level Thread，KLT）是直接由操作系统内核（kernel）支持的线程。
+
+> [!NOTE]
+>
+> * ① 内核线程是由操作系统内核来完成线程切换，操作系统内核通过操纵调度器（Scheduler）对线程进行调度，并负责将线程的任务映射到各个处理器上。
+> * ② 程序一般不会直接使用内核线程，而是使用它的高级接口：`轻量级进程`（LWP）。轻量级进程就是我们通常意义上讲的线程。每个轻量级进程都由一个内核线程支持，这种方式称为 1:1 的线程模型。
+> * ③ Java 中的线程就是采用内核线程的方式实现的（JDK21 之前的版本）。
+> * ④ JDK21 之后，Java 正式推出了虚拟线程，其就不再是采用内核线程的方式实现！！！
+
+![轻量级进程:线程 = 1:1](./assets/42.svg)
+
+* 优点：一个线程阻塞，并不会影响到另一个线程的执行。
+* 缺点：
+  * 由于是基于内核线程实现，各种线程操作，如：创建、休眠、同步等，都需要进行系统调用，而系统调用的代价相对较高，即：需要在用户态和系统内核态之间频繁切换，影响性能。
+  * 操作系统内核支持的线程数量是有限的，不可能无限地创建线程。
+
+#### 2.4.2.2 Linux 内核支持的最大线程数
+
+##### 2.4.2.2.1 通过文件查询（系统级别）
+
+* 查询 Linux 内核支持的最大线程数（系统级别）：
+
+::: code-group
+
+```bash
+cat /proc/sys/kernel/threads-max
+```
+
+```md:img [cmd 控制台]
+![](./assets/43.gif)
+```
+
+:::
+
+##### 2.4.2.2.2 通过命令查询（系统级别）
+
+* sysctl 可以在运行时修改或查看内核参数：
+
+```shell
+sysctl [-w][-a] [[k]=v] [...]
+```
+
+```shell
+sysctl -p [file]
+```
+
+> [!NOTE]
+>
+> * ① sysctl 命令用于在运行时修改内核参数。可用的参数为 “/proc/sys/” 下列出的参数。
+>
+>   * -a：表示输出所有的内核参数。
+>
+>   * -w k=v ：临时修改指定的内核参数。
+>
+>   * [k]：表示输出指定的内核参数，格式为`目录.文件`，如：`threads.max`。
+>
+> * ② sysctl 的配置文件是 /etc/sysctl.conf，可以在其中配置内核参数，系统重启时会自动加载，即：永久修改。
+>   * -p [file]：手动加载配置文件，让其生效。
 
 
 
+* 示例：查询 Linux 内核支持的最大线程数
 
+::: code-group
+
+```bash
+sysctl kernel.threads-max
+```
+
+```md:img [cmd 控制台]
+![](./assets/44.gif)
+```
+
+:::
+
+
+
+* 示例：查询所有的内核参数
+
+::: code-group
+
+```bash
+sysctl -a
+```
+
+```md:img [cmd 控制台]
+![](./assets/45.gif)
+```
+
+:::
+
+
+
+* 示例：修改指定的内核参数（临时生效）
+
+::: code-group
+
+```bash
+sysctl -w kernel.threads-max=10240
+```
+
+```md:img [cmd 控制台]
+![](./assets/46.gif)
+```
+
+:::
+
+##### 2.4.2.2.3 通过命令查询（用户级别）
+
+* ulimit 可以在运行时控制用户级别：
+
+```shell
+ulimit [-a][-u] 
+```
+
+> [!NOTE]
+>
+> * ① ulimit 用于控制进程资源使用的重要命令：
+>   * -a：查看当前用户的所有资源限制。
+>   * -u：查看当前用户的最大线程数。
+>   * -u 8192：修改当前用户的最大线程数为 8192。
+> * ② ulimit 的配置文件是 /etc/security/limits.conf，可以修改此文件，实现永久修改。
+
+
+
+* 示例：查看当前用户的所有资源限制
+
+::: code-group
+
+```bash
+ulimit -a
+```
+
+```md:img [cmd 控制台]
+![](./assets/47.gif)
+```
+
+:::
+
+
+
+* 示例：查看当前用户的最大线程数
+
+::: code-group
+
+```bash
+ulimit -u
+```
+
+```md:img [cmd 控制台]
+![](./assets/48.gif)
+```
+
+:::
+
+
+
+* 示例：使用 Java 测试当前用户的最大线程数
+
+::: code-group
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        int count = 0;
+        try {
+            while (true) {
+                new Thread(() -> {
+                            try {
+                                Thread.sleep(1000000000L);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .start();
+                count++;
+            }
+        } catch (Exception e) {
+            System.out.println("Max threads: " + count);
+            e.printStackTrace();
+        } finally {
+            System.out.println("Max threads: " + count);
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/49.gif)
+```
+
+:::
+
+### 2.4.3 用户线程
+
+* 用户线程指的是完全建立在用户自己的程序线程库上，系统内核不能感知到用户线程的存在及如何实现的。
+* 用户线程的创建、同步、销毁和调度完全在用户态中完成，不需要在频繁切换内核态，因此速度很快。
+
+> [!NOTE]
+>
+> 由于是一个进程对应多个用户线程，这种方式是 1:N 的线程模型。
+
+![进程:线程 = 1:N](./assets/50.svg)
+
+* 优点：在用户自己的程序中实现，不需要调用内核，操作非常快速且低消耗，也能够支持规模更大的线程数量。
+* 缺点：
+  * 所有的线程操作都需要由用户处理，如：线程的创建、销毁、切换、调度都是用户需要考虑的问题。
+  * 操作系统只将处理器的资源分配到进程程度，如：阻塞如何处理、多处理器如今分配资源等问题都需要由用户解决。
+
+### 2.4.4 用户线程 + 内核线程
+
+* 用户线程 + 内核线程混合实现的方式：既存在用户线程，又存在轻量级进程（内核线程）。
+
+> [!NOTE]
+>
+> * ① 用户线程建立在用户态中；所以，不需要频繁切换内核态，保证了速度的高效。
+> * ② 轻量级进程（内核线程）为用户线程和内核线程的桥梁，即：可以使用内核提供的线程调度功能处理用户线程中存在的问题。
+> * ③ 用户线程和轻量级进程的比例是不确定的，这种方式是 N:M 的线程模型。
+
+![用户线程:内核线程 = N:M](./assets/51.svg)
+
+## 2.5 再次认识 Java 中的线程
+
+* 线程是 Java 程序执行的一条路径，每一个线程都有自己的虚拟机栈、程序计数器（指向正在行的指令指针）。当启动了一个 Java 虚拟机（JVM）的时候，操作系统就会创建一个新的 Java 进程（JVM 进程），然后由 JVM 进程创建很多线程。
+
+![](./assets/52.png)
+
+* Java 中的线程在 JDK1.2 之前，是采用`用户线程`方式实现的，其被称为绿色线程；但是，由于太过繁琐以及复杂，最终放弃。
+* Java 中的线程在 JDK1.3 之后，是采用`内核线程`方式实现的，即：每个线程都是直接映射到操作系统的内核线程，JVM 自己不会去干涉线程的调度，可以设置线程优先级给操作系统提供调度建议；但是，线程的调度全权交给底层的操作系统去处理，至于何时冻结或唤醒线程、给线程分配多少处理器执行时间、把线程分配给哪个处理器核心去执行等，都是由操作系统来调度完成的。
+
+## 2.6 Java 中创建线程的方式
+
+### 2.6.1 概述
+
+* Java 创建线程很多方式，如下所示：
+  * ① `继承 Thread 类的方式创建线程`。
+  * ② `实现 Runnable 接口的方式创建线程`。
+  * ③ `利用 Callable 接口和 Future 接口的方式创建线程`。
+  * ④ `通过线程池的方式创建线程`。
+  * ⑤ `SpringBoot 提供的 ThreadPoolTaskExecutor` 。
+
+> [!NOTE]
+>
+> 在 JDK21 之后，Java 正式推出了虚拟线程！！！
+
+### 2.6.2 继承 Thread 类的方式
+
+* 创建线程的步骤：
+  * ① `自己定义一个类继承 Thread 类`。
+  * ② `重写 run 方法`。
+  * ③ `创建子类的对象，调用 start() 方法启动线程`。
+
+> [!NOTE]
+>
+> * ① 优点：编程比较简单，可以直接使用 Thread 类中的方法。
+> * ② 缺点：可扩展性较差，不能再继承其他的类。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [MyThread.java]
+package com.github.thread.demo1;
+
+public class MyThread extends Thread {
+    @Override
+    public void run() {
+        // 书写线程要执行的代码，即：业务逻辑
+        final String name = Thread.currentThread().getName();
+        for (int i = 0; i < 100; i++) {
+            System.out.println(name + i);
+        }
+    }
+}
+```
+
+```java [Test.java]
+package com.github.thread.demo1;
+
+public class Test {
+    public static void main(String[] args) {
+        /*
+         * Java 中实现线程的第一种方式：
+         * 1. 创建一个继承 Thread 类的子类。
+         * 2. 重写 run 方法，在 run 方法中编写线程的逻辑
+         * 3. 然后创建该子类的实例，调用 start 方法启动线程
+         *
+         * 注意：start 方法会调用 run 方法，但是 start 方法是异步执行的，run 方法是同步执行的
+         * 注意：run 方法中不能抛出异常，否则会导致线程终止
+         * 注意：run 方法中不能调用 yield 方法，否则会导致线程调度器无法调度该线程
+         * */
+        MyThread t = new MyThread();
+        t.start();
+
+        for (int i = 0; i < 100; i++) {
+            System.out.println("主线程：" + i);
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/33.gif)
+```
+
+:::
+
+### 2.6.3 实现 Runnable 接口的方式
+
+* 创建线程的步骤：
+  * ① `自定义定义一个类实现 Runnable 接口`。
+  * ② `重写 run 方法`。
+  * ③ `创建自己类的对象`。
+  * ④ `创建一个 Thread 类的对象，将自己类的对象作为构造方法参数，调用 start() 方法启动线程`。
+
+> [!NOTE]
+>
+> * ① 优点：扩展性强，实现该接口的同时还可以继承其他类。
+> * ② 缺点：编程相对复杂，不能直接使用 Thread 类中的方法。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [MyRunnable.java]
+package com.github.thread.demo1;
+
+public class MyRunnable implements Runnable {
+    @Override
+    public void run() {
+        // 书写线程要执行的代码，即：业务逻辑
+        String name = Thread.currentThread().getName();
+        for (int i = 0; i < 100; i++) {
+            System.out.println(name + i);
+        }
+    }
+}
+```
+
+```java [Test.java]
+package com.github.thread.demo1;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Runnable 实现类对象
+        Runnable r = new MyRunnable();
+        // 创建 Thread 对象，将 Runnable 实现类对象作为参数传递给 Thread 类的构造方法
+        Thread t = new Thread(r);
+        // 调用 Thread 类的 start() 方法启动线程
+        t.start();
+
+        for (int i = 0; i < 100; i++) {
+            System.out.println("主线程：" + i);
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/53.gif)
+```
+
+:::
+
+### 2.6.4 利用 Callable 接口和 Future 接口的方式
+
+* 使用步骤：
+  * ① `创建一个类 MyCallable 实现 Callable 接口`。
+  * ② `重写 call() 方法，返回值就表示线程执行的结果`。
+  * ③ `创建 MyCallable 类的对象，表示线程要执行的任务`。
+  * ④ `创建 FutureTask 类的对象，用来保存线程运行的结果`。
+  * ⑤ `创建 Thread 类的对象，并将 FutureTask  类对象作为构造方法的参数，并启动线程`。
+  * ⑥ `调用 FutureTask 类对象的 get() 方法，获取线程运行的结果`。
+
+> [!NOTE]
+>
+> * ① 优点：扩展性强，实现该接口的同时还可以继承其他类。
+> * ② 缺点：编程相对复杂，不能直接使用 Thread 类中的方法。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [MyCallable.java]
+package com.github.thread.demo1;
+
+import java.util.concurrent.Callable;
+
+public class MyCallable implements Callable<Integer> {
+    @Override
+    public Integer call() throws Exception {
+        int sum = 0;
+        for (int i = 0; i < 100; i++) {
+            sum += i;
+        }
+        System.out.println(Thread.currentThread().getName() + ":" + sum);
+        return sum;
+    }
+}
+```
+
+```java [Test.java]
+package com.github.thread.demo1;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建 Callable 实现类对象
+        Callable<Integer> r = new MyCallable();
+        // 创建 FutureTask 对象，将 Callable 实现类对象作为参数传递给 FutureTask 类的构造方法
+        FutureTask<Integer> ft = new FutureTask<>(r);
+        // 创建 Thread 对象，将 FutureTask 对象作为参数传递给 Thread 类的构造方法
+        Thread t = new Thread(ft);
+        t.start();
+        try {
+            // 获取 Callable 实现类对象计算结果
+            Integer sum = ft.get();
+            System.out.println("结果：" + sum);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/54.gif)
+```
+
+:::
+
+### 2.6.5 利用线程池的方式
+
+* 使用步骤：
+  * ① `通过 Executors 类的静态工厂方法创建线程池对象`。
+  * ② `通过调用线程池对象的 submit()、execute()、invokeAny() 以及 invokeAll() 方法将任务（线程）分配给线程池对象`。
+  * ③ `关闭线程池对象`。
+
+> [!NOTE]
+>
+> 此处只是简单演示，后续会详细讲解！！！
+
+
+
+* 示例：
+
+::: code-group
+
+```java [MyCallable.java]
+package com.github.thread.demo1;
+
+import java.util.concurrent.Callable;
+
+public class MyCallable implements Callable<Integer> {
+    @Override
+    public Integer call() throws Exception {
+        int sum = 0;
+        for (int i = 0; i < 100; i++) {
+            sum += i;
+        }
+        System.out.println(Thread.currentThread().getName() + ":" + sum);
+        return sum;
+    }
+}
+```
+
+```java [Test.java]
+package com.github.thread.demo1;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+public class Test {
+    public static void main(String[] args) {
+        // 创建线程池对象
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+        for (int i = 0; i < 5; i++) {
+            final Future<Integer> future = executorService.submit(new MyCallable());
+            new Thread(() -> {
+                        try {
+                            Integer sum = future.get();
+                            System.out.println(sum);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    })
+                    .start();
+        }
+
+        // 关闭线程池
+        executorService.shutdown();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/55.gif)
+```
+
+:::
+
+## 2.7 多线程调试技巧
+
+* 需要进行多线程调试的代码是这样的，如下所示：
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo1;
+
+public class Test {
+    public static void main(String[] args) {
+        String mainName = Thread.currentThread().getName();
+        System.out.println(mainName + "：开始运行");
+
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 3; i++) {
+                String name = Thread.currentThread().getName();
+                System.out.println(name + "：写代码");
+            }
+        });
+        t1.start();
+
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 3; i++) {
+                String name = Thread.currentThread().getName();
+                System.out.println(name + "：播放音乐");
+            }
+        });
+        t2.start();
+
+        System.out.println(mainName + "：结束运行");
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/56.png)
+```
+
+:::
+
+* 因为要在 IDEA 中进行多线程调试，此处就需要在 `run()` 或 `call()` 方法中设置断点：
+
+![](./assets/57.png)
+
+* 但是，当我们进行 debug 的时候，会发现就是进入不了 `run()` 或 `call()` 方法：
+
+![](./assets/58.gif)
+
+* 解决方案很简单，因为默认情况下，IDEA 的 debug 是 All（所有）级别，如下所示：
+
+![](./assets/59.png)
+
+* 我们需要将 debug 级别改为 Thread（线程）级别；就可以进行多线程的 debug 调试：
+
+![](./assets/60.gif)

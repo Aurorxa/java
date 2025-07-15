@@ -98,7 +98,7 @@ const vitePressOptions = withMermaid(defineConfig({
       Permalink(),
     ],
     server: {
-      port: 12189
+      port: 12289
     },
     css: {
       preprocessorOptions: {
