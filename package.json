@@ -18,11 +18,11 @@
     "@nolebase/vitepress-plugin-highlight-targeted-heading": "^2.18.0",
     "@nolebase/vitepress-plugin-inline-link-preview": "^2.18.0",
     "@rollup/plugin-terser": "^0.4.4",
-    "@shikijs/vitepress-twoslash": "^3.7.0",
+    "@shikijs/vitepress-twoslash": "^3.8.0",
     "@types/animejs": "^3.1.13",
     "@types/canvas-confetti": "^1.9.0",
     "@types/dom-view-transitions": "^1.0.6",
-    "@types/node": "^24.0.10",
+    "@types/node": "^24.0.14",
     "canvas-confetti": "^1.9.3",
     "cross-env": "^7.0.3",
     "markdown-it-mathjax3": "^4.3.2",
@@ -35,14 +35,14 @@
     "vitepress-plugin-group-icons": "^1.6.1",
     "vitepress-plugin-mermaid": "^2.0.17",
     "vitepress-plugin-tabs": "^0.7.1",
-    "vitepress-sidebar": "^1.31.1"
+    "vitepress-sidebar": "^1.32.1"
   },
   "dependencies": {
     "@nolebase/vitepress-plugin-breadcrumbs": "^2.18.0",
     "@theojs/lumen": "5.4.6",
     "animejs": "^3.2.2",
     "dayjs": "^2.0.0-alpha.4",
-    "dotenv": "^17.0.1",
+    "dotenv": "^17.2.0",
     "gsap": "^3.13.0",
     "markdown-it-container": "^4.0.0",
     "markdown-it-task-checkbox": "^1.0.6",
@@ -52,7 +52,6 @@
     "vitepress-markdown-timeline": "^1.2.2",
     "vitepress-plugin-breadcrumb": "^1.0.12",
     "vitepress-plugin-comment-with-giscus": "^1.1.15",
-    "vitepress-plugin-pagefind": "^0.4.13",
     "vitepress-plugin-permalink": "^1.1.2",
     "xgplayer": "^3.0.22"
   },
