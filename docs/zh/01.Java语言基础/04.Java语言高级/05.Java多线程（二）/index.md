@@ -72,7 +72,7 @@
 
 ### 1.2.2 前台线程 VS 后台线程
 
-* `线程`是进程中的执行路径，有`前台线程`和`后台线程`之分。
+* `线程`是`进程`中的执行路径，有`前台线程`和`后台线程`之分。
 
 > [!NOTE]
 >
@@ -281,6 +281,11 @@ public class Test {
 public static native Thread currentThread();
 ```
 
+> [!NOTE]
+>
+> * ① 当虚拟机启动的时候，会自动启动多条线程，其中有一条线程叫做 main 线程，其作用就是调用 main 方法，并执行里面的代码。
+> * ② 在之前，我们写的所有代码，其实都是运行在 main 线程之中的。
+
 
 
 * 示例：
@@ -392,8 +397,9 @@ TimeUnit.SECONDS.sleep(long timeout) throws InterruptedException;
 
 > [!NOTE]
 >
-> * ① `TimeUnit.SECONDS.sleep(timeout)` 就是对 `Thread.sleep(millis)` 的封装。
-> * ② 在实际开发中，推荐使用`TimeUnit.SECONDS.sleep(timeout)`，因为可读性更高！！！
+> * ① 那条线程执行了休眠的方法，那么那条线程就会在这里停留指定的时间；当时间到了之后，线程会自动醒来，继续执行下面的方法。 
+> * ② `TimeUnit.SECONDS.sleep(timeout)` 就是对 `Thread.sleep(millis)` 的封装。
+> * ③ 在实际开发中，推荐使用`TimeUnit.SECONDS.sleep(timeout)`，因为可读性更高！！！
 
 
 
@@ -550,6 +556,167 @@ public class Test {
 
 ```md:img [cmd 控制台]
 ![](./assets/9.gif)
+```
+
+:::
+
+## 1.7 守护线程相关方法
+
+* 设置当前线程为守护线程（后台线程）：
+
+```java
+public final void setDaemon(boolean on) {}
+```
+
+* 判断当前线程是否是守护线程（后台线程）：
+
+```java
+public final boolean isDaemon() {}
+```
+
+> [!NOTE]
+>
+> * ① Java 中默认创建的线程是非守护线程（普通线程，用户线程）。
+> * ② 如果一个应用中只要有一个普通线程还在运行，应用程序就不会退出；反之，则会退出。
+> * ③ 守护线程依赖于普通线程，当最后一个前台线程结束时，所有后台线程立即终止。
+> * ④ Java 中的 GC 就是典型的守护线程。
+
+
+
+* 示例：普通线程
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo8;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * 如果一个应用中只要有一个普通线程还在运行，应用程序就不会退出；反之，则会退出。
+ */
+public class Test {
+    public static void main(String[] args) {
+        System.out.println("main 线程开始：" + Thread.currentThread().getName());
+
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 100; i++) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println(Thread.currentThread().getName() + ":" + i);
+            }
+        });
+        t1.start();
+
+        System.out.println("main 线程结束：" + Thread.currentThread().getName());
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/10.gif)
+```
+
+:::
+
+
+
+* 示例：守护线程
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo8;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * 守护线程依赖于普通线程，当最后一个前台线程结束时，所有后台线程立即终止。
+ */
+public class Test {
+    public static void main(String[] args) {
+        System.out.println("main 线程开始：" + Thread.currentThread().getName());
+
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 100; i++) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println(Thread.currentThread().getName() + ":" + i);
+            }
+        });
+        // 设置为守护线程
+        t1.setDaemon(true);
+        t1.start();
+
+        System.out.println("main 线程结束：" + Thread.currentThread().getName());
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/11.gif)
+```
+
+:::
+
+## 1.8 礼让线程相关方法（了解）
+
+* 设置当前线程为礼让线程，即：放弃 CPU 的执行权：
+
+```java
+public static native void yield();
+```
+
+> [!NOTE]
+>
+> * ① Java 中的线程是映射到操作系统的内核线程，仅仅具备建议权，具体调度依靠的是操作系统内部的调度器。
+> * ② yield() 方法和 setPriority() 方法类似也是建议操作系统而已！！！
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo8;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * 守护线程依赖于普通线程，当最后一个前台线程结束时，所有后台线程立即终止。
+ */
+public class Test {
+    public static void main(String[] args) {
+        System.out.println("main 线程开始：" + Thread.currentThread().getName());
+
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 100; i++) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                System.out.println(Thread.currentThread().getName() + ":" + i);
+            }
+        });
+        // 设置为守护线程
+        t1.setDaemon(true);
+        t1.start();
+
+        System.out.println("main 线程结束：" + Thread.currentThread().getName());
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/12.gif)
 ```
 
 :::
