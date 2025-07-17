@@ -24,9 +24,13 @@
 ## 1.2 Java 源代码的执行流程
 
 * Java 源代码的执行，分为以下三个步骤：
-  * ① 编写 Java 源代码文件，如：`HelloWorld.java` 。
-  * ② 使用 javac 命令将 Java 源文件翻译为字节码文件，如：`HelloWorld.class` 。
-  * ③ 使用 Java 命令执行字节码文件，如：`java HelloWorld`，本质上是使用 Java 虚拟机加载并运行 Java 字节码文件，此时会启动一个新的 Java 进程。
+
+| 步骤                                                         | 例子                                       |
+| ------------------------------------------------------------ | ------------------------------------------ |
+| ① 编写 Java 源代码文件                                       | vim HelloWorld.java                        |
+| ② 使用 javac 命令将 Java 源文件翻译为字节码文件              | javac HelloWorld.java --> HelloWorld.class |
+| ③ 使用 Java 命令执行字节码文件，本质上是使用 Java 虚拟机加载并运行 Java 字节码文件，此时会启动一个新的 Java 进程。 | java HelloWorld                            |
+
 
 
 
@@ -89,3 +93,22 @@ public class HelloWorld {
 
 
 # 第三章：常见的 JVM
+
+## 3.1 概述
+
+
+
+
+
+
+
+## 3.2 Hotspot 虚拟机
+
+
+
+
+
+
+
+## 3.3 Hotspot 发展史
+

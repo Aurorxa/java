@@ -120,7 +120,17 @@ const vitePressOptions = withMermaid(defineConfig({
       lazyLoading: true
     },
     // md 配置
-    config: (md) => {
+    config: async (md) => {
+      // // 动态导入插件
+      const {default: multimdTable} = await import('markdown-it-multimd-table-ext')
+
+      md.use(multimdTable, {
+        multiline: true,
+        rowspan: true,
+        headerless: true,
+        multibody: true,
+        aotolabel:  true,
+      })
       // 创建 markdown-it 插件
       md.use((md) => {
         const defaultRender = md.render
