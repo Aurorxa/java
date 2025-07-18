@@ -252,7 +252,7 @@ int main() {
 
 ## 3.3 Hotspot 发展史
 
-* HotSpot JVM 是 Java 生态系统中最重要的虚拟机之一，其发展历程反映了Java 性能优化的演进过程。
+* HotSpot 是 Java 生态系统最重要的虚拟机之一，其发展历程反映了Java 性能优化的演进过程。
 
 ![](./assets/20.png)
 
