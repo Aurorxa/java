@@ -352,7 +352,7 @@ public class Test {
 
 > [!NOTE]
 >
-> jclasslib 提供了快捷方式，可以选中`字节码指令`，右键选择显示JVM规范，就会自动跳转到 Oracle 官网。
+> jclasslib 提供了快捷方式，可以选中`字节码指令`，右键选择`显示JVM规范`，就会自动跳转到 Oracle 官网。
 
 ![](./assets/27.gif)
 
