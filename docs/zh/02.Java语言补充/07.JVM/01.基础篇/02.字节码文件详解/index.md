@@ -268,13 +268,99 @@ hexdump -C xxx
 
 ### 2.4.4 常量池
 
+#### 2.4.4.1 概述
 
+* 字节码文件中常量池的作用：`避免相同的内容重复定义，节省空间`。
 
+#### 2.4.4.2 推演
 
+* 假设，我们在代码中定义相同的字符串，如下所示：
 
+```java
+public class Test {
+    public static void main(String[] args) {
+        String str = "人类无敌"; // [!code highlight]
+        String str2 = "人类无敌"; // [!code highlight]
+    }
+}
+```
 
+* 如果在编译之后，在字节码文件中也出现一模一样的两个字符串，将会是一种空间浪费。
+
+![](./assets/22.svg)
+
+* 刚才只出现了两个相同的字符串；但是，如果是三个、四个、...，甚至无数次，如下所示：
+
+```java
+public class Test {
+    public static void main(String[] args) {
+        for(int i = 0;i < 100_100_100;i++) { // [!code highlight:3]
+             String str = "人类无敌";
+        }
+    }
+}
+```
+
+* 按照刚才的想法，字节码文件的内容将会越来越多，体积也会越来越大，如下所示：
+
+> [!NOTE]
+>
+> 文件的体积太大，会影响将来文件的读取，使得文件读取的效率变得很低！！！
+
+![](./assets/23.svg)
+
+#### 2.4.4.3 优化措施
+
+* ① 常量池中的数据都有一个编号，编号从 1 开始，这样就可以在`字段`或`字节码指令`中通过编号快速找到对应的数据。
+
+::: code-group
+
+```java [Test.java]
+public class Test {
+
+    private static final String str = "人类无敌";
+    private static final String str2 = "人类无敌";
+    private static final String str3 = "str";
+
+    public static void main(String[] args) {
+        System.out.println(str);
+        System.out.println(str2);
+        System.out.println(str3);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/24.gif)
+```
+
+:::
+
+* ② `字节码指令`中通过`编号`引用到常量池的过程称之为`符号引用`：
+
+![](./assets/25.svg)
 
 ### 2.4.5 方法
+
+#### 2.4.5.1 概述
+
+* 字节码的`方法区域`是`字节码指令`的核心位置，字节码指令的内容存放在方法的 Code 属性中。
+
+![](./assets/26.svg)
+
+* 至此，我们就需要关注这些`字节码指令`在每一行执行过程中，到底做了什么？
+
+> [!NOTE]
+>
+> jclasslib 提供了快捷方式，可以选中`字节码指令`，右键选择显示JVM规范，就会自动跳转到 Oracle 官网。
+
+![](./assets/27.gif)
+
+#### 2.4.5.2 
+
+
+
+
 
 
 
