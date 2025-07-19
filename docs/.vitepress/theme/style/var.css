@@ -110,8 +110,5 @@ html {
   transition: background-color 0.25s;
 }
 
-/* 扩展表格 */
-.vp-doc th {
-    white-space: nowrap;
-}
+
 

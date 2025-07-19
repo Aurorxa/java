@@ -1,4 +1,10 @@
 /* 自定义表格样式 */
+
+/* 扩展表格 */
+.vp-doc th {
+    white-space: nowrap;
+}
+
 .vp-doc table {
     border-collapse: collapse;
     width: 100%;

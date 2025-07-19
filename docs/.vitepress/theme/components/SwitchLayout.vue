@@ -1,8 +1,5 @@
 <template>
   <DefaultTheme.Layout>
-    <template #sidebar-nav-before>
-      <Sidebar/>
-    </template>
     <template #doc-footer-before>
       <BackTop/>
     </template>
@@ -35,7 +32,6 @@
 
 <script lang="ts" setup>
 import BackTop from "./BackTop.vue";
-import Sidebar from "./Sidebar.vue";
 import ArticleMetadata from "./ArticleMetadata.vue";
 import {useData} from "vitepress";
 import DefaultTheme from "vitepress/theme";
