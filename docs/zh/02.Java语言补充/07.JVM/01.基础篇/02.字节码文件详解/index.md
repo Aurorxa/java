@@ -344,7 +344,7 @@ public class Test {
 
 #### 2.4.5.1 概述
 
-* 字节码的`方法区域`是`字节码指令`的核心位置，字节码指令的内容存放在方法的 Code 属性中。
+* 字节码的`方法区域`是`字节码指令`的核心位置，字节码指令的内容存放在方法的 `Code` 属性中。
 
 ![](./assets/26.svg)
 
@@ -356,19 +356,401 @@ public class Test {
 
 ![](./assets/27.gif)
 
-#### 2.4.5.2 
+#### 2.4.5.2 操作数栈和局部变量表
 
+* 假设，代码是这样的，如下所示：
 
+```java
+public class Test {
+    public static void main(String[] args) {
+        int i = 0;
+        int j = i + 1;
+    }
+}
+```
 
+* 上述代码编译为字节码指令就是这样的，如下所示：
 
+::: code-group
 
+```txt [byte code]
+0 iconst_0
+1 istore_1
+2 iload_1
+3 iconst_1
+4 iadd
+5 istore_2
+6 return
+```
 
+```md:img [cmd 控制台]
+![](./assets/27.png)
+```
+
+:::
+
+> [!NOTE]
+>
+> 要理解上述字节码指令是如何执行的，我们需要先理解两块内存区域：`操作数栈`和`局部变量表`！！！
+
+* `操作数栈`就是用来存放临时数据的内容，是一个栈式结构，其特点是：先近后出。
+
+![](./assets/28.svg)
+
+* `局部变量表`就是一个数组，用来存放方法中的局部变量（方法的形参、方法中定义的局部变量），在编译期就可以确定方法有多少个局部变量。
+
+![](./assets/29.svg)
+
+* 其实，我们可以从 jclasslib 中获取`局部变量表（本地变量表）`的信息，如下所示：
+
+![](./assets/30.png)
+
+#### 2.4.5.3 字节码指令的学习
+
+* 刚开始，还没有执行任何字节码指令，在内存中是这样的，如下所示：
+
+![](./assets/31.svg)
+
+* 当执行了 `int i = 0` ，其会拆分为 `iconst_0` 指令和 `istore_1` 指令，以便对 `i` 进行赋值：
+
+![](./assets/32.svg)
+
+* 当执行了 `iconst_0` 指令，其对应的指令是 `iconst_<i>`，其中 `<i>` 是常量。
+
+> [!NOTE]
+>
+> * ① `iconst_<i>` 指令的含义：将常量 `<i>` push（推） 到操作数栈上。
+> * ②  `iconst_0` 指令就是将常量 `0` 压入到操作数栈上。
+
+![](./assets/33.gif)
+
+* 当执行了 `istore_1` 指令，其对应的指令是 `istore_<n>`，其中 `<n>` 是常量。
+
+> [!NOTE]
+>
+> * ① `istore_<n>` 指令的含义：从操作数栈中，将栈顶的元素弹出来，并存放到局部变量表中索引为 `<n>` 的位置。
+> * ② `istore_1` 指令就是从操作数栈中，将栈顶的元素 `0` 弹出来，并存放到局部变量表中索引为 `1` 的位置。
+
+![](./assets/34.gif)
+
+* 当执行到了 `int j = i + 1`，其实分为两个步骤：
+
+> [!NOTE]
+>
+> * :one: 计算 i + 1 的结果。
+> * :two: 将 i + 1 的结果赋值给 j 。
+
+![](./assets/35.svg)
+
+* 换言之，当执行到了 `int j = i + 1` ，就涉及到了 4 个字节码指令：
+
+![](./assets/36.svg)
+
+* 当执行到 `iload_1` 指令的时候，其对应的指令是 `iload_<n>`，其中 `<n>` 是常量。
+
+> [!NOTE]
+>
+> * ① `iload_<n>` 指令的含义：将局部变量表中索引为 `<n>` 的位置上的值 push（推） 到操作数栈上。
+> * ② `iload_1` 指令就是将局部变量表中索引为 `1`的位置上的值 push（推） 到操作数栈上。
+> * ③ `iload_<n>` 指令和 `istore_<n>` 指令不同：
+>   * :one:`iload_<n>` 指令是加载操作，即：从局部变量表中复制了一份存入到操作数栈中（复制粘贴）。
+>   * :two:`istore_<n>` 这里是弹出并存储操作，即：从操作数栈中弹出栈顶圆形，并存储到局部变量表中（剪切粘贴）。
+
+![](./assets/37.gif)
+
+* 当执行了 `iconst_1` 指令，其对应的指令是 `iconst_<i>`，其中 `<i>` 是常量。
+
+> [!NOTE]
+>
+> * ① `iconst_<i>` 指令的含义：将常量 `<i>` push（推） 到操作数栈上。
+> * ②  `iconst_1` 指令就是将常量 `1` 压入到操作数栈上。
+
+![](./assets/38.gif)
+
+* 当执行了 `iadd` 指令：
+
+> [!NOTE]
+>
+> `iadd` 指令的含义：将操作数栈上的栈顶两个数据弹出并累加，再压入到操作数栈中。
+
+![](./assets/39.gif)
+
+* 当执行了 `istore_2` 指令，其对应的指令是 `istore_<n>`，其中 `<n>` 是常量。
+
+> [!NOTE]
+>
+> * ① `istore_<n>` 指令的含义：从操作数栈中，将栈顶的元素弹出来，并存放到局部变量表中索引为 `<n>` 的位置。
+> * ② `istore_2` 指令就是从操作数栈中，将栈顶的元素 `1` 弹出来，并存放到局部变量表中索引为 `2` 的位置。
+
+![](./assets/40.gif)
+
+#### 2.4.5.4 面试题
+
+* 如果代码是这样的，如下所示：
+
+```java
+public class Test {
+    public static void main(String[] args) {
+       int i = 0;
+       i = i++;
+    }
+}
+```
+
+* 其对应的字节码指令就是这样的，如下所示：
+
+```txt
+iconst_0
+istore_1
+iload_1
+iinc 1 by 1
+istore_1
+return
+```
+
+* 当执行了 `iconst_0` 指令，其对应的指令是 `iconst_<i>`，其中 `<i>` 是常量。
+
+> [!NOTE]
+>
+> * ① `iconst_<i>` 指令的含义：将常量 `<i>` push（推） 到操作数栈上。
+> * ②  `iconst_0` 指令就是将常量 `0` 压入到操作数栈上。
+
+![](./assets/41.gif)
+
+* 当执行了 `istore_1` 指令，其对应的指令是 `istore_<n>`，其中 `<n>` 是常量。
+
+> [!NOTE]
+>
+> * ① `istore_<n>` 指令的含义：从操作数栈中，将栈顶的元素弹出来，并存放到局部变量表中索引为 `<n>` 的位置。
+> * ② `istore_1` 指令就是从操作数栈中，将栈顶的元素 `0` 弹出来，并存放到局部变量表中索引为 `1` 的位置。
+
+![](./assets/42.gif)
+
+* 当执行到 `iload_1` 指令的时候，其对应的指令是 `iload_<n>`，其中 `<n>` 是常量。
+
+> [!NOTE]
+>
+> * ① `iload_<n>` 指令的含义：将局部变量表中索引为 `<n>` 的位置上的值 push（推） 到操作数栈上。
+> * ② `iload_1` 指令就是将局部变量表中索引为 `1`的位置上的值 push（推） 到操作数栈上。
+> * ③ `iload_<n>` 指令和 `istore_<n>` 指令不同：
+>   * :one:`iload_<n>` 指令是加载操作，即：从局部变量表中复制了一份存入到操作数栈中（复制粘贴）。
+>   * :two:`istore_<n>` 这里是弹出并存储操作，即：从操作数栈中弹出栈顶圆形，并存储到局部变量表中（剪切粘贴）。
+
+![](./assets/43.gif)
+
+* 当执行到 `iinc 1 by 1` 指令的时候，其对应的指令是 `iinc <n> by ?`，其中 `<n>` 是常量。
+
+> [!NOTE]
+>
+> `iinc 1 by 1` 指令的含义：直接对局部变量表索引为 `1` 的位置处进行增加 `1` 操作。
+
+![](./assets/44.gif)
+
+* 当执行了 `istore_1` 指令，其对应的指令是 `istore_<n>`，其中 `<n>` 是常量。
+
+> [!NOTE]
+>
+> * ① `istore_<n>` 指令的含义：从操作数栈中，将栈顶的元素弹出来，并存放到局部变量表中索引为 `<n>` 的位置。
+> * ② `istore_1` 指令就是从操作数栈中，将栈顶的元素 `0` 弹出来，并存放到局部变量表中索引为 `1` 的位置。
+
+![](./assets/45.gif)
 
 ## 2.5 玩转字节码常用工具
 
+### 2.5.1 概述
+
+* 在之前，我们都是使用 jclasslib 工具来打开字节码文件并详细查看其中的内容。
+* 其实，在实际开发中，我们还会使用其他的工具，这些工具的使用场景是不一样的：
+
+| 工具          | 功能             | 主要使用场景               | 特点                           |
+| ------------- | ---------------- | -------------------------- | ------------------------------ |
+| **javap**     | 反汇编字节码     | 查看字节码指令、学习JVM    | JDK 自带，轻量级，静态分析     |
+| **jclasslib** | 图形化字节码查看 | 可视化学习字节码结构       | 界面友好，IDE 插件，结构化展示 |
+| **Arthas**    | 动态诊断         | 生产环境问题排查、性能调优 | 功能强大，支持热更新，动态监控 |
+| **dump**      | 导出运行时类     | 获取JVM已加载类信息        | 运行时状态，批量导出           |
+| **jad**       | 反编译源码       | 逆向工程、查看第三方库     | 输出Java源码，易于理解         |
+
+### 2.5.2 javap 命令
+
+* `javap` 是 JDK 自带的`反编译`工具，可以通过控制台查看字节码文件的内容。 
+* javap 命令的使用：
+
+```shell
+javap [-v] [全限定类名|全限定类名.class]
+```
+
+> [!NOTE]
+>
+> * `-v`：表示查看所有附加信息，如：基本信息、常量池、字段、方法和属性。
+> * `-cp <path>`：指定查找用户类文件的位置，即：从 jar 包中查看类。
+> * `-p`：显示所有类和成员（包含私有）。
+
+> [!CAUTION]
+>
+> * ① 如果使用`-cp <path>`查看查询 jar 包中的某个类，只能使用`全限定类名`的方式！！！
+> * ② 如果什么参数也不加，默认获取的是基本类信息！！！
 
 
 
+* 示例：反编译字节码文件，获取所有附件信息（基本信息、常量池、字段、方法和属性）
+
+::: code-group
+
+```shell
+javap -v Test.class
+```
+
+```md:img [cmd 控制台]
+![](./assets/46.gif)
+```
+
+```txt [cmd 控制台]
+Classfile /root/Test.class
+  Last modified 2025-7-21; size 508 bytes
+  MD5 checksum 035be7e261a22f028b0c25368572ee47
+  Compiled from "Test.java"
+public class Test
+  minor version: 0
+  major version: 52
+  flags: ACC_PUBLIC, ACC_SUPER
+Constant pool:
+   #1 = Methodref          #7.#19         // java/lang/Object."<init>":()V
+   #2 = Fieldref           #20.#21        // java/lang/System.out:Ljava/io/PrintStream;
+   #3 = Class              #22            // Test
+   #4 = String             #23            // 人类无敌
+   #5 = Methodref          #24.#25        // java/io/PrintStream.println:(Ljava/lang/String;)V
+   #6 = Methodref          #24.#26        // java/io/PrintStream.println:(I)V
+   #7 = Class              #27            // java/lang/Object
+   #8 = Utf8               str
+   #9 = Utf8               Ljava/lang/String;
+  #10 = Utf8               ConstantValue
+  #11 = Utf8               <init>
+  #12 = Utf8               ()V
+  #13 = Utf8               Code
+  #14 = Utf8               LineNumberTable
+  #15 = Utf8               main
+  #16 = Utf8               ([Ljava/lang/String;)V
+  #17 = Utf8               SourceFile
+  #18 = Utf8               Test.java
+  #19 = NameAndType        #11:#12        // "<init>":()V
+  #20 = Class              #28            // java/lang/System
+  #21 = NameAndType        #29:#30        // out:Ljava/io/PrintStream;
+  #22 = Utf8               Test
+  #23 = Utf8               人类无敌
+  #24 = Class              #31            // java/io/PrintStream
+  #25 = NameAndType        #32:#33        // println:(Ljava/lang/String;)V
+  #26 = NameAndType        #32:#34        // println:(I)V
+  #27 = Utf8               java/lang/Object
+  #28 = Utf8               java/lang/System
+  #29 = Utf8               out
+  #30 = Utf8               Ljava/io/PrintStream;
+  #31 = Utf8               java/io/PrintStream
+  #32 = Utf8               println
+  #33 = Utf8               (Ljava/lang/String;)V
+  #34 = Utf8               (I)V
+{
+  public static final java.lang.String str;
+    descriptor: Ljava/lang/String;
+    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL
+    ConstantValue: String 人类无敌
+
+  public Test();
+    descriptor: ()V
+    flags: ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+         4: return
+      LineNumberTable:
+        line 1: 0
+
+  public static void main(java.lang.String[]);
+    descriptor: ([Ljava/lang/String;)V
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=2, locals=2, args_size=1
+         0: bipush        10
+         2: istore_1
+         3: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+         6: ldc           #4                  // String 人类无敌
+         8: invokevirtual #5                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+        11: getstatic     #2                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        14: iload_1
+        15: invokevirtual #6                  // Method java/io/PrintStream.println:(I)V
+        18: return
+      LineNumberTable:
+        line 4: 0
+        line 6: 3
+        line 7: 11
+        line 8: 18
+}
+SourceFile: "Test.java"
+
+```
+
+:::
+
+
+
+* 示例：反编译指定 jar 包中的指定字节码文件，获取基本类信息
+
+::: code-group
+
+```shell
+javap -cp aliyun-sdk-oss-3.17.4.jar com.aliyun.oss.OSS
+```
+
+```md:img [cmd 控制台]
+![](./assets/47.gif)
+```
+
+:::
+
+### 2.5.3 jclasslib 插件
+
+* IDEA 中有对应的 [jclasslib](https://plugins.jetbrains.com/plugin/9248-jclasslib) 插件，建议在开发阶段使用，可以在代码编译之后实时查看字节码文件的内容。
+* IDEA 插件安装方式：
+
+![](./assets/48.png)
+
+* IDEA 插件使用方式：
+  * ① 先选择源代码文件，点击`视图`（view）菜单，并选择 `Show Bytecode With Jclasslib`。
+  * ② 如果文件修改之后，需要重新编译，并点击`刷新`按钮。
+
+
+
+* 示例：
+
+![](./assets/49.gif)
+
+### 2.5.4 Arthas
+
+
+
+
+
+
+
+### 2.5.5 总结
+
+* 各种字节码常用工具对比，如下所示：
+
+| 工具          | 类型               | 功能简介                      | 主要用途                               | 优点                               | 缺点                                     |
+| ------------- | ------------------ | ----------------------------- | -------------------------------------- | ---------------------------------- | ---------------------------------------- |
+| **javap**     | JDK 内置命令行工具 | 反汇编 class 文件，查看字节码 | 查看字节码、分析方法、学习 JVM 指令    | 自带 JDK、轻量、支持多种输出格式   | 只能静态分析、输出较简单、无图形界面     |
+| **jclasslib** | GUI 工具或IDE 插件 | 图形化展示字节码结构          | 可视化分析字节码、教学用途             | 界面友好、结构清晰、集成 IDE       | 需图形环境、功能较基础                   |
+| **Arthas**    | 动态诊断工具       | 在线诊断Java 应用             | 线上问题排查、性能调优、动态修改字节码 | 支持热更新、无需重启、功能强大     | 使用复杂、有风险、需 attach 进程         |
+| **dump**      | 多种工具中的子命令 | 导出运行时类信息              | 获取运行时类、分析加载状态、对比差异   | 可获取真实运行时数据、支持批量导出 | 需运行中、输出需处理                     |
+| **jad**       | 反编译工具         | 将字节码还原为 Java 源码      | 逆向分析、查看库实现、代码审计         | 接近原始代码、易读、支持批量处理   | 结构可能丢失、泛型不准、不适用于混淆代码 |
+
+* 针对不同应用场景的使用建议：
+
+| 使用场景 | 使用建议                                                     |
+| -------- | ------------------------------------------------------------ |
+| 开发阶段 | :one: 学习字节码：jclasslib 插件 + javap 命令<br>:two: 编译优化分析：javap 命令查看指令级差异<br/>:three: IDE 集成开发：jclasslib 插件实时查看 |
+| 生产环境 | :one: 问题排查：Arthas 动态诊断 <br/>:two: 性能分析：Arthas + dump 命令组合使用 <br/>:three: 应急修复：Arthas 字节码热更新 |
+| 逆向分析 | :one: 源码恢复： jad 命令反编译 <br/>:two: 第三方库分析：jad + javap 组合 <br/>:three: 安全审计：多工具配合使用 |
 
 
 
