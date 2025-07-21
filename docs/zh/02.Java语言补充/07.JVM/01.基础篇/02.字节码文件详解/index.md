@@ -726,11 +726,232 @@ javap -cp aliyun-sdk-oss-3.17.4.jar com.aliyun.oss.OSS
 
 ### 2.5.4 Arthas
 
+#### 2.5.4.1 概述
+
+* [Arthas](https://arthas.aliyun.com/) 是一款线上监控诊断产品，通过全局视角实时查看应用 load、内存、gc、线程的状态信息，并能在不修改应用代码的情况下，对业务问题进行诊断，包括查看方法调用的出入参、异常，监测方法执行耗时，类加载信息等，大大提升线上问题排查效率。
+
+> [!NOTE]
+>
+> * ① 通常，本地开发环境无法访问生产环境。如果在生产环境中遇到问题，则无法使用 IDE 远程调试。更糟糕的是，在生产环境中调试是不可接受的，因为它会暂停所有线程，导致服务暂停。
+> * ② 开发人员可以尝试在测试环境或者预发环境中复现生产环境中的问题。但是，某些问题无法在不同的环境中轻松复现，甚至在重新启动后就消失了。
+> * ③ 如果您正在考虑在代码中添加一些日志以帮助解决问题，您将必须经历以下阶段：测试、预发，然后生产。这种方法效率低下，更糟糕的是，该问题可能无法解决，因为一旦 JVM 重新启动，它可能无法复现，如上文所述。
+> * ④ Arthas 旨在解决这些问题。开发人员可以在线解决生产问题。无需 JVM 重启，无需代码更改。 Arthas 作为观察者永远不会暂停正在运行的线程。
+
+* `Arthas` 是 Alibaba 开源的 Java 诊断工具，深受开发者喜爱，可以为您解决如下的问题：
+  * :one: 这个类从哪个 jar 包加载的？为什么会报各种类相关的 Exception？
+  * :two: 我改的代码为什么没有执行到？难道是我没 commit？分支搞错了？
+  * :three: 遇到问题无法在线上 debug，难道只能通过加日志再重新发布吗？
+  * :four: 线上遇到某个用户的数据处理有问题，但线上同样无法 debug，线下无法重现！
+  * :five: 是否有一个全局视角来查看系统的运行状况？
+  * :six: 有什么办法可以监控到 JVM 的实时运行状态？
+  * :seven: 怎么快速定位应用的热点，生成火焰图？
+  * :eight: 怎样直接从 JVM 内查找某个类的实例？
+
+> [!NOTE]
+>
+> `Arthas` 支持 JDK 6+（4.x 版本不再支持 JDK 6 和 JDK 7），支持 Linux/Mac/Windows，采用命令行交互模式，同时提供丰富的 `Tab` 自动补全功能，进一步方便进行问题的定位和诊断。
+
+* Arthas 的功能，如下所示：
+
+```mermaid
+mindmap
+  root((Arthas ))
+    监控面板
+    查看字节码文件
+    方法监控
+    类的热部署
+    内存监控
+    垃圾回收监控
+    应用热点定位
+```
 
 
 
+#### 2.5.4.2 安装
+
+##### 2.5.4.2.1 准备工作
+
+* 准备一个无限循环的程序，每隔 500 毫秒休眠一下：
+
+::: code-group
+
+```java
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
+
+public class Test {
+    private static final DateTimeFormatter df 
+        = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    public static void main(String[] args) throws InterruptedException {
+        while (true) {
+            System.out.println(df.format(LocalDateTime.now()));
+            TimeUnit.MILLISECONDS.sleep(500);
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/51.gif)
+```
+
+:::
+
+##### 2.5.4.2.2 使用 `arthas-boot`
+
+* ① 下载 `arthas-boot.jar` ：
+
+::: code-group
+
+```bash
+curl -O https://arthas.aliyun.com/arthas-boot.jar
+```
+
+```md:img [cmd 控制台]
+![](./assets/50.gif)
+```
+
+:::
+
+* ② 启动并连接到指定的 Java 进程上：
+
+::: code-group
+
+```bash
+jar -jar arthas-boot.jar
+```
+
+```md:img [cmd 控制台]
+![](./assets/52.gif)
+```
+
+:::
+
+#### 2.5.4.3 命令
+
+##### 2.5.4.3.1 dashboard
+
+* 命令：
+
+```shell
+dashboard [-i xxx] [-n xxx]
+```
+
+> [!NOTE]
+>
+> * ① 显示当前系统的实时数据面板，按 ctrl + c 退出。
+> * ② 参数：
+>   * `-i xxx`：刷新实时数据的时间间隔（ms），默认是 5000 ms。
+>   * `-n xxx`：刷新实时数据的次数。
 
 
+
+* 示例：
+
+::: code-group
+
+```bash
+dashboard
+```
+
+```md:img [cmd 控制台]
+![](./assets/53.gif)
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```bash
+dashboard -i 100
+```
+
+```md:img [cmd 控制台]
+![](./assets/54.gif)
+```
+
+:::
+
+##### 2.5.4.3.2 dump 
+
+* 命令：
+
+```shell
+dump [-d 绝对路径] 类的全限定名
+```
+
+> [!NOTE]
+>
+> * ① dump命令可以将字节码文件保存到本地或指定的目录。
+> * ② 参数：
+>   * `-d xxx`：下载到指定的目录。
+
+
+
+* 示例：
+
+::: code-group
+
+```bash
+dump java.lang.String
+```
+
+```md:img [cmd 控制台]
+![](./assets/55.gif)
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```bash
+dump -d /tmp/output java.lang.String
+```
+
+```md:img [cmd 控制台]
+![](./assets/56.gif)
+```
+
+:::
+
+##### 2.5.4.3.3 jad
+
+* 命令：
+
+```shell
+jad 类的全限定名
+```
+
+> [!NOTE]
+>
+> * ① jad 命令可以将类的字节码文件进行反编译成源代码，用于确认服务器上的字节码文件是否是最新的，并带有语法高亮，阅读更方便。
+> * ② 反编译出来的 java 代码可能会存在语法错误，但不影响你进行阅读理解。
+
+
+
+* 示例：
+
+::: code-group
+
+```bash
+jad 
+```
+
+```md:img [cmd 控制台]
+![](./assets/57.gif)
+```
+
+:::
 
 ### 2.5.5 总结
 
