@@ -944,7 +944,7 @@ jad 类的全限定名
 ::: code-group
 
 ```bash
-jad 
+jad java.lang.String
 ```
 
 ```md:img [cmd 控制台]
