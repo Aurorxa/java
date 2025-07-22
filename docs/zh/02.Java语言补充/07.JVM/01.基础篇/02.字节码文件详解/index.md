@@ -4,7 +4,7 @@
 
 * 需要先了解 Java 虚拟机中的`组成部分`，因为这些`组成部分`中的`重点内容`是后续学习的方向。
 
-## 1.2 Java 虚拟机的组成
+## 1.2 Java 虚拟机的组成（⭐）
 
 * Java 虚拟机主要分为以下几个组成部分：
 
@@ -57,7 +57,7 @@
 
 ![](./assets/7.png)
 
-## 2.3 以正确的姿势打开文件
+## 2.3 以正确的姿势打开文件（⭐）
 
 * 字节码文件保存了源代码编译后的内容，以二进制的形式存储，并不能使用`记事本`打开阅读。
 
@@ -81,7 +81,7 @@
 
 ![](./assets/10.gif)
 
-## 2.4 字节码文件的组成
+## 2.4 字节码文件的组成（⭐）
 
 ### 2.4.1 概述
 
@@ -555,7 +555,7 @@ return
 
 ![](./assets/45.gif)
 
-## 2.5 玩转字节码常用工具
+## 2.5 玩转字节码常用工具（⭐）
 
 ### 2.5.1 概述
 
@@ -975,17 +975,339 @@ jad java.lang.String
 
 
 
-
-
-
-
-
-
-
-
 # 第三章：类的生命周期
 
+## 3.1 概述
 
+* `类的生命周期`描述的是一个类被`加载`、`使用`、以及`卸载`的整个过程。
+
+> [!NOTE]
+>
+> 下文会详细地拆解，在整个生命周期中的每个阶段，虚拟机到底做了什么事情！！！
+
+## 3.2 为什么要学习？
+
+* ① `类的生命周期`本身就是一个`高频面试题`。
+
+```txt
+【问】类的生命周期分为哪几个阶段，每个阶段到底有什么作用？
+```
+
+```txt
+【问】描述一下，这个类是如何被加载到 Java 虚拟机中的？
+```
+
+* ② `类的生命周期`中的`初始化阶段`频繁出现在`大厂笔试题`中。
+
+::: code-group
+
+```java [Test1.java]
+public class Test1 {
+
+    static  {
+        System.out.println("D");
+    }
+
+    {
+        System.out.println("C");
+    }
+
+    public Test1(){
+        System.out.println("B");
+    }
+
+    public static void main(String[] args){
+        System.out.println("A");
+
+        new Test1();
+        new Test1();
+    }
+}
+```
+
+```java [Test2.java]
+public class Test2 {
+    public static void main(String[] args) {
+        new B02();
+        System.out.println(B02.a);
+    }
+}
+
+class A02 {
+    static int a = 0;
+
+    static {
+        a = 1;
+    }
+}
+
+class B02 extends A02 {
+    static {
+        a = 2;
+    }
+}
+```
+
+:::
+
+* ③ `类的生命周期`相关知识点是后续大量知识点的`基础知识`。
+
+> [!NOTE]
+>
+> * :one:运行时常量池。​ 
+> * :two: 类加载器的作用。
+> * :three: 多态的原理。
+> * :four: 类的加密和解密。
+
+## 3.3 类的生命周期的主要阶段
+
+* `类的生命周期`的主要阶段，如下所示：
+
+> [!NOTE]
+>
+> * ① 使用阶段：是我们最熟悉的阶段，因为平常经常使用的。
+>
+> ```java
+> Test test = new Test();
+> 
+> Class<Test> clazz = test.class;
+> Test test2 = clazz.newInstance();
+> ```
+>
+> * ② 卸载阶段：暂时不会涉及，将会在垃圾回收篇中讲解。
+
+![](./assets/58.svg)
+
+* `类的生命周期`主要阶段的详细内容，如下所示：
+
+| 类的生命周期主要阶段       | 描述                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| ① 加载（Loading）          | 类的字节码或定义被读入内存，但还未进行初始化。<br>这通常发生在程序首次引用该类时。 |
+| ② 链接（Linking）          | 验证、准备和解析。<br>包括验证类的结构完整性、为静态变量分配内存空间，以及解析类中的符号引用。 |
+| ③ 初始化（Initialization） | 执行类的静态初始化代码，如：静态变量赋值、静态代码块等。<br/>这个阶段确保类在首次使用前处于正确状态。 |
+| ④ 使用（Using）            | 类被实例化创建对象，或者直接访问静态成员。<br/>这是类发挥实际作用的阶段。 |
+| ⑤ 卸载（Unloading）        | 当类不再被引用且满足特定条件时，垃圾回收器可能会卸载该类，释放相关内存。 |
+
+* 在下文中，我们暂时只会聚焦`类的生命周期`的前三个阶段：`加载`、`链接`以及`初始化`。
+
+> [!NOTE]
+>
+> * ① `加载`、`链接`以及`初始化`中最重要的是`初始化`阶段。
+> * ② 之所以`初始化`阶段最重要，是因为程序员可以干涉，并且在笔试题中会大量涉及到。
+
+## 3.4 加载阶段
+
+### 3.4.1 步骤
+
+* ① `类加载器`根据类的`全限定名`通过`不同的渠道`以二进制流的方式将字节码文件加载到内存中。
+
+> [!NOTE]
+>
+> ::: details 点我查看 不同的渠道
+>
+> * ① 从本地磁盘上获取文件：这是最常见的方式。
+>
+> ```java
+> package com.example;
+> // 传统的 .class 文件加载
+> // 类加载器会在 classpath 中查找 com/example/MyClass.class
+> public class MyClass {
+>     // 类定义
+> }
+> ```
+>
+> * ② 运行时动态代理生成：Spring 框架中就大量使用该技术。
+>
+> ```java
+> // Spring AOP 代理示例
+> // Spring 会为这个类生成代理
+> @Service
+> public class UserService {
+> 
+>     @Transactional
+>     public void saveUser(User user) {
+>         // 业务逻辑
+>     }
+> }
+> ```
+>
+> ```java
+> // Spring 内部会动态生成类似这样的代理类字节码
+> public class UserService$$EnhancerBySpringCGLIB extends UserService {
+> 	// 增强后的方法实现
+> }
+> ```
+>
+> * ③ 通过网络获取字节码文件，如：Applet 技术（已淘汰）。
+>
+> ```html
+> <!-- HTML 中的 applet 标签 -->
+> <applet code="MyApplet.class" 
+>         codebase="http://example.com/applets/"
+>         width="300" height="200">
+> </applet>
+> ```
+>
+> * ④ 程序员可以自定义扩展方式：我们可以继承 classLoader 实现自定义加载。
+>
+> ```java
+> public class CustomClassLoader extends ClassLoader {
+>     
+>     @Override
+>     protected Class<?> findClass(String name) throws ClassNotFoundException {
+>         try {
+>             // 可以从任何地方获取字节码
+>             byte[] classData = getClassDataFromCustomSource(name);
+> 
+>             // 将字节数组转换为 Class 对象
+>             return defineClass(name, classData, 0, classData.length);
+>         } catch (Exception e) {
+>             throw new ClassNotFoundException(name);
+>         }
+>     }
+> 
+>     private byte[] getClassDataFromCustomSource(String className) {
+>         // 这里可以实现各种获取字节码的方式：
+>         // 1. 从数据库读取
+>         // 2. 从加密文件解密获取
+>         // 3. 通过 HTTP 请求获取
+>         // 4. 从内存中的字节数组获取
+>         return new byte[0]; 
+>     }
+> }
+> ```
+>
+> :::
+
+* ② 类加载器在加载完类之后，JVM 会将字节码中的信息保存到方法区中，`并在方法区中会生成一个 InstanceKlass 对象，保存了类的所有信息，里面还包含了特定功能，如：多态的信息`。换言之，如果 JVM 需要创建这个类对应的对象，就会使用到这些信息。
+
+> [!NOTE]
+>
+> ::: details 点我查看 方法区
+>
+> * ① 方法区只是 Java 虚拟机规范中设计出来的一个虚拟概念。
+> * ② 不同种类的 Java 虚拟机，甚至不同版本的 Hotspot 虚拟机，在设计方法区的时候，都用到了不同的内存空间，如：JDK7 之前使用到的是永久代，而 JDK8 之后使用的是元空间。
+> * ③ 方法区只是一个虚拟的概念，真正的实现，在后续的文章中会有详细讲解！！！
+>
+> :::
+
+![](./assets/59.svg)
+
+* ③ JVM 还会在堆中生成一份和方法区中数据类似的 `java.lang.Class` 对象，其作用是`可以在 Java 代码中获取类的信息以及存储的静态字段的数据`（JDK8+）。
+
+![](./assets/60.svg)
+
+### 3.4.2 疑问？
+
+* 在加载阶段，是通过类加载器将字节码文件的信息加载到内存中，JVM 会在方法区和堆区中分别创建一份对象，以便后面使用。
+
+![](./assets/60.svg)
+
+* 那么，能否只在方法区中创建一个对象，以便节省内存空间？
+
+![](./assets/59.svg)
+
+* `不可以`，其中一点原因是 InstanceKlass 对象是通过 C++ 语言来创建的，而 Java 语言一般是不能直接去操作 C++ 语言编写的对象（除非采用 JNI 或 JNA 等，但是非常麻烦）；所以，JVM 就在堆上创建了 java.lang.Class 对象，以便 Java 语言访问。
+
+![](./assets/62.png)
+
+* `不可以`，另外一点原因是对于开发者而言，只需要访问堆中的 class 对象而不需要访问方法区中的所有信息，即：`JVM 就可以很好地控制开发者访问数据的范围`。
+
+![](./assets/61.svg)
+
+### 3.4.3 查看内存中的对象
+
+* 可以使用 JDK 自带的 `hsdb` （HotSpot Debugger）工具来查看 JVM 内存的详细信息。
+
+> [!NOTE]
+>
+> * ① hsdb 是 HotSpot 虚拟机的调试器，可以查看正在运行的 JVM 进程或 core dump 文件的内存状态。
+> * ② JDK8 之前启动 hsdb （目前使用的版本）：
+>
+> ```shell
+> java -cp $JAVA_HOME/lib/sa-jdi.jar sun.jvm.hotspot.HSDB
+> ```
+>
+> * ② JDK9 之后启动 hsdb：
+>
+> ```shell
+> jhsdb hsdb
+> ```
+
+* :one: 准备代码，并编译和启动：
+
+::: code-group
+
+```java [HsdbDemo.java]
+import java.io.IOException;
+
+public class HsdbDemo {
+    public static final int i = 10;
+    public static void main(String[] args) throws IOException {
+        new HsdbDemo();
+        System.in.read();
+    }
+}
+```
+
+```bash
+javac HsdbDemo.java
+java HsdbDemo
+```
+
+```md:img [cmd 控制台]
+![](./assets/63.gif)
+```
+
+:::
+
+* :two: 查看当前运行的 Java 进程的 pid ：
+
+::: code-group
+
+```bash
+jps
+```
+
+```md:img [cmd 控制台]
+![](./assets/64.gif)
+```
+
+:::
+
+* :three: 启动 hsdb 的图形化界面：
+
+::: code-group
+
+```bash
+java -cp $JAVA_HOME/lib/sa-jdi.jar sun.jvm.hotspot.HSDB
+```
+
+```md:img [cmd 控制台]
+![](./assets/65.gif)
+```
+
+:::
+
+* :four: 选择 `File` --> `Attach to Hotspot process`，并输入指定的 Java 进程 pid ：
+
+![](./assets/66.gif)
+
+* :five: 选择 `Tools` --> `Object Histogram`，并输入 `HsdbDemo`，以便找到对应的 Java 对象：
+
+![](./assets/67.gif)
+
+* :six: 鼠标双击进去，并点击 `Inspect` 按钮：
+
+![](./assets/68.gif)
+
+## 3.5 链接阶段
+
+
+
+
+
+## 3.6 初始化阶段（⭐）
 
 
 

@@ -54,7 +54,7 @@ public class HelloWorld {
 
 
 
-# 第二章：JVM 的功能
+# 第二章：JVM 的功能（⭐）
 
 ## 2.1 概述
 
@@ -226,7 +226,7 @@ int main() {
 
 
 
-# 第三章：常见的 JVM
+# 第三章：常见的 JVM（⭐）
 
 ## 3.1 概述
 
