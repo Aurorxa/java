@@ -1303,6 +1303,321 @@ java -cp $JAVA_HOME/lib/sa-jdi.jar sun.jvm.hotspot.HSDB
 
 ## 3.5 链接阶段
 
+### 3.5.1 概述
+
+* `链接`（Linking）阶段分为三个小阶段：
+
+| 链接阶段的子阶段         | 描述                                                         |
+| ------------------------ | ------------------------------------------------------------ |
+| ① `验证`（Verification） | 验证内容是否满足《Java虚拟机规范》，确保不会危害虚拟机安全。 |
+| ② ` 准备`（Preparation） | 给静态变量分配内存，并赋初始化值。                           |
+| ③ `解析`（Resolution）   | 将常量池中的`符号引用`替换成执行内存的`直接引用`。           |
+
+> [!NOTE]
+>
+> 上述链接的三个子阶段，就是做了一些校验和前期的准备工作，并不会执行程序员写的代码。
+
+### 3.5.2 验证
+
+#### 3.5.2.1 概述
+
+* `验证`的主要目的是`检测 Java 字节码文件是否满足《Java虚拟机规范》中的约束`。
+
+> [!NOTE]
+>
+> 这个阶段不需要程序员的参与！！！
+
+* 主要包含四个方面的内容：
+
+| 验证的主要内容           | 描述                                                         |
+| ------------------------ | ------------------------------------------------------------ |
+| ① 文件格式验证           | 文件是否以 0xCAFEBABE 开头。<br>主次版本号是否满足当前 JVM 版本要求。 |
+| ② 元数据验证             | 检查类的结构信息是否符合 Java 语言规范，确保类的定义是合法的。 |
+| ③ 程序执行指令的语义验证 | 确保字节码指令的语义是合法的、符合逻辑。                     |
+| ④ 符号引用验证           | 对类自身以外（常量池中的各种符号引用）的信息进行匹配性校验。 |
+
+#### 3.5.2.2 文件格式验证
+
+* `文件格式验证`主要确保输入的字节流能被当前版本的虚拟机处理。
+
+| 验证阶段     | 描述                                  |
+| ------------ | ------------------------------------- |
+| 文件格式校验 | 文件是否以 0xCAFEBABE 开头。          |
+| ^^           | 主次版本号是否满足当前 JVM 版本要求。 |
+| ^^           | ...                                   |
+
+
+
+* 示例：修改魔数，看是否能启动
+
+::: code-group
+
+```java [Test.java]
+import java.io.IOException;
+
+public class Test {
+    public static final int i = 10;
+
+    public static void main(String[] args) throws IOException {
+        System.out.println("Hello World!!!");
+    }
+}
+```
+
+```md:img [IDEA编译和运行]
+![](./assets/69.gif)
+```
+
+```md:img [cmd 控制台(修改魔数)]
+![](./assets/70.gif)
+```
+
+```md:img [IDEA运行]
+![](./assets/71.gif)
+```
+
+:::
+
+
+
+* 示例：主次版本号是否满足当前 JVM 版本要求
+
+```cpp
+bool ClassFileParser::is_supported_version(u2 major, u2 minor) {
+  u2 max_version =
+    JDK_Version::is_gte_jdk17x_version() ? JAVA_MAX_SUPPORTED_VERSION :
+    (JDK_Version::is_gte_jdk16x_version() ? JAVA_6_VERSION : JAVA_1_5_VERSION);
+  // 编译文件的主版本号不能高于运行环境的主版本号
+  // 如果主版本号相等，次版本号也不能超过  
+  return (major >= JAVA_MIN_SUPPORTED_VERSION) &&
+         (major <= max_version) &&
+         ((major != max_version) ||
+          (minor <= JAVA_MAX_SUPPORTED_MINOR_VERSION));
+}
+```
+
+#### 3.5.2.3 元数据验证
+
+* `元数据验证`主要检查类的结构信息是否符合 Java 语言规范，确保类的定义是合法的。
+
+| 验证阶段   | 描述                               |
+| ---------- | ---------------------------------- |
+| 元数据验证 | 类必须有父类，即：super 不能为空。 |
+| ^^         | ...                                |
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+import java.io.IOException;
+
+public class Test {
+    public static final int i = 10;
+
+    public static void main(String[] args) throws IOException {
+        System.out.println("Hello World!!!");
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/72.png)
+```
+
+:::
+
+
+
+#### 3.5.2.4 程序执行指令的语义验证
+
+* `程序执行指令的语义验证`必须确保确保字节码指令的语义是合法的、符合逻辑的。
+
+| 验证阶段               | 描述                                   |
+| ---------------------- | -------------------------------------- |
+| 程序执行指令的语义验证 | 方法内的指令执行中跳转到不正确的位置。 |
+| ^^                     | ...                                    |
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+import java.io.IOException;
+
+public class Test {
+    public static final int i = 10;
+
+    public static void main(String[] args) throws IOException {
+        for (int i1 = 0; i1 < 10; i1++) {
+            System.out.println("HelloWorld" + i1);
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/73.png)
+```
+
+:::
+
+#### 3.5.2.5 符号引用验证
+
+* `符号引用验证`是验证阶段的最后一步，发生在虚拟机将符号引用转换为直接引用的时候。
+* 这个验证可以看作是对类自身以外（常量池中的各种符号引用）的信息进行匹配性校验。
+
+| 验证阶段     | 描述                                |
+| ------------ | ----------------------------------- |
+| 符号引用验证 | 是否访问了其他类中 private 的方法。 |
+| ^^           | ...                                 |
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+import java.io.IOException;
+
+public class Test {
+    public static final int i = 10;
+
+    public static void main(String[] args) throws IOException {
+        // 符号引用验证：将符号引用转换为直接引用的时候
+        String str = "hello";
+
+        // 阻塞，防止运行结束
+        System.in.read();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/74.png)
+```
+
+:::
+
+### 3.5.3 准备
+
+#### 3.5.3.1 概述
+
+* `准备`阶段就是为`静态变量`（static）`分配内存`并`设置初始值`。
+
+![在初始化阶段才会将 count 修改为 10](./assets/78.svg)
+
+* 每一种基本数据类型和引用数据类型都有其对应的初始化值，如下所示：
+
+| **数据类型**   | **初始值** |
+| -------------- | ---------- |
+| `int`          | `0`        |
+| `long`         | `0L`       |
+| `short`        | `0`        |
+| `char`         | `'\u0000'` |
+| `byte`         | `0`        |
+| `boolean`      | `false`    |
+| `double`       | `0.0`      |
+| `引用数据类型` | `null`     |
+
+#### 3.5.3.2 原因
+
+* 在`准备阶段`为静态变量赋值初始化值，就是为了保证`内存安全`以及`程序的确定性`。
+
+> [!NOTE]
+>
+> ::: details 点我查看 具体原因
+>
+> * ① `避免未定义行为`：如果静态变量在内存中包含随机的垃圾数据，程序在首次访问这些变量时可能会产生不可预测的结果，导致程序行为不确定。
+> * ② `提供默认的安全状态`：通过赋予零值（对于数值类型为 0，对于引用类型为 null），确保变量有一个明确的初始状态，即使开发者没有显式初始化。
+> * ③ `保证线程安全`：在多线程环境下，如果变量没有初始化就被访问，可能会出现竞态条件。统一的零值初始化避免了这种情况。
+> * ④ `简化 JVM 实现`：JVM 可以批量将整块内存区域清零，这比逐个检查每个变量是否需要初始化更高效。
+> * ⑤ `符合 Java 语言规范`：Java 规范要求所有字段都必须有确定的初始值，这样可以保证程序的可移植性和一致性。
+>
+> :::
+
+* 这种设计让程序员可以依赖变量的默认初始状态，减少了因忘记初始化而导致的 bug ，同时也让 JVM 的行为更加可预测和安全。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+public class Test {
+    /**
+     * 静态变量会在准备阶段赋初始化值
+     */
+    public static int count;
+
+    public static void main(String[] args) {
+
+        System.out.println("count = " + count);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/79.gif)
+```
+
+:::
+
+#### 3.5.3.3 注意事项
+
+* 如果使用 final 修饰基本数据类型的变量，JVM 在准备阶段为这类变量进行赋值，跳过了初始化阶段。
+
+> [!NOTE]
+>
+> ::: details 点我查看 具体原因
+>
+> * ① `编译时常量`：对于 static final 修饰的静态变量，其实在编译时就确定了值（在字节码文件中就持有一个常量池的引用），编译器在编译时会将其当做常量来处理。
+> * ② `避免重复赋值`：由于值在编译时已知且不可变，JVM 可以跳过初始化阶段的赋值操作，提高效率。
+>
+> :::
+
+![](./assets/80.svg)
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+public class Test {
+    /**
+     * static final 修饰的静态变量会当做编译时常量，在初始化阶段直接复制
+     */
+    public static final int count = 2;
+
+    public static void main(String[] args) {
+
+        System.out.println("count = " + count);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/81.gif)
+```
+
+:::
+
+### 3.5.4 解析
+
 
 
 
@@ -1314,4 +1629,52 @@ java -cp $JAVA_HOME/lib/sa-jdi.jar sun.jvm.hotspot.HSDB
 
 
 # 第四章：类加载器
+
+## 4.1 概述
+
+
+
+
+
+
+
+## 4.2 类加载器的分类
+
+
+
+
+
+## 4.3 启动类加载器
+
+
+
+
+
+
+
+## 4.4 扩展类加载和应用程序类加载器
+
+
+
+## 4.5 双亲委派机制
+
+
+
+
+
+## 4.6 打破双亲委派机制
+
+
+
+
+
+## 4.7 JDK9 之后的类加载器
+
+
+
+
+
+
+
+
 

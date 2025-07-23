@@ -8,6 +8,8 @@
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "jsx": "preserve",
+    "types": ["vitepress/client"],
     "typeRoots": [
       "node_modules/@types",
       ".vitepress/types",
@@ -15,9 +17,13 @@
     ]
   },
   "include": [
+    "docs/.vitepress/**/*",
+    "docs/**/*.md",
+    "docs/**/*.vue",
     "**/.vitepress/**/*.ts",
     "**/.vitepress/**/*.mts",
     "**/.vitepress/**/*.vue",
     "src/**/*.ts", "src/**/*.d.ts", "global.d.ts"
-  ]
+  ],
+  "exclude": ["node_modules", "docs/.vitepress/dist"]
 }
