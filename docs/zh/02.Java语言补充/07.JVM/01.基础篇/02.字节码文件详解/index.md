@@ -2086,7 +2086,7 @@ public class Test {
 | ① 创建数组                         | 创建数组对象不会初始化数组元素的类型。                       |
 | ② 直接访问父类的静态变量。         | 只有父类被初始化，子类不会被初始化。                         |
 | ③ 访问编译时常量                   | final static 的基本类型和字符串常量在编译时就确定了值，不需要初始化类。 |
-| ④ Class.forName 的 initialize 参数 | 当 initialize 参数为false时，只加载类但不初始化。            |
+| ④ Class.forName 的 initialize 参数 | 当 initialize 参数为 false 时，只加载类但不初始化。          |
 | ⑤ 获取 Class 对象                  | 使用`.class`语法只是获取类的元数据，不会触发初始化。         |
 
 
@@ -2257,6 +2257,85 @@ class Demo {
 ```
 
 :::
+
+## 3.7 总结
+
+* 类的生命周期的主要阶段，如下所示：
+
+| 类的生命周期主要阶段       | 描述                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| ① 加载（Loading）          | 类的字节码或定义被读入内存，但还未进行初始化。<br>这通常发生在程序首次引用该类时。 |
+| ② 链接（Linking）          | 验证、准备和解析。<br>包括验证类的结构完整性、为静态变量分配内存空间，以及解析类中的符号引用。 |
+| ③ 初始化（Initialization） | 执行类的静态初始化代码，如：静态变量赋值、静态代码块等。<br/>这个阶段确保类在首次使用前处于正确状态。 |
+| ④ 使用（Using）            | 类被实例化创建对象，或者直接访问静态成员。<br/>这是类发挥实际作用的阶段。 |
+| ⑤ 卸载（Unloading）        | 当类不再被引用且满足特定条件时，垃圾回收器可能会卸载该类，释放相关内存。 |
+
+* 其对应的流程图，如下所示：
+
+```mermaid
+flowchart TD
+    A[程序启动] --> B{首次引用类?}
+    B -->|是| C[① 加载 Loading]
+    B -->|否| H[继续执行]
+    
+    C --> D[② 链接 Linking]
+    D --> E[③ 初始化 Initialization]
+    E --> F[④ 使用 Using]
+    F --> G{类还被引用?}
+    G -->|是| F
+    G -->|否| I[⑤ 卸载 Unloading]
+    I --> J[内存释放]
+    
+    subgraph 加载阶段["① 加载 Loading"]
+        C1[读入字节码到内存<br/>未进行初始化]
+    end
+    
+    subgraph 链接阶段["② 链接 Linking"]
+        D1[验证类结构完整性]
+        D2[为静态变量分配内存]
+        D3[解析符号引用]
+        D1 --> D2 --> D3
+    end
+    
+    subgraph 初始化阶段["③ 初始化 Initialization"]
+        E1[执行静态变量赋值]
+        E2[执行静态代码块]
+        E1 --> E2
+    end
+    
+    subgraph 使用阶段["④ 使用 Using"]
+        F1[创建对象实例]
+        F2[访问静态成员]
+        F1 -.-> F2
+    end
+    
+    subgraph 卸载阶段["⑤ 卸载 Unloading"]
+        I1[满足卸载条件]
+        I2[垃圾回收器清理]
+        I1 --> I2
+    end
+    
+    C --> C1
+    D --> D1
+    E --> E1
+    F --> F1
+    I --> I1
+    
+    style 加载阶段 fill:#e1f5fe,stroke:#01579b
+    style 链接阶段 fill:#f3e5f5,stroke:#4a148c
+    style 初始化阶段 fill:#e8f5e8,stroke:#1b5e20
+    style 使用阶段 fill:#fff3e0,stroke:#e65100
+    style 卸载阶段 fill:#ffebee,stroke:#b71c1c
+    
+    style C fill:#b3e5fc
+    style D fill:#e1bee7
+    style E fill:#c8e6c9
+    style F fill:#ffe0b2
+    style I fill:#ffcdd2
+
+```
+
+
 
 
 
