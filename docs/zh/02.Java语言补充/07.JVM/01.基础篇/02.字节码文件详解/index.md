@@ -1722,6 +1722,542 @@ public class Test {
 
 ![](./assets/92.gif)
 
+### 3.6.4 注意事项
+
+* 如果我们将`静态变量`和`静态代码块`的顺序颠倒一下，如下所示：
+
+```java
+public class Test {
+
+    static {
+        count = 2;
+    }
+    
+    public static int count = 1;
+
+    public static void main(String[] args) {
+
+        System.out.println("count = " + count);
+    }
+}
+```
+
+* 其对应的字节码指令就是这样的，如下所示：
+
+![](./assets/93.png)
+
+* 对比一下，如下所示：
+
+![](./assets/94.svg)
+
+### 3.6.5 类生命周期相关 JVM 参数
+
+* JDK9 之前：
+
+| 类生命周期阶段 | 对应日志参数                | 输出时机           | 信息内容                 |
+| -------------- | --------------------------- | ------------------ | ------------------------ |
+| 加载           | `-XX:+TraceClassLoading`    | 字节码读入内存时   | 类名、来源路径、加载器   |
+| 链接-验证      | `-XX:+TraceClassResolution` | 符号引用解析时     | 被解析的类和引用关系     |
+| 链接-准备      | 无专门参数                  | -                  | 需要通过内存监控工具观察 |
+| 链接-解析      | `-XX:+TraceClassResolution` | 符号引用转直接引用 | 解析的符号引用详情       |
+| 初始化         | 无专门参数                  | 执行`<clinit>()`时 | 初始化开始和完成         |
+| 使用           | 无专门参数                  | -                  | 通过其他运行时日志观察   |
+| 卸载           | `-XX:+TraceClassUnloading`  | GC 回收类时        | 被卸载的类和加载器       |
+
+* JDK9 之后：
+
+| 类生命周期阶段 | 对应日志标签          | 输出时机           | 信息内容                 |
+| -------------- | --------------------- | ------------------ | ------------------------ |
+| 加载           | `-Xlog:class+load`    | 字节码读入内存时   | 类名、来源路径、加载器   |
+| 链接-验证      | `-Xlog:class+resolve` | 符号引用解析时     | 被解析的类和引用关系     |
+| 链接-准备      | 无专门标签            | -                  | 需要通过内存监控工具观察 |
+| 链接-解析      | `-Xlog:class+resolve` | 符号引用转直接引用 | 解析的符号引用详情       |
+| 初始化         | `-Xlog:class+init`    | 执行`<clinit>()`时 | 初始化开始和完成         |
+| 使用           | 无专门标签            | -                  | 通过其他运行时日志观察   |
+| 卸载           | `-Xlog:class+unload`  | GC 回收类时        | 被卸载的类和加载器       |
+
+### 3.6.6 触发类初始化的方式
+
+* 主动触发类初始化的方式：
+
+| 方式                             | 描述                                                         |
+| -------------------------------- | ------------------------------------------------------------ |
+| ① 访问一个类的静态变量或静态方法 | :one: 访问非 final 静态变量。<br>:two: 给静态变量赋值。<br>:three: 调用类的静态方法。<br> |
+| ② 反射调用或反射创建实例。       | :one: 调用 Class.forName(String className) 方法，即：使用反射加载类。<br>:two: 通过反射创建实例对象。 |
+| ③ 使用 new 关键字创建该类的对象  | 创建了类的对象，必然需要先对类进行初始化，并且只会初始化一次。 |
+| ④ 执行 main 方法的当前类         | 包含 main 方法的启动类。                                     |
+| ⑤ 初始化子类                     | 初始化子类时会先初始化父类。                                 |
+
+> [!NOTE]
+>
+> ::: details 点我查看 具体细节
+>
+> * ① `static final`修饰的静态常量，不会触发初始化，其在`链接`阶段中的`准备`阶段就直接赋值。
+> * ② `Class.forName()` 有重载方法可以不主动触发初始化。
+>
+> ```java
+> /*
+> * @param initialize 如果是 false 就不主动触发初始化
+> */
+> public static Class<?> forName(String name,boolean initialize,ClassLoader loader) {
+>     ...
+> }
+> ```
+> * ③ 类的初始化执行顺序：
+>
+> | 执行顺序 | 内容                     | 说明                     |
+> | -------- | ------------------------ | ------------------------ |
+> | 1        | 父类静态变量和静态代码块 | 按在代码中出现的顺序执行 |
+> | 2        | 子类静态变量和静态代码块 | 按在代码中出现的顺序执行 |
+> | 3        | 父类实例变量和实例代码块 | 创建实例时执行           |
+> | 4        | 父类构造方法             | 父类构造器执行           |
+> | 5        | 子类实例变量和实例代码块 | 创建实例时执行           |
+> | 6        | 子类构造方法             | 子类构造器执行           |
+>
+> * ④ 类初始化的重要特性：
+>
+> | 特性     | 描述                               |
+> | -------- | ---------------------------------- |
+> | 线程安全 | JVM 保证类初始化过程是线程安全的   |
+> | 单次执行 | 每个类在 JVM 中只会被初始化一次    |
+> | 懒加载   | 类只有在首次主动使用时才会被初始化 |
+> | 父类优先 | 子类初始化前必须先完成父类初始化   |
+> 
+> :::
+
+
+
+* 示例：访问一个类的静态变量或静态方法，会触发类的初始化
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+import java.io.IOException;
+
+public class Test {
+
+    public static void main(String[] args) throws IOException {
+
+        // 访问静态变量
+        System.out.println(Demo.count);
+
+        // 访问静态方法
+        System.out.println(Demo.getCount());
+
+        // 修改静态变量
+        Demo.count = 3;
+    }
+}
+
+class Demo {
+    public static int count = 1;
+
+    static {
+        
+        count = 2;
+    }
+
+    public static int getCount() {
+        return count;
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/95.gif)
+```
+
+:::
+
+
+
+* 示例：反射调用或反射创建实例，会触发类的初始化
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+public class Test {
+
+    public static void main(String[] args) throws Exception {
+
+        // 反射调用
+        Class.forName("com.github.thread.demo10.Demo");
+
+        // 反射创建实例
+        Demo.class.getDeclaredConstructor().newInstance();
+    }
+}
+
+class Demo {
+    public static int count = 1;
+
+    static {
+        System.out.println("Demo 初始化了");
+        count = 2;
+    }
+
+    public static int getCount() {
+        return count;
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/96.gif)
+```
+
+:::
+
+
+
+* 示例：使用 new 关键字创建该类的对象，会触发类的初始化
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+public class Test {
+
+    public static void main(String[] args) throws Exception {
+
+        // 使用 new 关键字创建该类的对象
+        new Demo();
+    }
+}
+
+class Demo {
+    public static int count = 1;
+
+    static {
+        System.out.println("Demo 初始化了");
+        count = 2;
+    }
+
+    public static int getCount() {
+        return count;
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/97.gif)
+```
+
+:::
+
+
+
+* 示例：执行 main 方法的当前类，会触发类的初始化
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+public class Test {
+
+    static {
+        System.out.println("Test 初始化了");
+    }
+    public static void main(String[] args) throws Exception {
+
+        System.out.println("Test");
+
+    }
+}
+
+class Demo {
+    public static int count = 1;
+
+    static {
+        System.out.println("Demo 初始化了");
+        count = 2;
+    }
+
+    public static int getCount() {
+        return count;
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/98.gif)
+```
+
+:::
+
+
+
+* 示例：初始化子类，会先初始化父类，并触发类的初始化
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+public class Test {
+
+    static {
+        System.out.println("Test 初始化了");
+    }
+    public static void main(String[] args) throws Exception {
+
+        System.out.println("Test");
+
+    }
+}
+
+class Demo {
+    public static int count = 1;
+
+    static {
+        System.out.println("Demo 初始化了");
+        count = 2;
+    }
+
+    public static int getCount() {
+        return count;
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/99.gif)
+```
+
+:::
+
+### 3.6.7 面试题解析
+
+* 【问】请给出下面代码的结果。
+
+```java
+public class Test {
+
+    static { // 会合并到 <cinit> 字节码指令中
+        System.out.println("D");
+    }
+
+    { // 会合并到 <init> 字节码指令中
+        System.out.println("C");
+    }
+
+    public Test() { // 会合并到 <init> 字节码指令中
+        System.out.println("B");
+    }
+
+    public static void main(String[] args) throws Exception {
+        System.out.println("A");
+        new Test();
+        new Test();
+    }
+}
+```
+
+> [!NOTE]
+>
+> static 静态方法块的字节码指令，如下所示：
+>
+> ```txt
+> // 将 [System.out] 压入操作数栈
+> 0 getstatic #7 <java/lang/System.out : Ljava/io/PrintStream;> 
+> // 将 [D] 压入操作数栈；此时，操作数栈就是 [System.out,"D"]
+> 3 ldc #28 <D> 
+> // 弹出操作数栈的栈顶元素，并执行 println 方法，打印 "D"
+> 5 invokevirtual #15 <java/io/PrintStream.println : (Ljava/lang/String;)V>
+> // 方法执行完毕
+> 8 return
+
+
+
+* 【答】D --> A --> C --> B --> C --> B
+
+### 3.6.8 不会触发类初始化的方式
+
+* 不会触发类初始化的方式：
+
+| 方式                               | 描述                                                         |
+| ---------------------------------- | ------------------------------------------------------------ |
+| ① 创建数组                         | 创建数组对象不会初始化数组元素的类型。                       |
+| ② 直接访问父类的静态变量。         | 只有父类被初始化，子类不会被初始化。                         |
+| ③ 访问编译时常量                   | final static 的基本类型和字符串常量在编译时就确定了值，不需要初始化类。 |
+| ④ Class.forName 的 initialize 参数 | 当 initialize 参数为false时，只加载类但不初始化。            |
+| ⑤ 获取 Class 对象                  | 使用`.class`语法只是获取类的元数据，不会触发初始化。         |
+
+
+
+* 示例：创建数组对象不会初始化数组元素的类型
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+import java.util.Arrays;
+
+public class Test {
+
+    public static void main(String[] args) throws Exception {
+        Demo[] arr = new Demo[10];
+        System.out.println("数组的长度: " + arr.length);
+        System.out.println("数组元素都是: " + Arrays.toString(arr));
+    }
+}
+
+class Demo {
+    static {
+        System.out.println("Demo 初始化了");
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/100.gif)
+```
+
+:::
+
+
+
+* 示例：直接访问父类的静态变量，只有父类被初始化，子类不会被初始化
+
+::: code-group
+
+```java [Test.java]
+public class Test {
+
+    public static void main(String[] args) throws Exception {
+        System.out.println(Father.a);
+        System.out.println(Zi.a);
+    }
+}
+
+class Father {
+    public static int a = 1;
+
+    static {
+        a = 2;
+        System.out.println("Father 初始化了");
+    }
+}
+
+class Zi extends Father {
+    static {
+        System.out.println("Zi 初始化了");
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/101.gif)
+```
+
+:::
+
+
+
+* 示例：访问编译时常量，不会触发初始化
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+public class Test {
+
+    public static void main(String[] args) throws Exception {
+        System.out.println(Demo.a);
+    }
+}
+
+class Demo {
+    public static final int a = 1;
+
+    static {
+        System.out.println("Demo 初始化了");
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/102.gif)
+```
+
+:::
+
+
+
+* 示例：Class.forName 的 `initialize` 参数，如果是 false ，不会触发初始化
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+public class Test {
+
+    public static void main(String[] args) throws Exception {
+        Class.forName("com.github.thread.demo10.Demo", 
+                      false,  // [!code highlight]
+                      Test.class.getClassLoader());
+    }
+}
+
+class Demo {
+    public static final int a = 1;
+
+    static {
+        System.out.println("Demo 初始化了");
+    }
+}
+
+```
+
+```md:img [cmd 控制台]
+![](./assets/103.gif)
+```
+
+:::
+
+
+
+* 示例：使用`.class`语法只是获取类的元数据，不会触发初始化
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+public class Test {
+
+    public static void main(String[] args) throws Exception {
+        Class.forName("com.github.thread.demo10.Demo", 
+                      false,  // [!code highlight]
+                      Test.class.getClassLoader());
+    }
+}
+
+class Demo {
+    public static final int a = 1;
+
+    static {
+        System.out.println("Demo 初始化了");
+    }
+}
+
+```
+
+```md:img [cmd 控制台]
+![](./assets/104.gif)
+```
+
+:::
+
 
 
 # 第四章：类加载器
