@@ -20,7 +20,8 @@
 
 /* 移除默认的斑马线效果 */
 .vp-doc table tbody tr:nth-child(2n) {
-    background-color: transparent;
+    /*background-color: transparent;*/
+    background-color: var(--vp-c-bg);
 }
 
 /* 表格体统一背景色 */
