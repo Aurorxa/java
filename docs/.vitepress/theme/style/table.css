@@ -12,7 +12,8 @@
 
 /* 表格头样式 - 保持默认颜色 */
 .vp-doc table thead th {
-    background-color: var(--vp-c-bg-soft); /* 或者使用 transparent 保持完全默认 */
+    text-align: center;
+    background-color: var(--vp-c-bg-soft);
     color: var(--vp-c-text-1);
     font-weight: 600;
     border-bottom: 1px solid var(--vp-c-divider);
