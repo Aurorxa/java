@@ -2610,6 +2610,50 @@ public class Launcher {
 
 ![](./assets/114.png)
 
+* 扩展类加载器（Extension ClassLoader）默认加载的是 `$JAVA_HOME/jre/lib/ext`目录下的类文件。
+
+![](./assets/115.png)
+
+#### 4.3.3.2 验证扩展类加载器
+
+* 可以通过 ScriptEnvironment 的 Class 对象的 getClassLoader() 方法来获取启动类加载器：
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+import jdk.nashorn.internal.runtime.ScriptEnvironment;
+
+public class Test {
+
+    public static void main(String[] args) throws Exception {
+        ClassLoader classLoader = ScriptEnvironment.class.getClassLoader();
+        System.out.println("classLoader = " + classLoader);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/116.gif)
+```
+
+:::
+
+* 也可以在 Arthas 中通过 `sc -d 类名` 命令去查看加载该类的类加载器的详细信息：
+
+::: code-group
+
+```bash
+sc -d jdk.nashorn.internal.runtime.ScriptEnvironment
+```
+
+```md:img [cmd 控制台]
+![](./assets/117.gif)
+```
+
+:::
+
 
 
 ### 4.3.4 应用程序类加载器
@@ -2641,7 +2685,7 @@ public class Launcher {
 
 ![](./assets/114.png)
 
-
+* 
 
 
 
