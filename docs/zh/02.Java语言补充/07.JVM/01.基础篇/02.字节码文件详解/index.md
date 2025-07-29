@@ -2352,7 +2352,8 @@ flowchart TD
 
 > [!NOTE]
 >
-> 类加载器会通过二进制流的方式将字节码文件的内容加载到内存中，之后将数据交给 JVM，JVM 会在方法区和堆上生成对应的对象来保存字节码信息，即：类加载器只参与`加载`过程中的字节码获取并加载到内存中这一部分。
+> * ① 类加载器会通过二进制流的方式将字节码文件的内容加载到内存中，之后将数据交给 JVM，JVM 会在方法区和堆上生成对应的对象去保存字节码信息，以便后续使用。
+> * ② 类加载器只参与`加载`过程中的字节码获取并加载到内存中这一部分。
 
 ![](./assets/105.svg)
 
@@ -2374,27 +2375,311 @@ flowchart TD
 
 ### 4.3.1 概述
 
-* 类加载器，从大的方面，主要分为两类：
-  * ① Java 代码中实现的类加载器。
-  * ② JVM 底层源码中实现的类加载器。
+* 类加载器，主要分为两类：
 
+| 类加载的分类                   | 描述                                                         |
+| ------------------------------ | ------------------------------------------------------------ |
+| ① JVM 底层源码中实现的类加载器 | :one: 类加载器源代码位于Java 虚拟机的源码中，实现语言与虚拟机底层语言一致，如：Hotspot 使用 C++。<br>:two: 主要目的是保证 Java 程序运行中基础类被正确地加载，如：java.lang.String，Java 虚拟机需要确保其可靠性。 |
+| ② Java 代码中实现的类加载器    | :one: JDK 中默认提供了多种处理不同渠道的类加载器，程序员也可以自己根据需求定制。<br>:two: 所有 Java 中实现的类加载器都需要继承 `ClassLoader` 这个抽象类。 |
 
+* 类加载器的设计在 JDK8 和 JDK8+ 版本的差别较大，暂时以 JDK8 作为基准来探讨：
 
+![](./assets/107.png)
 
+* 类加载器的详细信息在 Arthas 通过命令进行查看：
+
+> [!NOTE]
+>
+> * ① BootstrapClassLoader 是启动类加载器，numberOfInstances 表示类加载的数量，而 loadedCountTotal 表示加载类的数量。
+> * ② ExtClassLoader 是扩展类加载器，而 AppClassLoader 是应用程序类加载器。
+
+::: code-group
+
+```bash
+classloader -t
+```
+
+```md:img [cmd 控制台]
+![](./assets/108.gif)
+```
+
+:::
 
 ### 4.3.2 启动类加载器
 
+#### 4.3.2.1 概述
+
+* 启动类加载器（Bootstrap ClassLoader）是由 Hotspot 虚拟机提供的，是使用 C++ 编写的类加载器。
+
+> [!NOTE]
+>
+> 作为 Java 程序员很难去修改或扩展`启动类加载器`的源码，只需要了解其作用即可。
+
+* 启动类加载器默认会加载 `$JAVA_HOME/jre/lib/` 目录下的类文件，如：rt.jar 、tools.jar 以及 resources.jar 等。
+
+> [!NOTE]
+>
+> ::: details 点我查看 jar 包是什么？
+>
+> * ① jar 包的本质：就是一个压缩文件，使用 ZIP 格式进行压缩，但扩展名为`.jar`。它将多个Java 类文件、资源文件、元数据等打包到一个单独的文件中。
+>
+> * ② jar 的主要作用：
+>
+>   * :one: `代码打包和分发`：将编译后的 .class 文件、配置文件、图片等资源统一打包，便于分发和部署。一个复杂的 Java 应用可能包含数百个类文件，JAR 包将它们整合为一个文件。
+>
+>   * :two: `依赖管理`：可以将第三方库打包成 JAR 文件，其他项目通过引用这些 JAR 包来使用相应功能，避免重复开发。
+>
+>   * :three: `简化部署`：特别是可执行 JAR 包，可以通过`java -jar xxx.jar`命令直接运行，无需手动指定类路径。
+>
+>   * :four: `版本控制`：通过不同版本的 JAR 包来管理软件的不同版本，便于维护和升级。
+>
+> * ③ jar 包的结构：
+>   * :one: `编译后的 Java 类文件`（.class）。
+>   * :two: `META-INF 目录`：包含 MANIFEST.MF 清单文件等元数据。
+>   * :three: `资源文件`，如：配置文件、图片、文本等。
+>   * :four: `可选的数字签名信息`。
+>
+> :::
+
+ ![](./assets/109.png)
 
 
 
+> [!IMPORTANT]
+>
+> * ① 在启动类加载器加载的 jar 包中最重要的就是 rt.jar ，因为我们平常经常使用的 String、Integer 等都位于该 jar 包中。
+> * ② 当 JVM 启动的时候，启动类加载器就会将上述 jar 包中的类都加载进来，为程序提供一个基础的运行环境。
 
-### 4.3.3 扩展类加载
+#### 4.3.2.2 验证启动类加载器
+
+* 可以通过 String 的 Class 对象的 getClassLoader() 方法来获取启动类加载器：
+
+::: code-group
+
+```java [Test.java]
+package com.github.thread.demo10;
+
+public class Test {
+
+    public static void main(String[] args) throws Exception {
+        ClassLoader classLoader = String.class.getClassLoader();
+        // 结果是 null ，是因为启动类加载器在 JDK8 中是由 C++ 编写的
+        // 在 Java 代码中去获取既不合适，也不安全
+        // 如果返回的类加载器是 null，就证明是启动类加载器
+        System.out.println("classLoader = " + classLoader);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/110.gif)
+```
+
+:::
+
+* 也可以在 Arthas 中通过 `sc -d 类名` 命令去查看加载该类的类加载器的详细信息：
+
+::: code-group
+
+```bash
+sc -d java.lang.String
+```
+
+```md:img [cmd 控制台]
+![](./assets/111.gif)
+```
+
+:::
+
+#### 4.3.2.3 用户扩展基础 jar 包
+
+* 有时，用户希望扩展一些比较基础的 jar 包，以便让启动类加载器去加载，有下面两种方式：
+
+| 方式                                               | 描述                                                         |
+| -------------------------------------------------- | ------------------------------------------------------------ |
+| ① ~~`将 jar 包放入 jar/lib 下进行扩展`~~（不推荐） | 尽量不要去更改 JDK 安装目录中的内容，可能会出现即使放进去也会由于文件名不匹配等问题而不会正常的加载。 |
+| ② `使用参数进行扩展`（推荐）                       | 使用 `-Xbootclasspath/a:jar包目录/jar 包名`进行扩展，`/a`表示新增。 |
 
 
+
+* 示例：搭建 Maven 多模块项目
+
+::: code-group
+
+```txt [项目结构]
+├─📁 .idea
+├─📁 .mvn
+├─📁 jvm-extend-------------------- # 扩展项目
+│ ├─📁 src
+│ │ ├─📁 main
+│ │ │ └─📁 java
+│ │ │   └─📁 com
+│ │ │     └─📁 github
+│ │ │       └─📁 domain
+│ │ │         └─📄 Student.java---- # 扩展类
+│ │ └─📁 test
+│ └─📄 pom.xml--------------------- # 子项目的 pom.xml
+├─📁 jvm-test---------------------- # 测试项目
+│ ├─📁 src
+│ │ ├─📁 main
+│ │ │ └─📁 java
+│ │ │   └─📁 com
+│ │ │     └─📁 github
+│ │ │       └─📄 App.java---------- # 测试类
+│ │ └─📁 test
+│ └─📄 pom.xml--------------------- # 子项目的 pom.xml
+├─📄 .gitignore
+└─📄 pom.xml----------------------- # 父项目 pom.xml
+```
+
+```md:img [cmd 控制台]
+![](./assets/112.gif)
+```
+
+```java [jvm-extend/Student.java]
+package com.github.domain;
+
+public class Student {
+
+    static {
+        System.out.println("Student 加载了...");
+    }
+}
+```
+
+```java [jvm-test/App.java]
+package com.github;
+
+public class App {
+    public static void main( String[] args ) throws ClassNotFoundException {
+
+        Class<?> aClass = Class.forName("com.github.domain.Student");
+
+        System.out.println(aClass);
+
+        System.out.println( "Hello World!" );
+    }
+}
+
+```
+
+:::
+
+
+
+* 示例：IDEA 配置 JVM 参数
+
+::: code-group
+
+```txt [IDEA 配置 JVM 参数]
+-Xbootclasspath/a:D:/project/jvm/jvm-extend/target/jvm-extend-1.0.jar
+```
+
+```md:img [cmd 控制台]
+![](./assets/113.gif)
+```
+
+:::
+
+### 4.3.3 扩展类加载器
+
+#### 4.3.3.1 概述
+
+* `扩展类加载器`和`应用程序类加载器`都是 JDK 中提供的，并且使用 Java 编写的类加载器。
+* 其源码都位于 `sun.misc.Launcher` 中，并且都是静态内部类，也是 `URLClassLoader`的子类。
+
+> [!NOTE]
+>
+> URLClassLoader 可以从指定 URL 位置（JAR 包、目录路径、网络地址）动态加载 Java 类文件到内存中。
+
+```java
+package sun.misc;
+
+...
+
+public class Launcher {
+    
+    static class ExtClassLoader extends URLClassLoader {}
+    
+    static class AppClassLoader extends URLClassLoader {}
+    
+}
+```
+
+* 其类继承关系，如下所示：
+
+![](./assets/114.png)
 
 
 
 ### 4.3.4 应用程序类加载器
+
+#### 4.3.4.1 概述
+
+* `扩展类加载器`和`应用程序类加载器`都是 JDK 中提供的，并且使用 Java 编写的类加载器。
+* 其源码都位于 `sun.misc.Launcher` 中，并且都是静态内部类，也是 `URLClassLoader`的子类。
+
+> [!NOTE]
+>
+> URLClassLoader 可以从指定 URL 位置（JAR 包、目录路径、网络地址）动态加载 Java 类文件到内存中。
+
+```java
+package sun.misc;
+
+...
+
+public class Launcher {
+    
+    static class ExtClassLoader extends URLClassLoader {}
+    
+    static class AppClassLoader extends URLClassLoader {}
+    
+}
+```
+
+* 其类继承关系，如下所示：
+
+![](./assets/114.png)
+
+
+
+
+
+
+
+### 4.3.5 总结
+
+* 类加载器的层次结构，如下所示：
+
+```mermaid
+graph TD
+    A[启动类加载器<br/>Bootstrap ClassLoader<br/>虚拟机底层实现] --> B[扩展类加载器<br/>Extension ClassLoader<br/>Java语言实现]
+    B --> C[应用程序类加载器<br/>Application ClassLoader<br/>系统类加载器<br/>Java语言实现]
+    C --> D[自定义类加载器1<br/>Custom ClassLoader 1<br/>Java语言实现]
+    C --> E[自定义类加载器2<br/>Custom ClassLoader 2<br/>Java语言实现]
+    C --> F[自定义类加载器N<br/>Custom ClassLoader N<br/>Java语言实现]
+    
+    %% 加载内容说明
+    A1[核心类库<br/>java.lang.*<br/>java.util.*<br/>$JAVA_HOME/jre/lib] -.-> A
+    B1[扩展类库<br/>$JAVA_HOME/jre/lib/ext<br/>java.ext.dirs路径] -.-> B
+    C1[应用程序类<br/>classpath路径<br/>用户自定义类] -.-> C
+    D1[网络加载<br/>数据库加载<br/>加密解密<br/>热部署] -.-> D
+    
+    %% 样式定义
+    classDef bootstrap fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef extension fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef application fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef custom fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef content fill:#f5f5f5,stroke:#616161,stroke-width:1px,stroke-dasharray: 5 5
+    
+    class A bootstrap
+    class B extension
+    class C application
+    class D,E,F custom
+    class A1,B1,C1,D1 content
+```
+
+
 
 
 
