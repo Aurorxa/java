@@ -2340,7 +2340,7 @@ flowchart TD
 
 
 
-# 第四章：类加载器
+# 第四章：类加载器（⭐）
 
 ## 4.1 概述
 
@@ -2498,7 +2498,7 @@ sc -d java.lang.String
 | 方式                                               | 描述                                                         |
 | -------------------------------------------------- | ------------------------------------------------------------ |
 | ① ~~`将 jar 包放入 jar/lib 下进行扩展`~~（不推荐） | 尽量不要去更改 JDK 安装目录中的内容，可能会出现即使放进去也会由于文件名不匹配等问题而不会正常的加载。 |
-| ② `使用参数进行扩展`（推荐）                       | 使用 `-Xbootclasspath/a:jar包目录/jar 包名`进行扩展，`/a`表示新增。 |
+| ② `使用参数进行扩展`（推荐）                       | 使用 `-Xbootclasspath/a:jar包目录/jar包名`进行扩展，`/a`表示新增。 |
 
 
 
@@ -2614,6 +2614,23 @@ public class Launcher {
 
 ![](./assets/115.png)
 
+* 可以通过 `Arthas` 来查看`扩展类加载器`加载的路径（目录）：
+
+::: code-group
+
+```bash
+# 查看类加载器的列表，包括 hash
+classloader -l 
+# 查看指定类加载器加载的内容
+classloader -c <hash>
+```
+
+```md:img [cmd 控制台]
+![](./assets/119.gif)
+```
+
+:::
+
 #### 4.3.3.2 验证扩展类加载器
 
 * 可以通过 ScriptEnvironment 的 Class 对象的 getClassLoader() 方法来获取启动类加载器：
@@ -2654,7 +2671,95 @@ sc -d jdk.nashorn.internal.runtime.ScriptEnvironment
 
 :::
 
+#### 4.3.3.3 加载用户 jar 包
 
+* 有时，用户希望扩展类加载器能加载自定义的 jar 包，有如下两种方式：
+
+| 方式                                                   | 描述                                                         |
+| ------------------------------------------------------ | ------------------------------------------------------------ |
+| ① ~~`将 jar 包放入 jar/lib/ext 下进行扩展`~~（不推荐） | 尽量不要去更改 JDK 安装目录中的内容，可能会出现即使放进去也会由于文件名不匹配等问题而不会正常的加载。 |
+| ② `使用参数进行扩展`（推荐）                           | 使用`-Djava.ext.dirs=jar包目录`参数进行扩展，会覆盖原始目录。<br>可以使用 `;`（Windows） 或 `:`（Linux）追加原始目录。 |
+
+
+
+* 示例：搭建 Maven 多模块项目
+
+::: code-group
+
+```txt [项目结构]
+├─📁 .idea
+├─📁 .mvn
+├─📁 jvm-extend-------------------- # 扩展项目
+│ ├─📁 src
+│ │ ├─📁 main
+│ │ │ └─📁 java
+│ │ │   └─📁 com
+│ │ │     └─📁 github
+│ │ │       └─📁 domain
+│ │ │         └─📄 Student.java---- # 扩展类
+│ │ └─📁 test
+│ └─📄 pom.xml--------------------- # 子项目的 pom.xml
+├─📁 jvm-test---------------------- # 测试项目
+│ ├─📁 src
+│ │ ├─📁 main
+│ │ │ └─📁 java
+│ │ │   └─📁 com
+│ │ │     └─📁 github
+│ │ │       └─📄 App.java---------- # 测试类
+│ │ └─📁 test
+│ └─📄 pom.xml--------------------- # 子项目的 pom.xml
+├─📄 .gitignore
+└─📄 pom.xml----------------------- # 父项目 pom.xml
+```
+
+```md:img [cmd 控制台]
+![](./assets/112.gif)
+```
+
+```java [jvm-extend/Student.java]
+package com.github.domain;
+
+public class Student {
+
+    static {
+        System.out.println("Student 加载了...");
+    }
+}
+```
+
+```java [jvm-test/App.java]
+package com.github;
+
+public class App {
+    public static void main( String[] args ) throws ClassNotFoundException {
+
+        Class<?> aClass = Class.forName("com.github.domain.Student");
+
+        System.out.println(aClass);
+
+        System.out.println( "Hello World!" );
+    }
+}
+
+```
+
+:::
+
+
+
+* 示例：IDEA 配置 JVM 参数
+
+::: code-group
+
+```txt [IDEA 配置 JVM 参数]
+-Djava.ext.dirs="D:/develop/java/oracle/jdk1.8.0_131/jre/lib/ext;D:/project/jvm/jvm-extend/target"
+```
+
+```md:img [cmd 控制台]
+![](./assets/118.gif)
+```
+
+:::
 
 ### 4.3.4 应用程序类加载器
 
@@ -2685,11 +2790,82 @@ public class Launcher {
 
 ![](./assets/114.png)
 
-* 
+* 应用程序类加载器（Application ClassLoader）默认会加载 classpath 下的类文件。
 
+> [!NOTE]
+>
+> 默认加载的是项目中的类文件以及 Maven 等构建工具导入的第三方 jar 包中的类文件。
 
+* 可以通过 `Arthas` 来查看`应用程序类加载器`加载的路径（目录）：
 
+::: code-group
 
+```bash
+# 查看类加载器的列表，包括 hash
+classloader -l 
+# 查看指定类加载器加载的内容
+classloader -c <hash>
+```
+
+```md:img [cmd 控制台]
+![](./assets/120.gif)
+```
+
+::: 
+
+#### 4.3.4.2 验证应用程序类加载器
+
+* 可以通过 Student 的 Class 对象的 getClassLoader() 方法来获取启动类加载器：
+
+::: code-group
+
+```java [Student.java]
+package com.github;
+
+public class Student {
+
+  static {
+    System.out.println("Student 加载了...");
+  }
+}
+```
+
+```java [Test.java]
+package com.github;
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        ClassLoader classLoader = Student.class.getClassLoader();
+        System.out.println(classLoader);
+        classLoader = FileUtils.class.getClassLoader();
+        System.out.println(classLoader);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/121.gif)
+```
+
+:::
+
+* 也可以在 Arthas 中通过 `sc -d 类名` 命令去查看加载该类的类加载器的详细信息：
+
+::: code-group
+
+```bash
+sc -d org.apache.commons.io.FileUtils
+```
+
+```md:img [cmd 控制台]
+![](./assets/122.gif)
+```
+
+:::
 
 ### 4.3.5 总结
 
@@ -2723,11 +2899,136 @@ graph TD
     class A1,B1,C1,D1 content
 ```
 
-
-
-
-
 ## 4.4 双亲委派机制
+
+### 4.4.1 概述
+
+* 由于 JVM 中存在多个`类加载器`；此时，如果需要加载一个类，到底应该由那个`类加载`来完成？
+
+![](./assets/123.svg)
+
+* 有人可能认为上述`类加载器`加载目录不同，可以根据目录来确定该类由谁加载？但是，如果我将该类所在的目录配置到上述`类加载器`加载的目录中，那么该类又该由那个`类加载`完成？
+
+![](./assets/124.svg)
+
+* 如果要解决上述的问题，我们就需要学习`双亲委派机制`（父类委派模型）。
+
+> [!IMPORTANT]
+>
+> 双亲委派机制的核心就是`解决在多个类加载器存在的情况下，一个类到底由那个加载器来加载的问题`。
+
+### 4.4.2 双亲委派机制的作用
+
+* ① `保证类加载的安全性`：通过双亲委派机制避免恶意代码替换 JDK 中的核心类库，如：java.lang.String，确保核心类库的完整性和安全性。
+* ② `避免重复加载`：双亲委派机制可以避免同一个类被多次加载，减少加载过程中的性能开销。
+
+### 4.4.3 双亲委派机制
+
+#### 4.4.3.1 概述
+
+* 双亲委派机制：`当一个类加载器接收到加载类的任务的时候，会向上委派、最后自救`。
+
+> [!NOTE]
+>
+> * ① `向上委派`：类加载器收到请求之后，会向上委托，直到递归到启动类加载器；如果中间有任意一个类加载器已经加载了，就直接返回。
+> * ② `最后自救`：当所有的父类加载器都无法完成加载请求时，应用程序类加载器才会尝试自己加载，如果加载失败，就报错 ClassNotFoundException 。
+
+* 每个`类加载器`都有一个 `parent` 属性，指向上一级的类加载器（父加载器），形成层次关系。
+
+![](./assets/125.svg)
+
+* 双亲委派机制的流程，如下所示：
+
+| 流程                       | 描述                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| ① 先查缓存（避免重复加载） | 收到加载请求时，首先检查 JVM 是否已存在该类的 Class 对象，如果有，则直接返回。 |
+| ② 向上委派（递归加载）     | 类加载器不会自行加载，而是向上委托（递归加载），直到到达启动类加载器。<br>如果任意层次成功加载，立即返回 Class 对象，不再向上委派。<br> |
+| ③ 最后自救                 | 只有当父加载器明确无法加载时，子加载器才尝试自己加载。       |
+
+```mermaid
+graph TD
+    A[应用代码] --> B[AppClassLoader]
+    B --> C[ExtClassLoader]
+    C --> D[Bootstrap]
+    
+    D -->|① 优先尝试| E[rt.jar 核心类]
+    C -->|② 扩展尝试| F[jre/lib/ext]
+    B -->|③ 最后尝试| G[classpath 应用类]
+    
+    style D fill:#ffe58f,stroke:#faad14
+    style C fill:#ffd777,stroke:#fa8c16
+    style B fill:#ffccc7,stroke:#f5222d
+```
+
+* 其实，双亲委派机制的源码非常简单，如下所示：
+
+```java
+protected Class<?> loadClass(String name, boolean resolve)
+    throws ClassNotFoundException {
+    // 加锁，目的是为了只让一个线程去执行加载任务
+    synchronized (getClassLoadingLock(name)) {
+        // 判断是否加载过，如果加载过，直接返回
+        Class<?> c = findLoadedClass(name);
+        if (c == null) {
+            // 如果没有加载过，就委托给父类加载或启动类加载器进行加载
+            long t0 = System.nanoTime();
+            try {
+                // 如果有父类加载，就委托给父类加载器进行加载，并返回（递归）
+                if (parent != null) {
+                    c = parent.loadClass(name, false);
+                } else {
+                    // 如果不存在父类加载器，就委托给启动类加载器进行加载，并返回
+                    c = findBootstrapClassOrNull(name);
+                }
+            } catch (ClassNotFoundException e) {
+                // ClassNotFoundException thrown if class not found
+                // from the non-null parent class loader
+            }
+
+            // 如果到这里还是 null ，就说明没有类加载器进行加载，就尝试自身加载
+            if (c == null) {
+                // If still not found, then invoke findClass in order
+                // to find the class.
+                long t1 = System.nanoTime();
+                // 调用自己的加载功能，并返回
+                c = findClass(name);
+
+                // this is the defining class loader; record the stats
+                sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);
+                sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+                sun.misc.PerfCounter.getFindClasses().increment();
+            }
+        }
+        if (resolve) {
+            resolveClass(c);
+        }
+        return c;
+    }
+}
+```
+
+#### 4.4.3.2 向上委托
+
+* 每个类加载器都有父类加载器，在加载的过程中，每个类加载器会检查自己是否已经加载了该类？
+
+- [x] 如果加载了，则直接返回，加载过程结束。
+- [x] 如果没有加载，就将加载任务委托给父类加载器。
+
+> [!NOTE]
+>
+> 只要有一个类加载器加载过该类，就可以找到该类，并直接返回，避免重复加载！！！
+
+
+
+* 示例：
+
+![](./assets/127.gif)
+
+#### 4.4.3.3 最后自救
+
+* 如果所有的父类加载器都没有加载该类，则由当前类加载器自己尝试加载，即：最后自救。
+
+
 
 
 
