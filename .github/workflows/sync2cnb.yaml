@@ -17,5 +17,6 @@ jobs:
             -e PLUGIN_AUTH_TYPE="https" \
             -e PLUGIN_USERNAME=${{ secrets.GIT_USERNAME }} \
             -e PLUGIN_PASSWORD=${{ secrets.GIT_PASSWORD }} \
+            -e PLUGIN_BRANCH="master" \
             -e PLUGIN_FORCE="true" \
             tencentcom/git-sync
