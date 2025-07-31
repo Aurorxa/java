@@ -2357,7 +2357,7 @@ flowchart TD
 
 ![](./assets/105.svg)
 
-## 4.2 类加载器的实际应用程序
+## 4.2 类加载器的实际应用场景
 
 * 在实际开发中，项目中的`字节码文件`都依赖于类加载器，并且这些类加载器是 JDK 开箱提供的，对程序员来说是透明的，好像可以不用单独学习这部分内容？
 
@@ -2903,11 +2903,15 @@ graph TD
 
 ### 4.4.1 概述
 
-* 由于 JVM 中存在多个`类加载器`；此时，如果需要加载一个类，到底应该由那个`类加载`来完成？
+* 由于 JVM 中存在多个`类加载器`，如果需要加载一个类，到底应该由那个`类加载`来完成？
 
 ![](./assets/123.svg)
 
-* 有人可能认为上述`类加载器`加载目录不同，可以根据目录来确定该类由谁加载？但是，如果我将该类所在的目录配置到上述`类加载器`加载的目录中，那么该类又该由那个`类加载`完成？
+* 有人可能认为上述`类加载器`加载目录不同，可以根据目录来确定该类由那个`类加载器`来加载？
+
+> [!NOTE]
+>
+> 如果我将`该类所在的目录`配置到上述`类加载器`加载的目录中，那么该类又该由那个`类加载`完成？
 
 ![](./assets/124.svg)
 
@@ -2944,21 +2948,6 @@ graph TD
 | ① 先查缓存（避免重复加载） | 收到加载请求时，首先检查 JVM 是否已存在该类的 Class 对象，如果有，则直接返回。 |
 | ② 向上委派（递归加载）     | 类加载器不会自行加载，而是向上委托（递归加载），直到到达启动类加载器。<br>如果任意层次类加载器成功加载，立即返回 Class 对象，不再向上委派。<br> |
 | ③ 最后自救                 | 只有当父加载器明确无法加载时，子加载器才尝试自己加载。       |
-
-```mermaid
-graph TD
-    A[应用代码] --> B[AppClassLoader]
-    B --> C[ExtClassLoader]
-    C --> D[Bootstrap]
-    
-    D -->|① 优先尝试| E[rt.jar 核心类]
-    C -->|② 扩展尝试| F[jre/lib/ext]
-    B -->|③ 最后尝试| G[classpath 应用类]
-    
-    style D fill:#ffe58f,stroke:#faad14
-    style C fill:#ffd777,stroke:#fa8c16
-    style B fill:#ffccc7,stroke:#f5222d
-```
 
 * 其实，双亲委派机制的源码非常简单，如下所示：
 
@@ -3007,6 +2996,25 @@ protected Class<?> loadClass(String name, boolean resolve)
 }
 ```
 
+* 双亲委派机制对应的流程图，如下所示：
+
+```mermaid
+graph TD
+    A[应用代码] --> B[AppClassLoader]
+    B --> C[ExtClassLoader]
+    C --> D[Bootstrap]
+    
+    D -->|① 优先尝试| E[rt.jar 核心类]
+    C -->|② 扩展尝试| F[jre/lib/ext]
+    B -->|③ 最后尝试| G[classpath 应用类]
+    
+    style D fill:#ffe58f,stroke:#faad14
+    style C fill:#ffd777,stroke:#fa8c16
+    style B fill:#ffccc7,stroke:#f5222d
+```
+
+
+
 #### 4.4.3.2 向上委托
 
 * 每个类加载器都有父类加载器，在加载的过程中，每个类加载器会检查自己是否已经加载了该类？
@@ -3024,17 +3032,149 @@ protected Class<?> loadClass(String name, boolean resolve)
 
 ![](./assets/127.gif)
 
+
+
+* 示例：
+
+![](./assets/128.gif)
+
 #### 4.4.3.3 最后自救
 
 * 如果所有的父类加载器都没有加载该类，则由当前类加载器自己尝试加载，即：最后自救。
 
 
 
+* 示例：
 
+![](./assets/129.gif)
 
+#### 4.4.3.4 小问题
 
+* 常见的面试小问题，如下所示：
 
+| 问题                                                         | 答案                                                         | 关键知识点                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------ |
+| :one: 如果一个类重复出现在三个类加载器加载的路径上，应该由谁来进行加载？ | 启动类加载器进行加载，根据双亲委派机制，它的优先级是最高的。 | 双亲委派机制、类加载器优先级   |
+| :two: 在自己的项目中创建 java.lang.String 类，会被加载吗？   | 不会，会返回启动类加载器加载 rt.jar 包中的 String 类。       | 启动类加载器、核心类库保护机制 |
 
+#### 4.4.3.5 如何在代码中主动加载一个类
+
+* ① 使用 `Class.forName("类的全限定名")`方法，即：使用当前类的类加载器去加载指定的类。
+
+::: code-group
+
+```java [Class.java]
+public final class Class<T> implements java.io.Serializable,
+                              GenericDeclaration,Type,AnnotatedElement {
+    ...                              
+    public static Class<?> forName(String className)
+                throws ClassNotFoundException {
+        Class<?> caller = Reflection.getCallerClass();
+        return forName0(className, true, 
+                        ClassLoader.getClassLoader(caller), caller);
+    }
+     
+    ...
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main( String[] args ) throws ClassNotFoundException {
+        Class.forName("com.github.domain.Student");
+    }
+}
+```
+
+:::
+
+* ② 通过`类加载`对象的 `loadClass("")` 方法去加载指定的类。
+
+::: code-group
+
+```java [ClassLoader.java]
+public abstract class ClassLoader {
+    ...
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        return loadClass(name, false);
+    }
+    ...
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main( String[] args ) throws ClassNotFoundException {
+
+        ClassLoader classLoader = Test.class.getClassLoader();
+        System.out.println("classLoader = " + classLoader);
+
+        Class<?> aClass = classLoader.loadClass("com.github.domain.Student");
+        System.out.println("aClass = " + aClass);
+
+    }
+}
+```
+
+:::
+
+### 4.4.4 父类加载器细节
+
+* 每个 Java 实现的`类加载`中都保存了一个 parent 的成员变量，这样就形成了上下级关系。
+
+> [!NOTE]
+>
+> 类加载器之间是组合关系，不是继承关系！！！
+
+```java
+public abstract class ClassLoader {
+
+    ...
+        
+    private final ClassLoader parent; // 父
+	
+    ...
+}    
+```
+
+* 虽然扩展类加载器的`parent`是`null`；但是，从逻辑上依然认为`启动类加载器`是`扩展类加载器`的`父类加载器`。
+
+> [!NOTE]
+>
+> 启动类加载器是使用 C++ 实现的，没有父类加载器！！！
+
+![](./assets/130.svg)
+
+* 可以在`Arthas`中查看类加载器上下级关系：
+
+::: code-group
+
+```bash
+classloader -t
+```
+
+```md:img [cmd 控制台]
+![](./assets/108.gif)
+```
+
+:::
+
+### 4.4.5 总结
+
+* 双亲委派机制：`当一个类加载器接收到加载类的任务的时候，会向上委派、最后自救`。
+
+> [!NOTE]
+>
+> * ① `向上委派`：类加载器收到请求之后，会向上委托，直到递归到启动类加载器；如果中间有任意一个类加载器已经加载了，就直接返回。
+> * ② `最后自救`：当所有的父类加载器都无法完成加载请求时，应用程序类加载器才会尝试自己加载，如果加载失败，就报错 ClassNotFoundException 。
+
+* `应用程序类加载器`的`父类加载器`是`扩展类加载器`，`扩展类加载器`的`父类加载器`是`启动类加载器`。
+* 双亲委派机制的好处（作用）：
+
+| 好处（作用）          | 描述                                                         |
+| --------------------- | ------------------------------------------------------------ |
+| ①  保证类加载的安全性 | 避免恶意代码替换 JDK 中的核心类库，如：java.lang.String，确保核心类库的完整性和安全性。 |
+| ② 避免重复加载        | 双亲委派机制可以避免同一个类被多次加载，减少加载过程中的性能开销。 |
 
 ## 4.5 打破双亲委派机制
 
