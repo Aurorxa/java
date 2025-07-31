@@ -3167,8 +3167,8 @@ classloader -t
 >
 > * ① `向上委派`：类加载器收到请求之后，会向上委托，直到递归到启动类加载器；如果中间有任意一个类加载器已经加载了，就直接返回。
 > * ② `最后自救`：当所有的父类加载器都无法完成加载请求时，应用程序类加载器才会尝试自己加载，如果加载失败，就报错 ClassNotFoundException 。
+> * ③ `应用程序类加载器`的`父类加载器`是`扩展类加载器`，`扩展类加载器`的`父类加载器`是`启动类加载器`。
 
-* `应用程序类加载器`的`父类加载器`是`扩展类加载器`，`扩展类加载器`的`父类加载器`是`启动类加载器`。
 * 双亲委派机制的好处（作用）：
 
 | 好处（作用）          | 描述                                                         |
@@ -3180,23 +3180,527 @@ classloader -t
 
 ### 4.5.1 概述
 
+* `双亲委派机制`主要是为了保证`类加载过程中核心类库的安全`以及`防止一个类被重复加载`。
+
+```mermaid
+graph TD
+    A[应用代码] --> B[AppClassLoader]
+    B --> C[ExtClassLoader]
+    C --> D[Bootstrap]
+    
+    D -->|① 优先尝试| E[rt.jar 核心类]
+    C -->|② 扩展尝试| F[jre/lib/ext]
+    B -->|③ 最后尝试| G[classpath 应用类]
+    
+    style D fill:#ffe58f,stroke:#faad14
+    style C fill:#ffd777,stroke:#fa8c16
+    style B fill:#ffccc7,stroke:#f5222d
+```
+
+* 但是，在某些特殊的情况下，我们需要`打破双亲委派机制`以实现我们想要的功能。
+
+### 4.5.2 打破双亲委派机制的方式
+
+* 打破双亲委派机制的防止，主要有 3 种，如下所示：
+
+| 方式                      | 描述                                                         |
+| ------------------------- | ------------------------------------------------------------ |
+| ① 自定义类加载器          | 自定义类加载器并重写 loadClass() 方法，就可以将双亲委派的机制中的代码去除。<br>Tomcat 就是通过这种方式实现应用之间类的隔离。 |
+| ② 线程上下文类加载器      | 利用线程上下文类加载器加载指定的类，如：JDBC 和 JNDI 等。    |
+| ~~③ OSGI 框架的类加载器~~ | 历史上 OSGI 框架实现了一套新的类加载器机制，允许同级之间委托进行类的加载。 |
+
+### 4.5.3 自定义类加载器
+
+#### 4.5.3.1 概述
+
+* Tomcat 程序是可以运行多个 WEB 应用的，如果这两个应用中出现了相同限定名的类，如：`com.github.HelloServlet` ，Tomcat 需要保证这两个类都能被加载。
+
+![](./assets/131.svg)
+
+* 如果不打破双亲委派机制，当应用类加载器加载`应用1`中的`Servlet`之后，`应用2`中`相同限定名`的`Servlet`就无法被加载。
+
+![](./assets/132.svg)
+
+* Tomcat 使用了`自定义类加载器`来解决应用之间类的隔离，即：每个应用都会有一个独立的类加载器来加载对应的类。
+
+![](./assets/133.svg)
+
+#### 4.5.3.2 自定义类加载器相关方法
+
+* 自定义类加载的核心逻辑在 ClasssLoader 类中的 loadClass 方法中，如下所示：
+
+```java
+public Class<?> loadClass(String name) throws ClassNotFoundException {
+    return loadClass(name, false);
+}
+
+protected Class<?> loadClass(String name, boolean resolve)
+    throws ClassNotFoundException {
+    // 加锁，目的是为了只让一个线程去执行加载任务
+    synchronized (getClassLoadingLock(name)) {
+        // 判断是否加载过，如果加载过，直接返回
+        Class<?> c = findLoadedClass(name);
+        if (c == null) {
+            // 如果没有加载过，就委托给父类加载或启动类加载器进行加载
+            long t0 = System.nanoTime();
+            try {
+                // 如果有父类加载，就委托给父类加载器进行加载，并返回（递归）
+                if (parent != null) {
+                    c = parent.loadClass(name, false);
+                } else {
+                    // 如果不存在父类加载器，就委托给启动类加载器进行加载，并返回
+                    c = findBootstrapClassOrNull(name);
+                }
+            } catch (ClassNotFoundException e) {
+                // ClassNotFoundException thrown if class not found
+                // from the non-null parent class loader
+            }
+
+            // 如果到这里还是 null ，就说明没有类加载器进行加载，就尝试自身加载
+            if (c == null) {
+                // If still not found, then invoke findClass in order
+                // to find the class.
+                long t1 = System.nanoTime();
+                // 调用自己的加载功能，并返回
+                c = findClass(name);
+
+                // this is the defining class loader; record the stats
+                sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);
+                sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+                sun.misc.PerfCounter.getFindClasses().increment();
+            }
+        }
+        if (resolve) {
+            // 链接功能
+            resolveClass(c);
+        }
+        return c;
+    }
+}
+```
+
+* 其实会涉及到以下的四个方法，如下所示：
+
+```java
+// 类加载器的入口，内部实现了双亲委派机制。
+// 如果父类加载器没有加载，就会自救，即：调用了findClass()方法，加载classpath上的类
+public Class<?> loadClass(String name) throws ClassNotFoundException {
+    return loadClass(name, false);
+}
+```
+
+```java
+// 是一个空方法，由类加载器的子类实现
+// 因为扩展类加载器和应用程序类加载器都是 URLClassLoader 的子类，
+// 所以 URLClassader 就实现了该逻辑，即：根据文件路径去获取类文件中的二进制数据
+// 内部会调用 defineClass() 方法
+protected Class<?> findClass(String name) throws ClassNotFoundException {
+    throw new ClassNotFoundException(name);
+}
+```
+
+```java
+// 其目的是在做一些类的校验功能，并在堆和方法区创建对应的包含类信息的对象
+// 堆上创建的就是 Class 对象。
+// 方法区创建的是 KlassInstance 对象，以便实现多态等功能。
+private Class<?> defineClass(String name, Resource res) throws IOException {
+    long t0 = System.nanoTime();
+    int i = name.lastIndexOf('.');
+    URL url = res.getCodeSourceURL();
+    if (i != -1) {
+        String pkgname = name.substring(0, i);
+        // Check if package already loaded.
+        Manifest man = res.getManifest();
+        definePackageInternal(pkgname, man, url);
+    }
+    // Now read the class bytes and define the class
+    java.nio.ByteBuffer bb = res.getByteBuffer();
+    if (bb != null) {
+        // Use (direct) ByteBuffer:
+        CodeSigner[] signers = res.getCodeSigners();
+        CodeSource cs = new CodeSource(url, signers);
+        sun.misc.PerfCounter.getReadClassBytesTime().addElapsedTimeFrom(t0);
+        return defineClass(name, bb, cs);
+    } else {
+        byte[] b = res.getBytes();
+        // must read certificates AFTER reading bytes.
+        CodeSigner[] signers = res.getCodeSigners();
+        CodeSource cs = new CodeSource(url, signers);
+        sun.misc.PerfCounter.getReadClassBytesTime().addElapsedTimeFrom(t0);
+        return defineClass(name, b, 0, b.length, cs);
+    }
+}
+```
+
+```java
+// 执行类生命周期的链接功能
+protected final void resolveClass(Class<?> c) {
+    resolveClass0(c);
+}
+```
+
+#### 4.5.3.3 自定义类加载器
+
+* 自定义类加载器很简单，只需要重写 loadClass() 方法或 findClass() 方法。
+
+> [!NOTE]
+>
+> 在实际开发中，更推荐重写 findClass() 方法，因为这样不会打破双亲委派机制。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.domain;
+
+public class Student {
+
+    static {
+        System.out.println("Student 加载了...");
+    }
+
+    public Student() {
+        System.out.println("Student 创建了...");
+    }
+}
+```
+
+```java [BreakClassLoader.java]
+package com.github.loader;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+
+public class BreakClassLoader extends ClassLoader {
+
+    @Override
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        if (name.startsWith("java")) {
+            return super.loadClass(name);
+        }
+        try {
+            // 检查是否已经加载过该类
+            Class<?> clazz = findLoadedClass(name);
+
+            if (clazz != null) {
+                return clazz;
+            }
+            
+            // 读取类文件的字节码
+            String classPath = name.replace(".", "/") + ".class";
+            try (InputStream is = getResourceAsStream(classPath)) {
+                if (is == null) {
+                    return super.loadClass(name);
+                }
+
+                // 手动读取字节流
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = is.read(buffer)) != -1) {
+                    bos.write(buffer, 0, len);
+                }
+                byte[] classBytes = bos.toByteArray();
+
+                // 定义并返回类
+                return defineClass(name, classBytes, 0, classBytes.length);
+            }
+        } catch (Exception e) {
+            throw new ClassNotFoundException("Failed to load class: " + name, e);
+        }
+    }
+}
+```
+
+```java [Test.java]
+package com.github;
+
+import com.github.loader.BreakClassLoader;
+
+public class Test {
+    public static void main( String[] args ) throws Exception {
+
+        BreakClassLoader breakClassLoader = new BreakClassLoader();
+
+        Class<?> aClass = breakClassLoader.loadClass("com.github.domain.Student");
+        System.out.println("aClass = " + aClass.getClassLoader());
+
+        Object o = aClass.newInstance();
+        System.out.println("o = " + o);
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/134.gif)
+```
+
+:::
+
+#### 4.5.3.4 自定义类加载器的父类加载器是什么？
+
+* 默认情况下，`自定义类加载器`的`父类加载器`是`应用程序类加载器`。
+
+```mermaid
+graph TD
+    A[启动类加载器<br/>Bootstrap ClassLoader<br/>虚拟机底层实现] --> B[扩展类加载器<br/>Extension ClassLoader<br/>Java语言实现]
+    B --> C[应用程序类加载器<br/>Application ClassLoader<br/>系统类加载器<br/>Java语言实现]
+    C --> D[自定义类加载器1<br/>Custom ClassLoader 1<br/>Java语言实现]
+    C --> E[自定义类加载器2<br/>Custom ClassLoader 2<br/>Java语言实现]
+    C --> F[自定义类加载器N<br/>Custom ClassLoader N<br/>Java语言实现]
+    
+    %% 加载内容说明
+    A1[核心类库<br/>java.lang.*<br/>java.util.*<br/>$JAVA_HOME/jre/lib] -.-> A
+    B1[扩展类库<br/>$JAVA_HOME/jre/lib/ext<br/>java.ext.dirs路径] -.-> B
+    C1[应用程序类<br/>classpath路径<br/>用户自定义类] -.-> C
+    D1[网络加载<br/>数据库加载<br/>加密解密<br/>热部署] -.-> D
+    
+    %% 样式定义
+    classDef bootstrap fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef extension fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef application fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef custom fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef content fill:#f5f5f5,stroke:#616161,stroke-width:1px,stroke-dasharray: 5 5
+    
+    class A bootstrap
+    class B extension
+    class C application
+    class D,E,F custom
+    class A1,B1,C1,D1 content
+```
+
+* 以 JDK8 为例，ClassLoader 中提供了默认的无参构造方法，内部就设置了 parent 的值：
+
+```java
+protected ClassLoader() {
+    // getSystemClassLoader() 默认就是 ApplicationClassLoader
+    this(checkCreateClassLoader(), getSystemClassLoader());
+}
+
+private ClassLoader(Void unused, ClassLoader parent) {
+    this.parent = parent;
+    if (ParallelLoaders.isRegistered(this.getClass())) {
+        parallelLockMap = new ConcurrentHashMap<>();
+        package2certs = new ConcurrentHashMap<>();
+        domains =
+            Collections.synchronizedSet(new HashSet<ProtectionDomain>());
+        assertionLock = new Object();
+    } else {
+        // no finer-grained lock; lock on the classloader instance
+        parallelLockMap = null;
+        package2certs = new Hashtable<>();
+        domains = new HashSet<>();
+        assertionLock = this;
+    }
+}
+```
+
+* 如果想要自己设置`自定义类加载器`的`父类加载器`，只需要自己重写有参构造方法即可：
+
+```java
+package com.github.loader;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+
+public class BreakClassLoader extends ClassLoader {
+
+    public BreakClassLoader(ClassLoader parent) { // [!code highlight:3]
+        super(parent); 
+    }
+
+    public BreakClassLoader() { // [!code highlight:3]
+        // 设置父类加载器为扩展类加载器
+        super(ClassLoader.getSystemClassLoader().getParent());
+    }
+
+    ...
+
+}
+```
+
+#### 4.5.3.5 细节
+
+* 【问】两个`自定义类加载器`加载`相同限定名`的类，会冲突？
+
+> [!NOTE]
+>
+> 不会冲突，在同一个 JVM 中，只有`相同类加载器+相同限定名的类`才会被认定为一个同一个类。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+package com.github.domain;
+
+public class Student {
+
+    static {
+        System.out.println("Student 加载了...");
+    }
+
+    public Student() {
+        System.out.println("Student 创建了...");
+    }
+}
+```
+
+```java [BreakClassLoader.java]
+package com.github.loader;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+
+public class BreakClassLoader extends ClassLoader {
+
+    @Override
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        // 对于系统类，仍然使用双亲委派
+        if (name.startsWith("java.") || name.startsWith("javax.") || name.startsWith("sun.")) {
+            return super.loadClass(name);
+        }
+
+        // 检查是否已经加载
+        Class<?> clazz = findLoadedClass(name);
+        if (clazz != null) {
+            return clazz;
+        }
+
+        // 直接调用自己的findClass，打破双亲委派
+        return findClass(name);
+    }
+
+    @Override
+    public Class<?> findClass(String name) throws ClassNotFoundException {
+        try {
+            // 读取类文件的字节码
+            String classPath = name.replace(".", "/") + ".class";
+            try (InputStream is = getResourceAsStream(classPath)) {
+                if (is == null) {
+                    return super.loadClass(name);
+                }
+
+                // 手动读取字节流
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len;
+                while ((len = is.read(buffer)) != -1) {
+                    bos.write(buffer, 0, len);
+                }
+                byte[] classBytes = bos.toByteArray();
+
+                // 定义并返回类
+                return defineClass(name, classBytes, 0, classBytes.length);
+            }
+        } catch (Exception e) {
+            throw new ClassNotFoundException("Failed to load class: " + name, e);
+        }
+    }
+}
+```
+
+```java [Test.java]
+package com.github;
+
+import com.github.loader.BreakClassLoader;
+
+
+public class Test {
+    public static void main( String[] args ) throws Exception {
+
+        BreakClassLoader breakClassLoader = new BreakClassLoader();
+
+        Class<?> aClass = breakClassLoader.loadClass("com.github.domain.Student");
+        System.out.println("aClass = " + aClass.getClassLoader());
+
+        BreakClassLoader breakClassLoader2 = new BreakClassLoader();
+
+        Class<?> aClass2 = breakClassLoader2.loadClass("com.github.domain.Student");
+        System.out.println("aClass2 = " + aClass2.getClassLoader());
+
+        System.out.println(aClass == aClass2); // false
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/135.gif)
+```
+
+:::
+
+
+
+* 示例：
+
+::: code-group
+
+```bash
+sc -d com.github.domain.Student
+```
+
+```md:img [cmd 控制台]
+![](./assets/136.gif)
+```
+
+:::
+
+#### 4.5.3.6 细节
+
+* 自定义类加载器应该重写 `findClass` 方法而不是 `loadClass` 方法，有如下的好处：
+
+| 重写 `findClass` 方法的好处 | 描述                                                         |
+| --------------------------- | ------------------------------------------------------------ |
+| ① **保持双亲委派机制**      | `loadClass` 方法会先委托给父类加载器                         |
+| ② **实现自定义加载逻辑**    | 在 `findClass` 中实现从不同渠道（网络、数据库、加密文件等）加载字节码 |
+| ③ **避免破坏类加载顺序**    | 确保系统类和应用类的加载优先级                               |
+
+
+
+* 示例：
+
+```java
+public class CustomClassLoader extends ClassLoader {
+
+    @Override
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
+        try {
+            // 可以从任何地方获取字节码
+            byte[] classData = getClassDataFromCustomSource(name);
+
+            // 将字节数组转换为 Class 对象
+            return defineClass(name, classData, 0, classData.length);
+        } catch (Exception e) {
+            throw new ClassNotFoundException(name);
+        }
+    }
+
+    private byte[] getClassDataFromCustomSource(String className) {
+        // 这里可以实现各种获取字节码的方式：
+        // 1. 从数据库读取
+        // 2. 从加密文件解密获取
+        // 3. 通过 HTTP 请求获取
+        // 4. 从内存中的字节数组获取
+        return new byte[0]; 
+    }
+}
+```
+
+### 4.5.4 线程上下文类加载器
 
 
 
 
-### 4.5.2 自定义类加载器
 
-
-
-
-
-### 4.5.3 线程上下文类加载器
-
-
-
-
-
-### 4.5.4 OSGI 框架的类加载器
+### 4.5.5 OSGI 框架的类加载器
 
 
 
