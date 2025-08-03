@@ -3350,12 +3350,11 @@ CREATE TABLE IF NOT EXISTS users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 插入模拟数据
-INSERT INTO users (name) VALUES
-  ('Alice'),
-  ('Bob'),
-  ('Charlie'),
-  ('David'),
-  ('Eve');
+INSERT INTO users (id, name) VALUES (1, 'Alice');
+INSERT INTO users (id, name) VALUES (2, 'Bob');
+INSERT INTO users (id, name) VALUES (3, 'Charlie');
+INSERT INTO users (id, name) VALUES (4, 'David');
+INSERT INTO users (id, name) VALUES (5, 'Eve');
 ```
 
 ```xml [Maven]
@@ -3433,13 +3432,212 @@ public class Test {
 
 ```
 
+#### 2.5.5.3 线程上下文加载器
+
+##### 2.5.5.3.1 概述
+
+* JDBC 中使用了 DriverManager 来管理项目中引入的不同数据库驱动，如：mysql 驱动等。
+
+![](./assets/141.svg)
+
+* 在 JDK8 中，DriverManager 类位于 rt.jar 包中，由`启动类加载器`进行加载。
+
+![](./assets/142.png)
+
+* 但是，对于依赖中的 mysql 驱动对应的类，则由`应用类加载器`来加载。
+
+![](./assets/143.png)
+
+* 这就违背了双亲委派机制，原因是：DriverManager 属于 rt.jar 是由`启动类加载器`进行加载的；而 mysql 等驱动则需要由`应用程序类加载器`进行加载。
+
+> [!NOTE]
+>
+> * ① 启动类加载器加载完 DriverManager 后，需要委托应用程序类加载器，去加载 jar 包中的 MySQL 驱动。
+> * ② 在双亲委派机制中，启动类加载器的级别要比应用程序类加载器高很多，即：向上委派，最后自救。
+> * ③ 但是，现在的流程却是和`双亲委派机制`相反，即：启动类加载器加载完 DriverManager 后，需要委托应用程序类加载器，去加载 jar 包中的 MySQL 驱动。
+
+![](./assets/144.svg)
+
+##### 2.5.5.3.2 细节一
+
+* DriverManager 之所以知道 jar 包中要加载的驱动在哪里，使用了就是上文提及到的 SPI 机制。
+* 其原理，如下所示：
+
+| SPI 工作原理         | 米猫叔                                                       |
+| -------------------- | ------------------------------------------------------------ |
+| :one: 定义服务接口   | 创建一个服务接口。                                           |
+| :two: 提供具体实现   | 不同的厂商或开发者提供该接口的具体实现。                     |
+| :three: 配置文件声明 | 在 `META-INF/services/` 目录下创建以`接口全限定名`命名的文件，文件内容是实现类的全限定名。 |
+| :four: 运行时发现    | 使用 `ServiceLoader` 在运行时动态加载实现类。                |
+
+* JDBC 的原理，就是这样的：
+
+![](./assets/145.svg)
 
 
 
+* 示例：DriverManager 的源码分析
+
+```java
+public class DriverManager {
+
+    static {
+        // 初始化阶段，会加载驱动
+        loadInitialDrivers();
+        println("JDBC DriverManager initialized");
+    }
+    
+    // 加载驱动的具体实现
+    private static void loadInitialDrivers() {
+        String drivers;
+        try {
+            drivers = AccessController.doPrivileged(new PrivilegedAction<String>() {
+                public String run() {
+                    return System.getProperty("jdbc.drivers");
+                }
+            });
+        } catch (Exception ex) {
+            drivers = null;
+        }
+       
+
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
+				// 通过 ServiceLoader 加载 META-INF/Services/java.sql.Driver 文件
+                // 并将所有的驱动，即：java.sql.Driver 的实现类加载进来
+                ServiceLoader<Driver> loadedDrivers = ServiceLoader.load(Driver.class);
+                Iterator<Driver> driversIterator = loadedDrivers.iterator();
+
+               
+                try{
+                    // 循环遍历所有驱动，拿到类名，如：com.mysql.cj.jdbc.Driver
+                    while(driversIterator.hasNext()) {
+                        driversIterator.next();
+                    }
+                } catch(Throwable t) {
+                // Do nothing
+                }
+                return null;
+            }
+        });
+
+        println("DriverManager.initialize: jdbc.drivers = " + drivers);
+
+        if (drivers == null || drivers.equals("")) {
+            return;
+        }
+        String[] driversList = drivers.split(":");
+        println("number of Drivers:" + driversList.length);
+        for (String aDriver : driversList) {
+            try {
+                println("DriverManager.Initialize: loading " + aDriver);
+                Class.forName(aDriver, true,
+                        ClassLoader.getSystemClassLoader());
+            } catch (Exception ex) {
+                println("DriverManager.Initialize: load failed: " + ex);
+            }
+        }
+    }
+    
+    ...
+}   
+```
 
 
 
+* 示例：MySQL 驱动源码分析以及 Debug 分析
 
+::: code-group
+
+```java [Driver.java]
+package com.mysql.cj.jdbc;
+
+import java.sql.DriverManager;
+import java.sql.SQLException;
+// 实现了 java.sql.Driver  接口
+public class Driver extends NonRegisteringDriver implements java.sql.Driver {
+    public Driver() throws SQLException {
+    }
+
+    static {
+        try {
+            // 将当前类注册进去
+            DriverManager.registerDriver(new Driver());
+        } catch (SQLException var1) {
+            throw new RuntimeException("Can't register driver!");
+        }
+    }
+}
+```
+
+```txt [META-INF/services/java.sql.Driver]
+com.mysql.cj.jdbc.Driver
+```
+
+```md:img [cmd 控制台]
+![](./assets/146.gif)
+```
+
+:::
+
+##### 2.5.5.3.3 细节二
+
+* SPI 使用了线程上下文中保存的类加载器进行类的加载，并且该类加载器通常是应用程序类加载器。
+
+
+
+* 示例：ServiceLoader 源码分析
+
+```java
+public final class ServiceLoader<S>
+    implements Iterable<S> {
+
+    public static <S> ServiceLoader<S> load(Class<S> service) {
+        // 通过线程上下文加载器来进行类的加载 
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        return ServiceLoader.load(service, cl);
+    }
+    
+    ...
+}   
+```
+
+
+
+* 示例：Thread 源码分析
+
+```java
+public class Thread implements Runnable {    
+	
+    @CallerSensitive
+    public ClassLoader getContextClassLoader() {
+        if (contextClassLoader == null)
+            return null;
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            ClassLoader.checkClassLoaderPermission(contextClassLoader,
+                                                   Reflection.getCallerClass());
+        }
+        return contextClassLoader;
+    }
+    
+    ... 
+}
+```
+
+##### 2.5.5.3.4 总结
+
+* 使用`线程上下文加载器`打破双亲委派机制的步骤，如下所示：
+  * :one: 启动类加载器加载 DriverManager。
+  * :two: 在初始化 DriverManager 的时候，通过 SPI 机制加载 jar 包中的 MySQL 驱动。
+  * :three: 在 SPI 中利用了线程上下加载器（应用程序类加载器）去加载类并创建对象。
+* 其动图，如下所示：
+
+> [!NOTE]
+>
+> 这种由启动类加载器加载的类，委托给应用程序类加载器去加载类的方式，打破了双亲委派机制。
+
+![](./assets/147.svg)
 
 
 
