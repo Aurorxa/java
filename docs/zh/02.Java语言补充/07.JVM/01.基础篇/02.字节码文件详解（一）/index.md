@@ -454,7 +454,7 @@ public class Test {
 > * ② `iload_1` 指令就是将局部变量表中索引为 `1`的位置上的值 push（推） 到操作数栈上。
 > * ③ `iload_<n>` 指令和 `istore_<n>` 指令不同：
 >   * :one:`iload_<n>` 指令是加载操作，即：从局部变量表中复制了一份存入到操作数栈中（复制粘贴）。
->   * :two:`istore_<n>` 这里是弹出并存储操作，即：从操作数栈中弹出栈顶圆形，并存储到局部变量表中（剪切粘贴）。
+>   * :two:`istore_<n>` 这里是弹出并存储操作，即：从操作数栈中弹出栈顶元素，并存储到局部变量表中（剪切粘贴）。
 
 ![](./assets/37.gif)
 
@@ -977,5 +977,4 @@ jad java.lang.String
 | 开发阶段 | :one: 学习字节码：jclasslib 插件 + javap 命令<br>:two: 编译优化分析：javap 命令查看指令级差异<br/>:three: IDE 集成开发：jclasslib 插件实时查看 |
 | 生产环境 | :one: 问题排查：Arthas 动态诊断 <br/>:two: 性能分析：Arthas + dump 命令组合使用 <br/>:three: 应急修复：Arthas 字节码热更新 |
 | 逆向分析 | :one: 源码恢复： jad 命令反编译 <br/>:two: 第三方库分析：jad + javap 组合 <br/>:three: 安全审计：多工具配合使用 |
-
 
