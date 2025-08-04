@@ -3630,7 +3630,7 @@ public class Thread implements Runnable {
 * 使用`线程上下文加载器`打破双亲委派机制的步骤，如下所示：
   * :one: 启动类加载器加载 DriverManager。
   * :two: 在初始化 DriverManager 的时候，通过 SPI 机制加载 jar 包中的 MySQL 驱动。
-  * :three: 在 SPI 中利用了线程上下加载器（应用程序类加载器）去加载类并创建对象。
+  * :three: 在 SPI 中利用了线程上下文加载器（应用程序类加载器）去加载类并创建对象。
 * 其动图，如下所示：
 
 > [!NOTE]
@@ -3639,27 +3639,351 @@ public class Thread implements Runnable {
 
 ![](./assets/147.svg)
 
-
-
-
-
-
-
-
-
-
-
 ### 2.5.6 OSGI 框架的类加载器
 
+* 历史上，OSGI 模块化框架通过`模块化`设计实现了 Java 应用程序的动态加载和隔离。
 
+> [!NOTE]
+>
+> * ① JDK9 之后，Java 并没有采用 OSGI 这种模块化思想，而是采用了 `Java Platform Module System（JPMS）`，即：Jigsaw 项目。
+> * ② 其实，很好理解，在 JavaScript 模块化系统出来之前，出现了 CommonJS 等模块化思想；但是，最终 ES Module 统一天下。
+
+![](./assets/148.jpg)
+
+* 在 OSGI 中，允许同级之间的类加载进行委托加载，其中的层次结构，如下所示：
+
+| OSGI 类加载器        | 描述                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| :one: 父类加载器     | 由 Java平台直接提供，包括：启动类加载器（Bootstrap ClassLoader）、扩展类加载器（Extension ClassLoader）和应用程序类加载器（Application ClassLoader）。<br>它们负责加载以 `java.*` 开头的类以及在父类委派清单中声明为要委派给父类加载器加载的类。 |
+| :two: Bundle类加载器 | 每个 Bundle 都有自己独立的类加载器，用于加载本 Bundle 中的类和资源。<br/>当一个 Bundle 去请求加载另一个 Bundle 导出的 Package 中的类时，要把加载请求委派给导出类的那个 Bundle 的加载器处理 |
+| :three: 其它加载器   | 线程上下文类加载器、框架类加载器等。<br>框架类加载器是各个 OSGi 实现框架自己定义的，用于加载框架自身的代码。<br>线程上下文类加载器则用于解决一些特定的加载问题，如：直接加载没有经过导入和导出的类。 |
+
+![](./assets/149.svg)
+
+* OSGi 的类加载器支持动态加载，这意味着 Bundle 可以在运行时被安装、启动、停止和卸载。这种动态特性使得 OSGi 框架能够灵活地管理应用程序的模块化结构，支持热部署和热更新。如：当一个 Bundle 被卸载时，其类加载器也会被销毁，从而释放相关的资源。
+
+### 2.5.7 热部署
+
+#### 2.5.7.1 概述
+
+* 热部署指的就是在服务不停止的情况下，动态地更新字节码文件到内存中。
+
+#### 2.5.7.2 使用 arthas 不停机解决线上问题
+
+* 需求：小李的团队将代码上线之后，发现存在一个小 bug ；但是，用户着急使用。如果重新打包再发布需要 1 个多小时，希望能使用 arthas 尽快将该问题修复。
+
+> [!NOTE]
+>
+> 解决思路：
+>
+> * :one: 在出问题的服务器上部署 Arthas ，并启动。
+> * :two: `jad --source-only 类的全限定名 > 目录/文件名.java`，目的是使用 jad 命令反编译之后将源码保存到服务器某个目录中，再使用 vim 等修改源码。
+> * :three: `mc -c 类加载的hashcode 目录名/文件名.java -d 输出目录`。 mc 是 Memory Compiler 的意思，即：内存编译器。
+> * :four: `retransform class文件所在目录/xxx.class`，即：使用 retransform  命令将磁盘上的 .class 文件加载到内存中。
+
+> [!CAUTION]
+>
+> * ① 程序重启之后，字节码文件会恢复，除非将 class 文件放入到 jar 包中进行更新，即：上述方案是临时方案。
+> * ② 使用 retransform 不能添加方法或字段，也不能更新正在执行中的方法。
+
+
+
+* 示例：搭建环境
+
+::: code-group
+
+```txt[项目结构]
+├─📁 gradle/
+│ └─📁 wrapper/
+│   ├─📄 gradle-wrapper.jar
+│   └─📄 gradle-wrapper.properties
+├─📁 src/
+│ ├─📁 main/
+│ │ ├─📁 java/
+│ │ │ └─📁 com/
+│ │ │   └─📁 github/
+│ │ │     └─📁 lamesphinx/
+│ │ │       ├─📁 utils/
+│ │ │       │ └─📄 UserType.java
+│ │ │       ├─📁 web/
+│ │ │       │ └─📄 UserController.java
+│ │ │       └─📄 LameSphinxApplication.java
+│ │ └─📁 resources/
+│ │   ├─📁 static/
+│ │   ├─📁 templates/
+│ │   └─📄 application.properties
+│ └─📁 test/
+│   └─📁 java/
+│     └─📁 com/
+│       └─📁 github/
+│         └─📁 lamesphinx/
+│           └─📄 LameSphinxApplicationTests.java
+├─📄 .gitattributes
+├─📄 .gitignore
+├─📄 build.gradle
+├─📄 gradlew
+├─📄 gradlew.bat
+└─📄 settings.gradle
+```
+
+```md:img [cmd 控制台]
+![](./assets/150.png)
+```
+
+```groovy [build.gradle]
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.4'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.github'
+version = '0.0.1'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+```
+
+:::
+
+
+
+* 示例：有 bug 的代码
+
+::: code-group
+
+```java [UserType.java]
+package com.github.lamesphinx.utils;
+
+public enum UserType {
+    NORMAL(1001,"普通用户"),
+    VIP(1002,"VIP 用户");
+
+    private final Integer type;
+
+    private final String desc;
+
+    UserType(Integer type, String desc) {
+        this.type = type;
+        this.desc = desc;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+}
+```
+
+``` java [UserController.java]
+package com.github.lamesphinx.web;
+
+import com.github.lamesphinx.utils.UserType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    @GetMapping("/{type}/{id}")
+    public ResponseEntity<String> user(
+            @PathVariable("type") Integer type,
+            @PathVariable("id") Integer id) {
+        // 这边有 bug
+        if (type == UserType.NORMAL.getType()) {
+            return ResponseEntity
+                    .ok()
+                    .body(String.format("普通用户无权限查看 ==> %s", id));
+        }
+        return ResponseEntity
+                .ok()
+                .body((String.format("只有尊贵的 VIP 用户才能查看 ==> %s", id)));
+    }
+
+}
+```
+
+```java [LameSphinxApplication.java]
+package com.github.lamesphinx;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class LameSphinxApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(LameSphinxApplication.class, args);
+	}
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/151.gif)
+```
+
+:::
+
+
+
+* 示例：启动 Arthas 、反编译源码以及修改逻辑
+
+::: code-group
+
+```bash
+# 启动 Arthas 
+java -jar arthas-boot.jar
+```
+
+```md:img [cmd 控制台]
+![](./assets/152.gif)
+```
+
+```bash
+# 反编译源码到指定文件
+jad --source-only com.github.lamesphinx.web.UserController > /tmp/UserController.java
+```
+
+```md:img [cmd 控制台]
+![](./assets/153.gif)
+```
+
+```bash
+# 修改逻辑
+vim /tmp/UserController.java
+```
+
+```md:img [cmd控制台]
+![](./assets/154.gif)
+```
+
+:::
+
+
+
+* 示例：编译 Java 源代码、将字节码文件加载到内存
+
+::: code-group
+
+```bash
+# 查询加载类的类加载器的 hash
+sc -d com.github.lamesphinx.web.UserController
+```
+
+```md:img [cmd控制台]
+![](./assets/155.gif)
+```
+
+```bash
+# 使用专门的类加载器内存编译 Java 源代码
+mc -c 65b3120a /tmp/UserController.java -d /tmp
+```
+
+```md:img [cmd控制台]
+![](./assets/156.gif)
+```
+
+```bash
+# 将字节码文件加载到内存中
+retransform /tmp/com/github/lamesphinx/web/UserController.class
+```
+
+```md:img [cmd 控制台]
+![](./assets/157.gif)
+```
+
+:::
+
+
+
+* 示例：测试
+
+::: code-group
+
+```bash
+curl http://localhost:8080/user/1001/1
+```
+
+```md:img [cmd 控制台]
+![](./assets/158.gif)
+```
+
+:::
 
 ## 2.6 JDK9 之后的类加载器
 
+### 2.6.1 JDK8 之前的类加载器
 
+* JDK8 以及之前的版本中，`扩展类加载器`和`应用程序类加载器`的源码位于`rt.jar`包中的`sun.misc.Launcher.java`中。
 
+![](./assets/159.svg)
 
+### 2.6.2 JDK9 之后的类加载器
 
+* JDK9 引入了 module 的概念，不再使用 jar 包来管理类，而是使用 jmods 来管理类。
 
+![](./assets/160.png)
 
+* 类加载器在设计上也发生了很多变化：启动类加载器使用 Java 编写。
 
+> [!NOTE]
+>
+> * ① `启动类加载器`位于 jdk.internal.loader.ClassLoaders 类中
+> * ② Java 中的 BootClassLoader 继承自 BuiltinClassLoader ，实现从模块中找到要加载的字节码资源文件。
+> * ③ `启动类加载器依然无法通过 Java 代码获取到，返回的依然是 null，保持了统一`。
 
+![](./assets/161.svg)
+
+* 类加载器在设计上也发生了很多变化：扩展类加载器变成了平台类加载器。
+
+> [!NOTE]
+>
+> * ① `平台类加载器`位于 jdk.internal.loader.ClassLoaders 类中
+> * ② Java 中的 PlatformClassLoader 继承自 BuiltinClassLoader ，实现从模块中找到要加载的字节码资源文件。
+> * ③ `平台类加载器的存放更多的是为了和老版本的设计兼容，自身没有特殊的逻辑`。
+
+![](./assets/162.svg)
+
+* 类加载器在设计上也发生了很多变化：应用程序类加载器逻辑还是一样，继承发生了变化。
+
+> [!NOTE]
+>
+> * ① `应用程序类加载器`位于 jdk.internal.loader.ClassLoaders 类中
+> * ② Java 中的 AppClassLoader 继承自 BuiltinClassLoader ，实现从模块中找到要加载的字节码资源文件。
+
+![](./assets/163.svg)
