@@ -302,7 +302,7 @@ public class Test {
 >
 > * ① `局部变量表`（Local Variables Table）：用于在运行过程中存放所有的局部变量。
 > * ② `操作数栈`（Operand Stacks）：用于存放虚拟机在执行字节码指令过程中的临时数据。
-> * ③ `帧数据`（Frame Datas）：包含动态链接、方法出口以及异常表的引用。
+> * ③ `帧数据`（Frame Datas）：主要包含动态链接、方法出口以及异常表的引用。
 
 ![](./assets/18.svg)
 
