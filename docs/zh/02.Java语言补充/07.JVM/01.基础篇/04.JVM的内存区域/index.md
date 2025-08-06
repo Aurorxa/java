@@ -125,7 +125,12 @@ public class Test {
 
 ![](./assets/8.gif)
 
-* 在多线程环境下，JVM 会对线程进行调度，切换正在运行的线程。当线程被挂起并切换时，当前线程的程序计数器值会被保存在其线程的上下文中。下次该线程被调度时，JVM 会从程序计数器保存的值恢复执行，从而使得线程能够继续从中断的地方执行。
+* 在多线程环境下，JVM 会对线程进行调度，切换正在运行的线程。
+
+> [!NOTE]
+>
+> * ① 当线程被挂起并切换时，当前线程的程序计数器值会被保存在其线程的上下文中。
+> * ② 下次该线程被调度时，JVM 会从程序计数器保存的值恢复执行，从而使得线程能够继续从中断的地方执行。
 
 ![](./assets/9.svg)
 
@@ -439,15 +444,332 @@ public class Test {
 
 ### 3.3.3 操作数栈
 
+#### 3.3.3.1 概述
+
+* `操作数栈`是`栈帧`中虚拟机在执行`字节码指令`过程中用来存放`临时数据`的一块内存区域。
+* 操作数栈也是一种栈式的数据结构。
+
+> [!NOTE]
+>
+> 如果一条指令将一个值压入到操作数栈中，则后面的指令可以弹出并使用该值。
+
+#### 3.3.3.2 特点
+
+* `编译期就可以确定操作数栈的最大深度，从而在执行的时候正确地分配内存大小`。
+
+![](./assets/28.png)
 
 
 
+* 示例：演示操作数栈的最大深度
+
+::: code-group
+
+```txt [faq 计算过程]
+iconst_1    // 栈深度: 0→1, 最大深度: 1
+istore_1    // 栈深度: 1→0, 最大深度: 1
+iconst_2    // 栈深度: 0→1, 最大深度: 1  
+istore_2    // 栈深度: 1→0, 最大深度: 1
+iload_1     // 栈深度: 0→1, 最大深度: 1
+iload_2     // 栈深度: 1→2, 最大深度: 2
+iadd        // 栈深度: 2→1, 最大深度: 2
+istore_3    // 栈深度: 1→0, 最大深度: 2
+```
+
+```md:img [cmd 控制台]
+![](./assets/29.gif)
+```
+
+:::
 
 ### 3.3.4 帧数据
 
+#### 3.3.4.1 概述
 
+* `操作数栈`和`局部变量表`，对于每个 Java 虚拟机，都是按照 《[Java虚拟机规范](https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-2.html#jvms-2.5)》实现的。
+* `栈数据`主要包含`动态链接`、`方法出口`以及`异常表`；但是，不同的 Java 虚拟机有不同的扩展。
 
+#### 3.3.4.2 动态链接
 
+##### 3.3.4.2.1 概述
+
+* `符号引用`就是在字节码文件中使用`编号`来访问常量池中的内容。
+
+![符号引用](./assets/30.png)
+
+* 在`类加载`生命周期中的`链接`阶段（解析阶段）是将常量池中的`符号引用`替换为`直接引用`。
+
+> [!NOTE]
+>
+> 不使用编号，而是使用内存地址来进行具体数据的访问，就是为了性能（后续可以直接通过内存地址从内存中获取数据）。
+
+![直接引用](./assets/31.gif)
+
+* 但是，Java 并不能将所有的`符号引用`都替换为`直接引用`，如：虚方法调用（多态）。
+
+> [!NOTE]
+>
+> * ① 静态链接（Static Linking）：在编译期就把`符号引用`变成`直接引用`，如： C/C++ 编译后的二进制。
+> * ② 动态链接（Dynamic Linking）：在运行时才把`符号引用`解析成`直接引用`，即：允许方法调用的 `延迟绑定`（Java 中的多态）。
+
+> [!CAUTION]
+>
+> * ① 如果`字节码指令`中引用了`其他类的属性或者方法`的时候，需要将`符号引用`转换为对应的`运行时常量池`中的`内存地址`。
+> * ② 换言之，动态链接就保存了`编号`到`运行时常量池`的内存地址的映射关系。
+
+![](./assets/32.svg)
+
+##### 3.3.4.2.2 为什么需要动态链接？
+
+* 虽然在`解析阶段`能处理一部分`静态可确定`的符号引用；但是，在运行时仍有大量调用`动态链接`。
+
+> [!NOTE]
+>
+> 解析阶段并不能将所有的`符号引用`一次性的`全部替换`为`直接引用`的原因有两点，如下所示：
+>
+> * ① `延迟解析`（Lazy Resolution）：JVM 规范允许在真正使用某个符号引用时才解析，而不是类加载时全部解析。
+> * ② `多态与动态绑定`（Polymorphism & Dynamic Binding）：有些调用在编译期根本无法确定目标（ `invokevirtual`），只能在运行时动态决定。
+
+* 动态链接的典型例子 --- 虚方法调用（Virtual Method Call）：
+
+::: code-group
+
+```java [Test.java]
+abstract class Animal {
+
+    public abstract void eat();
+}
+
+class Dog extends Animal {
+    @Override
+    public void eat() {
+        System.out.println("狗吃饭");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Animal animal = new Dog();
+        /*
+        编译期只知道 eat() 是个符号引用；
+        在运行时，需要通过对象实际类型去查找vtable(虚方法表），跳转到对应的方法实现
+        */
+        animal.eat();
+    }
+}
+```
+
+```cmd [字节码指令]{6}
+ 0 new #2 <com/github/Dog>
+ 3 dup
+ 4 invokespecial #3 <com/github/Dog.<init> : ()V>
+ 7 astore_1
+ 8 aload_1
+ 9 invokevirtual #4 <com/github/Animal.eat : ()V> 
+12 return
+```
+
+:::
+
+* 动态链接的典型例子 --- 接口方法调用（invokeinterface）：
+
+::: code-group
+
+```java [Test.java]
+// 接口
+interface Fly {
+
+    void fly();
+}
+
+// 实现类
+class Bird implements Fly {
+    @Override
+    public void fly() {
+        System.out.println("鸟飞");
+    }
+}
+
+// 实现类
+class Plane implements Fly {
+    @Override
+    public void fly() {
+        System.out.println("飞机飞");
+    }
+}
+
+// 实现类
+class Ship implements Fly {
+    @Override
+    public void fly() {
+        System.out.println("船飞");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+       Fly fly = new Bird();
+       // 接口的实现类很多，只有在运行的时候才能确定真正调用那个实现类的方法
+       fly.fly();
+    }
+}
+```
+
+```cmd [字节码指令] {6}
+ 0 new #2 <com/github/Bird>
+ 3 dup
+ 4 invokespecial #3 <com/github/Bird.<init> : ()V>
+ 7 astore_1
+ 8 aload_1
+ 9 invokeinterface #4 <com/github/Fly.fly : ()V> count 1 
+14 return
+```
+
+:::
+
+* 动态链接的典型例子 --- 反射调用：
+
+::: code-group
+
+```java [Test.java]
+package com.github;
+
+// 接口
+interface Fly {
+
+    void fly();
+}
+
+// 实现类
+class Bird implements Fly {
+    @Override
+    public void fly() {
+        System.out.println("鸟飞");
+    }
+}
+
+// 实现类
+class Plane implements Fly {
+    @Override
+    public void fly() {
+        System.out.println("飞机飞");
+    }
+}
+
+// 实现类
+class Ship implements Fly {
+    @Override
+    public void fly() {
+        System.out.println("船飞");
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+       Class<?> clazz = Class.forName("com.github.Bird");
+       // 反射在编译期压根不知道调用哪个方法
+       // 反射只有在运行期才知道调用哪个方法
+       Method fly = clazz.getMethod("fly");
+       fly.invoke(clazz.newInstance());
+    }
+}
+```
+
+```cmd [字节码指令] {8}
+0 ldc #2 <com.github.Bird>
+ 2 invokestatic #3 <java/lang/Class.forName : (Ljava/lang/String;)Ljava/lang/Class;>
+ 5 astore_1
+ 6 aload_1
+ 7 ldc #4 <fly>
+ 9 iconst_0
+10 anewarray #5 <java/lang/Class>
+13 invokevirtual #6 <java/lang/Class.getMethod : (Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;>
+16 astore_2
+17 aload_2
+18 aload_1
+19 invokevirtual #7 <java/lang/Class.newInstance : ()Ljava/lang/Object;>
+22 iconst_0
+23 anewarray #8 <java/lang/Object>
+26 invokevirtual #9 <java/lang/reflect/Method.invoke : (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;>
+29 pop
+30 return
+```
+
+:::
+
+* 动态链接的典型例子 --- 动态语言支持：
+
+::: code-group
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        /*
+        invokedynamic 指令是为支持 JVM 上的动态语言引入的，如：Lambda 表达式。
+        方法绑定完全延迟到运行时。
+        */            
+        Thread thread = new Thread(() -> System.out.println("线程运行"));
+        thread.start();
+    }
+}
+```
+
+```cmd [字节码指令] {3}
+ 0 new #2 <java/lang/Thread>
+ 3 dup
+ 4 invokedynamic #3 <run, BootstrapMethods #0>
+ 9 invokespecial #4 <java/lang/Thread.<init> : (Ljava/lang/Runnable;)V>
+12 astore_1
+13 aload_1
+14 invokevirtual #5 <java/lang/Thread.start : ()V>
+17 return
+```
+
+:::
+
+##### 3.3.4.2.3 总结
+
+* 类加载解析 VS 动态链接：
+
+| 对比点   | 解析阶段（Resolution）           | 动态链接（Dynamic Linking）                 |
+| -------- | -------------------------------- | ------------------------------------------- |
+| 时间点   | 类加载时（或第一次使用时）       | 方法调用的运行时                            |
+| 解析范围 | 能静态确定的符号引用             | 需要运行时才能确定的调用                    |
+| 特点     | 一次性完成或延迟完成             | 每次调用时都可能发生                        |
+| 适用场景 | 静态方法、私有方法、final 方法等 | 虚方法、接口方法、多态、反射、invokedynamic |
+
+* `类加载`的`解析阶段`是 `能静态确定的先解析好`。
+* `动态链接`是`运行时根据实际对象和上下文动态解析`，尤其是支持`多态`和`延迟绑定`的核心机制。
+
+#### 3.3.4.3 返回地址
+
+* 在多线程环境下，JVM 会对线程进行调度，切换正在运行的线程。
+
+> [!NOTE]
+>
+> * ① 当线程被挂起并切换时，当前线程的程序计数器值会被保存在其线程的上下文中。
+> * ② 下次该线程被调度时，JVM 会从程序计数器保存的值恢复执行，从而使得线程能够继续从中断的地方执行。
+
+![](./assets/33.svg)
+
+* 程序计数器是怎么知道上一个栈帧中下一个指令的地址的？答案是`返回地址`（Return Address）。
+
+> [!NOTE]
+>
+> * ① 当调用一个方法时，调用指令（`invokestatic`, `invokevirtual` 等）不仅会创建新栈帧，还会在调用者的栈帧里保存`调用点的下一条字节码指令地址`。
+> * ② 被调用方法执行完后，JVM 会弹出当前栈帧，把控制权交回调用者，并`跳转到这个保存的地址`继续执行。
+
+![](./assets/34.gif)
+
+#### 3.3.4.4 异常表
+
+* 异常表存放是代码中的异常处理信息。
+
+> [!NOTE]
+>
+> 异常表的信息有：`异常捕获的生效范围`以及`异常发生后跳转的字节码指令位置`。
+
+![](./assets/35.svg)
 
 
 

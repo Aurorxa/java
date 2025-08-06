@@ -98,6 +98,8 @@ const vitePressOptions = withMermaid(defineConfig({
           'sh': 'vscode-icons:file-type-gnu',
           'cpu': localIconLoader(import.meta.url, '../../public/iconify/cpu.svg'),
           'faq': localIconLoader(import.meta.url, '../../public/iconify/reply.svg'),
+          'bytecode': localIconLoader(import.meta.url, '../../public/iconify/bytecode.svg'),
+          '字节码指令': localIconLoader(import.meta.url, '../../public/iconify/bytecode.svg'),
           'sql': 'vscode-icons:file-type-sql'
         }
       }) as any),
