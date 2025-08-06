@@ -771,9 +771,131 @@ public class Test {
 
 ![](./assets/35.svg)
 
+## 3.4 内存溢出（Java虚拟机栈）
+
+### 3.4.1 概述
+
+* `Java虚拟机栈`中的`栈帧`过多，占用内存超过`栈内存`可以分配的最大大小就会出现`内存溢出`。
+
+![](./assets/38.gif)
+
+* `JVM`给`虚拟机栈`分配内存有一个上限，如果超过了这个上限，就会出现`内存溢出`。
+
+> [!NOTE]
+>
+> * ① 当出现`内存溢出`的时候，JVM 会抛出 StackOverflowError 的错误，并且线程也会停止执行。
+> * ② 如果我们不指定栈空间的大小，JVM 将会创建一个`默认大小`的栈，该值取决于操作系统。
+>
+> | 平台（操作系统） | 默认栈分配的内存空间大小 |
+> | ---------------- | ------------------------ |
+> | Linux            | 1 MB                     |
+> | Windows          | 基于操作系统的默认值     |
+
+![](./assets/39.svg)
+
+### 3.4.2 模拟栈内存溢出
+
+* 需求：使用递归让方法自身调用自己，无需设置退出条件。
+
+> [!NOTE]
+>
+> * ① 定义调用次数的变量，每调用一次让变量 +1 。
+> * ② 查看错误发生时的总调用次数。
 
 
-## 3.4 内存溢出
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github;
+
+
+public class Test {
+    private static int count = 0;
+
+    public static void main(String[] args) {
+        recursion();
+    }
+
+    /**
+     * 递归
+     */
+    public static void recursion(){
+        System.out.println(++count);
+        recursion();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/40.gif)
+```
+
+:::
+
+### 3.4.3 手动设置大小
+
+* 可以通过修改 JVM 参数，达到修改`Java虚拟机栈`大小的目的。
+* 语法：
+
+```java
+-Xss栈大小
+```
+
+> [!NOTE]
+>
+> * ① 单位：字节（默认，必须是 1024 的整数倍）、k或者K(KB)、m或者M(MB)、g或者G(GB) 。
+> * ② `Java虚拟机栈`的`JVM参数`例子：
+>   * :one: -Xss1048576
+>   * :two: -Xss1024K
+> * ③ 和`-Xss`类似，也可以使用`-XX:ThreadStackSize`来配置堆栈大小，如：`-XX:ThreadStackSize=1024`。
+> * ④ HotSpot JVM 对栈大小的最大值和最小值有要求：
+>
+> | 操作系统 | JDK 版本 | 位数 | 测试最小值 | 测试最大值 |
+> | -------- | -------- | ---- | ---------- | ---------- |
+> | Windows  | JDK 8    | 64位 | 180 KB     | 1024 MB    |
+>
+> * ⑤ 局部变量过多、操作数栈深度过大也会影响栈内存的大小。
+
+> [!TIP]
+>
+> * ① 一般情况下，工作中即便使用了递归进行操作，栈的深度最多也只能到几百，不会出现栈的溢出。
+> * ② 参数可以手动指定为 -Xss256k 节省内存（通常不需要设置）。
+
+
+
+* 示例：IDEA 配置 JVM 参数
+
+::: code-group
+
+```java [Test.java]
+package com.github;
+
+
+public class Test {
+    private static int count = 0;
+
+    public static void main(String[] args) {
+        recursion();
+    }
+
+    /**
+     * 递归
+     */
+    public static void recursion(){
+        System.out.println(++count);
+        recursion();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/41.gif)
+```
+
+:::
 
 
 
