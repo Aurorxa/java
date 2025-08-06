@@ -779,7 +779,59 @@ public class Test {
 
 # 第四章：本地方法栈
 
+## 4.1 概述
 
+* `Java虚拟机栈`存储了 Java 方法调用时的栈帧，而`本地方法栈`存储的是 native 本地方法的栈帧。
+
+> [!NOTE]
+>
+> * ① 在 Hotspot 虚拟机中，`Java虚拟机栈`和`本地方法栈`实现上使用了同一个栈空间。
+>
+> * ② `本地方法栈`会在栈内存上生成一个栈帧，包含了`局部变量表`、`操作数栈`以及`帧数据`。
+
+![](./assets/36.svg)
+
+## 4.2 演示
+
+* 只要使用了 native 关键字修饰的方法就是本地方法，在调用的时候，就会创建本地方法栈。
+
+> [!NOTE]
+>
+> 在 Hotspot 虚拟机中，`Java虚拟机栈`和`本地方法栈`实现上使用了同一个栈空间。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class Test {
+    public static void main(String[] args){
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream("H:\\123.txt");
+            fileOutputStream.write(1);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/37.gif)
+```
+
+:::
 
 
 
