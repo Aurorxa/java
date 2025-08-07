@@ -847,17 +847,14 @@ public class Test {
 > [!NOTE]
 >
 > * ① 单位：字节（默认，必须是 1024 的整数倍）、k或者K(KB)、m或者M(MB)、g或者G(GB) 。
-> * ② `Java虚拟机栈`的`JVM参数`例子：
->   * :one: -Xss1048576
->   * :two: -Xss1024K
-> * ③ 和`-Xss`类似，也可以使用`-XX:ThreadStackSize`来配置堆栈大小，如：`-XX:ThreadStackSize=1024`。
-> * ④ HotSpot JVM 对栈大小的最大值和最小值有要求：
->
+> * ② 和`-Xss`类似，也可以使用`-XX:ThreadStackSize`来配置堆栈大小，如：`-XX:ThreadStackSize=1024`。
+> * ③ HotSpot JVM 对栈大小的最大值和最小值有要求：
+> 
 > | 操作系统 | JDK 版本 | 位数 | 测试最小值 | 测试最大值 |
 > | -------- | -------- | ---- | ---------- | ---------- |
-> | Windows  | JDK 8    | 64位 | 180 KB     | 1024 MB    |
->
-> * ⑤ 局部变量过多、操作数栈深度过大也会影响栈内存的大小。
+>| Windows  | JDK 8    | 64位 | 180 KB     | 1024 MB    |
+> 
+> * ④ 局部变量过多、操作数栈深度过大也会影响栈内存的大小。
 
 > [!TIP]
 >
@@ -866,9 +863,13 @@ public class Test {
 
 
 
-* 示例：IDEA 配置 JVM 参数
+* 示例：IDEA 配置 JVM 参数来调整栈大小
 
 ::: code-group
+
+```bash
+-Xss1024m
+```
 
 ```java [Test.java]
 package com.github;
@@ -959,11 +960,380 @@ public class Test {
 
 # 第五章：堆内存
 
+## 5.1 概述
 
+* 我们已经学习了`运行时数据区`中的`程序计数器`、`栈`，下面将学习`堆`、`方法区`和`直接内存`。
+
+> [!NOTE]
+>
+> * ① 线程`不共享`的内存区域有：`程序计数器`、`Java 虚拟机栈`以及`本地方法栈`。
+> * ② 线程`共享`的内存区域有：`方法区`、`堆区`以及`直接内存`。
+
+![](./assets/42.svg)
+
+## 5.2 堆内存
+
+* Java 程序中`堆内存`是`内存空间`中最大的一块内存区域，创建出来的对象都是位于`堆内存`中。
+
+> [!NOTE]
+>
+> * ① `栈`中的`局部变量表`中，可以存放`堆`中`对象`的`引用`。
+> * ② `静态变量`也可以存放`堆对象`的`引用`，通过`静态变量`就可以实现对象在线程之间共享。
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+    String name;
+    int age;
+    static String teacherName;
+    
+    public void show() {
+        System.out.println("Student{"
+                + "name='" + name
+                + '\'' + ", age=" + age
+                + '\'' + ", teacherName='" + teacherName 
+                + '\'' + '}');
+    }
+}
+```
+
+```java [StudentTest.java]
+public class StudentTest {
+    public static void main(String[] args) {
+        Student.teacherName = "苍老师";  
+
+        // 创建第一个对象
+        Student s1 = new Student();
+        s1.name = "张三";
+        s1.age = 18;
+        s1.show();
+
+        // 创建第二个对象
+        Student s2 = new Student();
+        s2.name = "李四";
+        s2.age = 20;
+        s2.show();
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/43.gif)
+```
+
+:::
+
+## 5.3 内存溢出（堆内存） 
+
+### 5.3.1 模拟堆内存溢出
+
+* 需求：通过 new 关键字不同的创建对象，放入到集合中，观察堆溢出之后的异常信息。
+
+> [!NOTE]
+>
+> 堆内存大小是有上限的，当一直向堆中放入对象达到上限之后，就会抛出 OutOfMemoryError 错误。
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+package com.github;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) throws InterruptedException {
+        List<Object> objList = new ArrayList<>();
+        while (true) {
+            objList.add(new byte[1024 * 1024 * 100]);
+        }
+
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/44.gif)
+```
+
+:::
+
+### 5.3.2 相关值
+
+* 堆空间有三个需要关注的值，即：used、total 和 max 。
+
+| 堆空间相关值 | 描述                            |
+| ------------ | ------------------------------- |
+| used         | 当前已经使用的堆内存。          |
+| total        | Java 虚拟机分配的可用的堆内存。 |
+| max          | Java 虚拟机分配的最大堆内存。   |
+
+![](./assets/45.svg)
+
+* 我们可以通过 Arthas 来查看这三个值：
+
+::: code-group
+
+```java [Test.java]
+package com.github;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        List<Object> objList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            objList.add(new byte[1024 * 1024 * 100]);
+        }
+
+        System.in.read();
+    }
+
+}
+```
+
+```bash [Arthas]
+# 类似于 Linux 中的 free 命令
+memory
+
+ # 类似于 top 或 glances 命令
+dashboard -i
+```
+
+```md:img [cmd 控制台]
+![](./assets/46.gif)
+```
+
+:::
+
+* 随着堆中对象的增多，used 会越来越接近于 total ，如下所示：
+
+::: code-group
+
+```md:img [faq 动态图]
+![](./assets/47.gif)
+```
+
+```java [Test.java]
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        List<Object> objList = new ArrayList<>();
+        while(true) {
+            // 阻塞，直到键盘输入字符为止
+            System.in.read();
+            objList.add(new byte[1024 * 1024 * 100]);
+        }
+    }
+
+}
+```
+
+```bash [Arthas]
+# 类似于 Linux 中的 free 命令
+memory
+
+ # 类似于 top 或 glances 命令
+dashboard -i
+```
+
+```md:img [cmd 控制台]
+![](./assets/48.gif)
+```
+
+:::
+
+* 如果 used 和 total 非常接近，JVM 将继续分配内存给 total，这样就可以继续向堆中增加对象。
+
+::: code-group
+
+```md:img [faq 动态图]
+![](./assets/49.gif)
+```
+
+```java [Test.java]
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        List<Object> objList = new ArrayList<>();
+        while(true) {
+            // 阻塞，直到键盘输入字符为止
+            System.in.read();
+            objList.add(new byte[1024 * 1024 * 100]);
+        }
+    }
+
+}
+```
+
+```bash [Arthas]
+# 类似于 Linux 中的 free 命令
+memory
+
+ # 类似于 top 或 glances 命令
+dashboard -i
+```
+
+```md:img [cmd 控制台]
+![](./assets/50.gif)
+```
+
+:::
+
+* 但是，JVM 并不会一直给 total 分配内存，极限情况就是 used = total = max 。
+
+::: code-group
+
+```md:img [faq 动态图]
+![](./assets/51.gif)
+```
+
+```java [Test.java]
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        List<Object> objList = new ArrayList<>();
+        while(true) {
+            // 阻塞，直到键盘输入字符为止
+            System.in.read();
+            objList.add(new byte[1024 * 1024 * 10]);
+        }
+    }
+
+}
+```
+
+```bash [Arthas]
+# 类似于 Linux 中的 free 命令
+memory
+
+ # 类似于 top 或 glances 命令
+dashboard -i
+```
+
+```md:img [cmd 控制台]
+![](./assets/52.gif)
+```
+
+:::
+
+### 5.3.3 细节
+
+* 【问】如果 used = total = max 的时候，堆内存就开始内存溢出？
+* 【答】不是，`堆内存`出现`内存溢出`的判断条件比较复杂，在《垃圾回收》中有详细的介绍。
+
+### 5.3.4 细节
+
+* 【问】为什么 Arthas 中显示的 heap 堆大小和设置的值不一样？
+* 【答】Arthas 中的 heap 堆内存使用了 JMX 技术来获取的，这种方式和垃圾回收器有关，计算的是可以分配对象的内存，而不是总内存。
+
+### 5.3.5 默认堆内存大小
+
+* 默认情况下，max 是系统内存的 1/4，total 是系统内存的 1/64 。
+
+> [!NOTE]
+>
+> * ① [文档地址](https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/ergonomics.html)。
+> * ② 在实际应用中一般都需要设置 total 和 max 的值。
+
+
+
+* 示例：
+
+::: code-group
+
+```bash
+java -XX:+PrintFlagsFinal -version | grep -i HeapSize
+```
+
+```mg:img [cmd 控制台]
+![](./assets/53.png)
+```
+
+:::
+
+### 5.3.6 手动设置大小
+
+* 可以使用 JVM 参数来修改堆内存大小。
+* 语法：
+
+```java
+// 初始 total
+-Xms值 
+// max 最大值    
+-Xmx值
+```
+
+> [!NOTE]
+>
+> * ① 单位：字节（默认，必须是 1024 的整数倍）、k或者K(KB)、m或者M(MB)、g或者G(GB) 。
+> * ② 和`-Xms`类似，也可以使用`-XX:InitalHeapSize`来配置堆大小，如：`-XX:InitalHeapSize=1024`。
+> * ③ 和`-Xmx`类似，也可以使用`-XX:MaxHeapSize`来配置堆大小，如：`-XX:MaxHeapSize=1024`。
+> * ④ -Xms 必须大于 1MB；而 -Xms 必须大于 2 MB。
+>
+
+> [!TIP]
+>
+> * ① Java 服务端程序开发时，建议将 `-Xmx` 和 `-Xms` 设置为相同的值，这样在程序启动之后可使用的总内存就是最大内存，而无需向 JVM 再次申请，减少了申请并分配内存时间上的开销，同时也不会出现内存过剩之后堆收缩的情况。
+> * ② `-Xmx` 具体设置的值与实际的应用程序运行环境有关，在《实战篇》中会给出设置方案。
+
+
+
+* 示例：IDEA 配置 JVM 参数来调整堆大小
+
+::: code-group
+
+```bash
+-Xms1g -Xmx1g
+```
+
+```java [Test.java]
+package com.github;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        List<Object> objList = new ArrayList<>();
+        while (true){
+            System.in.read();
+            objList.add(new byte[1024 * 1024 * 100]);
+        }
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/54.gif)
+```
+
+:::
 
 
 
 # 第六章：方法区
+
+## 6.1 概述
 
 
 

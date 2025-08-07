@@ -100,6 +100,10 @@ const vitePressOptions = withMermaid(defineConfig({
           'faq': localIconLoader(import.meta.url, '../../public/iconify/reply.svg'),
           'bytecode': localIconLoader(import.meta.url, '../../public/iconify/bytecode.svg'),
           '字节码指令': localIconLoader(import.meta.url, '../../public/iconify/bytecode.svg'),
+          'chrome': localIconLoader(import.meta.url, '../../public/iconify/chrome.svg'),
+          'firefox': localIconLoader(import.meta.url, '../../public/iconify/firefox.svg'),
+          'edge': localIconLoader(import.meta.url, '../../public/iconify/edge.svg'),
+          'arthas': localIconLoader(import.meta.url, '../../public/iconify/arthas.svg'),
           'sql': 'vscode-icons:file-type-sql'
         }
       }) as any),
