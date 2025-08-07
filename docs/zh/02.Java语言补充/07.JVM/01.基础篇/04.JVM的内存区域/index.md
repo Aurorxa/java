@@ -1263,7 +1263,7 @@ dashboard -i
 java -XX:+PrintFlagsFinal -version | grep -i HeapSize
 ```
 
-```mg:img [cmd 控制台]
+```md:img [cmd 控制台]
 ![](./assets/53.png)
 ```
 
