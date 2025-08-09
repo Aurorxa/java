@@ -1118,10 +1118,6 @@ dashboard -i
 
 ::: code-group
 
-```md:img [faq 动态图]
-![](./assets/47.gif)
-```
-
 ```java [Test.java]
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1138,6 +1134,10 @@ public class Test {
     }
 
 }
+```
+
+```md:img [faq 动态图]
+![](./assets/47.gif)
 ```
 
 ```bash [Arthas]
@@ -1158,10 +1158,6 @@ dashboard -i
 
 ::: code-group
 
-```md:img [faq 动态图]
-![](./assets/49.gif)
-```
-
 ```java [Test.java]
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1178,6 +1174,10 @@ public class Test {
     }
 
 }
+```
+
+```md:img [faq 动态图]
+![](./assets/49.gif)
 ```
 
 ```bash [Arthas]
@@ -1198,10 +1198,6 @@ dashboard -i
 
 ::: code-group
 
-```md:img [faq 动态图]
-![](./assets/51.gif)
-```
-
 ```java [Test.java]
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1218,6 +1214,10 @@ public class Test {
     }
 
 }
+```
+
+```md:img [faq 动态图]
+![](./assets/51.gif)
 ```
 
 ```bash [Arthas]
