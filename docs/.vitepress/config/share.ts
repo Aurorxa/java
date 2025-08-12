@@ -88,6 +88,8 @@ const vitePressOptions = withMermaid(defineConfig({
           "项目结构": localIconLoader(import.meta.url, '../../public/iconify/architecture.svg'),
           "AlmaLinux": localIconLoader(import.meta.url, '../../public/iconify/almaLinux.svg'),
           "Ubuntu": localIconLoader(import.meta.url, '../../public/iconify/ubuntu.svg'),
+          "effect": localIconLoader(import.meta.url, '../../public/iconify/effect.svg'),
+          "结果": localIconLoader(import.meta.url, '../../public/iconify/effect.svg'),
           'cmd': 'vscode-icons:file-type-shell',
           'powershell': 'vscode-icons:file-type-powershell',
           'maven': 'vscode-icons:file-type-apache',

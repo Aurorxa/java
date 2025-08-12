@@ -1413,15 +1413,239 @@ public class Test {
 
 ### 6.4.2 Arthas 中查看方法区
 
-* 可以使用 Arthas 中的 memory 命令查看方法区的具体实现。
+* 可以使用 Arthas 中的 `memory` 命令查看方法区的具体实现。
+
+> [!NOTE]
+>
+> * ① 本人已经将对应版本的 JDK 和 Arthas 通过 Docker 封装到一起并推送到 Docker Hub 中。
+> * ② 我们只需要运行 Dokcer 容器就可以查看到结果。
 
 
 
-* 示例：
+* 示例：JDK 7 的永久代
+
+::: code-group
+
+```txt [结果] {9}
+[arthas@40]$ memory | plaintext
+Memory                            used        total      max         usage
+heap                              38M         246M       455M        8.57%
+ps_eden_space                     17M         64M        150M        11.94%
+ps_survivor_space                 10M         10M        10M         99.87%
+ps_old_gen                        10M         171M       341M        3.10%
+nonheap                           17M         23M        130M        13.75%
+code_cache                        718K        2496K      49152K      1.46%
+ps_perm_gen                       17M         21M        82M(有上限)  20.94%
+direct                            0K          0K         -           0.00%
+mapped                            0K          0K         -           0.00%
+```
+
+```bash
+docker run --rm aurorxa/jdk7-jvm:latest
+```
+
+```md:img [cmd 控制台]
+![](./assets/62.gif)
+```
+
+:::
+
+
+
+* 示例：JDK8 的元空间
+
+::: code-group
+
+```txt [结果] {9}
+[arthas@50]$ memory | plaintext
+Memory                            used        total      max         usage
+heap                              52M         245M       455M        11.52%
+ps_eden_space                     33M         64M        149M        22.62%
+ps_survivor_space                 0K          10752K     10752K      0.00%
+ps_old_gen                        18M         171M       341M        5.46%
+nonheap                           34M         35M        -1          97.63%
+code_cache                        7M          7M         240M        2.93%
+metaspace                         24M         25M        -1(无上限)   97.54%
+compressed_class_space            2M          3M         1024M       0.28%
+direct                            0K          0K         -           0.00%
+mapped                            0K          0K         -           0.00%
+```
+
+```bash
+docker run --rm aurorxa/jdk8-jvm:latest
+```
+
+```md:img [cmd 控制台]
+![](./assets/63.gif)
+```
+
+:::
+
+### 6.4.3 模拟方法区溢出
+
+* 需求：通过 ByteBuddy 框架，动态生成字节码数据，并通过死循环加载到方法区中，观察方法区中是否有内存溢出。
+
+> [!NOTE]
+>
+> ::: details 点我查看 ByteBuddy 的使用
+>
+> * ① 导入依赖坐标：
+>
+> ```xml
+> <dependency>
+>     <groupId>net.bytebuddy</groupId>
+>     <artifactId>byte-buddy</artifactId>
+>     <version>1.17.6</version>
+> </dependency>
+> ```
+>
+> * ② 创建 ClassWriter 对象：
+>
+> ```java
+> ClassWriter classWriter = new ClassWriter(0);
+> ```
+>
+> * ③ 调用 visit 方法，创建字节码数据：
+>
+> ```java
+> classWriter.visit(Opcodes.V1_7, Opcodes.ACC_PUBLIC, "类的全限定名",
+>         null, "java/lang/Object", null);
+> byte[] byteArray = classWriter.toByteArray();
+> ```
+>
+> :::
+
+
+
+* 示例：JDK7 的测试
+
+::: code-group
+
+```java [Main.java]
+package com.github;
+
+import net.bytebuddy.jar.asm.ClassWriter;
+import net.bytebuddy.jar.asm.Opcodes;
+
+public class Main {
+    // 自定义类加载器
+    static class ByteClassLoader extends ClassLoader {
+        public Class<?> defineClass(String name, byte[] b) {
+            return defineClass(name, b, 0, b.length);
+        }
+    }
+    public static void main(String[] args) throws Exception {
+        int count = 0;
+        ByteClassLoader loader = new ByteClassLoader();
+        while (true) {
+            String name = "Class" + count;
+            ClassWriter classWriter = new ClassWriter(0);
+            classWriter.visit(Opcodes.V1_7, Opcodes.ACC_PUBLIC, name,
+                    null, "java/lang/Object", null);
+            byte[] byteArray = classWriter.toByteArray();
+            loader.defineClass(name.replace("/", "."), byteArray);
+            System.out.println(++count);
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/64.gif)
+```
+
+:::
+
+
+
+* 示例：JDK8 的测试
+
+::: code-group
+
+```java [Main.java]
+package com.github;
+
+import net.bytebuddy.jar.asm.ClassWriter;
+import net.bytebuddy.jar.asm.Opcodes;
+
+public class Main {
+    // 自定义类加载器
+    static class ByteClassLoader extends ClassLoader {
+        public Class<?> defineClass(String name, byte[] b) {
+            return defineClass(name, b, 0, b.length);
+        }
+    }
+    public static void main(String[] args) {
+        int count = 0;
+        ByteClassLoader loader = new ByteClassLoader();
+        while (true) {
+            String name = "Class" + count;
+            ClassWriter classWriter = new ClassWriter(0);
+            classWriter.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, name,
+                    null, "java/lang/Object", null);
+            byte[] byteArray = classWriter.toByteArray();
+            loader.defineClass(name.replace("/", "."), byteArray);
+            System.out.println(++count);
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/65.gif)
+```
+
+:::
+
+### 6.4.4 方法区溢出总结
+
+* 通过实验，我们不难发现这样的结果：
+  * ① JDK7 上在方法区中短时间加载 11 万个字节码信息，就出现了永久代错误。
+  * ② JDK8 上在方法区中短时间加载百万次个字节码信息，程序也没有出现错误；但是，内存会直线升高。
+
+* JDK7 是将`方法区`存放在`堆区中的永久代空间`，堆的大小可以通过虚拟机参数`-XX:maxPermsize=值`来控制。
+
+![](./assets/60.svg)
+
+* JDK8 是将`方法区`存放在`元空间`中，元空间是在进程地址空间中，默认情况下只要不超过操作系统的上限，可以一致分配，并且可以使用`-XX:MaxMetaspaceSize=值`来限制元空间的大小。
+
+> [!NOTE]
+>
+> * ① 在实际开发中，一台服务器上可能会部署多个程序，如：Java 进程、MySQL 服务以及 Redis 服务等。
+> * ② 如果 Java 程序在`方法区`处理上出现了问题，如：不停地将字节码信息加载到方法区，将会导致 Java 进程的内存逐渐升高，当到达操作系统内存上限的时候，将使得其他程序出现内存不足而停止工作。
+
+![](./assets/61.svg)
+
+## 6.5 字符串常量池
+
+### 6.5.1 概述
+
+* 方法区中除了类的元信息、运行时常量池之外，还有一块区域叫做`字符串常量池`。
+* `字符串常量池` 是 JVM 为了提升性能和减少内存消耗针对字符串（String 类）专门开辟的一块区域，主要目的是为了避免字符串的重复创建。
+
+### 6.5.2 演示
+
+* 假设代码是这样的，如下所示：
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        String str = "aaa";
+        String str2 = "aaa";
+        System.out.println(str == str2);
+    }
+}
+```
+
+* 其执行过程就是这样的，如下所示：
+
+
 
 
 
 # 第七章：直接内存
+
+## 7.1 概述
 
 
 
