@@ -15,6 +15,7 @@ import path from 'path'
 import {VitePressSidebarOptions} from "vitepress-sidebar/types"
 import {withSidebar} from "vitepress-sidebar"
 
+
 const mode = process.env.NODE_ENV || 'development'
 const {VITE_BASE_URL} = loadEnv(mode, process.cwd())
 console.log('Mode:', process.env.NODE_ENV)
@@ -134,16 +135,9 @@ const vitePressOptions = withMermaid(defineConfig({
     },
     // md 配置
     config: async (md) => {
-      // // 动态导入插件
-      const {default: multimdTable} = await import('markdown-it-multimd-table-ext')
-
-      md.use(multimdTable, {
-        multiline: true,
-        rowspan: true,
-        headerless: true,
-        multibody: true,
-        aotolabel:  true,
-      })
+      // // // 动态导入插件
+      // const {default: multimdTable} = await import('markdown-it-multimd-table-ext')
+      //
       // 创建 markdown-it 插件
       md.use((md) => {
         const defaultRender = md.render
