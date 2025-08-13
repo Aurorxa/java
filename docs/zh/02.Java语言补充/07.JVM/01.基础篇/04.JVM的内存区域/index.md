@@ -1685,3 +1685,155 @@ public class Test {
 
 ## 7.1 概述
 
+* 众所周知，当今世界上绝大部多数操作系统（Win、Linux 等）都是使用 C/C++ 语言编写的。
+
+![](./assets/71.svg)
+
+* 目前的操作系统都是`多用户`、`多任务`、`图形化`、`网络化`的操作系统。
+
+> [!NOTE]
+>
+> 所谓的`多任务`就是支持运行多个应用程序（进程）。
+
+![](./assets/72.png)
+
+* 如果你学习过 C 程序，那么一定知道可以通过`&`运算符来获取变量的内存地址，如下所示：
+
+```java
+#include <stdio.h>
+
+// 全局变量
+int a = 10;
+int b = 20;
+
+int main() {
+
+    // 禁用 stdout 缓冲区
+    setbuf(stdout, nullptr);
+
+    printf("a = %p\n", &a); // a = 0x55fda7351010
+    printf("b = %p\n", &b); // b = 0x55fda7351014
+
+    return 0;
+}
+```
+
+* 其实上述的内存地址都不是真实的物理地址，而是虚拟的地址（虚地址）。
+
+> [!NOTE]
+>
+> * ① 虚拟地址（虚地址）需要通过 CPU 内部的 MMU（Memory Management Unit，内存管理单元）来将这些虚拟地址（虚地址）转换为物理地址（实地址）。
+> * ② 如果没有虚拟地址，将会带来以下的问题：
+>   * 进程间隔离实现困难。
+>   * 不利于程序员管理内存。
+>   * 内存碎片化无可避免、导致内存利用率低下。
+>   * 无法共享内存。
+>   * 复杂性很高，难以实现。
+> * ③ 如果存在虚拟地址，那么`站在一个进程的角度来说`，它所“看到”的是操作系统为其分配的一片连续的虚拟内存空间，进程获取的内存地址不是真实的物理内存地址（实地址），而是虚拟内存空间的地址（虚地址）。换言之，对于每个进程，它都认为自己完全拥有了整台计算机，并使用了整台计算机的资源，这样的设计使得内存管理的复杂性大大的降低（对程序员来说是降低）。
+
+![](./assets/73.svg)
+
+* 为了更好的管理程序，操作系统将虚拟地址空间分为了不同的内存区域，这些内存区域存放的数据、用途、特点等皆有不同。
+
+> [!NOTE]
+>
+> `存储式程序`中的`程序`分为`指令`和`数据`；其中，`代码段`中保存的是`指令`，`数据段`中保存的是`数据`。
+
+![](./assets/74.svg)
+
+* Java 程序运行在 JVM 之上，JVM 是使用 C++ 来编写的，即：`运行时数据区域`就在 JVM 的堆中。
+
+![JVM 进程的虚拟地址空间](./assets/75.svg)
+
+* 其实，从操作系统的视角，JVM 进程的虚拟地址空间的内容就是这样的：
+
+![](./assets/76.svg)
+
+* 但是，Java 中的线程是通过 JNI 调用的 C++ 层实现的，即：本地线程栈，如下所示：
+
+> [!NOTE]
+>
+> * ① 所谓的本地内存（Native Memory）就是 Java 进程占用的内存，即：JVM 向操作系统申请的内存，包括：方法区、Java 堆内存、线程栈、JVM 代码段、JVM 数据段等。 
+> * ② JVM 通过 malloc 等申请的堆内存也被称为本地堆（Native Heap）和 Java 对象运行的堆内存（Java Heap）是不一样的。
+
+![](./assets/79.svg)
+
+* 当我们在 Arthas 中通过 `memory` 命令查看内存时，会出现如下的结果：
+
+![](./assets/78.png)
+
+* 这是因为对于 Java 程序而言，除了 JVM 内存还有非 JVM 内存，如下所示：
+
+![](./assets/80.png)
+
+## 7.2 直接内存
+
+### 7.2.1 概述
+
+* 在 JDK1.4 中引入了 NIO 机制，就是使用了直接内存（Direct Memory），如下所示：
+
+![](./assets/81.svg)
+
+* 其主要解决了以下两个问题：
+  * :one: Java 堆中的对象，如果不再使用会被 GC 回收，如果此时用户正在使用系统，正好出现 JVM 去回收堆中不再使用的对象，整个回收的过程，可能会导致用户在使用的过程中，感觉卡顿，影响用户的体验。而直接内存的出现，就可以实现在回收这部分内存的时候，不会影响到堆上对象的创建和使用，这样就不会对用户的使用产生影响了。
+  * :two: 直接内存的出现可以提升 IO 的效率，即：避免 JVM 堆与操作系统内核之间的数据拷贝，提升 I/O 性能，实现“零拷贝”通信。
+* 传统的 BIO ，需要将`操作系统内核缓冲区`复制到`用户空间`中的`对象`中，即：Java  Heap，有一次内存拷贝，即：
+
+![](./assets/82.svg)
+
+* 我们可以通过如下的 BIO 代码来测试下效率，如下所示：
+
+::: code-group
+
+```java [Test.java]
+package com.github;
+
+import java.io.*;
+
+public class Main {
+
+    private static final int BUFFER_SIZE = 1024; // 8KB 缓冲区
+    private static final String SOURCE_FILE = "D:\\test.zip";
+    private static final String DEST_FILE_1 = "D:\\test-copy1.zip";
+    private static final String DEST_FILE_2 = "D:\\test-copy2.zip";
+    public static void main(String[] args) throws IOException {
+        bio();
+    }
+
+    public static void bio(){
+        long startTime = System.currentTimeMillis();
+
+        try (FileInputStream fis = new FileInputStream(SOURCE_FILE);
+             FileOutputStream fos = new FileOutputStream(DEST_FILE_1)) {
+
+            // 堆内存分配，即：内存拷贝
+            byte[] buffer = new byte[BUFFER_SIZE];
+            int bytesRead;
+
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                fos.write(buffer, 0, bytesRead);
+            }
+
+            fos.flush(); // 确保数据写入磁盘
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 传统IO耗时：16626
+        System.out.println("传统IO耗时：" + (System.currentTimeMillis() - startTime));
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/83.gif)
+```
+
+:::
+
+* NIO 不需要进行内存拷贝，即：
+
+
+
+* 示例：
+
