@@ -1625,39 +1625,63 @@ public class Main {
 
 ### 6.5.2 演示
 
-* 假设代码是这样的，如下所示：
+* `字符串常量池`中存储的是代码中定义的常量字符串，如下所示：
+
+::: code-group
 
 ```java [Test.java]
 public class Test {
     public static void main(String[] args) {
-        String str = "aaa";
+        String str = "aaa"; // "aaa" 就是常量字符串
         String str2 = "aaa";
         System.out.println(str == str2);
     }
 }
 ```
 
-* 其执行过程就是这样的，如下所示：
+```md:img [cmd 控制台]
+![](./assets/66.gif)
+```
 
+:::
 
+* 但是，如果使用了 new 关键字，还会在堆中保存一份，如下所示：
+
+::: code-group
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) {
+        String str = new String("aaa"); // 会在堆中和字符串常量池中各保存一份
+        String str2 = "aaa";
+        System.out.println(str == str2);
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/67.gif)
+```
+
+:::
+
+### 6.5.3 字符串常量池的演变
+
+* 在 JDK6 中，`字符串常量池`、`运行时常量池`、`静态变量`和`JIT 缓存`等在`方法区`中，而`方法区`中是在`堆`中的`永久代`。
+
+![](./assets/68.svg)
+
+* 在 JDK7 中，`静态变量`和`字符串常量池`从`永久代`中移除，迁移到`堆`中。
+
+![](./assets/69.svg)
+
+* 在 JDK8 中，将`方法区`的实现由`永久代`改为`元空间`，`静态变量`和`字符串常量池`还在`堆`中。
+
+![](./assets/70.svg)
 
 
 
 # 第七章：直接内存
 
 ## 7.1 概述
-
-
-
-
-
-
-
-
-
-
-
-
-
-# 第八章：总结
 
