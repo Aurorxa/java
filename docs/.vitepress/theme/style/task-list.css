@@ -2,7 +2,7 @@
 li.task-list-item {
   display: flex;
   align-items: baseline;
-  flex-wrap: wrap;
+  /*flex-wrap: wrap;*/
   /* margin: 2px 0 0; */
   list-style: inherit;
 }
