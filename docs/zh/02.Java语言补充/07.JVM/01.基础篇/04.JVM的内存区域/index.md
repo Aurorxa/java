@@ -1776,52 +1776,87 @@ int main() {
 
 * 其主要解决了以下两个问题：
   * :one: Java 堆中的对象，如果不再使用会被 GC 回收，如果此时用户正在使用系统，正好出现 JVM 去回收堆中不再使用的对象，整个回收的过程，可能会导致用户在使用的过程中，感觉卡顿，影响用户的体验。而直接内存的出现，就可以实现在回收这部分内存的时候，不会影响到堆上对象的创建和使用，这样就不会对用户的使用产生影响了。
-  * :two: 直接内存的出现可以提升 IO 的效率，即：避免 JVM 堆与操作系统内核之间的数据拷贝，提升 I/O 性能，实现“零拷贝”通信。
-* 传统的 BIO ，需要将`操作系统内核缓冲区`复制到`用户空间`中的`对象`中，即：Java  Heap，有一次内存拷贝，即：
+  * :two: 直接内存的出现可以提升 IO 的效率，即：避免 JVM 堆与操作系统内核之间的数据拷贝，提升 I/O 性能。
+
+### 7.2.2 传统的 BIO 模型
+
+* 传统的 BIO ，需要在`内核缓冲区`和`用户缓冲区`中不停地复制，效率较低。
 
 ![](./assets/82.svg)
 
-* 我们可以通过如下的 BIO 代码来测试下效率，如下所示：
+* 传统 BIO 模型需要进行 4 次数据拷贝：
+
+```txt
+磁盘 → 内核缓冲区 → 用户缓冲区 → 内核缓冲区 → 磁盘
+```
+
+* 传统 BIOS 模型的特点：
+  * :one: 4 次上下文切换（用户态 <--> 内核态）。
+  * :two: 4 次数据拷贝（其中 2 次是用户空间和内核空间之间的复制）。
+  * :three: 需要使用堆内存（Java Heap Memory），GC 管理。
+  * :four: 简单易用，适合小文件和低并发场景。
+  * :five: 性能较低，尤其是在大文件传输的时候，CPU 和内存开销很大。
+
+
+
+* 示例：测试 BIO 的效率
 
 ::: code-group
 
 ```java [Test.java]
 package com.github;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
-public class Main {
+public class Test {
 
-    private static final int BUFFER_SIZE = 1024; // 8KB 缓冲区
+    private static final int BUFFER_SIZE = 8192; // 8KB 缓冲区
     private static final String SOURCE_FILE = "D:\\test.zip";
     private static final String DEST_FILE_1 = "D:\\test-copy1.zip";
     private static final String DEST_FILE_2 = "D:\\test-copy2.zip";
+    private static final String DEST_FILE_3 = "D:\\test-copy3.zip";
+    private static final String DEST_FILE_4 = "D:\\test-copy4.zip";
+
     public static void main(String[] args) throws IOException {
-        bio();
+        bioWithHeapMemory();
     }
 
-    public static void bio(){
+
+    /**
+     * BIO + 堆内存
+     */
+    public static void bioWithHeapMemory() {
+        System.out.println("=== BIO + 堆内存 ===");
         long startTime = System.currentTimeMillis();
 
         try (FileInputStream fis = new FileInputStream(SOURCE_FILE);
              FileOutputStream fos = new FileOutputStream(DEST_FILE_1)) {
 
-            // 堆内存分配，即：内存拷贝
+            // 在 JVM 堆中分配字节数组
             byte[] buffer = new byte[BUFFER_SIZE];
-            int bytesRead;
-
-            while ((bytesRead = fis.read(buffer)) != -1) {
-                fos.write(buffer, 0, bytesRead);
+            System.out.println("堆内存缓冲区创建: " + buffer.length + " bytes");
+            int len;
+            // 调用 read 方法：磁盘 → 内核缓冲区（Kernel Buffer） → 用户缓冲区（User Buffer，即：Java 中的 buffer）
+            while ((len = fis.read(buffer)) != -1) {
+                // 调用 write 方法：用户缓冲区（User Buffer，即：Java 中的 buffer） → 内核缓冲区（Kernel Buffer） → 磁盘
+                fos.write(buffer, 0, len);
             }
 
             fos.flush(); // 确保数据写入磁盘
+
+            System.out.println("数据拷贝路径:磁盘 → 内核缓冲区 → 用户缓冲区 → 内核缓冲区 → 磁盘");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        // 传统IO耗时：16626
         System.out.println("传统IO耗时：" + (System.currentTimeMillis() - startTime));
     }
+
 }
 ```
 
@@ -1831,9 +1866,453 @@ public class Main {
 
 :::
 
-* NIO 不需要进行内存拷贝，即：
+### 7.2.3 NIO 模型
+
+* NIO 模型，也需要在`内核缓冲区`和`用户缓冲区`中不停地复制，其原理是将数据复制到`直接内存`（Direct Memory）中。
+
+> [!NOTE]
+>
+> 和传统的 BIO 相对，`直接内存`（Direct Memory）是分配在堆外的，不受 GC 管理，适合长期复用，性能相对 BIO 要高一点。
+
+![](./assets/84.svg)
+
+* `直接内存`（Direct Memory）在`用户地址空间`中是这样的，如下所示：
+
+![](./assets/85.svg)
+
+* NIO 模型需要进行 4 次数据拷贝：
+
+```txt
+磁盘 → 内核缓冲区 → 直接内存（Direct Memory） → 内核缓冲区 → 磁盘
+```
+
+* NIO 模型中使用`直接内存`的特点：
+  * :one: 4 次上下文切换（用户态 <--> 内核态）。
+  * :two: 4 次数据拷贝（其中 2 次是用户空间和内核空间之间的复制）。
+  * :three: 缓冲区是在直接内存（Direct Memory）中，不受 JVM GC 频繁回收影响，适合高频率 IO。
+  * :four: 减少 GC 压力，性能略优于BIO，但本质仍是“全路径拷贝”。
+  * :five: 虽然叫“直接内存”，但它不是`零拷贝`，数据仍需经过用户空间（只是在堆外）。
 
 
 
-* 示例：
+* 示例：测试 BIO 和 NIO（直接内存） 的效率
 
+::: code-group
+
+```java [Test.java]
+package com.github;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+public class Test {
+
+    private static final int BUFFER_SIZE = 8192; // 8KB 缓冲区
+    private static final String SOURCE_FILE = "D:\\test.zip";
+    private static final String DEST_FILE_1 = "D:\\test-copy1.zip";
+    private static final String DEST_FILE_2 = "D:\\test-copy2.zip";
+    private static final String DEST_FILE_3 = "D:\\test-copy3.zip";
+    private static final String DEST_FILE_4 = "D:\\test-copy4.zip";
+
+    public static void main(String[] args) throws IOException {
+        bioWithHeapMemory();
+        nioWithHeapMemory();
+        nioWithDirectMemory();
+    }
+
+
+    /**
+     * BIO + 堆内存
+     */
+    public static void bioWithHeapMemory() {
+        System.out.println("=== BIO + 堆内存 ===");
+        Instant start = Instant.now();
+
+        try (FileInputStream fis = new FileInputStream(SOURCE_FILE);
+             FileOutputStream fos = new FileOutputStream(DEST_FILE_1)) {
+
+            // 在 JVM 堆中分配字节数组
+            byte[] buffer = new byte[BUFFER_SIZE];
+            System.out.println("堆内存缓冲区创建: " + buffer.length + " bytes");
+            int len;
+            // 调用 read 方法：磁盘 → 内核缓冲区（Kernel Buffer） → 用户缓冲区（User Buffer，即：Java 中的 buffer）
+            while ((len = fis.read(buffer)) != -1) {
+                // 调用 write 方法：用户缓冲区（User Buffer，即：Java 中的 buffer） → 内核缓冲区（Kernel Buffer） → 磁盘
+                fos.write(buffer, 0, len);
+            }
+
+            fos.flush(); // 确保数据写入磁盘
+
+            System.out.println("数据拷贝路径:磁盘 → 内核缓冲区 → 用户缓冲区 → 内核缓冲区 → 磁盘");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("BIO + 堆内存 ==> 耗时：" + 
+                           ChronoUnit.MILLIS.between(start, Instant.now()));
+    }
+
+    /**
+     * NIO + 堆内存
+     */
+    public static void nioWithHeapMemory() {
+        System.out.println("\n=== NIO + 堆内存 ===");
+        Instant start = Instant.now();
+
+        try (RandomAccessFile fis = new RandomAccessFile(SOURCE_FILE, "r");
+             RandomAccessFile fos = new RandomAccessFile(DEST_FILE_2, "rw");
+             FileChannel inChannel = fis.getChannel();
+             FileChannel outChannel = fos.getChannel()) {
+
+            // NIO 中使用堆内存缓冲区
+            ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+            System.out.println("NIO 堆内存缓冲区: " + buffer.capacity() + " bytes");
+            System.out.println("是否为直接内存: " + buffer.isDirect());
+
+            while (inChannel.read(buffer) != -1) {
+                // 切换到读模式
+                buffer.flip();
+                // 写入目标文件
+                outChannel.write(buffer);
+                // 清空缓冲区，准备下次读取
+                buffer.clear();
+            }
+
+            outChannel.force(true); // 确保数据写入磁盘
+
+            System.out.println("数据拷贝路径: 磁盘 → 内核缓冲区 → 用户缓冲区 → 内核缓冲区 → 磁盘");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("NIO + 堆内存 ==> 耗时：" + 
+                           ChronoUnit.MILLIS.between(start, Instant.now()));
+
+    }
+
+    /**
+     * NIO + 直接内存
+     */
+    public static void nioWithDirectMemory() {
+        System.out.println("\n=== NIO + 直接内存 ===");
+        Instant start = Instant.now();
+
+        try (RandomAccessFile sourceFile = new RandomAccessFile(SOURCE_FILE, "r");
+             RandomAccessFile destFile = new RandomAccessFile(DEST_FILE_3, "rw");
+             FileChannel inChannel = sourceFile.getChannel();
+             FileChannel outChannel = destFile.getChannel()) {
+
+            // 分配直接内存缓冲区（堆外内存）
+            ByteBuffer directBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
+            System.out.println("直接内存缓冲区: " + directBuffer.capacity() + " bytes");
+            System.out.println("是否为直接内存: " + directBuffer.isDirect());
+
+            // 读取数据：磁盘 → 内核缓冲区 → 直接缓冲区（堆外内存）
+            while (inChannel.read(directBuffer) != -1) { // buffer接收数据（写模式）
+                // 切换到读模式
+                directBuffer.flip();
+                // 写入数据：直接缓冲区（堆外内存） → 内核缓冲区 → 磁盘
+                outChannel.write(directBuffer); // buffer 提供数据（读模式）
+                // 重置为写模式
+                directBuffer.clear();
+            }
+
+            outChannel.force(true); // 确保数据写入磁盘
+
+            System.out.println("数据拷贝路径: 磁盘 → 内核缓冲区 → 堆外内存（直接内存） → 内核缓冲区 → 磁盘");
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("NIO + 直接内存 ==> 耗时：" + 
+                           ChronoUnit.MILLIS.between(start, Instant.now()));
+
+    }
+    
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/86.gif)
+```
+
+:::
+
+### 7.2.4 直接内存的限制
+
+* 可以通过如下的命令查看直接内存相关参数：
+
+```bash
+java -XX:+PrintFlagsFinal -version | grep MaxDirectMemorySize
+```
+
+> [!NOTE]
+>
+> * ① `MaxDirectMemorySize=0`表示未显示设置，JVM 将使用默认策略：
+>   * :one: 默认值 = `-Xmx` 的值。
+>   * :two: 如果 `-Xmx` 也没有设置，则使用 JVM 默认堆大小。
+> * ② 可以通过 JVM 参数`-XX:MaxDirectMemorySize=值`来手动调整直接内存大小。
+
+
+
+* 示例：查询直接内存大小
+
+::: code-group
+
+```bash
+java -XX:+PrintFlagsFinal -version | grep MaxDirectMemorySize
+```
+
+```md:img [cmd 控制台]
+![](./assets/87.gif)
+```
+
+:::
+
+
+
+* 示例：测试直接内存溢出
+
+::: code-group
+
+```bash
+# 虚拟机参数
+-XX:MaxDirectMemorySize=2g -Xmx1g
+```
+
+```java [Test.java]
+package com.github;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+
+    private static final List<ByteBuffer> bufferList = new ArrayList<>();
+
+    public static void main(String[] args) {
+        System.out.println("尝试分配直接内存...");
+        long count = 0;
+        while (true) {
+            // 分配 100MB 的 DirectBuffer
+            ByteBuffer buffer = ByteBuffer.allocateDirect(1024 * 1024 );
+            bufferList.add(buffer);
+            count++;
+            System.out.println("已分配: " + count  + " MB");
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/88.gif)
+```
+
+:::
+
+## 7.3 零拷贝
+
+* JDK 在 NIO 中也引入了`零拷贝`技术，其核心原理就是通过`虚拟内存映射`来达到数据不经过用户空间。
+
+![](./assets/89.svg)
+
+* NIO 模型（零拷贝）需要进行 2 次数据拷贝：
+
+```txt
+磁盘 → 内核缓冲区 -(虚拟映射)→ 目标文件缓冲区 → 磁盘
+```
+
+* NIO 模型（零拷贝）的特点：
+  * :one: 数据始终在内核空间，不进入用户空间。
+  * :two: 第 2 步是虚拟地址映射（VMA），不是物理拷贝，不需要 CPU 的参与。
+  * :three: 2次上下文切换，比 BIO 少了一半。
+  * :four: 减少 GC 压力，性能略优于BIO，但本质仍是“全路径拷贝”。
+  * :five: 虽然叫“直接内存”，但它不是`零拷贝`，数据仍需经过用户空间（只是在堆外）。
+
+
+
+* 示例：测试 BIO 、NIO（直接内存）以及 NIO（零拷贝）的效率
+
+::: code-group
+
+```java [Test.java]
+package com.github;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
+public class Test {
+
+    private static final int BUFFER_SIZE = 8192; // 8KB 缓冲区
+    private static final String SOURCE_FILE = "D:\\test.zip";
+    private static final String DEST_FILE_1 = "D:\\test-copy1.zip";
+    private static final String DEST_FILE_2 = "D:\\test-copy2.zip";
+    private static final String DEST_FILE_3 = "D:\\test-copy3.zip";
+    private static final String DEST_FILE_4 = "D:\\test-copy4.zip";
+
+    public static void main(String[] args) throws IOException {
+        bioWithHeapMemory();
+        nioWithHeapMemory();
+        nioWithDirectMemory();
+        zeroCopy();
+    }
+
+
+    /**
+     * BIO + 堆内存
+     */
+    public static void bioWithHeapMemory() {
+        System.out.println("=== BIO + 堆内存 ===");
+        Instant start = Instant.now();
+
+        try (FileInputStream fis = new FileInputStream(SOURCE_FILE);
+             FileOutputStream fos = new FileOutputStream(DEST_FILE_1)) {
+
+            // 在 JVM 堆中分配字节数组
+            byte[] buffer = new byte[BUFFER_SIZE];
+            System.out.println("堆内存缓冲区创建: " + buffer.length + " bytes");
+            int len;
+            // 调用 read 方法：磁盘 → 内核缓冲区（Kernel Buffer） → 用户缓冲区（User Buffer，即：Java 中的 buffer）
+            while ((len = fis.read(buffer)) != -1) {
+                // 调用 write 方法：用户缓冲区（User Buffer，即：Java 中的 buffer） → 内核缓冲区（Kernel Buffer） → 磁盘
+                fos.write(buffer, 0, len);
+            }
+
+            fos.flush(); // 确保数据写入磁盘
+
+            System.out.println("数据拷贝路径:磁盘 → 内核缓冲区 → 用户缓冲区 → 内核缓冲区 → 磁盘");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("BIO + 堆内存 ==> 耗时：" + ChronoUnit.MILLIS.between(start, Instant.now()));
+    }
+
+    /**
+     * NIO + 堆内存
+     */
+    public static void nioWithHeapMemory() {
+        System.out.println("\n=== NIO + 堆内存 ===");
+        Instant start = Instant.now();
+
+        try (RandomAccessFile fis = new RandomAccessFile(SOURCE_FILE, "r");
+             RandomAccessFile fos = new RandomAccessFile(DEST_FILE_2, "rw");
+             FileChannel inChannel = fis.getChannel();
+             FileChannel outChannel = fos.getChannel()) {
+
+            // NIO 中使用堆内存缓冲区
+            ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+            System.out.println("NIO 堆内存缓冲区: " + buffer.capacity() + " bytes");
+            System.out.println("是否为直接内存: " + buffer.isDirect());
+
+            while (inChannel.read(buffer) != -1) {
+                // 切换到读模式
+                buffer.flip();
+                // 写入目标文件
+                outChannel.write(buffer);
+                // 清空缓冲区，准备下次读取
+                buffer.clear();
+            }
+
+            outChannel.force(true); // 确保数据写入磁盘
+
+            System.out.println("数据拷贝路径: 磁盘 → 内核缓冲区 → 用户缓冲区 → 内核缓冲区 → 磁盘");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("NIO + 堆内存 ==> 耗时：" + ChronoUnit.MILLIS.between(start, Instant.now()));
+
+    }
+
+    /**
+     * NIO + 直接内存
+     */
+    public static void nioWithDirectMemory() {
+        System.out.println("\n=== NIO + 直接内存 ===");
+        Instant start = Instant.now();
+
+        try (RandomAccessFile sourceFile = new RandomAccessFile(SOURCE_FILE, "r");
+             RandomAccessFile destFile = new RandomAccessFile(DEST_FILE_3, "rw");
+             FileChannel inChannel = sourceFile.getChannel();
+             FileChannel outChannel = destFile.getChannel()) {
+
+            // 分配直接内存缓冲区（堆外内存）
+            ByteBuffer directBuffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
+            System.out.println("直接内存缓冲区: " + directBuffer.capacity() + " bytes");
+            System.out.println("是否为直接内存: " + directBuffer.isDirect());
+
+            // 读取数据：磁盘 → 内核缓冲区 → 直接缓冲区（堆外内存）
+            while (inChannel.read(directBuffer) != -1) { // buffer接收数据（写模式）
+                // 切换到读模式
+                directBuffer.flip();
+                // 写入数据：直接缓冲区（堆外内存） → 内核缓冲区 → 磁盘
+                outChannel.write(directBuffer); // buffer 提供数据（读模式）
+                // 重置为写模式
+                directBuffer.clear();
+            }
+
+            outChannel.force(true); // 确保数据写入磁盘
+
+            System.out.println("数据拷贝路径: 磁盘 → 内核缓冲区 → 堆外内存（直接内存） → 内核缓冲区 → 磁盘");
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("NIO + 直接内存 ==> 耗时：" + ChronoUnit.MILLIS.between(start, Instant.now()));
+
+    }
+
+    /**
+     * 零拷贝
+     */
+    public static void zeroCopy() {
+        System.out.println("\n=== 零拷贝 ===");
+        Instant start = Instant.now();
+
+        try (RandomAccessFile sourceFile = new RandomAccessFile(SOURCE_FILE, "r");
+             RandomAccessFile destFile = new RandomAccessFile(DEST_FILE_4, "rw");
+             FileChannel sourceChannel = sourceFile.getChannel();
+             FileChannel destChannel = destFile.getChannel()) {
+
+            // 使用 transferTo 实现零拷贝
+            long size = sourceChannel.size();
+            long transferred = 0;
+            while (transferred < size) {
+                transferred += sourceChannel.transferTo(transferred, size - transferred, destChannel);
+            }
+
+            destChannel.force(true);
+
+            System.out.println("数据拷贝路径: 磁盘 → 内核缓冲区 -(虚拟映射)→ 目标文件缓冲区 → 磁盘");
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("零拷贝 ==> 耗时：" + ChronoUnit.MILLIS.between(start, Instant.now()));
+    }
+}
+
+```
+
+```md:img [cmd 控制台]
+![](./assets/90.gif)
+```
+
+:::
