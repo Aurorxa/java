@@ -59,6 +59,7 @@
     "xgplayer": "^3.0.22"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.34.9"
+    "@rollup/rollup-linux-x64-gnu": "^4.34.9",
+    "@esbuild/linux-x64":"0.24.0"
   }
 }
