@@ -7,4 +7,4 @@ main:
           script: npm install -g npm && npm i && npm run docs:build
         - name: 部署到 Pages
           image: node:22
-          script: npx edgeone pages deploy ./docs/.vitepress/dist --name vitepress-java --token $EDGEONE_PAGES_API_TOKEN
+          script: npx edgeone pages deploy ./docs/.vitepress/dist --name vitepress-java --token $EDGEONE_API_TOKEN
