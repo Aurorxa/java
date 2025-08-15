@@ -4,7 +4,7 @@ master:
       stages:
         - name: 构建当前项目
           image: node:24
-          script: npm i && npm run docs:build
+          script: npm cache clean --force && npm i && npm run docs:build
         - name: 部署到 Pages
           image: node:24
           script: npx edgeone pages deploy ./docs/.vitepress/dist --name vitepress-java --token $EDGEONE_API_TOKEN
