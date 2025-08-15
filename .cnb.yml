@@ -3,8 +3,8 @@ master:
     - imports: https://cnb.cool/Aurorxa/passkey/-/blob/main/envs.yml
       stages:
         - name: 构建当前项目
-          image: node:22
-          script: npm install -g npm && npm i && npm run docs:build
+          image: node:24
+          script: npm i && npm run docs:build
         - name: 部署到 Pages
-          image: node:22
+          image: node:24
           script: npx edgeone pages deploy ./docs/.vitepress/dist --name vitepress-java --token $EDGEONE_API_TOKEN
