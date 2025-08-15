@@ -1,0 +1,10 @@
+main:
+  push:
+    - imports: https://cnb.cool/Aurorxa/passkey/envs/-/blob/main/pages.yml
+      stages:
+        - name: 构建当前项目
+          image: node:22
+          script: npm install -g npm && npm i && npm run docs:build
+        - name: 部署到 Pages
+          image: node:22
+          script: npx edgeone pages deploy ./docs/.vitepress/dist --name vitepress-java --token $EDGEONE_PAGES_API_TOKEN
