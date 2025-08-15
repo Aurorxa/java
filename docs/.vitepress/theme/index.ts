@@ -132,7 +132,7 @@ export default {
     )
     // giscus配置
     giscusTalk({
-      repo: 'Aurorxa/java', //仓库
+      repo: 'Aexiar/java', //仓库
       repoId: 'R_kgDONXPoQw', //仓库ID
       category: 'Announcements', // 讨论分类
       categoryId: 'DIC_kwDONXPoQ84ClC9a', //讨论分类ID
