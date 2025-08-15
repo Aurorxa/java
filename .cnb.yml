@@ -1,6 +1,6 @@
 main:
   push:
-    - imports: https://cnb.cool/Aurorxa/passkey/envs/-/blob/main/pages.yml
+    - imports: https://cnb.cool/Aurorxa/passkey/-/blob/main/envs.yml
       stages:
         - name: 构建当前项目
           image: node:22
