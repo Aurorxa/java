@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ESNext",
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "types": ["node"],
+    "typeRoots": [
+      "node_modules/@types",
+      ".vitepress/types",
+      "./global.d.ts"
+    ]
+  },
+  "include": [
+    "docs/.vitepress/**/*",
+    "docs/**/*.md",
+    "docs/**/*.vue",
+    "**/.vitepress/**/*.ts",
+    "**/.vitepress/**/*.mts",
+    "**/.vitepress/**/*.vue",
+    "src/**/*.ts", "src/**/*.d.ts", "global.d.ts"
+  ],
+  "exclude": ["node_modules", "docs/.vitepress/dist"]
+}
