@@ -542,5 +542,82 @@ public class Test {
 
 * 示例：
 
+::: code-group
 
+```java [A.java]
+public class A {
+    B b;
+}
+```
+
+```java [B.java]
+public class B {
+    A a;
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) throws Exception {
+        A a1 = new A();
+        B b1 = new B();
+        a1.b = b1;
+        b1.a = a1;
+        
+        // 将堆上对象的引用去除掉，即：对象可以被 GC 回收
+        a1 = null; // [!code highlight:2]
+        b1.a = null;
+    }
+}
+```
+
+```md:img [cmd 控制台]
+
+```
+
+::: 
+
+
+
+* 示例：
+
+::: code-group
+
+```java [A.java]
+public class A {
+    B b;
+}
+```
+
+```java [B.java]
+public class B {
+    A a;
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) throws Exception {
+        A a1 = new A();
+        B b1 = new B();
+        a1.b = b1;
+        b1.a = a1;
+        
+        // 因为局部变量都没引用这两个对象，即：对象可以被 GC 回收
+        // 即使堆上对象之间相互有引用关系，也不影响对象的回收
+        a1 = null; // [!code highlight:2]
+        b1 = null;
+    }
+}
+```
+
+```md:img [cmd 控制台]
+
+```
+
+::: 
+
+
+
+## 3.3 如何判断堆上的对象是否被引用
 
