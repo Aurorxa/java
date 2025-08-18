@@ -43,8 +43,8 @@
 
 | 如何检测         | 描述                                                         |
 | ---------------- | ------------------------------------------------------------ |
-| :one: 如何检测？ | - **C/C++**: 使用 `Valgrind`、`AddressSanitizer`、Visual Studio 调试器分析内存使用。<br/>- **Java**: 使用 `JProfiler`、`jvisualvm`、`Eclipse MAT` 分析堆内存和对象引用。<br/>- **JavaScript**: 使用 Chrome DevTools 的 Memory 面板进行堆快照和内存录制。<br/>- **Python**: 使用 `tracemalloc`、`memory_profiler`、`objgraph` 检测对象引用和内存分配。 |
-| :two: 如何避免？ | - 及时释放资源：确保 `malloc`/`new` 有对应 `free`/`delete`。<br/>- 使用自动资源管理机制：C++ 的 RAII 和智能指针（`unique_ptr`、`shared_ptr`），Java 的 `try-with-resources`。<br/>- 使用弱引用（`WeakReference`、`weakref`）避免长期持有对象。<br/>- 组件销毁时注销事件监听器、清除定时器（如 `removeEventListener`、`clearInterval`）。<br/>- 打破循环引用，合理设计对象关系。<br/>- 加强代码审查，结合自动化工具在 CI/CD 中检测内存问题。 |
+| :one: 如何检测？ | - C/C++: 使用 `Valgrind`、`AddressSanitizer`、Visual Studio 调试器分析内存使用。<br/>- Java: 使用 `JProfiler`、`jvisualvm`、`Eclipse MAT` 分析堆内存和对象引用。<br/>- JavaScript: 使用 Chrome DevTools 的 Memory 面板进行堆快照和内存录制。<br/>- Python: 使用 `tracemalloc`、`memory_profiler`、`objgraph` 检测对象引用和内存分配。 |
+| :two: 如何避免？ | - 及时释放资源：确保 `malloc`/`new` 有对应 `free`/`delete`。<br/>- 使用自动资源管理机制：C++ 的 RAII 和智能指针（`unique_ptr`、`shared_ptr`），Java 的 `try-with-resources`。<br/>- 使用弱引用（`WeakReference`、`weakref`）避免长期持有对象。<br/>- 组件销毁时注销事件监听器、清除定时器（`removeEventListener`、`clearInterval`）。<br/>- 打破循环引用，合理设计对象关系。<br/>- 加强代码审查，结合自动化工具在 CI/CD 中检测内存问题。 |
 
 ### 1.2.2 内存溢出（Memory Overflow）
 
@@ -130,10 +130,11 @@
 
 int main() {
     
-    while (true) {    // 死循环
+    // 死循环
+    while (true) {    
         // 在堆区一直不停地创建 1024 个 int 大小的内存
         // 并且不释放，就会产生内存泄漏
-        int* ptr = (int*) malloc(sizeof(int) * num); 
+        int* ptr = (int*) malloc(sizeof(int) * 1024); 
     }
     
     return 0;
@@ -141,9 +142,8 @@ int main() {
 ```
 
 ```md:img [cmd 控制台]
+![](./assets/4.gif)
 ```
-
-
 
 :::
 
@@ -156,10 +156,12 @@ int main() {
 ```c [main.c]
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 int main() {
     
-    while (true) {    // 死循环
+    // 死循环
+    while (true) {    
         // 在堆区一直不停地创建 1024 个 int 大小的内存
         // 并且不释放，就会产生内存泄漏
         int* ptr = (int*) malloc(sizeof(int) * 1024); 
@@ -176,10 +178,8 @@ int main() {
 ```
 
 ```md:img [cmd 控制台]
-
+![](./assets/5.gif)
 ```
-
-
 
 :::
 
@@ -198,7 +198,7 @@ int main() {
 
 > [!NOTE]
 >
-> 自动垃圾回收 ≠ 不会内存泄漏。不当使用静态引用、缓存、监听器等仍可能导致“逻辑泄漏”。 
+> 自动垃圾回收 ≠ 不会内存泄漏。不恰当地使用静态引用、缓存、监听器等仍可能导致“逻辑泄漏”。 
 
 
 
@@ -206,11 +206,42 @@ int main() {
 
 ::: code-group
 
-```java
+```java [Test.java]
+import java.util.Date;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+    static final int MB = 1024 * 1024;
+    public static void main(String[] args) throws InterruptedException {
+        // 阶段 1：制造大量短命对象，触发多次 Young GC
+        for (int i = 0; i < 60; i++) {
+            for (int j = 0; j < 50_000; j++) {
+                byte[] tmp = new byte[4 * 1024]; // 4KB 短命对象
+            }
+            Thread.sleep(200);
+        }
+
+        // 阶段 2：占住一批内存，让堆明显增大
+        List<byte[]> holder = new ArrayList<>();
+        for (int i = 0; i < 160; i++) {  // 约 160MB
+            holder.add(new byte[MB]);
+            Thread.sleep(50);
+        }
+
+        // 阶段 3：释放引用，观察 GC 回收
+        holder.clear();
+        System.out.println("holder cleared; wait and observe...");
+        // 保持进程存活，便于观察
+        Thread.sleep(300_000);
+
+    }
+}
 ```
 
 ```md:img [cmd 控制台]
-
+![](./assets/6.gif)
 ```
 
 :::
@@ -238,16 +269,278 @@ int main() {
 * 如果追求极致性能、低延迟或精细控制资源（操作系统、驱动、游戏引擎），选择`手动回收`。
 * 如果追求开发效率、代码安全和可维护性（`Web`后端、`App`开发、脚本），选择`自动回收`。
 
+### 1.3.4 应用场景
+
+* ① 解决系统僵死的问题：大厂系统出现的许多僵死问题都和频繁的垃圾回收有关。
+
+> [!NOTE]
+>
+> * ① 系统僵死就是程序还在运行中；但是，已经失去响应、无法操作、仿佛“死掉”了一样的状态。
+> * ② JVM 忙于垃圾回收，导致用户的请求不能正常的处理有可能会导致系统出现僵死问题。
+
+* ② 性能优化：对垃圾回收器的合理设置可以有效地提升程序的执行性能。
+  * :one: 程序性能如果出现问题，可以对程序进行性能优化。
+  * :two: 性能优化里面的重要手段（环节）就是对垃圾回收器的优化。
+* ③ 高频面试题：
+  * :one: 常见的垃圾回收器。
+  * :two: 常见的垃圾回收算法。
+  * :three: 四种引用。
+  * :four: 项目中使用了哪一种垃圾回收器。
 
 
-# 第二章：
+
+# 第二章：方法区的回收
+
+## 2.1 概述
+
+* 之前，我们已经学习过`运行时数据区域`了，如下所示：
+
+![](./assets/7.svg)
+
+* 对于线程不共享的区域，如：程序计数器、JVM 虚拟机栈以及本地方法栈，是不需要 JVM 进行垃圾回收的。因为这些区域的生命周期都是伴随着线程的创建而创建，线程的销毁而销毁。
+
+## 2.2 方法区的回收
+
+### 2.2.1 概述
+
+* 对于方法区的回收，我们最主要关注的是`方法区中的类信息到底是怎么回收的`。
+* 首先，回顾下类的生命周期，如下所示：
+
+| 类的生命周期主要阶段       | 描述                                                         |
+| :------------------------- | :----------------------------------------------------------- |
+| ① 加载（Loading）          | 类的字节码或定义被读入内存，但还未进行初始化。 这通常发生在程序首次引用该类时。 |
+| ② 链接（Linking）          | 验证（Verification）、准备（Preparation）和解析（Resolution）。 <br>验证就是用来验证内容释放满足《Java 虚拟机规范》。<br>准备就是给静态变量赋初始化值。<br>解析就是将常量池中的符号引用替换成指向内存的直接引用。 |
+| ③ 初始化（Initialization） | 执行类的静态初始化代码，如：静态变量赋值、静态代码块等。 这个阶段确保类在首次使用前处于正确状态。 |
+| ④ 使用（Using）            | 类被实例化创建对象，或者直接访问静态成员。 这是类发挥实际作用的阶段。 |
+| ⑤ 卸载（Unloading）        | 当类不再被引用且满足特定条件时，垃圾回收器可能会卸载该类，释放相关内存。 |
+
+* 所谓的`卸载`指的就是`方法区中的类到底是怎么回收的`。
+
+### 2.2.2 方法区中类的回收
+
+* 判断一个类是否可以被卸载，需要同时满足以下三个条件：
+  * ① 此类所有实例对象都已经被回收，即：在堆上不存在任何该类的实例对象以及子类对象。
+  * ② 加载该类的类加载器已经被回收。
+  * ③ 该类对应的 java.lang.Class 对象在任何地方都没有被引用。
+
+> [!NOTE]
+>
+> * ① 在实际开发中，类卸载的场景一般很少使用，主要应用于 OSGI、JSP 等热部署的应用场景中。
+> * ② 每个 JSP 文件对应一个唯一的类加载器，当一个 JSP 文件修改了，就直接卸载这个 JSP 类加载器，重新创建类加载器，以便重新加载 JSP 文件。
+> * ③ JSP 已经过时了，前端早已进入 MVVM 的时代，如：Angular、Vue 和 React 等。
 
 
 
+* 示例：条件 ①
+
+```java 
+package com.github;
+
+import java.lang.reflect.InvocationTargetException;
+
+public class Test {
+    public static void main(String[] args) throws Exception {
+        Class<?> clazz = Class.forName("com.github.domain.Student");
+
+        Object obj = clazz
+                .getDeclaredConstructor()
+                .newInstance();
+        // 将局部变量对堆上实例对象的引用去除了，所以对象就可以被回收
+        obj = null;
+
+    }
+}
+```
 
 
 
+* 示例：条件 ②
+
+```java
+package com.github;
+
+import java.net.URL;
+import java.net.URLClassLoader;
+
+public class Test {
+    public static void main(String[] args) throws Exception  {
+        URLClassLoader classLoader =
+                new URLClassLoader(new URL[]{new URL("file:D:\\lib\\")});
+
+        // 让局部变量对类加载器的引用去除，类加载器就可以被回收
+        classLoader = null;
+    }
+}
+```
 
 
 
-# 第三章：
+* 示例：条件 ③
+
+```java
+package com.github;
+
+public class Test {
+    public static void main(String[] args) throws Exception {
+        Class<?> clazz = Class.forName("com.github.domain.Student");
+
+        // 该类对应的 java.lang.Class 对象没有在任何地方被引用
+        clazz = null;
+
+    }
+}
+```
+
+### 2.2.3 类生命周期相关 JVM 参数
+
+- JDK9 之前：
+
+| 类生命周期阶段 | 对应日志参数                | 输出时机           | 信息内容                 |
+| :------------- | :-------------------------- | :----------------- | :----------------------- |
+| 加载           | `-XX:+TraceClassLoading`    | 字节码读入内存时   | 类名、来源路径、加载器   |
+| 链接-验证      | `-XX:+TraceClassResolution` | 符号引用解析时     | 被解析的类和引用关系     |
+| 链接-准备      | 无专门参数                  | -                  | 需要通过内存监控工具观察 |
+| 链接-解析      | `-XX:+TraceClassResolution` | 符号引用转直接引用 | 解析的符号引用详情       |
+| 初始化         | 无专门参数                  | 执行`<clinit>()`时 | 初始化开始和完成         |
+| 使用           | 无专门参数                  | -                  | 通过其他运行时日志观察   |
+| 卸载           | `-XX:+TraceClassUnloading`  | GC 回收类时        | 被卸载的类和加载器       |
+
+- JDK9 之后：
+
+| 类生命周期阶段 | 对应日志标签          | 输出时机           | 信息内容                 |
+| :------------- | :-------------------- | :----------------- | :----------------------- |
+| 加载           | `-Xlog:class+load`    | 字节码读入内存时   | 类名、来源路径、加载器   |
+| 链接-验证      | `-Xlog:class+resolve` | 符号引用解析时     | 被解析的类和引用关系     |
+| 链接-准备      | 无专门标签            | -                  | 需要通过内存监控工具观察 |
+| 链接-解析      | `-Xlog:class+resolve` | 符号引用转直接引用 | 解析的符号引用详情       |
+| 初始化         | `-Xlog:class+init`    | 执行`<clinit>()`时 | 初始化开始和完成         |
+| 使用           | 无专门标签            | -                  | 通过其他运行时日志观察   |
+| 卸载           | `-Xlog:class+unload`  | GC 回收类时        | 被卸载的类和加载器       |
+
+### 2.2.4 演示
+
+* 我们可以通过 JVM 参数来演示类加载和类卸载的过程。
+
+> [!NOTE]
+>
+> JDK 9 之后的类加载和类卸载的 JVM 参数是 `-Xlog:class+load` 以及 `-Xlog:class+unload`。
+
+
+
+* 示例：
+
+::: code-group
+
+```bash
+# JVM 参数
+-Xlog:class+load -Xlog:class+unload
+```
+
+```java [Test.java]
+package com.github;
+
+import java.net.URL;
+import java.net.URLClassLoader;
+
+public class Test {
+    public static void main(String[] args) throws Exception {
+
+        for (int i = 0; i < 20; i++) {
+
+            // 创建独立的类加载器
+            Class<?> clazz;
+            try (URLClassLoader loader = new URLClassLoader(
+                    new URL[]{new URL("file:D:/lib/")},
+                    null  // 父加载器设为 null ，确保隔离
+            )) {
+
+                // 加载类并实例化
+                clazz = loader.loadClass("com.github.domain.Student");
+            }
+            Object obj = clazz
+                    .getDeclaredConstructor()
+                    .newInstance();
+
+            // 触发GC
+            if (i % 5 == 0) {
+                System.gc();
+                Thread.sleep(100);
+            }
+        }
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/8.gif)
+```
+
+:::
+
+
+
+# 第三章：堆回收
+
+## 3.1 概述
+
+* `堆`是`运行时数据区域`中最大的部分，里面包含了很多对象，如下所示：
+
+ ![](./assets/9.svg)
+
+
+
+* 垃圾回收器回收对象，首选需要判断堆上哪些对象可以被回收，哪些对象不可以被回收。
+
+## 3.2 如何判断堆上的对象能否被回收？
+
+* 垃圾回收器回收对象，需要判断哪些对象可以被回收，即：根据对象是否被`引用`来决定。
+
+> [!NOTE]
+>
+> * ① 如果该对象被引用了（局部变量保存有该对象的地址），则说明该对象还在使用，就不允许被回收。
+> * ② 上述的说法不是很精准，后文会逐渐进行修正！！！
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Student.java]
+public class Student {
+    
+    private String name;
+    
+    private Integer age;
+    
+    ...
+}
+```
+
+```java [Test.java]
+public class Test {
+    public static void main(String[] args) throws Exception {
+
+        Student stu = new Student();
+
+        // 将 stu 设置为 null
+        // 就意味着将堆上对象的引用去除掉，即：对象可以被 GC 回收
+        stu = null; // [!code highlight]
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/10.gif)
+```
+
+:::
+
+
+
+* 示例：
+
+
+

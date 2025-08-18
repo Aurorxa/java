@@ -17,7 +17,7 @@
     "@nolebase/vitepress-plugin-enhanced-readabilities": "^2.18.2",
     "@nolebase/vitepress-plugin-highlight-targeted-heading": "^2.18.2",
     "@nolebase/vitepress-plugin-inline-link-preview": "^2.18.2",
-    "@nolebase/vitepress-plugin-breadcrumbs": "^2.18.1",
+    "@nolebase/vitepress-plugin-breadcrumbs": "^2.18.2",
     "@rollup/plugin-terser": "^0.4.4",
     "@shikijs/vitepress-twoslash": "^3.9.2",
     "@types/animejs": "^3.1.13",
