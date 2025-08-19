@@ -494,7 +494,7 @@ public class Test {
 
 ## 3.2 如何判断堆上的对象能否被回收？
 
-* 垃圾回收器回收对象，需要判断哪些对象可以被回收，即：根据对象是否被`引用`来决定。
+* Java 中的对象能否被回收，是根据对象是否被`引用`来决定。
 
 > [!NOTE]
 >
@@ -503,7 +503,7 @@ public class Test {
 
 
 
-* 示例：
+* 示例：局部变量对堆上对象的引用
 
 ::: code-group
 
@@ -540,23 +540,19 @@ public class Test {
 
 
 
-* 示例：
+* 示例：对象中包含对象引用
 
 ::: code-group
 
-```java [A.java]
-public class A {
+```java [Test.java]
+class A {
     B b;
 }
-```
 
-```java [B.java]
-public class B {
+class B {
     A a;
 }
-```
 
-```java [Test.java]
 public class Test {
     public static void main(String[] args) throws Exception {
         A a1 = new A();
@@ -564,7 +560,9 @@ public class Test {
         a1.b = b1;
         b1.a = a1;
         
-        // 将堆上对象的引用去除掉，即：对象可以被 GC 回收
+        // 将 A 实例对象回收，有两个引用要去除。
+        // ① 栈中 a1 变量到 A 对象的引用。
+        // ② B 对象到 A 对象的引用。
         a1 = null; // [!code highlight:2]
         b1.a = null;
     }
@@ -572,30 +570,26 @@ public class Test {
 ```
 
 ```md:img [cmd 控制台]
-
+![](./assets/11.gif)
 ```
 
 ::: 
 
 
 
-* 示例：
+* 示例：对象中包含对象引用
 
 ::: code-group
 
-```java [A.java]
-public class A {
+```java [Test.java]
+class A {
     B b;
 }
-```
 
-```java [B.java]
-public class B {
+class B {
     A a;
 }
-```
 
-```java [Test.java]
 public class Test {
     public static void main(String[] args) throws Exception {
         A a1 = new A();
@@ -603,8 +597,9 @@ public class Test {
         a1.b = b1;
         b1.a = a1;
         
-        // 因为局部变量都没引用这两个对象，即：对象可以被 GC 回收
-        // 即使堆上对象之间相互有引用关系，也不影响对象的回收
+        // 因为局部变量都没引用这两个对象，即：没有任何方式去访问这两个对象。
+        // 所以这两个对象可以被回收。
+        // 换言之，即使堆上对象之间相互有引用关系，也不影响对象的回收。
         a1 = null; // [!code highlight:2]
         b1 = null;
     }
@@ -612,12 +607,206 @@ public class Test {
 ```
 
 ```md:img [cmd 控制台]
-
+![](./assets/12.gif)
 ```
 
 ::: 
 
+## 3.3 如何判断对象是否被引用？
+
+### 3.3.1 概述
+
+* Java 虚拟机底层主要通过以下两种方式，去判断该对象是否能被引用（是否能被回收）。
+  * :one: 引用计数法。
+  * :two: 可达性分析法。
+
+### 3.3.2 引用计数法
+
+#### 3.3.2.1 概述
+
+* `引用计数法`会为每个对象维护一个引用计数器，当对象被引用时`+1`，取消引用时`-1` 。
 
 
-## 3.3 如何判断堆上的对象是否被引用
+
+* 示例：引用计数法清理垃圾
+
+::: code-group
+
+```java [Test.java]
+class A {
+    B b;
+}
+
+class B {
+   
+}
+
+public class Test {
+    public static void main(String[] args)  {
+        A a1 = new A();
+        B b1 = new B();
+        a1.b = b1;
+        
+        a1.b = null;        
+        a1 = null;
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/13.gif)
+```
+
+::: 
+
+#### 3.3.2.2 优缺点
+
+* 引用计数法的优点是`实现简单`，如：C++ 中的智能指针就是采用了引用计数法。
+* 引用计数法有如下的缺点：
+  * :one: 每次引用和取消引用都需要维护计数器，对系统性能有一定的影响。
+  * :two: 存在循环引用问题，即：A 引用 B，B 引用 A ，会出现对象无法回收的问题。
+
+> [!NOTE]
+>
+> * ① 由于引用计数器的循环引用问题，导致对象不能回收，就是内存泄漏问题；C++ 和 OC 等编程语言压根不处理，而是完全依赖开发者主动识别并自行解决。
+> * ② Java 并没有采取`引用计数法`，而是采取了`可达性分析算法`来解决，即：即使有循环引用的对象也可以回收。
+
+
+
+* 示例：演示循环引用问题
+
+::: code-group
+
+```java [Test.java]
+class A {
+    B b;
+}
+
+class B {
+   A a;
+}
+
+public class Test {
+    public static void main(String[] args)  {
+        A a1 = new A();
+        B b1 = new B();
+        
+        // 循环引用
+        a1.b = b1; // [!code highlight:2]
+        b1.a = a1;
+        
+        a1 = null;        
+        b1 = null;
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/14.gif)
+```
+
+::: 
+
+#### 3.3.2.3 Java 对于循环引用是否会出现内存泄漏？
+
+* 我们可以通过查看垃圾回收信息，来判断如果需要循环引用，Java 是否会出现内存泄漏？
+
+> [!NOTE]
+>
+> * ① 可以使用 `-verbose:gc`参数来查看垃圾回收信息。
+> * ② 日志信息，如下所示：
+>
+> ![](./assets/15.png)
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+class A {
+    B b;
+}
+
+class B {
+   A a;
+}
+
+public class Test {
+    public static void main(String[] args)  {
+        while (true){
+            A a1 = new A();
+            B b1 = new B();
+
+            // 循环引用
+            a1.b = b1;
+            b1.a = a1;
+
+            a1 = null;
+            b1 = null;
+
+            System.gc();
+        }
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/16.gif)
+```
+
+```bash [日志]
+# 通过死循环创建对象，内存并没有上升，一直维持在 644k 左右
+# 说明每轮循环创建的对象都被垃圾回收器进行回收了。
+
+[GC (System.gc())  644K->644K(1507328K), 0.0003783 secs]
+[Full GC (System.gc())  644K->644K(1507328K), 0.0017401 secs]
+[GC (System.gc())  644K->644K(1507328K), 0.0004623 secs]
+[Full GC (System.gc())  644K->644K(1507328K), 0.0016572 secs]
+[GC (System.gc())  644K->644K(1507328K), 0.0005047 secs]
+[Full GC (System.gc())  644K->644K(1507328K), 0.0016296 secs]
+[GC (System.gc())  644K->644K(1507328K), 0.0004049 secs]
+[Full GC (System.gc())  644K->644K(1507328K), 0.0021300 secs]
+[GC (System.gc())  644K->644K(1507328K), 0.0004555 secs]
+[Full GC (System.gc())  644K->644K(1507328K), 0.0019811 secs]
+[GC (System.gc())  644K->644K(1507328K), 0.0005147 secs]
+[Full GC (System.gc())  644K->644K(1507328K), 0.0018901 secs]
+```
+
+::: 
+
+### 3.3.3 可达性分析法
+
+
+
+
+
+
+
+## 3.4 常见的引用对象
+
+
+
+
+
+
+
+## 3.5 垃圾回收算法
+
+
+
+
+
+
+
+
+
+## 3.6 垃圾回收器
+
+
+
+
+
+
 

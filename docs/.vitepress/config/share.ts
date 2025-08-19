@@ -1,13 +1,11 @@
-import {defineConfig, type UserConfig} from 'vitepress'
+import {defineConfig} from 'vitepress'
 import timeline from "vitepress-markdown-timeline"
 import {groupIconMdPlugin, groupIconVitePlugin, localIconLoader} from 'vitepress-plugin-group-icons'
 import {figure} from '@mdit/plugin-figure'
 import {loadEnv} from 'vite'
 import {withMermaid} from 'vitepress-plugin-mermaid'
 import Permalink from "vitepress-plugin-permalink"
-import {
-  InlineLinkPreviewElementTransform
-} from '@nolebase/vitepress-plugin-inline-link-preview/markdown-it'
+import {InlineLinkPreviewElementTransform} from '@nolebase/vitepress-plugin-inline-link-preview/markdown-it'
 import terser from '@rollup/plugin-terser'
 import {vitepressDemoPlugin} from 'vitepress-demo-plugin'
 import markdownItTaskCheckbox from 'markdown-it-task-checkbox'
@@ -107,6 +105,8 @@ const vitePressOptions = withMermaid(defineConfig({
           'firefox': localIconLoader(import.meta.url, '../../public/iconify/firefox.svg'),
           'edge': localIconLoader(import.meta.url, '../../public/iconify/edge.svg'),
           'arthas': localIconLoader(import.meta.url, '../../public/iconify/arthas.svg'),
+          'log': localIconLoader(import.meta.url, '../../public/iconify/log.svg'),
+          '日志': localIconLoader(import.meta.url, '../../public/iconify/log.svg'),
           'sql': 'vscode-icons:file-type-sql'
         }
       }) as any),
