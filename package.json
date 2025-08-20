@@ -19,7 +19,7 @@
     "@nolebase/vitepress-plugin-inline-link-preview": "^2.18.2",
     "@nolebase/vitepress-plugin-breadcrumbs": "^2.18.2",
     "@rollup/plugin-terser": "^0.4.4",
-    "@shikijs/vitepress-twoslash": "^3.9.2",
+    "@shikijs/vitepress-twoslash": "^3.11.0",
     "@types/animejs": "^3.1.13",
     "@types/canvas-confetti": "^1.9.0",
     "@types/dom-view-transitions": "^1.0.6",
