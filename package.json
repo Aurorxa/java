@@ -29,7 +29,7 @@
     "cross-env": "^10.0.0",
     "markdown-it-mathjax3": "^4.3.2",
     "markdown-it-multimd-table": "^4.2.3",
-    "mermaid": "^11.9.0",
+    "mermaid": "^11.10.0",
     "rollup-plugin-visualizer": "^6.0.3",
     "vitepress": "^1.6.4",
     "vitepress-demo-plugin": "^1.4.7",
@@ -56,7 +56,7 @@
     "vitepress-markdown-timeline": "^1.2.2",
     "vitepress-plugin-breadcrumb": "^1.0.12",
     "vitepress-plugin-comment-with-giscus": "^1.1.15",
-    "vitepress-plugin-permalink": "^1.1.2",
+    "vitepress-plugin-permalink": "^1.2.1",
     "xgplayer": "^3.0.23"
   },
   "optionalDependencies": {

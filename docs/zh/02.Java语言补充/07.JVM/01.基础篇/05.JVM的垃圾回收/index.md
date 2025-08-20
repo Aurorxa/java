@@ -713,7 +713,7 @@ public class Test {
 
 > [!NOTE]
 >
-> * ① 可以使用 `-verbose:gc`参数来查看垃圾回收信息。
+> * ① 可以使用 `-verbose:gc` 参数来查看垃圾回收信息。
 > * ② 日志信息，如下所示：
 >
 > ![](./assets/15.png)
@@ -778,11 +778,259 @@ public class Test {
 
 ### 3.3.3 可达性分析法
 
+#### 3.3.3.1 概述
+
+* 可达性分析算法（Reachability Algorithm）是 JVM 中垃圾回收（GC）的核心机制。
+
+> [!NOTE]
+>
+> 可达性分析算法用于判断哪些对象是“存活的”（程序仍在使用，不能被回收）；哪些是“垃圾”（不可达，可以被安全回收）。
+
+* 可达性分析算法的核心思想是：从一组固定的`根对象`（GC Roots），通过对象之间的引用链，追踪所有可达（reachable）的对象；如果未必追踪到的对象就是不可达的，将会被回收。
+
+> [!NOTE]
+>
+> * ① 可达（Reachable）：一个对象能从 GC Roots 通过引用链被访问到，如：Root --> A --> B （A 和 B 都是可达的）。
+> * ② 不可达（Unreachable）：一个对象无法从任何 GC Roots 通过引用链被访问到，即：程序无法再访问它，就认为是垃圾，可以被安全回收。
+
+![](./assets/17.svg)
+
+* 可达性分析算法是 JVM 垃圾回收的基础，解决了早期垃圾回收方法（引用计数器）的缺陷（循环引用问题）。
+
+#### 3.3.3.2 可达性算法的工作原理
+
+* 可达性算法主要分为两个阶段：标记和回收。
+
+* ① 确定 GC  Roots（根对象）：GC Roots 是算法的起点，它们是始终存活的对象，包括：
+
+> [!NOTE]
+>
+> GC Roots 是 JVM 能直接访问的“源头”对象，它们永远不会被回收！！！
+
+| GC Roots 对象                                                | 描述                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| :one: 线程 Thread 对象（栈帧中的局部变量）                   | 当前运行方法中，方法参数、局部变量引用的对象，如：`Object obj = new Object();` 中的 `obj`。 |
+| :two: 系统类加载器加载的 java.lang.Class 对象，引用类中的静态变量 | 类中 `static` 修饰的变量引用的对象，如：`public static User user = new User();` 中的 `user`。 |
+| :three: JNI 引用（本地方法调用的全局对象）                   | 本地方法（Native Code）中通过 JNI 传递的对象引用（Java 程序员无需了解，属于 JVM 底层细节） |
+| :four: 监视器对象                                            | 用来保存同步锁 synchronized 关键字持有的对象                 |
+
+* ② 遍历引用链，用于标记存活对象。
+  * JVM 从所有的 GC Roots 出发，递归遍历所有的引用链。
+    * Root --> A --> B --> C，则 A、B、C 都是可达的。
+    * 使用 DFS 或 BFS 遍历对象图（Object Graph），标记所有可达对象。
+  * 关键特性：
+    * 解决循环引用：即使 A 和 B 互相引用（`A ↔ B`），但如果它们无法从 GC Roots 到达（ `Root → A` 但 `B` 无其他引用），则 A 和 B 都会被回收。
+    * STW（Stop-The-World）：标记阶段通常需要暂停所有应用线程（现代 GC 器如 ZGC 通过并发标记减少停顿）。
+
+* ③ 回收不可达对象：标记完成后，回收器根据策略清理不可达的对象。
+
+| 回收器策略   | 描述                                     |
+| ------------ | ---------------------------------------- |
+| Mark-Sweep   | 直接清除不可达对象（可能产生内存碎片）。 |
+| Mark-Compact | 清除后压缩内存，减少碎片。               |
+| Copying      | 将存活对象复制到新区域。                 |
+
+#### 3.3.3.3 证明 GC Roots 
+
+* 可以通过 Arthas 或 IDEA 以及 [MAT](https://eclipse.dev/mat/)（Eclipse Memory Analyzer）工具来查看 GC Roots。
+
+> [!NOTE]
+>
+> * ① 使用 Arthas 的 heapdump 命令将`堆内存快照`保存到本地磁盘中，以 `*.hprof` 命名（IDEA 也支持）。
+> * ② 使用 MAT 工具打开堆内存快照文件。
+> * ③ 选择 GC Roots 功能查看所有的 GC Roots 。
 
 
 
+* 示例：准备代码
+
+```java
+package com.github;
+
+import java.io.IOException;
+
+class A {
+    B b;
+}
+
+class B {
+    A a;
+}
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        A a1 = new A();
+        B b1 = new B();
+
+        // 循环引用
+        a1.b = b1;
+        b1.a = a1;
+
+        System.in.read();
+
+    }
+}
+```
 
 
+
+* 示例：使用 IDEA 导出堆内存快照
+
+![](./assets/18.gif)
+
+
+
+* 示例：MAT 导入堆内存快照文件，并查看 GC Roots
+
+::: code-group
+
+```bash
+System Class # 系统类加载器加载的 java.lang.Class 对象，引用类中的静态变量
+JNI  Global # JNI 引用（本地方法调用的全局对象）
+Thread # 线程 Thread 对象（栈帧中的局部变量）
+Busy Monitor # 监视器对象
+```
+
+```md:img [cmd 控制台]
+![](./assets/19.gif)
+```
+
+:::
+
+#### 3.3.3.4 可达性算法分析
+
+* 需求：分析 A 实例对象和 B 实例对象，是如何通过可达性算法来判断是否可被回收的？
+
+
+
+* 示例：
+
+::: code-group
+
+```java [Test.java]
+class A {
+    B b;
+}
+
+class B {
+    A a;
+}
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        A a1 = new A();
+        B b1 = new B();
+
+        // 循环引用
+        a1.b = b1;
+        b1.a = a1;
+
+        a1 = null;
+        b1 = null;
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/20.gif)
+```
+
+:::
+
+#### 3.3.3.5 GC Roots 对象详解
+
+* ① 线程 Thread 对象（栈帧中的局部变量），即：当前运行方法中，方法参数、局部变量引用的对象。
+
+![](./assets/21.svg)
+
+* ② 系统类加载器加载的 java.lang.Class 对象，引用类中的静态变量：
+
+![](./assets/22.svg)
+
+* ③ 监视器对象，用来保存同步锁 synchronized 关键字持有的对象。
+
+![](./assets/23.svg)
+
+* ④ JNI 引用（本地方法调用的全局对象），本地方法（Native Code）中通过 JNI 传递的对象引用。
+
+> [!NOTE]
+>
+> Java 程序员无需了解，属于 JVM 底层细节！！！
+
+#### 3.3.3.6 查看 GC Root 底层细节
+
+* 可以通过 Arthas 或 IDEA 以及 [MAT](https://eclipse.dev/mat/)（Eclipse Memory Analyzer）工具来查看 GC Roots。
+
+> [!NOTE]
+>
+> * ① 使用 Arthas 的 heapdump 命令将`堆内存快照`保存到本地磁盘中，以 `*.hprof` 命名（IDEA 也支持）。
+> * ② 使用 MAT 工具打开堆内存快照文件。
+> * ③ 选择 GC Roots 功能查看所有的 GC Roots 。
+
+
+
+* 示例：准备代码
+
+```java
+package com.github;
+
+import java.io.IOException;
+
+class A {
+    B b;
+}
+
+class B {
+    A a;
+}
+
+public class Test {
+    // 静态变量 a
+    public static A a = new A();
+
+    public static void main(String[] args) throws IOException {
+
+        // 局部变量
+        A a1 = new A();
+        B b1 = new B();
+
+        // 循环引用
+        a1.b = b1;
+        b1.a = a1;
+
+        // 静态变量 a 赋值为局部变量 a1
+        a = a1;
+
+        System.in.read();
+
+    }
+}
+```
+
+
+
+* 示例：使用 IDEA 导出堆内存快照
+
+![](./assets/24.gif)
+
+
+
+* 示例：MAT 导入堆内存快照文件
+
+![](./assets/25.gif)
+
+
+
+* 示例：MAT 查看局部变量
+
+![](./assets/26.gif)
+
+
+
+* 示例：MAT 查看静态变量
+
+![](./assets/27.gif)
 
 ## 3.4 常见的引用对象
 
