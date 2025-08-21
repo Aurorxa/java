@@ -1032,7 +1032,7 @@ public class Test {
 
 ![](./assets/27.gif)
 
-## 3.4 常见的引用对象
+## 3.4 常见的对象引用
 
 ### 3.4.1 概述
 
@@ -1042,17 +1042,20 @@ public class Test {
   * :two: 弱引用。
   * :three: 虚引用。
   * :four: 终结器引用。
+* Java 中`对象引用`的整体架构，如下所示：
+
+![](./assets/28.png)
 
 ### 3.4.2 软引用
 
 #### 3.4.2.1 概述
 
-* `软引用`相对于`强引用`是一种比较`弱`的引用关系，即：`如果一个对象只有软引用关联到它，当程序内存不足的时候，就会将软应用中的数据进行回收`。
+* `软引用`相对于`强引用`是一种比较`弱`的引用关系，即：`如果一个对象只有软引用关联到它，当程序出现内存不足的时候，就会将软引用中的数据进行回收`。
 
 > [!NOTE]
 >
-> * ① 当程序的内存出现不足的时候，通过``强引用引用的普通对象会被保留。`
-> * ② 当程序的内存出现不足的时候，通过`弱引用引用的普通对象会被回收` ，这样可以帮我们去释放掉一定的堆内存，保证程序的正常运行。
+> * ① 当程序的内存出现不足的时候，通过`强引用引用的普通对象会被保留`，除非手动设置为 null 。
+> * ② 当程序的内存出现不足的时候，通过`弱引用引用的普通对象会被回收`，这样可以帮我们去释放掉一定的堆内存，保证程序的正常运行。
 
 * JDK 1.2 之后提供了 `SoftReference` 类实现`软引用`，并且`软引用`常用于`缓存`中。
 
@@ -1061,6 +1064,229 @@ public class Test {
 > * ① `软引用`包含的对象，一定不可能是程序必须要使用到的数据。
 > * ② 假设在`软引用`中存放了一些重要的数据，当内存出现不足的时候，这部分数据就会被回收掉，这样有可能会导致程序无法正常的运行。
 > * ③ `软引用`通常用于缓存中，因为`缓存`一般来说就是为了提高程序的访问性能；换言之，即使缓存中的数据不能再使用，程序也应该可以通过访问真实的数据，让其继续运行。
+
+![](./assets/29.gif)
+
+#### 3.4.2.2 软引用的使用方法
+
+* 软引用的执行过程，如下所示：
+  * :one: 将对象使用软引用包装起来，即：`new SoftReference<对象类型>(对象);`，并确保没有强引用持有它。
+  * :two: 清理不可达对象，即：堆中年轻代、老年代、元空间中的垃圾。
+  * :three: 当 JVM 内存不足（接近 OOM）时，JVM 会优先回收所有软引用指向的对象，以释放内存，避免 `OutOfMemoryError`。
+  * :four: 如果回收软引用对象后，内存足够，程序继续运行。
+  * :five: 如果回收软引用对象后，内存仍不足，则抛出 `OutOfMemoryError`。
+
+
+
+* 示例：设置堆内存的最大空间是 200m，并查看是否清理软引用中的对象
+
+::: code-group
+
+```bash 
+-Xmx200m # JVM 参数
+```
+
+```java [Test.java]
+package com.github;
+
+import java.io.IOException;
+import java.lang.ref.SoftReference;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建 100 MB 的字节数组
+        byte[] bytes = new byte[1024 * 1024 * 100];
+
+        // 创建软引用并关联对象，而 softRef 本身也占内存，大约是 16B
+        SoftReference<byte[]> softRef = new SoftReference<>(bytes);
+
+        // 手动断开强引用，即：只剩下软引用关联对象
+        bytes = null;
+
+        // 检查软引用是否被回收，只使用了 100MB + 16B
+        // 此时内存足够，不会清理软引用中的对象
+        System.out.println(softRef.get());
+
+        // 继续向堆内存中添加 100 MB
+        byte[] bytes2 = new byte[1024 * 1024 * 100];
+
+        // 检查软引用是否被回收，此时内存总量是 100MB + 16B + 100MB
+        // 此时内存不足，将会清理软引用中的对象
+        System.out.println(softRef.get());
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/30.gif)
+```
+
+:::
+
+
+
+* 示例：设置堆内存的最大空间是 400m，并查看是否清理软引用中的对象
+
+::: code-group
+
+```bash 
+-Xmx400m # JVM 参数
+```
+
+```java [Test.java]
+package com.github;
+
+import java.io.IOException;
+import java.lang.ref.SoftReference;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建 100 MB 的字节数组
+        byte[] bytes = new byte[1024 * 1024 * 100];
+
+        // 创建软引用并关联对象，而 softRef 本身也占内存，大约是 16B
+        SoftReference<byte[]> softRef = new SoftReference<>(bytes);
+
+        // 手动断开强引用，即：只剩下软引用关联对象
+        bytes = null;
+
+        // 检查软引用是否被回收，只使用了 100MB + 16B
+        // 此时内存足够，不会清理软引用中的对象
+        System.out.println(softRef.get());
+
+        // 继续向堆内存中添加 100 MB
+        byte[] bytes2 = new byte[1024 * 1024 * 100];
+
+        // 检查软引用是否被回收，只使用了 100MB + 16B + 100MB
+        // 此时内存足够，不会清理软引用中的对象
+        System.out.println(softRef.get());
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/31.gif)
+```
+
+:::
+
+
+
+* 示例：设置堆内存的最大空间是 200m，并查看是否清理软引用中的对象
+
+::: code-group
+
+```bash 
+-Xmx200m # JVM 参数
+```
+
+```java [Test.java]
+package com.github;
+
+import java.io.IOException;
+import java.lang.ref.SoftReference;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建 100 MB 的字节数组
+        byte[] bytes = new byte[1024 * 1024 * 100];
+
+        // 创建软引用并关联对象，而 softRef 本身也占内存，大约是 16B
+        SoftReference<byte[]> softRef = new SoftReference<>(bytes);
+
+        // 手动断开强引用，即：只剩下软引用关联对象
+        bytes = null;
+
+        // 检查软引用是否被回收，只使用了 100MB + 16B
+        // 此时内存足够，不会清理软引用中的对象
+        System.out.println(softRef.get());
+        
+		// 继续向堆内存中添加 100 MB
+        byte[] bytes2 = new byte[1024 * 1024 * 100];
+
+        // 检查软引用是否被回收，只使用了 100MB + 16B + 100MB
+        // 此时内存不足，会清理软引用中的对象
+        System.out.println(softRef.get());
+
+        // 此时，堆中的内存虽然回收了 100 MB，但是剩余不足 100 MB。
+        // 因为 softRef 本来就是强引用，会占用一定的内存空间
+        // 此时，再向堆中增加 100 MB 的数据，就会导致 OOM
+        byte[] bytes3 = new byte[1024 * 1024 * 100];
+
+    }
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/30.gif)
+```
+
+:::
+
+#### 3.4.2.3 问题抛出
+
+* JVM 在出现 OOM 之前，会尝试将`软引用`关联的`对象`都回收；那么，`软引用本身`也没有必要存在，也应该让 JVM 回收。
+
+> [!NOTE]
+>
+> * ① 我们并不确定 JVM 什么时候会将`软引用`关联的`对象`回收？
+>   * JVM 可能会在内存充足的时候，不回收`软引用`关联的`对象`。
+>   * JVM 可能会在内存不足的时候，回收`软引用`关联的`对象`。
+> * ② 问题：当 JVM 将`软引用`关联的`对象`回收之后，有没有一种合理的机制将`软引用本身`也回收？
+
+
+
+* 示例：
+
+```java
+package com.github;
+
+import java.io.IOException;
+import java.lang.ref.SoftReference;
+
+public class Test {
+    public static void main(String[] args) throws IOException {
+        // 创建 100 MB 的字节数组
+        byte[] bytes = new byte[1024 * 1024 * 100];
+
+        // 创建软引用并关联对象，而 softRef 本身也占内存，大约是 16B
+        SoftReference<byte[]> softRef = new SoftReference<>(bytes); // [!code highlight]
+
+        // 手动断开强引用，即：只剩下软引用关联对象
+        bytes = null;
+
+        // 检查软引用是否被回收，只使用了 100MB + 16B
+        // 此时内存足够，不会清理软引用中的对象
+        System.out.println(softRef.get());
+
+        // 继续向堆内存中添加 100 MB
+        byte[] bytes2 = new byte[1024 * 1024 * 100];
+
+        // 检查软引用是否被回收，只使用了 100MB + 16B + 100MB
+        // 此时内存不足，会清理软引用中的对象
+        System.out.println(softRef.get());
+        // 直接设置为 null ，非常不妥。
+        // 因为我们并不能确定 JVM 什么时候会将 softRef 关联的对象清除掉
+        // 因为 JVM 可能会在内存充足的时候，不清理 softRef 关联的对象
+        // 因为 JVM 可能会在内存不足的时候，清理掉 softRef 关联的对象
+        softRef = null; // [!code highlight]
+    }
+}
+```
+
+#### 3.4.2.4 软引用本身如何回收？
+
+* 当`软引用`关联的`对象`被回收的时候，我们可以通过`队列机制`来回收`软引用本身`。
+
+
+
+
+
+#### 3.4.2.5 应用场景
+
+* 需求：实现多级缓存。
+
+
 
 
 
