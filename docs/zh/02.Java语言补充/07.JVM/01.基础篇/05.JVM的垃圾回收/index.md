@@ -1280,6 +1280,60 @@ public class Test {
 
 
 
+* 示例：
+
+```java
+package com.github;
+
+import java.io.IOException;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.SoftReference;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Test {
+
+    static class SoftRefWithId<T> extends SoftReference<T> {
+        final int id;
+        SoftRefWithId(int id, T referent, ReferenceQueue<T> q) {
+            super(referent, q);
+            this.id = id;
+        }
+        @Override public String toString() { return "SoftRef#" + id; }
+    }
+    public static void main(String[] args) throws IOException {
+
+        List<SoftReference<byte[]>> softReferenceList = new ArrayList<>();
+        // 队列，用于存放软引用本身
+        ReferenceQueue<byte[]> queue = new ReferenceQueue<>();
+        for (int i = 1; i <= 10; i++) {
+            byte[] bytes = new byte[1024 * 1024 * 100];
+            SoftRefWithId<byte[]> softReference = new SoftRefWithId<>(i,bytes,queue);
+            // 如果不保存到集合中，softReference 就会被回收
+            softReferenceList.add(softReference);
+        }
+
+        System.out.println("初始可达数量 = " + softReferenceList.stream().filter(r -> r.get() != null).count());
+
+        int count = 0;
+        SoftReference<byte[]> polled;
+        while ((polled = (SoftReference<byte[]>) queue.poll()) != null){
+            count++;
+            System.out.println(polled + " 的 referent 已被回收并入队");
+            // 主动清理引用对象本身
+            polled.clear();
+
+        }
+        System.out.println("入队数量 = " + count);
+        System.out.println("现在仍可达的数量 = " + softReferenceList.stream().filter(r -> r.get() != null).count());
+
+        softReferenceList.clear();
+    }
+}
+```
+
+
+
 
 
 #### 3.4.2.5 应用场景
