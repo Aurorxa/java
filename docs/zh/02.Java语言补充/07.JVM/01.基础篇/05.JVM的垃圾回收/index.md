@@ -1078,10 +1078,6 @@ public class Test {
 
 * 其流程图，如下所示：
 
-
-
-
-
 ```mermaid
 flowchart TD
     A[开始] --> B["1️⃣ 创建软引用<br/>new SoftReference&lt;对象类型&gt;(对象)<br/>确保没有强引用持有"]
