@@ -1076,6 +1076,40 @@ public class Test {
   * :four: 如果回收`软引用`包含的`对象`（目标对象）后，内存足够，程序继续运行。
   * :five: 如果回收`软引用`包含的`对象`（目标对象）后，内存仍不足，则抛出 `OutOfMemoryError`。
 
+* 其流程图，如下所示：
+
+
+
+
+
+```mermaid
+flowchart TD
+    A[开始] --> B["1️⃣ 创建软引用<br/>new SoftReference&lt;对象类型&gt;(对象)<br/>确保没有强引用持有"]
+    B --> C["2️⃣ 清理不可达对象<br/>回收年轻代、老年代、元空间中的垃圾"]
+    C --> D{"JVM 内存是否不足<br/>(接近 OOM)？"}
+    D -->|否| E[程序正常运行]
+    E --> D
+    D -->|是| F["3️⃣ 回收所有软引用包含的对象<br/>释放内存空间"]
+    F --> G{"4️⃣ 回收软引用对象后<br/>内存是否足够？"}
+    G -->|是| H["✅ 程序继续运行"]
+    G -->|否| I["5️⃣ 抛出 OutOfMemoryError"]
+    H --> J[结束]
+    I --> K[程序异常终止]
+    
+    style A fill:#e1f5fe,font-size:12px,padding:2px
+    style B fill:#f3e5f5,font-size:12px,padding:2px
+    style C fill:#f3e5f5,font-size:12px,padding:2px
+    style D fill:#fff3e0,font-size:12px,padding:2px
+    style F fill:#ffebee,font-size:12px,padding:2px
+    style G fill:#fff3e0,font-size:12px,padding:2px
+    style H fill:#e8f5e8,font-size:12px,padding:2px
+    style I fill:#ffcdd2,font-size:12px,padding:2px
+    style J fill:#e8f5e8,font-size:12px,padding:2px
+    style K fill:#ffcdd2,font-size:12px,padding:2px
+```
+
+
+
 
 
 * 示例：设置堆内存的最大空间是 200m，并查看是否清理`软引用`包含的`对象`（目标对象）
