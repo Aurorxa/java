@@ -44,7 +44,7 @@
     "animejs": "^3.2.2",
     "dayjs": "^2.0.0-alpha.4",
     "dotenv": "^17.2.1",
-    "esbuild": "^0.25.5",
+    "esbuild": "^0.25.9",
     "gsap": "^3.13.0",
     "markdown-it-attrs": "^4.3.1",
     "markdown-it-container": "^4.0.0",
