@@ -1042,6 +1042,11 @@ public class Test {
   * :two: 弱引用。
   * :three: 虚引用。
   * :four: 终结器引用。
+
+> [!CAUTION]
+>
+> 终结器引用在 JDK8 之后的版本已经被标记为过时，未来版本可能会被删除，即：不再赘述！！！
+
 * Java 中`对象引用`的整体架构，如下所示：
 
 ![](./assets/28.png)
@@ -1635,17 +1640,113 @@ public class Test {
 
 ### 3.4.3 弱引用
 
+#### 3.4.3.1 概述
+
+* `弱引用`和`软引用`的整体机制基本一致，区别在于`弱引用`包含的`对象`，在`垃圾回收`时不管内存`是否足够`都会被回收。
+
+![](./assets/37.gif)
+
+* `弱引用本身`也可以使用`引用队列`来进行回收。
+
+![](./assets/38.gif)
+
+* `软引用` VS `弱引用`，如下所示：
+
+| 特性     | 软引用（SoftReference） | 弱引用（WeakReference）                   |
+| -------- | ----------------------- | ----------------------------------------- |
+| 回收时机 | 内存不足时才回收        | 下次 GC 会立即回收                        |
+| 生存条件 | 内存充足时可以存活      | 只要 GC 就会被回收                        |
+| 主要用途 | 内存敏感的缓存          | 避免内存泄漏（ThreadLocal）、打破循环引用 |
+
+#### 3.4.3.2 弱引用的使用方法
+
+* 弱引用的执行过程，如下所示：
+  * 1️⃣ 将`对象`（目标对象）使用`弱引用`包装起来，即：`new WeakReference<对象类型>(对象);`，并确保没有`强引用`持有它。
+  * 2️⃣ 当 JVM 进行垃圾回收时（不论内存是否充足）。
+  * 3️⃣ JVM 会立即回收所有只被`弱引用`持有的`对象`（目标对象），无论当前内存使用情况如何。
+  * 4️⃣ 回收对象后， `weakReference.get()` 返回 `null`。
+  * 5️⃣ 如果创建弱引用时指定了`ReferenceQueue`，被回收的弱引用会被加入到该队列中，便于后续清理工作。
+
+* 其流程图，如下所示：
+
+```mermaid
+flowchart TD
+    A[开始] --> B["1️⃣ 创建弱引用<br/>new WeakReference&lt;对象类型&gt;(对象)<br/>确保没有强引用持有"]
+    B --> C["2️⃣ JVM 触发垃圾回收<br/>(不论内存是否充足)"]
+    C --> D["3️⃣ 立即回收弱引用对象<br/>无论当前内存使用情况"]
+    D --> E["4️⃣ weakReference.get() = null"]
+    E --> F{"5️⃣ 是否指定了<br/>ReferenceQueue？"}
+    F -->|是| G["✅ 弱引用加入引用队列<br/>便于后续清理工作"]
+    F -->|否| H["✅ 完成回收过程"]
+    G --> I[结束]
+    H --> I
+    
+    style A fill:#e1f5fe,font-size:12px,padding:2px
+    style B fill:#f3e5f5,font-size:12px,padding:2px
+    style C fill:#fff3e0,font-size:12px,padding:2px
+    style D fill:#ffebee,font-size:12px,padding:2px
+    style E fill:#ffebee,font-size:12px,padding:2px
+    style F fill:#fff3e0,font-size:12px,padding:2px
+    style G fill:#fff8e1,font-size:12px,padding:2px
+    style H fill:#e8f5e8,font-size:12px,padding:2px
+    style I fill:#e8f5e8,font-size:12px,padding:2px
+```
+
+
+
+* 示例：
+
+::: code-group
+
+```bash
+# JVM 参数
+-Xms200m
+```
+
+```java [Test.java]
+package com.github;
+
+import java.lang.ref.WeakReference;
+
+public class Test {
+
+    public static void main(String[] args) {
+        byte[] bytes = new byte[1024 * 1024 * 100];
+        WeakReference<byte[]> weakReference = new WeakReference<>(bytes);
+        // 断开强引用
+        bytes = null;
+        // 此时，还没有触发垃圾回收，所以目标对象还在
+        System.out.println(weakReference.get()); // [B@2503dbd3
+        // 手动触发垃圾回收
+        System.gc();
+        // 虽然内存足够，但是目标对象依然会回收
+        System.out.println(weakReference.get()); // null
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/39.gif)
+```
+
+:::
+
+### 3.4.4 虚引用（了解）
+
+#### 3.4.4.1 概述
+
+* 虚引用（幽灵引用/幻影引用），无法通过虚引用获取对象，即：get() 方法永远返回 null 。
+* 虚引用只有在`对象即将被回收`时，才会被放入 `ReferenceQueue`，用于通知程序：“这个对象马上就要被回收了”，即：必须与 `ReferenceQueue` 一起使用。
+* `虚引用`唯一的应用场景：当对象被 GC 回收的时候可以接收到对应的通知。
+
+> [!CAUTION]
+>
+> 在常规开发中，几乎很少使用到！！！
 
 
 
 
-### 3.4.4 虚引用
-
-
-
-
-
-### 3.4.5 终结器引用
 
 
 
