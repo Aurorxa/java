@@ -1314,13 +1314,35 @@ public class Test {
 
 #### 3.4.2.4 软引用本身如何回收？
 
-* 当`软引用`关联的`对象`（目标对象）被回收时，我们可以通过`队列机制`来回收`软引用本身`。
+* 当`软引用`关联的`对象`（目标对象）被回收时，我们可以通过`队列机制`来回收`软引用本身`：
+  * :one: 创建阶段：`软引用`创建的时候，通过`构造器`传入`引用队列`。
+  * :two: 存活阶段：对象正常使用，`软引用`保持对`目标对象`的引用。
+  * :three: 回收触发：内存不足的时候，GC 决定回收`软引用`关联的`目标对象`。
+  * :four: 入队阶段：对象被回收后，`软引用`进入关联的`引用队列`。
+  * :five: 清理阶段：应用程序从`引用队列`中取出`软引用`后，进行后续清理。
+
+* `队列机制`的优点：
+  * :one: 自动内存管理：系统内存不足的时候，自动释放缓存对象。
+  * :two: 延迟清理：通过队列机制可以延迟执行清理操作。
+  * :three: 内存效率：避免内存泄漏，优化内存使用。
+  * :four: 透明性：对应用程序相对透明的内存管理。
+* 其动态图，如下所示：
+
+![](./assets/33.gif)
 
 
 
 * 示例：
 
-```java
+::: code-group
+
+```bash 
+# JVM 参数
+# 验证内存中是否只能存放一个 100MB 的字节数组，因为其它的对象也需要占用内存
+-Xmx200m 
+```
+
+```java [Test.java]
 package com.github;
 
 import java.lang.ref.Reference;
@@ -1333,62 +1355,283 @@ public class Test {
 
     static class SoftRefWithId<T> extends SoftReference<T> {
         final int id;
-        
+
         SoftRefWithId(int id, T referent, ReferenceQueue<T> q) {
             super(referent, q);
             this.id = id;
         }
+
         @Override public String toString() {
             return "SoftRef#" + id;
         }
     }
-    
-    public static void main(String[] args)  {
 
-        List<SoftReference<byte[]>> softReferenceList = new ArrayList<>();
-        // 队列，用于存放软引用本身
+    public static void main(String[] args) {
+        List<SoftRefWithId<byte[]>> softList = new ArrayList<>();
         ReferenceQueue<byte[]> queue = new ReferenceQueue<>();
-        for (int i = 1; i <= 10; i++) {
+
+        for (int i = 0; i < 10; i++) {
             byte[] bytes = new byte[1024 * 1024 * 100];
-            SoftRefWithId<byte[]> softReference = new SoftRefWithId<>(i,bytes,queue);
-            // 如果不保存到集合中，softReference 就会被回收
-            softReferenceList.add(softReference);
+            SoftRefWithId<byte[]> softReference = new SoftRefWithId<>(i,bytes, queue);
+            // 必须添加到集合中，否则 softReference 会被垃圾回收
+            softList.add(softReference);
         }
 
-        System.out.println("初始可达数量 = " + softReferenceList.stream().filter(r -> r.get() != null).count());
+        System.out.println("初始可达数量：" + count(softList));
 
         int count = 0;
         Reference<? extends byte[]> polled;
         while ((polled =  queue.poll()) != null){
+            // 累加计数
             count++;
-            System.out.println(polled + " 的 referent 已被回收并入队");
+            System.out.println(polled + "已被回收并入队");
             // 主动清理引用对象本身
             polled.clear();
-
         }
-        System.out.println("入队数量 = " + count);
-        System.out.println("现在仍可达的数量 = " + softReferenceList.stream().filter(r -> r.get() != null).count());
 
-        softReferenceList.clear();
+        System.out.println("入队数量 = " + count);
+        System.out.println("现在仍可达的数量 = " + count(softList));
+    }
+
+
+    private static long count(List<SoftRefWithId<byte[]>> list){
+        return list.stream().filter(r -> r.get() != null).count();
     }
 }
 ```
 
+```md:img [cmd 控制台]
+![](./assets/34.gif)
+```
 
-
-
+:::
 
 #### 3.4.2.5 应用场景
 
-* 需求：实现多级缓存。
+* 需求：`软引用`的`队列机制`通常用于实现内存敏感的`缓存`。
+
+> [!NOTE]
+>
+> * ① `软引用`也可以使用`继承`自 `SoftReference` 类的方式来实现。
+>
+> ```java
+> public class StudentReference extends SoftReference<Student> {
+> 
+>     public StudentReference(Student ref, ReferenceQueue<Student> q) {
+>         super(ref, q);
+>     }
+> }
+> ```
+>
+> * ② `软引用`实现`学生数据`的`缓存`，如下所示：
+>
+> ![](./assets/35.svg)
 
 
 
+* 示例：
+
+::: code-group
+
+```bash
+# JVM 参数
+-Xmx10m
+```
+
+```java [Student.java]
+package com.github;
+
+import java.util.Objects;
+
+public class Student {
+
+    private Integer id;
+
+    private String name;
+
+    public Student() {
+    }
+
+    public Student(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return Objects.equals(id, student.id) && Objects.equals(name, student.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+               "id=" + id +
+               ", name='" + name + '\'' +
+               '}';
+    }
+}
+```
+
+```java [StudentCache.java]
+package com.github;
 
 
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.SoftReference;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class StudentCache {
+
+    private static final StudentCache instance = new StudentCache();
+    // 缓存：存储键值对的 Map，值使用软引用包装
+    private final Map<Integer, StudentRef> cache;
+    // 引用队列，用于清理已被回收目标对象对应的软引用
+    private final ReferenceQueue<Student> queue;
+
+    private static class StudentRef extends SoftReference<Student> {
+        
+        private final Integer key;
+
+        public StudentRef(
+            	Student referent, 
+            	ReferenceQueue<? super Student> q, 
+            	Integer key) {
+            super(referent, q);
+            this.key = key;
+        }
+
+        public Integer getKey() {
+            return key;
+        }
+    }
 
 
+    private StudentCache() {
+        cache = new ConcurrentHashMap<>();
+        queue = new ReferenceQueue<>();
+    }
 
+    public static StudentCache getInstance() {
+        return instance;
+    }
+
+    public Student get(Integer id) {
+        if (null == id) {
+            return null;
+        }
+
+        Student student = null;
+
+        // ① 查询缓存，如果缓存中有，则直接返回
+        SoftReference<Student> ref = cache.get(id);
+        if (ref != null) {
+            student = ref.get();
+        }
+
+        // ② 如果缓存中没有，则在缓存中重新构建
+        if (student == null) {
+            // 加载目标对象
+            student = loadStudent(id);
+            // 并存储到缓存中
+            put(id, student);
+        }
+
+        return student;
+    }
+
+    /**
+     * 模拟从数据库等加载 Student
+     */
+    private Student loadStudent(Integer id) {
+        return new Student(id, "name");
+    }
+
+    public long size() {
+        return cache.size();
+    }
+
+
+    /**
+     * 清理已被回收的软引用
+     */
+    private void cleanUp() {
+        Reference<? extends Student> ref;
+        while ((ref = queue.poll()) != null) {
+            // 从缓存中移除
+            cache.remove(((StudentRef) ref).getKey());
+            // 清理自身
+            ref.clear();
+        }
+    }
+
+    /**
+     * 存储缓存
+     */
+    public void put(Integer id, Student student) {
+        if (id == null || student == null) {
+            return;
+        }
+
+        // 清理已被回收的软引用
+        cleanUp();
+
+        // 创建软引用关联对象，并存储到缓存中
+        cache.put(id, new StudentRef(student, queue, id));
+    }
+
+
+}
+```
+
+```java [Test.java]
+package com.github;
+
+public class Test {
+
+    public static void main(String[] args) {
+        StudentCache cache = StudentCache.getInstance();
+
+        for (int i = 0; ; i++) {
+            final int index = i;
+            // 向线程池中提交任务
+            Student student = cache.get(index);
+            System.out.println(cache.size());
+        }
+    }
+
+}
+```
+
+```md:img [cmd 控制台]
+![](./assets/36.gif)
+```
+
+:::
 
 ### 3.4.3 弱引用
 
